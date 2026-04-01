@@ -215,13 +215,7 @@
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec"; 
 
         // ==================== THEME & EFFECTS ====================
-        const themes = {
-            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
-            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
-            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
-            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
-            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
-        };
+        const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
 
         function applyTheme(themeKey) {
@@ -297,7 +291,7 @@
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
-        // ==================== LOAD & SYNC DATA (อัปเดตใหม่) ====================
+        // ==================== LOAD & SYNC DATA ====================
         function loadStudentData() {
             const email = localStorage.getItem('student_email');
             if (!email) { document.getElementById('showLoginBtn').style.display = 'flex'; return; }
@@ -315,7 +309,6 @@
             document.getElementById('editProfileBtn').style.display = 'inline-block';
             document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
 
-            // เริ่มกระบวนการซิงค์ข้อมูลจาก Google Sheets
             fetchDataFromServer(email);
             loadEnrolledSubjects(email);
         }
@@ -326,29 +319,22 @@
             
             if(GOOGLE_SCRIPT_URL) {
                 try {
-                    // 1. ดึงข้อมูลกิจกรรม (Activities)
                     const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
                     const actData = await actRes.json();
                     if(actData && actData.type === 'activities' && Array.isArray(actData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(actData.data));
                     }
 
-                    // 2. ดึงข้อมูลคะแนนนักเรียน เพื่อมาอัปเดตสถานะและผลคะแนน
                     const stdRes = await fetch(GOOGLE_SCRIPT_URL);
                     const allStudents = await stdRes.json();
-                    
-                    // ค้นหานักเรียนคนปัจจุบัน
                     const myData = allStudents.find(s => s.email === email);
                     
                     if(myData) {
-                        // อัปเดตสถานะว่าส่งงานไหนไปแล้วบ้าง
                         if(myData.works) {
                             for(let actId in myData.works) {
                                 localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
                             }
                         }
-                        
-                        // อัปเดตคะแนน ถ้ามีคะแนนแปลว่า "ตรวจแล้ว" (ล็อกปุ่มทันที)
                         if(myData.scores) {
                             for(let actId in myData.scores) {
                                 if(myData.scores[actId] !== "" && myData.scores[actId] !== null) {
@@ -358,12 +344,8 @@
                             }
                         }
                     }
-                } catch(e) { 
-                    console.log("ไม่สามารถเชื่อมต่อ Server ได้ ระบบจะใช้ข้อมูลที่บันทึกในเครื่องแทน"); 
-                }
+                } catch(e) { console.log("ใช้ข้อมูลในเครื่องแทน"); }
             }
-            
-            // เมื่อซิงค์เสร็จแล้ว ค่อยนำมาแสดงผล
             renderModules(email);
         }
 
@@ -380,9 +362,6 @@
             
             if (activities.length === 0) {
                 container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนที่เปิดสอนสำหรับห้องของคุณ</p></div>';
-                document.getElementById('total-score').innerHTML = `0 <span style="font-size: 1rem;">/ 0</span>`;
-                document.getElementById('progress-fill').style.width = '0%';
-                document.getElementById('progress-text').innerHTML = `ความคืบหน้า 0%`;
                 return;
             }
 
@@ -397,6 +376,7 @@
                 if (status === 'submitted' || status === 'graded') submittedCount++;
                 if (status === 'graded') totalEarned += score;
 
+                // เช็คเวลาหมดเขต
                 let isPastDeadline = false;
                 if (act.date) {
                     const deadline = new Date(act.date + 'T' + (act.time || '23:59:00'));
@@ -406,30 +386,29 @@
                 let badgeHtml = '', btnHtml = '', scoreHtml = '';
                 let linkPath = act.link && act.link !== '#' ? `${act.link}?actid=${act.id}` : '#';
 
-                // ==================== เงื่อนไขตรวจสอบสถานะ ====================
+                // เช็คเงื่อนไข ล็อกปุ่ม 100%
                 if (status === 'graded') {
-                    // ตรวจแล้ว โชว์คะแนน และ ปิดปุ่มแก้ไข (Lock)
                     badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
                     scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">ได้คะแนน: ${score} / ${act.points}</div>`;
                     btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดการแก้ไขแล้ว</button>`;
                 
                 } else if (status === 'submitted') {
-                    // ส่งแล้ว (รอคะแนน)
                     badgeHtml = `<span class="badge submitted">✅ รอตรวจ</span>`;
                     scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${act.points})</div>`;
-                    btnHtml = isPastDeadline 
-                        ? `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> หมดเวลาแก้ไข</button>` 
-                        : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
+                    
+                    if (isPastDeadline) {
+                        btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> หมดเวลาแก้ไขงาน</button>`;
+                    } else {
+                        btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '';
+                    }
                 
-                } else {
-                    // ยังไม่ส่ง
+                } else { // ยังไม่ส่ง
                     scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.points}</div>`;
-                    if (isPastDeadline && act.strict) {
-                        badgeHtml = `<span class="badge late">❌ ปิดรับงาน</span>`;
-                        btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ส่งไม่ทัน</button>`;
-                    } else if (isPastDeadline && !act.strict) {
-                        badgeHtml = `<span class="badge late">⚠️ ส่งช้าได้</span>`;
-                        btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action"><i class="fas fa-arrow-right"></i> ส่งงาน (ช้า)</a>` : '';
+                    
+                    if (isPastDeadline) {
+                        // ปิดระบบไม่ให้ทำทันที
+                        badgeHtml = `<span class="badge late">❌ หมดเวลา</span>`;
+                        btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> หมดเวลาส่งงานแล้ว</button>`;
                     } else {
                         badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
                         btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action">ทำกิจกรรม <i class="fas fa-arrow-right"></i></a>` : '';
@@ -437,11 +416,11 @@
                 }
 
                 container.innerHTML += `
-                    <div class="task-card" style="border-left: 4px solid #3b82f6;">
+                    <div class="task-card" style="border-left: 4px solid ${isPastDeadline && status !== 'graded' && status !== 'submitted' ? '#ef4444' : '#3b82f6'};">
                         <div class="task-info">
                             <h4>${act.title}</h4>
                             <p style="font-size:0.85rem; opacity:0.8;">${act.desc}</p>
-                            <small style="color:#60a5fa; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.date || '-'} | ${act.time || '-'}</small>
+                            <small style="color:${isPastDeadline ? '#ef4444' : '#60a5fa'}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.date || '-'} | ${act.time || '-'}</small>
                         </div>
                         <div class="task-meta">${badgeHtml}${scoreHtml}<div style="margin-top:8px;">${btnHtml}</div></div>
                     </div>`;
