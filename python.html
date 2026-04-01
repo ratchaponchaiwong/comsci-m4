@@ -171,13 +171,7 @@ print("Hello, PROT Smart Workspace!")
         const actId = urlParams.get('actid');
 
         // ==================== THEME ====================
-        const themes = {
-            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
-            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
-            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
-            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
-            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
-        };
+        const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
 
         function applyTheme(themeKey) {
@@ -210,93 +204,63 @@ print("Hello, PROT Smart Workspace!")
             for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 150);
             particleInterval = setInterval(createParticle, 800);
         }
-
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
+        document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         // ==================== SYSTEM & LAYOUT ====================
         function loadLoginInfo() {
             const email = localStorage.getItem('student_email');
-            if(!email) { alert("กรุณาเข้าสู่ระบบก่อนใช้งาน"); window.location.href = "index.html"; return; }
-            const name = localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name');
-            document.getElementById('header-user-name').innerText = `👤 ${name.split(' ')[0]}`;
+            if(!email) { window.location.href = "index.html"; return; }
+            document.getElementById('header-user-name').innerText = `👤 ${(localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name')).split(' ')[0]}`;
         }
 
         function setLayout(type) {
             const wrapper = document.getElementById('mainWrapper');
-            if(type === 'single') {
-                wrapper.classList.remove('split-view');
-                wrapper.classList.add('single-view');
-                document.getElementById('btn-single').classList.add('active');
-                document.getElementById('btn-split').classList.remove('active');
-            } else {
-                wrapper.classList.remove('single-view');
-                wrapper.classList.add('split-view');
-                document.getElementById('btn-split').classList.add('active');
-                document.getElementById('btn-single').classList.remove('active');
-            }
+            if(type === 'single') { wrapper.classList.replace('split-view', 'single-view'); document.getElementById('btn-single').classList.add('active'); document.getElementById('btn-split').classList.remove('active'); } 
+            else { wrapper.classList.replace('single-view', 'split-view'); document.getElementById('btn-split').classList.add('active'); document.getElementById('btn-single').classList.remove('active'); }
         }
 
-        // ==================== โหลดกิจกรรม ====================
         function loadActivityData() {
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const act = activities.find(a => a.id == actId);
-
-            if (!act) {
-                document.getElementById('act-title-header').innerText = "กิจกรรม Coding";
-                document.getElementById('act-desc-body').innerText = "ไม่พบคำสั่งเฉพาะสำหรับหน้านี้ คุณสามารถฝึกเขียนโปรแกรมอิสระได้เลยครับ";
-                return;
-            }
+            if (!act) { document.getElementById('act-title-header').innerText = "ไม่พบกิจกรรม"; return; }
 
             document.getElementById('act-title-header').innerHTML = act.title;
-            document.getElementById('act-desc-body').innerText = act.desc;
+
+            // ตรวจสอบเวลาหมดเขต
+            let isPastDeadline = false;
+            if (act.date) {
+                const deadline = new Date(act.date + 'T' + (act.time || '23:59:00'));
+                isPastDeadline = new Date() > deadline;
+            }
+
+            // ถ้าหมดเวลา ให้ซ่อนช่องส่งงาน
+            if(isPastDeadline) {
+                document.getElementById('act-desc-body').innerHTML = act.desc + '<br><br><span style="color:#ef4444; font-weight:bold; background:rgba(239,68,68,0.1); padding:8px 12px; border-radius:8px; display:inline-block;"><i class="fas fa-lock"></i> กิจกรรมนี้หมดเวลาส่งแล้ว ระบบได้ปิดรับการส่งงาน</span>';
+                const submitBox = document.querySelector('.submit-box');
+                if(submitBox) submitBox.style.display = 'none'; 
+            } else {
+                document.getElementById('act-desc-body').innerText = act.desc;
+            }
 
             const tabs = document.getElementById('mediaTabs');
             let hasMedia = false;
-
             if (act.yt) { addTab("yt-tab", "<i class='fab fa-youtube'></i> YouTube", () => showMedia(formatYT(act.yt))); hasMedia = true; }
             if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(formatDocs(act.doc))); hasMedia = true; }
-
             if (hasMedia) tabs.children[0].click();
-            
-            const email = localStorage.getItem('student_email');
-            const savedCode = localStorage.getItem(email + '_act_' + actId + '_work_code');
-            if(savedCode) document.getElementById('code-editor').value = savedCode;
+
+            const savedCode = localStorage.getItem(localStorage.getItem('student_email') + '_act_' + actId + '_work_code');
+            if (savedCode && !isPastDeadline) { document.getElementById('code-editor').value = savedCode; }
         }
 
         function addTab(className, label, callback) {
-            const btn = document.createElement('button');
-            btn.className = `media-tab ${className}`;
-            btn.innerHTML = label;
-            btn.onclick = () => {
-                document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
-                btn.classList.add('active'); callback();
-            };
+            const btn = document.createElement('button'); btn.className = `media-tab ${className}`; btn.innerHTML = label;
+            btn.onclick = () => { document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); callback(); };
             document.getElementById('mediaTabs').appendChild(btn);
         }
+        function showMedia(url) { document.getElementById('mediaBox').style.display = 'block'; document.getElementById('mediaBox').innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`; }
+        function formatYT(url) { if (!url) return ""; let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0]; return `https://www.youtube.com/embed/${id}`; }
+        function formatDocs(url) { if (!url) return ""; if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/presentation/d/')) return url.split('/edit')[0] + '/preview'; return url; }
 
-        function showMedia(url) {
-            const box = document.getElementById('mediaBox');
-            box.style.display = 'block';
-            box.innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
-        }
-
-        function formatYT(url) {
-            if (!url) return "";
-            let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0];
-            return `https://www.youtube.com/embed/${id}`;
-        }
-        
-        function formatDocs(url) {
-            if (!url) return "";
-            if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/presentation/d/')) {
-                return url.split('/edit')[0] + '/preview';
-            }
-            return url;
-        }
-
-        // ==================== ระบบ Code Editor (Skulpt) ====================
         function changeLanguage() {
             const lang = document.getElementById('lang-select').value;
             const editor = document.getElementById('code-editor');
@@ -310,11 +274,9 @@ print("Hello, PROT Smart Workspace!")
             document.getElementById('code-output').innerHTML = ">_ ผลลัพธ์จะแสดงที่นี่...";
         }
 
-        function builtinRead(x) {
-            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'";
-            return Sk.builtinFiles["files"][x];
-        }
-
+        function outf(text) { document.getElementById("output-area").innerHTML += text; }
+        function builtinRead(x) { if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'"; return Sk.builtinFiles["files"][x]; }
+        
         function runAndCheckCode() {
             const lang = document.getElementById('lang-select').value;
             const code = document.getElementById('code-editor').value;
@@ -326,42 +288,24 @@ print("Hello, PROT Smart Workspace!")
 
             if (lang === 'python') {
                 Sk.pre = "code-output";
-                Sk.configure({
-                    output: function(text) { output.innerHTML += text; },
-                    read: builtinRead
-                });
-                
-                var myPromise = Sk.misceval.asyncToPromise(function() {
-                    return Sk.importMainWithBody("<stdin>", false, code, true);
-                });
-                
-                myPromise.then(function(mod) {
-                    output.innerHTML += '\n\n✅ โปรแกรมทำงานสำเร็จ ไม่มี Error (Pass!)';
-                    btnSubmit.style.display = 'block';
-                    warningMsg.style.display = 'none';
-                }, function(err) {
-                    output.innerHTML += '\n\n❌ พบข้อผิดพลาด: ' + err.toString();
-                    btnSubmit.style.display = 'none';
-                    warningMsg.style.display = 'block';
+                Sk.configure({ output: function(text) { output.innerHTML += text; }, read: builtinRead });
+                var myPromise = Sk.misceval.asyncToPromise(function() { return Sk.importMainWithBody("<stdin>", false, code, true); });
+                myPromise.then(function(mod) { 
+                    output.innerHTML += '\n\n✅ โปรแกรมทำงานสำเร็จ (Pass!)'; 
+                    btnSubmit.style.display = 'block'; warningMsg.style.display = 'none'; 
+                }, function(err) { 
+                    output.innerHTML += '\n\n❌ พบข้อผิดพลาด: ' + err.toString(); 
+                    btnSubmit.style.display = 'none'; warningMsg.style.display = 'block'; 
                 });
             } else {
                 if(code.includes('setup()') && code.includes('loop()')) {
-                    setTimeout(() => {
-                        output.innerHTML += 'Compiling C++ Code...\n\n✅ Build Successful (Pass!)\n>_ Hello, PROT!';
-                        btnSubmit.style.display = 'block';
-                        warningMsg.style.display = 'none';
-                    }, 800);
+                    setTimeout(() => { output.innerHTML += 'Compiling C++ Code...\n\n✅ Build Successful\n>_ Hello, PROT!'; btnSubmit.style.display = 'block'; warningMsg.style.display = 'none'; }, 800);
                 } else {
-                    setTimeout(() => {
-                        output.innerHTML += 'Compiling C++ Code...\n\n❌ Error: ไม่พบฟังก์ชัน setup() หรือ loop() ในโค้ดของคุณ';
-                        btnSubmit.style.display = 'none';
-                        warningMsg.style.display = 'block';
-                    }, 500);
+                    setTimeout(() => { output.innerHTML += 'Compiling C++ Code...\n\n❌ Error: ไม่พบฟังก์ชัน setup() หรือ loop()'; btnSubmit.style.display = 'none'; warningMsg.style.display = 'block'; }, 500);
                 }
             }
         }
 
-        // ==================== ส่งงานขึ้น Google Sheets ====================
         async function submitWork() {
             const email = localStorage.getItem('student_email');
             const code = document.getElementById('code-editor').value;
@@ -369,31 +313,17 @@ print("Hello, PROT Smart Workspace!")
             
             localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
             localStorage.setItem(email + '_act_' + actId + '_work_code', code);
-            
             document.getElementById('btn-submit').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...';
             
-            let worksObj = {};
-            worksObj[actId] = code;
-
+            let worksObj = {}; worksObj[actId] = code;
             try {
-                await fetch(GOOGLE_SCRIPT_URL, {
-                    method: 'POST', mode: 'no-cors',
-                    body: JSON.stringify({ email: email, works: worksObj })
-                });
-                alert("🎉 ระบบได้รับโค้ดผลงานของคุณเรียบร้อยแล้ว!");
+                await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ email: email, works: worksObj }) });
+                alert("🎉 ระบบได้รับผลงานโค้ดของคุณเรียบร้อยแล้ว!");
                 window.location.href = "student.html"; 
-            } catch(e) {
-                alert("⚠️ เกิดข้อผิดพลาดในการส่งงาน แต่ระบบได้บันทึกลงเครื่องแล้ว");
-                window.location.href = "student.html"; 
-            }
+            } catch(e) { alert("⚠️ ส่งงานเข้าเครื่องแล้ว แต่เชื่อมเน็ตไม่ได้"); window.location.href = "student.html"; }
         }
 
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('smart_theme') || "default";
-            applyTheme(savedTheme);
-            loadLoginInfo();
-            loadActivityData();
-        };
+        window.onload = () => { applyTheme(localStorage.getItem('smart_theme') || "default"); loadLoginInfo(); loadActivityData(); };
     </script>
 </body>
 </html>
