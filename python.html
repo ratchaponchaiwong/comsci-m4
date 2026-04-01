@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Smart Workspace | วิทยาการคำนวณ ม.4 - บทเรียนอัจฉริยะ</title>
+    <title>Smart Workspace | PROT Robotics - วิทยาการคำนวณ ม.4</title>
     
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -29,7 +29,7 @@
             font-family: 'Prompt', 'Inter', 'Tahoma', sans-serif;
         }
 
-        /* ธีมเริ่มต้น (Light Professional) - พื้นหลังแต่ละส่วนต่างกัน */
+        /* ธีมเริ่มต้น (Light Professional) */
         :root {
             --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --bg-sidebar: rgba(255, 255, 255, 0.95);
@@ -191,6 +191,8 @@
             background: transparent;
             border: none;
             font-family: 'Prompt', sans-serif;
+            text-decoration: none;
+            display: inline-block;
         }
         .nav-item:hover {
             background: var(--nav-hover);
@@ -471,28 +473,12 @@
             white-space: pre-wrap;
         }
         
-        .success-message {
-            background: linear-gradient(135deg, var(--success), var(--success-dark));
-            color: white;
-            padding: 15px;
-            border-radius: 16px;
-            margin-top: 10px;
-            text-align: center;
-            animation: pulse 1s ease-in-out;
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.02); }
-        }
-        
-        .warning-message {
-            background: var(--warning);
-            color: white;
-            padding: 12px;
-            border-radius: 12px;
-            margin-top: 10px;
-            text-align: center;
+        .problem-card {
+            background: var(--card-bg);
+            border-radius: 20px;
+            padding: 20px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--accent);
         }
         
         @media (max-width: 780px) {
@@ -513,14 +499,6 @@
             background: var(--accent);
             border-radius: 10px;
         }
-        
-        .problem-card {
-            background: var(--card-bg);
-            border-radius: 20px;
-            padding: 20px;
-            margin-bottom: 20px;
-            border-left: 4px solid var(--accent);
-        }
     </style>
 </head>
 <body data-theme="light">
@@ -535,8 +513,8 @@
     </div>
     
     <div class="nav-menu">
-        <a href="index.html" class="nav-item active"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="student.html" class="nav-item"><i class="fas fa-book"></i> บทเรียน</a>
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="my_classroom.html" class="nav-item"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
         <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
         <a href="student_portfolio.html" class="nav-item"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
         <a href="extra_subjects.html" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
@@ -675,10 +653,8 @@ print("SUCCESS")</textarea>
         });
         
         myPromise.then(function(mod) {
-            // ตรวจสอบว่ามีคำว่า SUCCESS ในผลลัพธ์
             if (outputContent.includes("SUCCESS")) {
                 uploadDiv.style.display = "block";
-                // เพิ่มเอฟเฟกต์พิเศษ
                 outputDiv.innerHTML += '\n\n<span style="color: #10b981;">✅ พบคำว่า "SUCCESS"! ส่งงานได้เลย</span>';
                 uploadDiv.scrollIntoView({ behavior: 'smooth' });
             } else if (outputContent.includes("success") || outputContent.includes("Success")) {
@@ -773,19 +749,18 @@ print("SUCCESS")</textarea>
         setTimeout(() => statusDiv.innerHTML = '', 4000);
         alert("🎉 ระบบบันทึกผลงานของคุณเรียบร้อยแล้ว! ครูจะตรวจสอบให้เร็วที่สุด");
         
-        // เคลียร์ฟอร์ม
         document.getElementById('wokwi-link').value = '';
         document.getElementById('file-upload').value = '';
+        
+        // อัปเดตคะแนนใน localStorage
+        let currentScore = parseInt(localStorage.getItem('student_total_score') || '0');
+        let newScore = Math.min(currentScore + 15, 100);
+        localStorage.setItem('student_total_score', newScore);
+        
+        // อัปเดตจำนวนกิจกรรม
+        let activityCount = parseInt(localStorage.getItem('student_activity_count') || '0');
+        localStorage.setItem('student_activity_count', activityCount + 1);
     }
-    
-    // ==================== NAVIGATION ====================
-    document.querySelectorAll('.nav-item').forEach(item => {
-        item.addEventListener('click', function() {
-            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
-            this.classList.add('active');
-            alert(`🔍 กำลังนำทางไปยังหน้า "${this.textContent.trim()}" (กำลังพัฒนาในระยะถัดไป)`);
-        });
-    });
     
     // ==================== INITIALIZE ====================
     window.addEventListener('DOMContentLoaded', () => {
