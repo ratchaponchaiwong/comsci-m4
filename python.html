@@ -3,13 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Coding Lab | PROT Smart Workspace</title>
+    <title>Arduino & Robotics Lab | PROT Smart Workspace</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
@@ -30,11 +26,11 @@
         
         .page-content-wrapper { padding: 20px; max-width: 1600px; margin: 0 auto; width: 100%; display: grid; gap: 20px; transition: 0.3s; flex-grow: 1;}
         
-        /* สลับ Layout */
+        /* สลับ Layout 1 จอ / 2 จอ */
         .page-content-wrapper.split-view { grid-template-columns: 450px 1fr; }
         .page-content-wrapper.single-view { grid-template-columns: 1fr; }
 
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content; display: flex; flex-direction: column;}
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content; }
         body[data-theme="snow"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
 
         /* Media Display Area */
@@ -44,35 +40,31 @@
         .media-tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
         .media-tab { padding: 8px 15px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; white-space: nowrap; color: inherit; font-family: 'Prompt';}
         .media-tab.active { background: #ef4444; color: white; border-color: #ef4444; }
+        .media-tab.doc-tab.active { background: #3b82f6; border-color: #3b82f6;}
+        .media-tab.canva-tab.active { background: #8b5cf6; border-color: #8b5cf6;}
+
+        /* Lab Area */
+        .lab-frame { width: 100%; height: 750px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
 
         .layout-toggle { position: absolute; top: 80px; right: 40px; display: flex; gap: 10px; z-index: 100; }
         .toggle-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-family: 'Prompt'; transition: 0.2s;}
         .toggle-btn.active, .toggle-btn:hover { background: #3b82f6; border-color: #3b82f6; }
-
-        /* Coding Area */
-        .editor-container { display: flex; flex-direction: column; gap: 10px; height: 700px; }
-        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .lang-select { padding: 8px 15px; border-radius: 10px; border: 1px solid #3b82f6; background: rgba(59,130,246,0.1); color: inherit; font-family: 'Prompt'; outline: none; cursor: pointer; font-weight: 600;}
-        
-        textarea#code-editor { flex: 2; width: 100%; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', monospace; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); resize: none; font-size: 1rem; outline: none; }
-        
-        .btn-run { background: #3b82f6; color: white; border: none; padding: 10px 25px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-run:hover { background: #2563eb; }
-
-        pre#code-output { flex: 1; background: #000; color: #4ade80; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; font-family: 'Consolas', monospace; margin: 0; font-size: 0.9rem;}
-        body[data-theme="snow"] pre#code-output { background: #f1f5f9; color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .toggle-btn { background: rgba(255,255,255,0.8); color: #1e293b; border-color: rgba(0,0,0,0.2); }
+        body[data-theme="snow"] .toggle-btn.active { background: #3b82f6; color: white; }
 
         /* Submission Box */
-        .submit-box { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 15px; text-align: center; }
+        .submit-box { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 15px; }
         body[data-theme="snow"] .submit-box { border-top-color: rgba(0,0,0,0.1); }
+        .work-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; margin-bottom: 10px; }
+        body[data-theme="snow"] .work-input { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.2); }
         
-        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; /* ซ่อนไว้ก่อน */ }
+        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; }
         .btn-submit:hover { background: #059669; transform: translateY(-2px); }
         
         .warning-text { font-size: 0.85rem; color: #f59e0b; margin-top: 5px; display: block; }
         body[data-theme="snow"] .warning-text { color: #d97706; }
 
-        @media (max-width: 1000px) { .page-content-wrapper.split-view { grid-template-columns: 1fr; } .editor-container { height: auto; min-height: 500px;} textarea#code-editor { min-height: 300px;} }
+        @media (max-width: 1000px) { .page-content-wrapper.split-view { grid-template-columns: 1fr; } .lab-frame{ height: 500px; } }
     </style>
 </head>
 <body data-theme="default">
@@ -99,38 +91,40 @@
                 <div id="act-desc-body" style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px; overflow-y: auto; max-height: 200px; padding-right: 5px;">กรุณารอข้อมูลสักครู่...</div>
 
                 <div class="submit-box">
-                    <h4 style="margin-bottom: 10px;"><i class="fas fa-tasks"></i> ส่งผลงาน</h4>
+                    <h4 style="margin-bottom: 10px;"><i class="fas fa-link"></i> ส่งลิงก์ผลงาน (Wokwi)</h4>
+                    <p style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 10px;">หลังจากจำลองหุ่นยนต์เสร็จ ให้กด "Save" แล้วนำลิงก์มาวางด้านล่างนี้</p>
                     
-                    <span id="warning-msg" class="warning-text"><i class="fas fa-lock"></i> กรุณาเขียนโค้ดและกด "Run / ตรวจโค้ด" ฝั่งขวามือให้ผ่านก่อน ปุ่มส่งงานถึงจะปรากฏครับ</span>
+                    <input type="text" id="work-link" class="work-input" placeholder="https://wokwi.com/projects/..." oninput="checkInput()">
+                    
+                    <span id="warning-msg" class="warning-text"><i class="fas fa-exclamation-triangle"></i> กรุณาวางลิงก์เพื่อเปิดปุ่มส่งงาน</span>
                     
                     <button id="btn-submit" class="btn-submit" onclick="submitWork()">
-                        <i class="fas fa-paper-plane"></i> ยืนยันการส่งโค้ด
+                        <i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน
                     </button>
                 </div>
             </div>
 
-            <div class="glass-panel" style="padding: 15px;">
-                <div class="editor-container">
-                    <div class="editor-header">
-                        <select id="lang-select" class="lang-select" onchange="changeLanguage()">
-                            <option value="python">🐍 Python (ไพทอน)</option>
-                            <option value="cpp">⚙️ C++ (Arduino)</option>
-                        </select>
-                        <button class="btn-run" onclick="runAndCheckCode()"><i class="fas fa-play"></i> Run / ตรวจโค้ด</button>
-                    </div>
-                    
-                    <textarea id="code-editor" spellcheck="false"># 🐍 ฝึกเขียน Python
-print("Hello, PROT Smart Workspace!")
-</textarea>
-                    
-                    <pre id="code-output">>_ ผลลัพธ์จะแสดงที่นี่...</pre>
-                </div>
+            <div class="glass-panel" style="padding: 10px;">
+                <iframe id="labFrame" class="lab-frame" src="about:blank" title="Wokwi Simulator"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== โหลดข้อมูลพื้นฐาน ====================
+        function checkInput() {
+            const linkVal = document.getElementById('work-link').value.trim();
+            const btnSubmit = document.getElementById('btn-submit');
+            const warningMsg = document.getElementById('warning-msg');
+
+            if (linkVal !== "") {
+                btnSubmit.style.display = "block";
+                warningMsg.style.display = "none";
+            } else {
+                btnSubmit.style.display = "none";
+                warningMsg.style.display = "block";
+            }
+        }
+
         const urlParams = new URLSearchParams(window.location.search);
         const actId = urlParams.get('actid');
 
@@ -154,33 +148,39 @@ print("Hello, PROT Smart Workspace!")
             }
         }
 
-        // ==================== โหลดกิจกรรมและสื่อ ====================
         function loadActivityData() {
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const act = activities.find(a => a.id == actId);
 
             if (!act) {
-                document.getElementById('act-title-header').innerText = "กิจกรรม Coding";
-                document.getElementById('act-desc-body').innerText = "ไม่พบคำสั่งเฉพาะสำหรับหน้านี้ คุณสามารถฝึกเขียนโปรแกรมอิสระได้เลยครับ";
+                document.getElementById('act-title-header').innerText = "ไม่พบกิจกรรม";
+                document.getElementById('act-desc-body').innerText = "กรุณากลับไปที่หน้าห้องเรียน แล้วกดเข้าทำกิจกรรมใหม่อีกครั้งครับ";
+                document.getElementById('labFrame').src = "https://wokwi.com/projects/new/arduino-uno"; 
                 return;
             }
 
             document.getElementById('act-title-header').innerHTML = act.title;
             document.getElementById('act-desc-body').innerText = act.desc;
+            
+            const labFrame = document.getElementById('labFrame');
+            labFrame.src = (act.link && act.link !== "#") ? act.link : "https://wokwi.com/projects/new/arduino-uno";
 
             const tabs = document.getElementById('mediaTabs');
             let hasMedia = false;
 
             if (act.yt) { addTab("yt-tab", "<i class='fab fa-youtube'></i> YouTube", () => showMedia(formatYT(act.yt))); hasMedia = true; }
-            if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(act.doc)); hasMedia = true; }
+            // ปรับแก้การเรียกใช้ formatDocs ที่นี่
+            if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(formatDocs(act.doc))); hasMedia = true; }
             if (act.canva) { addTab("canva-tab", "<i class='fas fa-paint-brush'></i> Canva", () => showMedia(formatCanva(act.canva))); hasMedia = true; }
 
             if (hasMedia) tabs.children[0].click();
-            
-            // เช็คว่าเคยเซฟโค้ดเก่าไว้ไหม
+
             const email = localStorage.getItem('student_email');
-            const savedCode = localStorage.getItem(email + '_act_' + actId + '_work_code');
-            if(savedCode) document.getElementById('code-editor').value = savedCode;
+            const savedLink = localStorage.getItem(email + '_act_' + actId + '_work_link');
+            if (savedLink) {
+                document.getElementById('work-link').value = savedLink;
+                checkInput();
+            }
         }
 
         function addTab(className, label, callback) {
@@ -205,88 +205,30 @@ print("Hello, PROT Smart Workspace!")
             let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0];
             return `https://www.youtube.com/embed/${id}`;
         }
+        
+        // ฟังก์ชันแก้ไข URL สำหรับ Google Docs/Drive ให้เปิด Preview ได้
+        function formatDocs(url) {
+            if (!url) return "";
+            if (url.includes('docs.google.com/document/d/')) {
+                // ตัดส่วน /edit... ทิ้ง แล้วแทนที่ด้วย /preview
+                return url.split('/edit')[0] + '/preview';
+            } else if (url.includes('docs.google.com/presentation/d/')) {
+                 return url.split('/edit')[0] + '/preview';
+            }
+            return url;
+        }
+
         function formatCanva(url) { return url.includes('/view') && !url.includes('embed') ? url.replace('/view', '/view?embed') : url; }
 
-        // ==================== ระบบ Code Editor & Checker ====================
-        function changeLanguage() {
-            const lang = document.getElementById('lang-select').value;
-            const editor = document.getElementById('code-editor');
-            if(lang === 'python') {
-                editor.value = '# 🐍 ฝึกเขียน Python\nprint("Hello, PROT Smart Workspace!")';
-            } else {
-                editor.value = '// ⚙️ ฝึกเขียน C++ (Arduino)\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println("Hello, PROT!");\n  delay(1000);\n}';
-            }
-            // ซ่อนปุ่มเมื่อเปลี่ยนภาษา
-            document.getElementById('btn-submit').style.display = 'none';
-            document.getElementById('warning-msg').style.display = 'block';
-            document.getElementById('code-output').innerHTML = ">_ ผลลัพธ์จะแสดงที่นี่...";
-        }
-
-        function builtinRead(x) {
-            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'";
-            return Sk.builtinFiles["files"][x];
-        }
-
-        function runAndCheckCode() {
-            const lang = document.getElementById('lang-select').value;
-            const code = document.getElementById('code-editor').value;
-            const output = document.getElementById('code-output');
-            const btnSubmit = document.getElementById('btn-submit');
-            const warningMsg = document.getElementById('warning-msg');
-
-            output.innerHTML = 'กำลังตรวจสอบและรันโค้ด...\n--------------------\n';
-
-            if (lang === 'python') {
-                // รัน Python ผ่าน Skulpt
-                Sk.pre = "code-output";
-                Sk.configure({
-                    output: function(text) { output.innerHTML += text; },
-                    read: builtinRead
-                });
-                
-                var myPromise = Sk.misceval.asyncToPromise(function() {
-                    return Sk.importMainWithBody("<stdin>", false, code, true);
-                });
-                
-                myPromise.then(function(mod) {
-                    output.innerHTML += '\n\n✅ โปรแกรมทำงานสำเร็จ ไม่มี Error (Pass!)';
-                    // เปิดปุ่มให้ส่งงานได้!
-                    btnSubmit.style.display = 'block';
-                    warningMsg.style.display = 'none';
-                }, function(err) {
-                    output.innerHTML += '\n\n❌ พบข้อผิดพลาด: ' + err.toString();
-                    btnSubmit.style.display = 'none';
-                    warningMsg.style.display = 'block';
-                });
-            } else {
-                // จำลองการรัน C++ (ตรวจโครงสร้างพื้นฐาน)
-                if(code.includes('setup()') && code.includes('loop()')) {
-                    setTimeout(() => {
-                        output.innerHTML += 'Compiling C++ Code...\n\n✅ Build Successful (Pass!)\n>_ Hello, PROT!';
-                        btnSubmit.style.display = 'block';
-                        warningMsg.style.display = 'none';
-                    }, 800);
-                } else {
-                    setTimeout(() => {
-                        output.innerHTML += 'Compiling C++ Code...\n\n❌ Error: ไม่พบฟังก์ชัน setup() หรือ loop() ในโค้ดของคุณ';
-                        btnSubmit.style.display = 'none';
-                        warningMsg.style.display = 'block';
-                    }, 500);
-                }
-            }
-        }
-
-        // ==================== ระบบส่งงาน ====================
         function submitWork() {
             const email = localStorage.getItem('student_email');
-            const code = document.getElementById('code-editor').value;
+            const link = document.getElementById('work-link').value.trim();
             if(!email) return alert("⚠️ กรุณาล็อกอินก่อนส่งงาน");
             
-            // บันทึกสถานะและโค้ด
             localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
-            localStorage.setItem(email + '_act_' + actId + '_work_code', code);
+            localStorage.setItem(email + '_act_' + actId + '_work_link', link);
             
-            alert("🎉 ระบบได้รับโค้ดผลงานของคุณเรียบร้อยแล้ว!");
+            alert("🎉 ระบบได้รับผลงานของคุณเรียบร้อยแล้ว!");
             window.location.href = "student.html"; 
         }
 
