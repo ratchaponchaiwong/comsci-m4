@@ -67,14 +67,14 @@
         .btn-delete { background: #ef4444; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-family: 'Prompt'; }
         .btn-edit { background: #f59e0b; color: white; border: none; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-family: 'Prompt'; }
         
-        .activity-list { list-style: none; margin-top: 20px; max-height: 500px; overflow-y: auto; padding-right: 10px;}
+        .activity-list { list-style: none; margin-top: 20px; max-height: 600px; overflow-y: auto; padding-right: 10px;}
         .activity-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 10px; border: 1px solid rgba(255,255,255,0.05); }
         body[data-theme="snow"] .activity-item { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
         .deadline-tag { font-size: 0.75rem; background: rgba(255,255,255,0.1); padding: 4px 8px; border-radius: 5px; display: inline-block; margin-top: 5px; }
         body[data-theme="snow"] .deadline-tag { background: rgba(0,0,0,0.05); }
         .room-group-header { background: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; padding: 10px 15px; margin-top: 20px; margin-bottom: 10px; border-radius: 8px; font-weight: 600; color: #10b981; display: flex; align-items: center; gap: 10px; }
 
-        /* Classroom Grid (ของจริง) */
+        /* Classroom Grid */
         .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .room-card { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.4)); border: 1px solid rgba(59,130,246,0.5); padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
         .room-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(59,130,246,0.3); background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(37,99,235,0.5)); }
@@ -151,9 +151,8 @@
 
             <div class="admin-tabs">
                 <button class="admin-tab-btn active" onclick="switchTab('tab-classroom')"><i class="fas fa-chalkboard-teacher"></i> 1. จัดการชั้นเรียนและบทเรียน</button>
-                <button class="admin-tab-btn" onclick="switchTab('tab-portfolio')"><i class="fas fa-images"></i> 2. จัดการผลงานนักเรียน</button>
-                <button class="admin-tab-btn" onclick="switchTab('tab-subjects')"><i class="fas fa-book"></i> 3. จัดการวิชาเพิ่มเติม</button>
-                <button class="admin-tab-btn" onclick="switchTab('tab-profile')"><i class="fas fa-user-tie"></i> 4. จัดการข้อมูลผู้สอน</button>
+                <button class="admin-tab-btn" onclick="alert('อยู่ในช่วงอัปเดตระบบ')"><i class="fas fa-images"></i> 2. ผลงาน</button>
+                <button class="admin-tab-btn" onclick="alert('อยู่ในช่วงอัปเดตระบบ')"><i class="fas fa-book"></i> 3. วิชาเพิ่มเติม</button>
             </div>
 
             <div id="tab-classroom" class="tab-content active">
@@ -183,9 +182,8 @@
                             </label>
                         </div>
 
-                        <div class="form-group"><label><i class="fab fa-youtube" style="color: #ef4444;"></i> ลิงก์ YouTube (ถ้ามี)</label><input type="text" id="act-yt" placeholder="https://youtu.be/..."></div>
-                        <div class="form-group"><label><i class="fas fa-file-pdf" style="color: #3b82f6;"></i> ลิงก์ Drive/Docs/PDF</label><input type="text" id="act-doc" placeholder="https://docs.google.com/..."></div>
-                        <div class="form-group"><label><i class="fas fa-paint-brush" style="color: #8b5cf6;"></i> ลิงก์ Canva (ถ้ามี)</label><input type="text" id="act-canva" placeholder="https://www.canva.com/..."></div>
+                        <div class="form-group"><label><i class="fab fa-youtube" style="color: #ef4444;"></i> ลิงก์ YouTube (ถ้ามี)</label><input type="text" id="act-yt"></div>
+                        <div class="form-group"><label><i class="fas fa-file-pdf" style="color: #3b82f6;"></i> ลิงก์ Drive/Docs/PDF</label><input type="text" id="act-doc"></div>
                         <div class="form-group">
                             <label>ลิงก์ห้อง Lab</label>
                             <select id="act-link">
@@ -208,7 +206,7 @@
 
                 <div class="glass-panel" style="margin-bottom: 40px;">
                     <div class="panel-title" id="class-panel-title">
-                        <span><i class="fas fa-users"></i> ตรวจสอบและให้คะแนน (ซิงค์กับ Google Sheets)</span>
+                        <span><i class="fas fa-users"></i> ตรวจสอบการส่งงาน (นักเรียนของจริง)</span>
                         <button id="btn-back-rooms" class="btn-action" style="display: none; width: auto; padding: 6px 15px; font-size: 0.85rem;" onclick="showRoomsGrid()">
                             <i class="fas fa-arrow-left"></i> กลับไปหน้ารวมห้อง
                         </button>
@@ -231,54 +229,6 @@
                     </div>
                 </div>
             </div>
-
-            <div id="tab-portfolio" class="tab-content">
-                <div class="admin-grid">
-                    <div class="glass-panel">
-                        <div class="panel-title"><i class="fas fa-images"></i> เพิ่มผลงานนักเรียนใหม่</div>
-                        <div class="form-group"><label>ลิงก์รูปภาพผลงาน (URL)</label><input type="text" id="port-img" placeholder="https://images.unsplash.com/..."></div>
-                        <div class="form-group"><label>ชื่อผลงาน / กิจกรรม</label><input type="text" id="port-title" placeholder="เช่น โครงงานเกษตรอัจฉริยะ"></div>
-                        <div class="form-group"><label>รายละเอียดผลงาน</label><textarea id="port-desc" rows="3" placeholder="อธิบายเกี่ยวกับผลงาน..."></textarea></div>
-                        <div class="form-group"><label>ป้ายกำกับ (เช่น ระดับชั้น, รางวัลที่ได้)</label><input type="text" id="port-badge" placeholder="เช่น ม.4/1 หรือ รางวัลชนะเลิศ"></div>
-                        <button class="btn-action" onclick="savePortfolio()"><i class="fas fa-save"></i> บันทึกผลงานขึ้นเว็บ</button>
-                    </div>
-                    <div class="glass-panel">
-                        <div class="panel-title"><i class="fas fa-images"></i> แกลลอรีผลงานบนเว็บไซต์</div>
-                        <ul class="activity-list" id="portfolio-list"></ul>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-subjects" class="tab-content">
-                <div class="admin-grid">
-                    <div class="glass-panel">
-                        <div class="panel-title"><i class="fas fa-plus-circle"></i> เพิ่มวิชาเพิ่มเติมใหม่</div>
-                        <div class="form-group"><label>ไอคอน (เช่น fas fa-robot)</label><input type="text" id="subj-icon" value="fas fa-robot"></div>
-                        <div class="form-group"><label>ชื่อวิชา</label><input type="text" id="subj-title" placeholder="เช่น AI & Machine Learning"></div>
-                        <div class="form-group"><label>รายละเอียดวิชา</label><textarea id="subj-desc" rows="3"></textarea></div>
-                        <div class="form-group"><label>ป้ายกำกับ</label><input type="text" id="subj-badge1" placeholder="เช่น เปิดรับสมัคร ม.4 - ม.6"></div>
-                        <div class="form-group"><label>เวลาเรียน</label><input type="text" id="subj-time" placeholder="เช่น จันทร์-พุธ 15:00-17:00"></div>
-                        <button class="btn-action" onclick="saveSubject()"><i class="fas fa-save"></i> บันทึกวิชาเพิ่มเติม</button>
-                    </div>
-                    <div class="glass-panel">
-                        <div class="panel-title"><i class="fas fa-book"></i> รายวิชาที่เปิดสอนอยู่</div>
-                        <ul class="activity-list" id="subject-list"></ul>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-profile" class="tab-content">
-                <div class="glass-panel" style="max-width: 800px; margin: 0 auto;">
-                    <div class="panel-title"><i class="fas fa-user-edit"></i> แก้ไขข้อมูลผู้สอน</div>
-                    <div class="form-group"><label>ชื่อ-นามสกุล / ตำแหน่งหลัก</label><input type="text" id="prof-name" placeholder="ชื่อ-นามสกุล"></div>
-                    <div class="form-group"><label>ตำแหน่ง / กลุ่มสาระ</label><input type="text" id="prof-position" placeholder="ตำแหน่ง..."></div>
-                    <div class="form-group"><label>คติพจน์ / คำคม</label><textarea id="prof-quote" rows="2" placeholder="ใส่คำคมประจำตัว..."></textarea></div>
-                    <div class="form-group"><label>ประวัติการศึกษา (คั่นด้วยคอมมา)</label><input type="text" id="prof-edu" placeholder="ป.ตรี คอมพิวเตอร์ศึกษา, ป.โท..."></div>
-                    <div class="form-group"><label>ทักษะความเชี่ยวชาญ (คั่นด้วยคอมมา)</label><input type="text" id="prof-skills" placeholder="Python, Arduino, Robotics..."></div>
-                    <button class="btn-action" onclick="saveProfileData()"><i class="fas fa-save"></i> อัปเดตข้อมูลผู้สอน</button>
-                </div>
-            </div>
-
         </div>
     </div>
 
@@ -325,15 +275,12 @@
     </div>
 
     <script>
-        // ⚠️ ต้องนำ URL จาก Apps Script มาใส่ตรงนี้นะครับ
+        // ⚠️ อย่าลืมนำ URL Web App มาใส่ในบรรทัดนี้นะครับ ⚠️
         const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE";
 
-        // ------------------ Tab & Theme ------------------
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.querySelectorAll('.admin-tab-btn').forEach(btn => btn.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
-            event.currentTarget.classList.add('active');
         }
 
         document.querySelectorAll(".theme-btn").forEach(btn => {
@@ -347,35 +294,39 @@
 
         function checkTeacherAccess() {
             const email = localStorage.getItem('student_email');
-            const isLoggedIn = localStorage.getItem('is_logged_in');
-            if (isLoggedIn !== 'true' || (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th')) {
-                alert('⚠️ เฉพาะครูผู้สอนเท่านั้น');
-                window.location.href = 'index.html';
-                return false;
+            if (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th') {
+                window.location.href = 'index.html'; return false;
             }
             document.getElementById('bodyContent').style.display = 'block';
             document.getElementById('teacherAvatar').src = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=T&background=10b981&color=fff";
             return true;
         }
 
-        // ==================== ระบบดึงนักเรียนจาก Google Sheets ====================
+        // ==================== ดึงข้อมูลนักเรียนจาก Google Sheets ====================
         let globalStudents = [];
 
         async function fetchStudents() {
             const roomsView = document.getElementById('rooms-view');
             roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px;"><i class="fas fa-spinner fa-spin"></i> กำลังดึงข้อมูลรายชื่อจาก Google Sheets...</div>';
 
-            if (GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycbx8RqCXRcz8zMQDVfJoU0jL4VtnaozdtKG1n0zx0IA/dev") {
-                roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px; color:#f87171;">⚠️ ยังไม่ได้เชื่อมต่อ Google Sheets URL ครับ แต่ยังสามารถดูข้อมูลจากในเครื่อง (Local) ได้</div>';
-                fetchStudentsLocal(); 
+            if (GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE" || GOOGLE_SCRIPT_URL === "") {
+                roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px; color:#f87171;">⚠️ ยังไม่ได้ใส่ URL Google Sheets ในโค้ดบรรทัดที่ 245 ครับ</div>';
                 return;
             }
 
             try {
                 const response = await fetch(GOOGLE_SCRIPT_URL);
-                const sheetData = await response.json();
+                const textResponse = await response.text(); 
                 
+                // ดักจับ Error กรณีลืมตั้งสิทธิ์เป็น "Anyone" (ทุกคน)
+                if(textResponse.includes("<html") || textResponse.includes("<HTML")) {
+                    roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px; color:#f87171;">⚠️ <b>ข้อผิดพลาดด้านสิทธิ์การเข้าถึง!</b><br>กรุณากลับไปที่ Apps Script > จัดการการทำให้ใช้งานได้<br>แล้วแก้ไข <b>"ผู้ที่มีสิทธิ์เข้าถึง (Who has access)"</b> ให้เป็น <b>"ทุกคน (Anyone)"</b> เท่านั้นครับ</div>';
+                    return;
+                }
+
+                const sheetData = JSON.parse(textResponse);
                 globalStudents = [];
+                
                 sheetData.forEach(s => {
                     if(s.email && s.name) {
                         let totalScore = parseInt(localStorage.getItem(s.email + '_total_score') || 0);
@@ -397,45 +348,16 @@
                 });
                 renderRoomsGrid();
             } catch (error) {
-                console.error("Error fetching sheets:", error);
-                fetchStudentsLocal(); 
+                console.error("Error:", error);
+                roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px; color:#f87171;">❌ ไม่สามารถเชื่อมต่อกับ Google Sheets ได้ กรุณาตรวจสอบ URL หรือการเชื่อมต่ออินเทอร์เน็ต</div>';
             }
-        }
-
-        function fetchStudentsLocal() {
-            globalStudents = [];
-            let emails = new Set();
-            for (let i = 0; i < localStorage.length; i++) {
-                let key = localStorage.key(i);
-                if (key.includes('@')) {
-                    let email = key.split('_')[0];
-                    if (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th' && email.includes('@')) emails.add(email);
-                }
-            }
-            emails.forEach(email => {
-                let name = localStorage.getItem(email + '_custom_name') || localStorage.getItem(email + '_name') || "รอตั้งชื่อ";
-                let room = localStorage.getItem(email + '_room') || "รอระบุห้อง";
-                let number = parseInt(localStorage.getItem(email + '_number')) || 999;
-                let totalScore = parseInt(localStorage.getItem(email + '_total_score') || 0);
-                
-                let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
-                let submittedCount = 0;
-                activities.forEach(act => {
-                    let status = localStorage.getItem(email + '_act_' + act.id + '_status');
-                    if(status === 'submitted' || status === 'graded') submittedCount++;
-                });
-                
-                let progress = activities.length > 0 ? Math.round((submittedCount / activities.length) * 100) : 0;
-                globalStudents.push({ email, name, room, number, totalScore, progress });
-            });
-            renderRoomsGrid();
         }
 
         function renderRoomsGrid() {
             const roomsView = document.getElementById('rooms-view');
             roomsView.innerHTML = '';
             if (globalStudents.length === 0) {
-                roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px; opacity: 0.7;">ยังไม่มีนักเรียนกรอกข้อมูลในระบบครับ</div>';
+                roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px; opacity: 0.7;">ยังไม่มีข้อมูลนักเรียนในชีตครับ (ให้นักเรียนกดบันทึกข้อมูลก่อน)</div>';
                 return;
             }
             
@@ -456,7 +378,7 @@
             document.getElementById('rooms-view').style.display = 'grid';
             document.getElementById('students-view').style.display = 'none';
             document.getElementById('btn-back-rooms').style.display = 'none';
-            document.getElementById('class-panel-title').querySelector('span').innerHTML = '<i class="fas fa-users"></i> ตรวจสอบและให้คะแนน (ซิงค์กับ Google Sheets)';
+            document.getElementById('class-panel-title').querySelector('span').innerHTML = '<i class="fas fa-users"></i> ตรวจสอบการส่งงาน';
         }
 
         function openRoom(roomName) {
@@ -496,7 +418,6 @@
             });
         }
 
-        // ==================== เปิดหน้าต่างให้คะแนน ====================
         function openStudentDetails(email) {
             const student = globalStudents.find(s => s.email === email);
             if(!student) return;
@@ -522,6 +443,7 @@
                 let status = localStorage.getItem(email + '_act_' + act.id + '_status');
                 let score = localStorage.getItem(email + '_act_' + act.id + '_score');
                 let link = localStorage.getItem(email + '_act_' + act.id + '_work_link');
+                let code = localStorage.getItem(email + '_act_' + act.id + '_work_code');
                 
                 if (status === 'graded') {
                     totalScore += parseInt(score || 0);
@@ -531,8 +453,11 @@
                             <span style="color: #10b981; font-weight: bold;">${score} / ${act.points}</span>
                         </li>`;
                 } else if (status === 'submitted') {
-                    let viewBtn = link ? `<a href="${link}" target="_blank" style="color:#60a5fa; font-size:0.85rem;"><i class="fas fa-external-link-alt"></i> เปิดดูผลงาน</a>` : `<span style="font-size:0.85rem; color:#f59e0b;">ส่งในระบบ</span>`;
-                    
+                    let viewBtn = '';
+                    if(link) viewBtn = `<a href="${link}" target="_blank" style="color:#60a5fa; font-size:0.85rem;"><i class="fas fa-external-link-alt"></i> เปิดดูผลงาน</a>`;
+                    else if(code) viewBtn = `<span style="font-size:0.85rem; color:#f59e0b;"><i class="fas fa-code"></i> โค้ดส่งในระบบแล้ว</span>`;
+                    else viewBtn = `<span style="font-size:0.85rem; color:#f59e0b;">ส่งในระบบ</span>`;
+
                     subList.innerHTML += `
                         <li style="flex-direction: column; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 12px; margin-bottom: 10px; width: 100%;">
                             <div style="display:flex; justify-content:space-between; width:100%; margin-bottom:10px;">
@@ -540,13 +465,13 @@
                                 ${viewBtn}
                             </div>
                             <div style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                                <input type="number" id="grade_${email}_${act.id}" placeholder="ให้คะแนน" min="0" max="${act.points}" class="grade-input">
+                                <input type="number" id="grade_${email}_${act.id}" placeholder="คะแนน" min="0" max="${act.points}" class="grade-input">
                                 <span>/ ${act.points}</span>
-                                <button class="btn-action" style="padding: 8px 15px; font-size: 0.85rem; width: auto; margin-left:auto;" onclick="saveGrade('${email}', ${act.id}, '${act.title}', ${act.points})">บันทึก & ซิงค์ Sheet</button>
+                                <button class="btn-action" style="padding: 8px 15px; font-size: 0.85rem; width: auto; margin-left:auto;" onclick="saveGrade('${email}', ${act.id}, '${act.title}', ${act.points})">บันทึกคะแนน</button>
                             </div>
                         </li>`;
                 } else {
-                    missList.innerHTML += `<li><i class="fas fa-times" style="color: #ef4444; margin-top: 3px;"></i> ${act.title}</li>`;
+                    missList.innerHTML += `<li><i class="fas fa-times" style="color: #ef4444; margin-top: 3px;"></i> ${act.title} (กำหนด: ${act.date || '-'})</li>`;
                 }
             });
 
@@ -587,7 +512,7 @@
             alert("✅ บันทึกคะแนนเรียบร้อย!");
             openStudentDetails(email); // รีเฟรชหน้าต่าง
 
-            if(GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") {
+            if(GOOGLE_SCRIPT_URL !== "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec" && GOOGLE_SCRIPT_URL !== "") {
                 let name = localStorage.getItem(email + '_custom_name') || "";
                 let room = localStorage.getItem(email + '_room') || "";
                 let number = localStorage.getItem(email + '_number') || "";
@@ -714,52 +639,12 @@
             if (checkTeacherAccess()) {
                 const savedTheme = localStorage.getItem('smart_theme') || "default";
                 document.body.setAttribute("data-theme", savedTheme);
+                document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
+                
                 loadActivities();
                 fetchStudents();
             }
         };
-
-        // --- ระบบ Tab 2, 3, 4 (ทำงานกับ LocalStorage ภายในเครื่อง) ---
-        function savePortfolio() {
-            const title = document.getElementById('port-title').value; if (!title) return;
-            let data = JSON.parse(localStorage.getItem('global_portfolios') || '[]');
-            data.push({ id: Date.now(), title, desc: document.getElementById('port-desc').value, img: document.getElementById('port-img').value || 'https://via.placeholder.com/600x400?text=No+Image', badge: document.getElementById('port-badge').value });
-            localStorage.setItem('global_portfolios', JSON.stringify(data));
-            alert('✅ บันทึกข้อมูลสำเร็จ!'); document.querySelectorAll('#tab-portfolio input, #tab-portfolio textarea').forEach(el => el.value = ''); loadPortfolios();
-        }
-        function loadPortfolios() {
-            const list = document.getElementById('portfolio-list'); const ports = JSON.parse(localStorage.getItem('global_portfolios') || '[]');
-            list.innerHTML = ports.length === 0 ? '<li style="text-align:center; opacity:0.7;">ยังไม่มีผลงาน</li>' : '';
-            ports.forEach(p => { list.innerHTML += `<li class="activity-item" style="flex-direction: row; align-items: center;"><img src="${p.img}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;"><div style="flex-grow:1; margin-left:15px;"><div style="font-weight:600; color:#60a5fa;">${p.title}</div><span class="media-badge">${p.badge}</span></div><button class="btn-delete" onclick="deleteData('global_portfolios', ${p.id}, loadPortfolios)"><i class="fas fa-trash"></i></button></li>`; });
-        }
-        function saveSubject() {
-            const title = document.getElementById('subj-title').value; if (!title) return;
-            let data = JSON.parse(localStorage.getItem('global_subjects') || '[]');
-            data.push({ id: Date.now(), title, desc: document.getElementById('subj-desc').value, icon: document.getElementById('subj-icon').value || 'fas fa-book', badge1: document.getElementById('subj-badge1').value, time: document.getElementById('subj-time').value });
-            localStorage.setItem('global_subjects', JSON.stringify(data));
-            alert('✅ บันทึกวิชาสำเร็จ!'); document.querySelectorAll('#tab-subjects input:not(#subj-icon), #tab-subjects textarea').forEach(el => el.value = ''); loadSubjects();
-        }
-        function loadSubjects() {
-            const list = document.getElementById('subject-list'); const subjects = JSON.parse(localStorage.getItem('global_subjects') || '[]');
-            list.innerHTML = subjects.length === 0 ? '<li style="text-align:center; opacity:0.7;">ยังไม่มีวิชาที่เปิดสอน</li>' : '';
-            subjects.forEach(s => { list.innerHTML += `<li class="activity-item" style="flex-direction: row; align-items: center;"><div style="font-size:1.5rem; color:#60a5fa; width:40px; text-align:center;"><i class="${s.icon}"></i></div><div style="flex-grow:1; margin-left:15px;"><div style="font-weight:600; color:#60a5fa;">${s.title}</div><div style="font-size:0.85rem; opacity:0.8;">${s.time}</div></div><button class="btn-delete" onclick="deleteData('global_subjects', ${s.id}, loadSubjects)"><i class="fas fa-trash"></i></button></li>`; });
-        }
-        function saveProfileData() {
-            localStorage.setItem('global_teacher_profile', JSON.stringify({ name: document.getElementById('prof-name').value, position: document.getElementById('prof-position').value, quote: document.getElementById('prof-quote').value, edu: document.getElementById('prof-edu').value, skills: document.getElementById('prof-skills').value }));
-            alert("✅ อัปเดตข้อมูลผู้สอนเรียบร้อย!");
-        }
-        function deleteData(key, id, callback) {
-            if(confirm("แน่ใจหรือไม่ที่จะลบรายการนี้?")) {
-                let data = JSON.parse(localStorage.getItem(key) || '[]');
-                data = data.filter(item => item.id !== id);
-                localStorage.setItem(key, JSON.stringify(data));
-                if(callback) callback();
-            }
-        }
-        
-        // Initial load for other tabs
-        loadPortfolios();
-        loadSubjects();
     </script>
 </body>
 </html>
