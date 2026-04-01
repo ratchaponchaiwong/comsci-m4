@@ -334,7 +334,6 @@
             startThemeParticles(themeKey);
         }
 
-        // ==================== อัปเดต: สคริปต์ให้ร่วงจากบนลงล่าง ====================
         function startThemeParticles(theme) {
             const container = document.getElementById("particleContainer");
             if(!container) return;
@@ -344,12 +343,13 @@
             function createParticle() {
                 const particle = document.createElement("div");
                 particle.className = "theme-particle";
-                // สุ่มตำแหน่งแกน X และบังคับให้แกน Y เริ่มจากบนสุด
                 particle.style.left = Math.random() * 100 + "vw";
-                particle.style.top = "-10vh"; 
                 particle.style.fontSize = (Math.random() * 15 + 15) + "px";
                 particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
                 particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                
+                particle.style.top = "-10vh";
+                
                 particle.innerHTML = themeData.particleChar;
                 container.appendChild(particle);
                 setTimeout(() => particle.remove(), 12000);
@@ -357,6 +357,7 @@
             for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 200);
             particleInterval = setInterval(createParticle, 600);
         }
+
         document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         // ==================== SYSTEM & TABS ====================
@@ -422,8 +423,8 @@
                         </div>
                     </div>
                     <div>
-                        <button class="btn-edit" onclick="editAct(${a.id})" style="background:${tColor};"><i class="fas fa-edit"></i></button>
-                        <button class="btn-delete" onclick="deleteAct(${a.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn-edit" onclick="editAct('${a.id}')" style="background:${tColor};"><i class="fas fa-edit"></i></button>
+                        <button class="btn-delete" onclick="deleteAct('${a.id}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
                 `;
@@ -444,7 +445,7 @@
             const target = (grade === 'all') ? 'ทุกห้อง' : `${grade}/${roomNum}`;
 
             const actData = {
-                id: document.getElementById('edit-id').value || Date.now(),
+                id: document.getElementById('edit-id').value || Date.now().toString(), // บังคับเป็น String
                 type: type,
                 title: title, 
                 desc: document.getElementById('act-desc').value,
@@ -458,18 +459,19 @@
             };
 
             let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const idx = acts.findIndex(a => a.id == actData.id);
+            const idx = acts.findIndex(a => String(a.id) === String(actData.id)); // เทียบ String
             if(idx > -1) acts[idx] = actData; else acts.push(actData);
 
             localStorage.setItem('global_activities', JSON.stringify(acts));
             syncActivities();
             alert("✅ บันทึกโพสต์สำเร็จ!");
             resetForm(); loadActivities();
+            loadMatrixData(); // อัปเดตตารางคะแนนด้วย
         }
 
         function editAct(id) {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const act = acts.find(a => a.id == id);
+            const act = acts.find(a => String(a.id) === String(id)); // เทียบ String
             if(!act) return;
 
             document.getElementById('edit-id').value = act.id;
@@ -507,10 +509,12 @@
         function deleteAct(id) {
             if(confirm("⚠️ คุณต้องการลบโพสต์นี้ใช่หรือไม่?")) {
                 let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-                acts = acts.filter(a => a.id !== id);
+                // ใช้การเทียบ String เพื่อแก้บั๊กลบไม่ออก
+                acts = acts.filter(a => String(a.id) !== String(id)); 
                 localStorage.setItem('global_activities', JSON.stringify(acts));
                 syncActivities();
                 loadActivities();
+                loadMatrixData(); // อัปเดตตารางตรวจงานด้วย
             }
         }
 
@@ -566,7 +570,7 @@
 
             let filteredHTML = '';
             let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            let actData = acts.find(a => a.id == actId);
+            let actData = acts.find(a => String(a.id) === String(actId));
             let maxPoints = actData ? actData.points : 0;
 
             studentsList.filter(s => {
@@ -595,7 +599,7 @@
             currentGradeActId = actId;
             const student = studentsList.find(s => s.email === email);
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const act = acts.find(a => a.id == actId);
+            const act = acts.find(a => String(a.id) === String(actId));
 
             document.getElementById('grade-student-name').innerText = studentName;
             document.getElementById('grade-act-title').innerText = act ? act.title : 'ไม่พบชื่องาน';
