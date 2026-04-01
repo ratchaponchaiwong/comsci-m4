@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ผลงานนักเรียน | PROT CS Hub</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        body { font-family: 'Prompt', sans-serif; background: #f1f5f9; margin: 0; padding: 40px 20px; text-align: center; }
+        .header-title { margin-bottom: 40px; }
+        .header-title h1 { color: #1e3a5f; font-size: 2rem; }
+        
+        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
+        .gallery-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #e2e8f0; }
+        .gallery-item:hover { transform: translateY(-10px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
+        .gallery-item img { width: 100%; height: 220px; object-fit: cover; }
+        .item-info { padding: 20px; text-align: left; }
+        .item-info h4 { margin: 0 0 10px 0; color: #1e3a5f; }
+        .item-info p { margin: 0; font-size: 0.85rem; color: #64748b; }
+
+        .btn-back { margin-top: 50px; display: inline-block; padding: 12px 25px; background: #1e3a5f; color: white; text-decoration: none; border-radius: 10px; font-weight: 600; }
+    </style>
+</head>
+<body>
+
+    <div class="header-title">
+        <h1><i class="fas fa-images"></i> คลังกิจกรรมและผลงานนักเรียน</h1>
+        <p>บันทึกการเรียนรู้และการทำโครงงานของนักเรียน ม.4</p>
+    </div>
+
+    <div class="gallery">
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=600" alt="ทัศนศึกษา">
+            <div class="item-info">
+                <h4>ทัศนศึกษา ม.เกษตรฯ ศรีราชา</h4>
+                <p>นักเรียน 122 คน เข้าศึกษาดูงานด้านวิศวกรรมคอมพิวเตอร์และหุ่นยนต์ เมื่อวันที่ 17 ม.ค. 2026</p>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=600" alt="Coding">
+            <div class="item-info">
+                <h4>Workshop: Python For Robot</h4>
+                <p>การเขียนโปรแกรมควบคุมบอร์ด ESP32 เบื้องต้นเพื่อเตรียมพร้อมสำหรับโครงงาน PROT ROBOT</p>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600" alt="Smart Farm">
+            <div class="item-info">
+                <h4>นำเสนอโครงงานเกษตรอัจฉริยะ</h4>
+                <p>นักเรียนนำเสนอไอเดียการใช้เซนเซอร์วัดความชื้นในดินเชื่อมต่อกับระบบอัตโนมัติ</p>
+            </div>
+        </div>
+    </div>
+
+    <a href="index.html" class="btn-back"><i class="fas fa-home"></i> กลับหน้าหลัก</a>
+
+</body>
+</html>
