@@ -3,83 +3,112 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Arduino & Robotics Lab | PROT Smart Workspace</title>
+    <title>Coding Lab | PROT Smart Workspace</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         /* ==================== CSS โครงสร้างหลักและธีม ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; cursor: default; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
-        .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+
+        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
-        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
-        
+        .logo { font-size: 1.4rem; font-weight: 800; color: #60a5fa; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        body[data-theme="snow"] .logo { color: #2563eb; }
+
+        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
+        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+
         .page-content-wrapper { padding: 20px; max-width: 1600px; margin: 0 auto; width: 100%; display: grid; gap: 20px; transition: 0.3s; flex-grow: 1;}
-        
-        /* สลับ Layout 1 จอ / 2 จอ */
         .page-content-wrapper.split-view { grid-template-columns: 450px 1fr; }
         .page-content-wrapper.single-view { grid-template-columns: 1fr; }
 
         .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content; }
-        body[data-theme="snow"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+        body[data-theme="snow"] .glass-panel, body[data-theme="love"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
 
-        /* Media Display Area */
+        /* Media */
         .media-container { margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #000; position: relative; aspect-ratio: 16 / 9; display: none; }
         .media-container iframe { width: 100%; height: 100%; border: none; position: absolute; top:0; left:0;}
-        
         .media-tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
         .media-tab { padding: 8px 15px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; white-space: nowrap; color: inherit; font-family: 'Prompt';}
+        body[data-theme="snow"] .media-tab, body[data-theme="love"] .media-tab { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
         .media-tab.active { background: #ef4444; color: white; border-color: #ef4444; }
         .media-tab.doc-tab.active { background: #3b82f6; border-color: #3b82f6;}
-        .media-tab.canva-tab.active { background: #8b5cf6; border-color: #8b5cf6;}
 
-        /* Lab Area */
-        .lab-frame { width: 100%; height: 750px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
+        /* Code Editor Area */
+        .code-area { width: 100%; height: 400px; background: #1e1e1e; color: #d4d4d4; font-family: 'Courier New', Courier, monospace; padding: 15px; border-radius: 12px; border: 1px solid #333; resize: vertical; font-size: 1rem; outline: none;}
+        .output-area { width: 100%; min-height: 150px; max-height: 250px; overflow-y: auto; background: #000; color: #0f0; font-family: 'Courier New', Courier, monospace; padding: 15px; border-radius: 12px; border: 1px solid #333; margin-top: 15px;}
+        
+        .toolbar { display: flex; justify-content: space-between; margin-bottom: 10px; }
+        .btn-run { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; display: flex; align-items: center; gap: 8px; }
+        .btn-run:hover { background: #059669; }
 
-        .layout-toggle { position: absolute; top: 80px; right: 40px; display: flex; gap: 10px; z-index: 100; }
-        .toggle-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-family: 'Prompt'; transition: 0.2s;}
+        .submit-box { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 15px; }
+        body[data-theme="snow"] .submit-box, body[data-theme="love"] .submit-box { border-top-color: rgba(0,0,0,0.1); }
+        .btn-submit { background: #3b82f6; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; }
+        .btn-submit:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59, 130, 246, 0.4); }
+
+        .layout-toggle { display: flex; justify-content: flex-end; gap: 10px; padding: 0 20px; margin-top: -10px;}
+        .toggle-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-family: 'Prompt'; transition: 0.2s;}
         .toggle-btn.active, .toggle-btn:hover { background: #3b82f6; border-color: #3b82f6; }
         body[data-theme="snow"] .toggle-btn { background: rgba(255,255,255,0.8); color: #1e293b; border-color: rgba(0,0,0,0.2); }
         body[data-theme="snow"] .toggle-btn.active { background: #3b82f6; color: white; }
 
-        /* Submission Box */
-        .submit-box { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 15px; }
-        body[data-theme="snow"] .submit-box { border-top-color: rgba(0,0,0,0.1); }
-        .work-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; margin-bottom: 10px; }
-        body[data-theme="snow"] .work-input { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.2); }
-        
-        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; }
-        .btn-submit:hover { background: #059669; transform: translateY(-2px); }
-        
-        .warning-text { font-size: 0.85rem; color: #f59e0b; margin-top: 5px; display: block; }
-        body[data-theme="snow"] .warning-text { color: #d97706; }
-
-        @media (max-width: 1000px) { .page-content-wrapper.split-view { grid-template-columns: 1fr; } .lab-frame{ height: 500px; } }
+        @media (max-width: 1000px) { .page-content-wrapper.split-view { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
+    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+
     <div class="content-layer">
         <header>
             <a href="student.html" class="logo"><i class="fas fa-chevron-left"></i> <span id="act-title-header">กำลังโหลดกิจกรรม...</span></a>
-            <div style="font-weight: 500; font-size: 0.9rem;" id="loginArea">กำลังตรวจสอบสิทธิ์...</div>
+            <div style="font-weight: 500; font-size: 0.9rem;" id="loginArea">
+                <div class="user-info">
+                    <span class="user-name" id="header-user-name">กำลังตรวจสอบ...</span>
+                </div>
+            </div>
         </header>
+
+        <div class="theme-switcher">
+            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
+            <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
+            <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
+            <button class="theme-btn" data-theme="halloween">🎃 ฮัลโลวีน</button>
+            <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
+        </div>
 
         <div class="layout-toggle">
             <button class="toggle-btn" id="btn-single" onclick="setLayout('single')"><i class="fas fa-square"></i> 1 หน้าจอ</button>
             <button class="toggle-btn active" id="btn-split" onclick="setLayout('split')"><i class="fas fa-columns"></i> 2 หน้าจอ</button>
         </div>
 
-        <div class="page-content-wrapper split-view" id="mainWrapper" style="margin-top: 40px;">
+        <div class="page-content-wrapper split-view" id="mainWrapper">
             
             <div class="glass-panel" id="leftPanel">
                 <div id="media-section">
@@ -88,51 +117,91 @@
                 </div>
 
                 <h3 style="margin-bottom: 10px; color: #60a5fa;"><i class="fas fa-info-circle"></i> คำชี้แจงกิจกรรม</h3>
-                <div id="act-desc-body" style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px; overflow-y: auto; max-height: 200px; padding-right: 5px;">กรุณารอข้อมูลสักครู่...</div>
+                <div id="act-desc-body" style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px; padding-right: 5px;">กรุณารอข้อมูลสักครู่...</div>
 
                 <div class="submit-box">
-                    <h4 style="margin-bottom: 10px;"><i class="fas fa-link"></i> ส่งลิงก์ผลงาน (Wokwi)</h4>
-                    <p style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 10px;">หลังจากจำลองหุ่นยนต์เสร็จ ให้กด "Save" แล้วนำลิงก์มาวางด้านล่างนี้</p>
-                    
-                    <input type="text" id="work-link" class="work-input" placeholder="https://wokwi.com/projects/..." oninput="checkInput()">
-                    
-                    <span id="warning-msg" class="warning-text"><i class="fas fa-exclamation-triangle"></i> กรุณาวางลิงก์เพื่อเปิดปุ่มส่งงาน</span>
+                    <h4 style="margin-bottom: 10px;"><i class="fas fa-paper-plane"></i> ส่งงานของฉัน</h4>
+                    <p style="font-size: 0.8rem; opacity: 0.8; margin-bottom: 10px;">กรุณากดรันโค้ด (Run) ให้ผ่านก่อน จึงจะสามารถกดปุ่มส่งงานได้</p>
+                    <span id="warning-msg" style="font-size: 0.85rem; color: #f59e0b;"><i class="fas fa-exclamation-triangle"></i> รอการรันโค้ดให้สำเร็จ...</span>
                     
                     <button id="btn-submit" class="btn-submit" onclick="submitWork()">
-                        <i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน
+                        <i class="fas fa-save"></i> ยืนยันการส่งโค้ด
                     </button>
                 </div>
             </div>
 
-            <div class="glass-panel" style="padding: 10px;">
-                <iframe id="labFrame" class="lab-frame" src="about:blank" title="Wokwi Simulator"></iframe>
+            <div class="glass-panel" style="padding: 15px;">
+                <div class="toolbar">
+                    <h3 style="color: #60a5fa;"><i class="fab fa-python"></i> Python Editor</h3>
+                    <button class="btn-run" onclick="runit()"><i class="fas fa-play"></i> Run Code</button>
+                </div>
+                
+                <textarea id="code-editor" class="code-area"># พิมพ์โค้ด Python ของคุณที่นี่
+print("Hello, PROT Smart Workspace!")
+</textarea>
+                
+                <h4 style="margin-top: 15px; color: #10b981;"><i class="fas fa-terminal"></i> Output:</h4>
+                <pre id="output-area" class="output-area"></pre>
             </div>
         </div>
     </div>
 
     <script>
-        function checkInput() {
-            const linkVal = document.getElementById('work-link').value.trim();
-            const btnSubmit = document.getElementById('btn-submit');
-            const warningMsg = document.getElementById('warning-msg');
-
-            if (linkVal !== "") {
-                btnSubmit.style.display = "block";
-                warningMsg.style.display = "none";
-            } else {
-                btnSubmit.style.display = "none";
-                warningMsg.style.display = "block";
-            }
-        }
-
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
         const urlParams = new URLSearchParams(window.location.search);
         const actId = urlParams.get('actid');
 
+        // ==================== THEME ====================
+        const themes = {
+            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
+            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
+            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
+            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
+            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
+        };
+        let particleInterval = null;
+
+        function applyTheme(themeKey) {
+            document.body.setAttribute("data-theme", themeKey);
+            localStorage.setItem('smart_theme', themeKey);
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            const btn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
+            if(btn) btn.classList.add("active");
+            startThemeParticles(themeKey);
+        }
+
+        function startThemeParticles(theme) {
+            const container = document.getElementById("particleContainer");
+            if(particleInterval) clearInterval(particleInterval);
+            container.innerHTML = "";
+            const themeData = themes[theme];
+            function createParticle() {
+                const particle = document.createElement("div");
+                particle.className = "theme-particle";
+                particle.style.position = "absolute";
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
+                particle.style.opacity = Math.random() * 0.6 + 0.3;
+                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
+                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                particle.innerHTML = themeData.particleChar;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 10000);
+            }
+            for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 150);
+            particleInterval = setInterval(createParticle, 800);
+        }
+
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+        });
+
+        // ==================== SYSTEM & UI ====================
         function loadLoginInfo() {
             const email = localStorage.getItem('student_email');
             if(!email) { alert("กรุณาเข้าสู่ระบบก่อนใช้งาน"); window.location.href = "index.html"; return; }
             const name = localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name');
-            document.getElementById('loginArea').innerHTML = `👤 ${name.split(' ')[0]}`;
+            document.getElementById('header-user-name').innerText = `👤 ${name.split(' ')[0]}`;
         }
 
         function setLayout(type) {
@@ -155,32 +224,23 @@
             if (!act) {
                 document.getElementById('act-title-header').innerText = "ไม่พบกิจกรรม";
                 document.getElementById('act-desc-body').innerText = "กรุณากลับไปที่หน้าห้องเรียน แล้วกดเข้าทำกิจกรรมใหม่อีกครั้งครับ";
-                document.getElementById('labFrame').src = "https://wokwi.com/projects/new/arduino-uno"; 
                 return;
             }
 
             document.getElementById('act-title-header').innerHTML = act.title;
             document.getElementById('act-desc-body').innerText = act.desc;
-            
-            const labFrame = document.getElementById('labFrame');
-            labFrame.src = (act.link && act.link !== "#") ? act.link : "https://wokwi.com/projects/new/arduino-uno";
 
             const tabs = document.getElementById('mediaTabs');
             let hasMedia = false;
 
             if (act.yt) { addTab("yt-tab", "<i class='fab fa-youtube'></i> YouTube", () => showMedia(formatYT(act.yt))); hasMedia = true; }
-            // ปรับแก้การเรียกใช้ formatDocs ที่นี่
             if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(formatDocs(act.doc))); hasMedia = true; }
-            if (act.canva) { addTab("canva-tab", "<i class='fas fa-paint-brush'></i> Canva", () => showMedia(formatCanva(act.canva))); hasMedia = true; }
-
+            
             if (hasMedia) tabs.children[0].click();
 
             const email = localStorage.getItem('student_email');
-            const savedLink = localStorage.getItem(email + '_act_' + actId + '_work_link');
-            if (savedLink) {
-                document.getElementById('work-link').value = savedLink;
-                checkInput();
-            }
+            const savedCode = localStorage.getItem(email + '_act_' + actId + '_work_code');
+            if (savedCode) { document.getElementById('code-editor').value = savedCode; }
         }
 
         function addTab(className, label, callback) {
@@ -206,35 +266,77 @@
             return `https://www.youtube.com/embed/${id}`;
         }
         
-        // ฟังก์ชันแก้ไข URL สำหรับ Google Docs/Drive ให้เปิด Preview ได้
         function formatDocs(url) {
             if (!url) return "";
-            if (url.includes('docs.google.com/document/d/')) {
-                // ตัดส่วน /edit... ทิ้ง แล้วแทนที่ด้วย /preview
+            if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/presentation/d/')) {
                 return url.split('/edit')[0] + '/preview';
-            } else if (url.includes('docs.google.com/presentation/d/')) {
-                 return url.split('/edit')[0] + '/preview';
             }
             return url;
         }
 
-        function formatCanva(url) { return url.includes('/view') && !url.includes('embed') ? url.replace('/view', '/view?embed') : url; }
+        // ==================== Python Engine (Skulpt) ====================
+        function outf(text) { 
+            const mypre = document.getElementById("output-area"); 
+            mypre.innerHTML = mypre.innerHTML + text; 
+        }
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+                    throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
 
-        function submitWork() {
+        function runit() {
+            var prog = document.getElementById("code-editor").value; 
+            var mypre = document.getElementById("output-area"); 
+            mypre.innerHTML = ''; 
+            
+            Sk.pre = "output-area";
+            Sk.configure({output:outf, read:builtinRead}); 
+            
+            var myPromise = Sk.misceval.asyncToPromise(function() {
+                return Sk.importMainWithBody("<stdin>", false, prog, true);
+            });
+            
+            myPromise.then(function(mod) {
+                document.getElementById('btn-submit').style.display = "block";
+                document.getElementById('warning-msg').style.display = "none";
+            }, function(err) {
+                mypre.innerHTML = `<span style="color:#ef4444;">${err.toString()}</span>`;
+                document.getElementById('btn-submit').style.display = "none";
+                document.getElementById('warning-msg').style.display = "block";
+            });
+        }
+
+        // ==================== ส่งงานเข้า Google Sheets ====================
+        async function submitWork() {
             const email = localStorage.getItem('student_email');
-            const link = document.getElementById('work-link').value.trim();
+            const code = document.getElementById('code-editor').value;
             if(!email) return alert("⚠️ กรุณาล็อกอินก่อนส่งงาน");
             
             localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
-            localStorage.setItem(email + '_act_' + actId + '_work_link', link);
+            localStorage.setItem(email + '_act_' + actId + '_work_code', code);
             
-            alert("🎉 ระบบได้รับผลงานของคุณเรียบร้อยแล้ว!");
-            window.location.href = "student.html"; 
+            document.getElementById('btn-submit').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...';
+            
+            let worksObj = {};
+            worksObj[actId] = code;
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({ email: email, works: worksObj })
+                });
+                alert("🎉 ระบบได้รับผลงานโค้ดของคุณเรียบร้อยแล้ว!");
+                window.location.href = "student.html"; 
+            } catch(e) {
+                alert("⚠️ เกิดข้อผิดพลาดในการส่งงาน แต่ระบบได้บันทึกลงเครื่องแล้ว");
+                window.location.href = "student.html"; 
+            }
         }
 
         window.onload = () => {
             const savedTheme = localStorage.getItem('smart_theme') || "default";
-            document.body.setAttribute("data-theme", savedTheme);
+            applyTheme(savedTheme);
             loadLoginInfo();
             loadActivityData();
         };
