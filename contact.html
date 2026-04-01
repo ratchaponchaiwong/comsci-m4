@@ -27,7 +27,6 @@
             min-height: 100vh;
         }
 
-        /* ธีมที่สอดคล้องกับ Smart Workspace */
         :root {
             --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --header-bg: linear-gradient(135deg, #1e3a5f 0%, #2c4e6e 100%);
@@ -45,7 +44,6 @@
             --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Dark Mode */
         body[data-theme="dark"] {
             --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2d3a4e 100%);
             --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -57,7 +55,6 @@
             --accent: #60a5fa;
         }
 
-        /* Forest Theme */
         body[data-theme="forest"] {
             --bg-body: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
             --header-bg: linear-gradient(135deg, #065f46 0%, #047857 100%);
@@ -69,7 +66,6 @@
             --accent: #10b981;
         }
 
-        /* Ocean Theme */
         body[data-theme="ocean"] {
             --bg-body: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);
             --header-bg: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
@@ -86,7 +82,6 @@
             color: var(--text-secondary);
         }
 
-        /* Navbar */
         nav {
             background: var(--header-bg);
             padding: 0 32px;
@@ -115,7 +110,6 @@
             font-size: 1.5rem;
         }
 
-        /* Navigation Menu */
         .nav-menu {
             display: flex;
             gap: 8px;
@@ -183,7 +177,6 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* User Profile */
         .user-info {
             display: flex;
             align-items: center;
@@ -213,14 +206,12 @@
             font-size: 0.7rem;
         }
 
-        /* Main Container */
         .container {
             max-width: 800px;
             margin: 60px auto;
             padding: 0 20px;
         }
 
-        /* Contact Card */
         .contact-card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -295,7 +286,6 @@
             color: var(--accent);
         }
 
-        /* Map Section */
         .map-section {
             margin-top: 30px;
             border-radius: 20px;
@@ -308,7 +298,6 @@
             border: none;
         }
 
-        /* Quick Message Form */
         .message-form {
             margin-top: 30px;
             padding-top: 30px;
@@ -364,7 +353,6 @@
             transform: translateY(-2px);
         }
 
-        /* Footer Buttons */
         .footer-buttons {
             text-align: center;
             margin-top: 30px;
@@ -418,8 +406,8 @@
     </a>
     
     <div class="nav-menu">
-        <a href="student.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="my_classroom.html" class="nav-item"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="student.html" class="nav-item"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
         <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
         <a href="student_portfolio.html" class="nav-item"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
         <a href="extra_subjects.html" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
@@ -440,7 +428,7 @@
             <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
         </div>
         <div id="login-section">
-            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID_HERE" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
             <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="medium"></div>
         </div>
     </div>
@@ -504,13 +492,11 @@
             </div>
         </div>
 
-        <!-- Map Section -->
         <div class="map-section">
             <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.729329215663!2d100.523691!3d13.727276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e299f2e5b1b1b1%3A0x0!2zMTDCsDQzJzM4LjIiTiAxMDDCsDMxJzI1LjMiRQ!5e0!3m2!1sth!2sth!4v1700000000000!5m2!1sth!2sth" 
                     allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
         </div>
 
-        <!-- Quick Message Form -->
         <div class="message-form">
             <h3><i class="fas fa-comment-dots"></i> ส่งข้อความด่วนถึงครู</h3>
             <div class="form-group">
@@ -533,7 +519,6 @@
 </div>
 
 <script>
-    // ==================== THEME MANAGEMENT ====================
     function setTheme(themeName) {
         document.body.setAttribute('data-theme', themeName);
         localStorage.setItem('smart_theme', themeName);
@@ -542,7 +527,6 @@
     if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
     else document.body.setAttribute('data-theme', 'light');
 
-    // ==================== GOOGLE LOGIN ====================
     function decodeJwtResponse(token) {
         let base64Url = token.split('.')[1];
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -599,7 +583,6 @@
         }
     }
     
-    // ==================== SEND MESSAGE ====================
     function sendMessage() {
         const name = document.getElementById('msg-name').value;
         const email = document.getElementById('msg-email').value;
@@ -615,20 +598,16 @@
             return;
         }
         
-        // จำลองการส่งข้อความ
         alert(`✅ ส่งข้อความสำเร็จ!\n\nชื่อ: ${name}\nอีเมล: ${email}\nข้อความ: ${message}\n\n🎉 ครูรัชพลจะตอบกลับภายใน 24 ชั่วโมงครับ`);
         
-        // เคลียร์ฟอร์ม
         document.getElementById('msg-name').value = '';
         document.getElementById('msg-email').value = '';
         document.getElementById('msg-content').value = '';
     }
     
-    // เริ่มต้นตรวจสอบการ Login
     window.addEventListener('DOMContentLoaded', () => {
         checkExistingLogin();
         
-        // แอนิเมชันเลื่อนสำหรับ contact items
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry, index) => {
                 if(entry.isIntersecting) {
