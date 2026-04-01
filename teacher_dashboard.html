@@ -276,7 +276,7 @@
 
     <script>
         // ⚠️ อย่าลืมนำ URL Web App มาใส่ในบรรทัดนี้นะครับ ⚠️
-        const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycbx8RqCXRcz8zMQDVfJoU0jL4VtnaozdtKG1n0zx0IA/dev";
 
         function switchTab(tabId) {
             document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
@@ -512,7 +512,7 @@
             alert("✅ บันทึกคะแนนเรียบร้อย!");
             openStudentDetails(email); // รีเฟรชหน้าต่าง
 
-            if(GOOGLE_SCRIPT_URL !== "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec" && GOOGLE_SCRIPT_URL !== "") {
+            if(GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE" && GOOGLE_SCRIPT_URL !== "") {
                 let name = localStorage.getItem(email + '_custom_name') || "";
                 let room = localStorage.getItem(email + '_room') || "";
                 let number = localStorage.getItem(email + '_number') || "";
