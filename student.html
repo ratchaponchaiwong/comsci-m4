@@ -27,7 +27,6 @@
             min-height: 100vh;
         }
 
-        /* ธีมที่สอดคล้องกับ Smart Workspace */
         :root {
             --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --header-bg: linear-gradient(135deg, #1e3a5f 0%, #2c4e6e 100%);
@@ -46,7 +45,6 @@
             --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Dark Mode */
         body[data-theme="dark"] {
             --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2d3a4e 100%);
             --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -58,7 +56,6 @@
             --accent: #60a5fa;
         }
 
-        /* Forest Theme */
         body[data-theme="forest"] {
             --bg-body: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
             --header-bg: linear-gradient(135deg, #065f46 0%, #047857 100%);
@@ -70,7 +67,6 @@
             --accent: #10b981;
         }
 
-        /* Ocean Theme */
         body[data-theme="ocean"] {
             --bg-body: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);
             --header-bg: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
@@ -87,7 +83,6 @@
             color: var(--text-secondary);
         }
 
-        /* Navbar */
         nav {
             background: var(--header-bg);
             padding: 0 32px;
@@ -99,6 +94,8 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo {
@@ -114,7 +111,6 @@
             font-size: 1.5rem;
         }
 
-        /* Navigation Menu */
         .nav-menu {
             display: flex;
             gap: 8px;
@@ -122,6 +118,8 @@
             padding: 6px 20px;
             border-radius: 50px;
             backdrop-filter: blur(8px);
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .nav-item {
             padding: 8px 20px;
@@ -151,6 +149,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
         .theme-picker {
@@ -179,7 +178,6 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* User Menu */
         .user-menu {
             display: flex;
             align-items: center;
@@ -209,7 +207,6 @@
             transform: scale(1.05);
         }
 
-        /* Container */
         .container {
             max-width: 1200px;
             margin: 40px auto;
@@ -219,7 +216,6 @@
             gap: 30px;
         }
 
-        /* Profile Card */
         .profile-card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -285,7 +281,6 @@
             transition: width 0.5s ease;
         }
 
-        /* Content Area */
         .content-area {
             display: flex;
             flex-direction: column;
@@ -304,7 +299,6 @@
             gap: 12px;
         }
 
-        /* Task Cards */
         .task-card {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -391,7 +385,6 @@
             display: inline-block;
         }
 
-        /* Announcement */
         .announcement {
             background: linear-gradient(135deg, var(--accent), var(--accent-hover));
             border-radius: 20px;
@@ -418,9 +411,7 @@
             }
             nav {
                 padding: 0 16px;
-                flex-wrap: wrap;
                 height: auto;
-                gap: 10px;
             }
             .nav-menu {
                 display: none;
@@ -445,12 +436,12 @@
     </a>
     
     <div class="nav-menu">
-        <a href="student.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="#" class="nav-item active"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="student.html" class="nav-item active"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
         <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
         <a href="student_portfolio.html" class="nav-item"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
-        <a href="#" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
-        <a href="#" class="nav-item"><i class="fas fa-envelope"></i> ติดต่อ</a>
+        <a href="extra_subjects.html" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
+        <a href="contact.html" class="nav-item"><i class="fas fa-envelope"></i> ติดต่อ</a>
     </div>
     
     <div class="header-right">
@@ -493,13 +484,11 @@
 
     <div class="content-area">
         
-        <!-- ประกาศสำคัญ -->
         <div class="announcement">
             <h4><i class="fas fa-bullhorn"></i> ประกาศจากครูผู้สอน</h4>
             <p>📢 นักเรียนทุกคนเตรียมตัวสอบเก็บคะแนนบทที่ 2 ในวันที่ 10 เมษายน 2569 เวลา 13:00 น. ณ ห้องปฏิบัติการคอมพิวเตอร์ ศึกษาบทเรียนผ่าน Smart Workspace ให้ครบถ้วนนะครับ</p>
         </div>
         
-        <!-- แบบทดสอบวัดผล -->
         <div>
             <div class="section-header">
                 <i class="fas fa-clipboard-check"></i> แบบทดสอบวัดผล (Exam)
@@ -528,7 +517,6 @@
             </div>
         </div>
 
-        <!-- บทเรียนและกิจกรรม -->
         <div>
             <div class="section-header">
                 <i class="fas fa-book-open"></i> บทเรียนและกิจกรรม (Modules)
@@ -547,14 +535,27 @@
 
             <div class="task-card" style="border-left: 4px solid var(--accent);">
                 <div class="task-info">
-                    <h4 style="color: var(--accent);">🤖 บทที่ 2: โลกแห่งการเขียนโปรแกรม (กำลังเรียน)</h4>
+                    <h4 style="color: var(--accent);">🐍 บทที่ 2: โลกแห่งการเขียนโปรแกรม Python (กำลังเรียน)</h4>
                     <p>ฝึกเขียน Python และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
                     <p style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
                 </div>
                 <div class="task-meta">
                     <span class="badge pending">⏳ ค้างส่งงาน</span>
                     <span class="score-text">🎯 คะแนนเต็ม 15</span>
-                    <a href="student.html" class="btn-action">เข้าเรียน & ส่งงาน <i class="fas fa-arrow-right"></i></a>
+                    <a href="python.html" class="btn-action">เข้าเรียน Python <i class="fas fa-arrow-right"></i></a>
+                </div>
+            </div>
+
+            <div class="task-card" style="border-left: 4px solid var(--accent);">
+                <div class="task-info">
+                    <h4 style="color: var(--accent);">🤖 บทที่ 2: โลกแห่งการเขียนโปรแกรม Arduino (กำลังเรียน)</h4>
+                    <p>ฝึกเขียน Arduino และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
+                    <p style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
+                </div>
+                <div class="task-meta">
+                    <span class="badge pending">⏳ ค้างส่งงาน</span>
+                    <span class="score-text">🎯 คะแนนเต็ม 15</span>
+                    <a href="robotics.html" class="btn-action">เข้าเรียน Arduino <i class="fas fa-arrow-right"></i></a>
                 </div>
             </div>
 
@@ -581,7 +582,6 @@
             </div>
         </div>
 
-        <!-- กิจกรรมที่ผ่านมา -->
         <div>
             <div class="section-header">
                 <i class="fas fa-history"></i> กิจกรรมที่เข้าร่วมแล้ว
@@ -613,7 +613,6 @@
 </div>
 
 <script>
-    // ==================== THEME MANAGEMENT ====================
     function setTheme(themeName) {
         document.body.setAttribute('data-theme', themeName);
         localStorage.setItem('smart_theme', themeName);
@@ -622,7 +621,6 @@
     if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
     else document.body.setAttribute('data-theme', 'light');
 
-    // ==================== CHECK LOGIN ====================
     window.onload = function() {
         const isLoggedIn = localStorage.getItem('is_logged_in');
         
@@ -632,7 +630,6 @@
             return;
         }
 
-        // ดึงข้อมูลชื่อและอีเมล
         const studentName = localStorage.getItem('student_name');
         const studentEmail = localStorage.getItem('student_email');
         
@@ -645,10 +642,9 @@
             document.getElementById('profile-name').innerText = 'นักเรียน';
         }
         
-        // จำลองข้อมูลคะแนน (ดึงจาก localStorage หรือใช้ค่าเริ่มต้น)
         let totalScore = localStorage.getItem('student_total_score');
         if (!totalScore) {
-            totalScore = 25; // คะแนนเริ่มต้น
+            totalScore = 25;
             localStorage.setItem('student_total_score', totalScore);
         }
         
@@ -657,7 +653,6 @@
         document.getElementById('progress-fill').style.width = percentage + '%';
         document.getElementById('progress-text').innerHTML = `ความคืบหน้า ${percentage}%`;
         
-        // ตั้งค่า join date
         const joinDate = localStorage.getItem('student_join_date');
         if (!joinDate) {
             localStorage.setItem('student_join_date', 'มกราคม 2026');
@@ -666,14 +661,12 @@
             document.getElementById('join-date').innerText = joinDate;
         }
         
-        // จำนวนกิจกรรม
         const activityCount = localStorage.getItem('student_activity_count');
         if (activityCount) {
             document.getElementById('activity-count').innerText = activityCount;
         }
     };
     
-    // ฟังก์ชันออกจากระบบ
     function logout() {
         if(confirm('⚠️ คุณต้องการออกจากระบบใช่หรือไม่?')) {
             localStorage.removeItem('is_logged_in');
@@ -681,13 +674,11 @@
         }
     }
     
-    // ฟังก์ชันอัปเดตคะแนน (สำหรับการส่งงาน)
     function updateScore(points) {
         let currentScore = parseInt(localStorage.getItem('student_total_score') || '0');
         let newScore = Math.min(currentScore + points, 100);
         localStorage.setItem('student_total_score', newScore);
         
-        // อัปเดตกิจกรรม
         let activityCount = parseInt(localStorage.getItem('student_activity_count') || '0');
         localStorage.setItem('student_activity_count', activityCount + 1);
         
