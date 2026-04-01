@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ชื่อหน้า | PROT Smart Workspace</title>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* ==================== 1. CSS โครงสร้างหลักจาก index.html ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; }
+        
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
+        
+        .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; backdrop-filter: blur(4px); font-size: 0.9rem; }
+        .theme-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.4); }
+        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; transition: background 0.3s; }
+        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
+        body[data-theme="forest"] header { background: rgba(30, 60, 30, 0.8); border-bottom-color: rgba(100,200,100,0.3); }
+        body[data-theme="halloween"] header { background: rgba(40, 20, 40, 0.8); border-bottom-color: rgba(255,100,0,0.3); }
+        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
+        
+        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; background-clip: text; }
+        body[data-theme="forest"] .logo { background: linear-gradient(135deg, #90ee90, #6b8e23); -webkit-background-clip: text; background-clip: text; }
+        body[data-theme="halloween"] .logo { background: linear-gradient(135deg, #ff8c00, #ff4500); -webkit-background-clip: text; background-clip: text; }
+        
+        .nav-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; margin: 0; padding: 0; align-items: center; }
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        body[data-theme="forest"] .nav-links a { color: #d4ffd4; }
+        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        
+        .login-area { display: flex; align-items: center; gap: 15px; }
+        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Prompt'; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; backdrop-filter: blur(4px); }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
+        .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
+        body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; color: inherit; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        
+        footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); margin-top: auto; position: relative; z-index: 10; }
+        
+        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .login-modal.active { visibility: visible; opacity: 1; }
+        .login-modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+        .login-modal-content h3 { font-size: 1.8rem; margin-bottom: 16px; color: white; }
+        .login-modal-content p { color: #94a3b8; margin-bottom: 28px; }
+        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: white; background: none; border: none; }
+        .theme-particle { position: absolute; pointer-events: none; animation: floatParticle linear forwards; z-index: 1; }
+        @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
+        
+        .page-content-wrapper { padding: 40px 20px; max-width: 1000px; margin: 0 auto; width: 100%; z-index: 10; position: relative; }
+
+        /* ==================== 2. วาง CSS ของหน้าเฉพาะตรงนี้ (เช่น CSS ของฟอร์มติดต่อ หรือ การ์ดวิชา) ==================== */
+        /* ตัวอย่าง: ถ้าทำหน้า contact ให้เอา CSS ส่วนของ .contact-card มาวางที่นี่ */
+
+
+    </style>
+</head>
+<body data-theme="default">
+    <div class="bg-animation">
+        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
+    </div>
+    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+
+    <div class="content-layer">
+        <header>
+            <a href="index.html" class="logo">
+                <i class="fas fa-robot"></i>
+                <span>PROT Smart Workspace</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
+                <ul class="nav-links">
+                    <li><a href="index.html">หน้าหลัก</a></li>
+                    <li><a href="student.html">ห้องเรียนของฉัน</a></li>
+                    <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
+                    <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
+                    <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
+                    <li><a href="contact.html">ติดต่อ</a></li>
+                </ul>
+                <div class="login-area" id="loginArea">
+                    <button class="login-btn" id="showLoginBtn">
+                        <i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="theme-switcher">
+            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
+            <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
+            <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
+            <button class="theme-btn" data-theme="halloween">🎃 ฮัลโลวีน</button>
+            <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
+        </div>
+
+        <div class="page-content-wrapper">
+            
+            </div>
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | วิทยาการคำนวณเพื่ออนาคต</p>
+        </footer>
+    </div>
+
+    <div id="loginModal" class="login-modal">
+        <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+        <div class="login-modal-content">
+            <h3><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
+            <p>กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
+            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+        </div>
+    </div>
+
+    <script>
+        // ==================== THEME & PARTICLE SYSTEM จากหน้า index.html ====================
+        const themes = {
+            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
+            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
+            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
+            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
+            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
+        };
+        let particleInterval = null;
+        
+        function applyTheme(themeKey) {
+            document.body.setAttribute("data-theme", themeKey);
+            localStorage.setItem('smart_theme', themeKey);
+            
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
+            if(activeBtn) activeBtn.classList.add("active");
+
+            startThemeParticles(themeKey);
+        }
+        
+        function startThemeParticles(theme) {
+            const container = document.getElementById("particleContainer");
+            if(particleInterval) clearInterval(particleInterval);
+            container.innerHTML = "";
+            const themeData = themes[theme];
+            
+            function createParticle() {
+                const particle = document.createElement("div");
+                particle.className = "theme-particle";
+                particle.style.position = "absolute";
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
+                particle.style.opacity = Math.random() * 0.6 + 0.3;
+                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
+                particle.style.animationDelay = Math.random() * 5 + "s";
+                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                particle.innerHTML = themeData.particleChar;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 10000);
+            }
+            for(let i = 0; i < 15; i++) setTimeout(() => createParticle(), i * 150);
+            particleInterval = setInterval(() => createParticle(), 800);
+        }
+
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+        });
+
+        // ==================== LOGIN SYSTEM ====================
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join('')));
+        }
+        
+        function handleCredentialResponse(response) {
+            const userData = decodeJwtResponse(response.credential);
+            if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userData.email);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                closeLoginModal();
+                updateLoginUI(userData.name, userData.picture);
+            } else {
+                alert('อีเมลนี้ไม่ได้รับอนุญาต');
+            }
+        }
+        
+        function updateLoginUI(userName, userPic) {
+            const loginArea = document.getElementById('loginArea');
+            loginArea.innerHTML = `
+                <div class="user-info">
+                    <img src="${userPic}" class="user-avatar" alt="avatar">
+                    <span class="user-name">${userName.split(' ')[0]}</span>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            `;
+        }
+        
+        function logout() {
+            localStorage.removeItem('is_logged_in');
+            localStorage.removeItem('student_name');
+            localStorage.removeItem('student_email');
+            localStorage.removeItem('student_pic');
+            location.reload();
+        }
+        
+        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+
+        // ==================== INITIALIZE ====================
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('smart_theme') || "default";
+            applyTheme(savedTheme);
+            
+            if (localStorage.getItem('is_logged_in') === 'true') {
+                updateLoginUI(localStorage.getItem('student_name'), localStorage.getItem('student_pic'));
+            } else {
+                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
+            }
+            
+            // ทำให้เมนูนำทาง Active ตามหน้าปัจจุบันอัตโนมัติ
+            const currentPath = window.location.pathname.split("/").pop();
+            document.querySelectorAll('.nav-links a').forEach(link => {
+                if(link.getAttribute('href') === currentPath) {
+                    link.classList.add('active');
+                }
+            });
+        };
+    </script>
+</body>
+</html>
