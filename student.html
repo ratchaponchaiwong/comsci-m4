@@ -2,690 +2,465 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ห้องเรียนของฉัน | PROT Smart Workspace</title>
     
-    <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
-    <!-- Google Fonts & Icons -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            transition: all 0.2s ease;
-        }
+        /* ==================== CSS โครงสร้างหลัก (จาก index.html) ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; }
+        
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
+        
+        .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; backdrop-filter: blur(4px); font-size: 0.9rem; }
+        .theme-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.4); }
+        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; transition: background 0.3s; }
+        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
+        body[data-theme="forest"] header { background: rgba(30, 60, 30, 0.8); border-bottom-color: rgba(100,200,100,0.3); }
+        body[data-theme="halloween"] header { background: rgba(40, 20, 40, 0.8); border-bottom-color: rgba(255,100,0,0.3); }
+        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
+        
+        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; display: flex; align-items: center; gap: 12px; text-decoration: none; }
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; background-clip: text; }
+        body[data-theme="forest"] .logo { background: linear-gradient(135deg, #90ee90, #6b8e23); -webkit-background-clip: text; background-clip: text; }
+        body[data-theme="halloween"] .logo { background: linear-gradient(135deg, #ff8c00, #ff4500); -webkit-background-clip: text; background-clip: text; }
+        
+        .nav-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; margin: 0; padding: 0; align-items: center; }
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        body[data-theme="forest"] .nav-links a { color: #d4ffd4; }
+        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        
+        .login-area { display: flex; align-items: center; gap: 15px; }
+        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Prompt'; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; backdrop-filter: blur(4px); }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
+        .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
+        body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; color: inherit; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.8); color: white; }
+        
+        footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); margin-top: auto; position: relative; z-index: 10; }
+        
+        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .login-modal.active { visibility: visible; opacity: 1; }
+        .login-modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+        .login-modal-content h3 { font-size: 1.8rem; margin-bottom: 16px; color: white; }
+        .login-modal-content p { color: #94a3b8; margin-bottom: 28px; }
+        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: white; background: none; border: none; }
+        .theme-particle { position: absolute; pointer-events: none; animation: floatParticle linear forwards; z-index: 1; }
+        @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
+        
+        .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; z-index: 10; position: relative; }
 
-        body {
-            font-family: 'Prompt', 'Inter', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: #334155;
-            min-height: 100vh;
-        }
+        /* ==================== CSS เฉพาะของหน้า Student (ปรับปรุงให้เข้ากับธีม) ==================== */
+        .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+        
+        /* Profile Card */
+        .profile-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); padding: 30px; border-radius: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; border: 1px solid rgba(255,255,255,0.1); height: fit-content; color: inherit; }
+        body[data-theme="snow"] .profile-card, body[data-theme="love"] .profile-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
+        
+        .profile-pic { width: 100px; height: 100px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 20px auto; box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
+        .profile-card h3 { margin: 0 0 5px 0; font-size: 1.3rem; }
+        .profile-card p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
 
-        :root {
-            --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            --header-bg: linear-gradient(135deg, #1e3a5f 0%, #2c4e6e 100%);
-            --header-text: #ffffff;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --border-color: #e2e8f0;
-            --text-primary: #0f172a;
-            --text-secondary: #334155;
-            --accent: #3b82f6;
-            --accent-hover: #2563eb;
-            --success: #10b981;
-            --warning: #f59e0b;
-            --danger: #ef4444;
-            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
-            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
-        }
+        /* Score Box */
+        .score-box { background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; margin-top: 20px; border: 1px solid rgba(255,255,255,0.05); }
+        body[data-theme="snow"] .score-box, body[data-theme="love"] .score-box { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.05); }
+        .score-box p { margin: 0 0 5px 0; font-weight: 600; opacity: 0.9; }
+        .score-box h2 { margin: 0; color: #60a5fa; font-size: 2.5rem; }
+        body[data-theme="snow"] .score-box h2, body[data-theme="love"] .score-box h2 { color: #3b82f6; }
+        
+        .progress-bar-bg { background: rgba(0,0,0,0.3); height: 10px; border-radius: 5px; margin-top: 15px; overflow: hidden; }
+        body[data-theme="snow"] .progress-bar-bg, body[data-theme="love"] .progress-bar-bg { background: rgba(0,0,0,0.1); }
+        .progress-bar-fill { background: #3b82f6; height: 100%; width: 0%; border-radius: 5px; transition: width 0.5s ease; }
 
-        body[data-theme="dark"] {
-            --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2d3a4e 100%);
-            --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
-            --header-text: #e2e8f0;
-            --card-bg: rgba(30, 41, 59, 0.95);
-            --border-color: #334155;
-            --text-primary: #f1f5f9;
-            --text-secondary: #cbd5e1;
-            --accent: #60a5fa;
-        }
+        .profile-meta { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.9rem; }
+        body[data-theme="snow"] .profile-meta, body[data-theme="love"] .profile-meta { border-top-color: rgba(0,0,0,0.1); }
+        .profile-meta p { margin-bottom: 8px; }
 
-        body[data-theme="forest"] {
-            --bg-body: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
-            --header-bg: linear-gradient(135deg, #065f46 0%, #047857 100%);
-            --header-text: #f0fdf4;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --border-color: #a7f3d0;
-            --text-primary: #064e3b;
-            --text-secondary: #047857;
-            --accent: #10b981;
-        }
+        /* Content Area */
+        .content-area { display: flex; flex-direction: column; gap: 30px; }
+        
+        .announcement { background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 20px; padding: 20px; color: white; box-shadow: 0 10px 20px rgba(59,130,246,0.3); }
+        .announcement h4 { margin: 0 0 8px 0; display: flex; align-items: center; gap: 10px; font-size: 1.1rem; }
+        .announcement p { margin: 0; font-size: 0.9rem; opacity: 0.95; line-height: 1.5; }
 
-        body[data-theme="ocean"] {
-            --bg-body: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);
-            --header-bg: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
-            --header-text: #f0f9ff;
-            --card-bg: rgba(255, 255, 255, 0.95);
-            --border-color: #bae6fd;
-            --text-primary: #075985;
-            --text-secondary: #0284c7;
-            --accent: #0ea5e9;
-        }
+        .section-header { font-size: 1.3rem; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: inherit; }
 
-        body {
-            background: var(--bg-body);
-            color: var(--text-secondary);
-        }
-
-        nav {
-            background: var(--header-bg);
-            padding: 0 32px;
-            height: 70px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: var(--shadow-md);
-            position: sticky;
-            top: 0;
-            z-index: 100;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-
-        .logo {
-            font-weight: 700;
-            font-size: 1.2rem;
-            color: var(--header-text);
-            text-decoration: none;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-        .logo i {
-            font-size: 1.5rem;
-        }
-
-        .nav-menu {
-            display: flex;
-            gap: 8px;
-            background: rgba(255,255,255,0.15);
-            padding: 6px 20px;
-            border-radius: 50px;
-            backdrop-filter: blur(8px);
-            flex-wrap: wrap;
-            justify-content: center;
-        }
-        .nav-item {
-            padding: 8px 20px;
-            border-radius: 40px;
-            cursor: pointer;
-            transition: all 0.2s;
-            font-weight: 500;
-            font-size: 0.9rem;
-            color: var(--header-text);
-            background: transparent;
-            border: none;
-            font-family: 'Prompt', sans-serif;
-            text-decoration: none;
-            display: inline-block;
-        }
-        .nav-item:hover {
-            background: rgba(255,255,255,0.2);
-            transform: translateY(-2px);
-        }
-        .nav-item.active {
-            background: var(--accent);
-            color: white;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
-        }
-
-        .header-right {
-            display: flex;
-            align-items: center;
-            gap: 20px;
-            flex-wrap: wrap;
-        }
-
-        .theme-picker {
-            display: flex;
-            gap: 8px;
-            background: rgba(0,0,0,0.25);
-            padding: 5px 12px;
-            border-radius: 40px;
-        }
-        .theme-btn {
-            background: transparent;
-            border: none;
-            font-size: 1.1rem;
-            cursor: pointer;
-            border-radius: 50%;
-            width: 30px;
-            height: 30px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            transition: 0.2s;
-            color: var(--header-text);
-        }
-        .theme-btn:hover {
-            transform: scale(1.1);
-            background: rgba(255,255,255,0.2);
-        }
-
-        .user-menu {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            background: rgba(255,255,255,0.15);
-            padding: 5px 20px;
-            border-radius: 40px;
-        }
-        .user-menu span {
-            font-size: 0.9rem;
-            font-weight: 500;
-            color: var(--header-text);
-        }
-        .btn-logout {
-            background: rgba(255,255,255,0.2);
-            border: none;
-            color: white;
-            padding: 6px 15px;
-            border-radius: 30px;
-            cursor: pointer;
-            font-family: 'Prompt';
-            transition: 0.2s;
-            font-size: 0.8rem;
-        }
-        .btn-logout:hover {
-            background: var(--danger);
-            transform: scale(1.05);
-        }
-
-        .container {
-            max-width: 1200px;
-            margin: 40px auto;
-            padding: 0 20px;
-            display: grid;
-            grid-template-columns: 320px 1fr;
-            gap: 30px;
-        }
-
-        .profile-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            padding: 30px;
-            border-radius: 28px;
-            box-shadow: var(--shadow-md);
-            text-align: center;
-            border: 1px solid var(--border-color);
-            height: fit-content;
-        }
-        .profile-pic {
-            width: 100px;
-            height: 100px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-            color: white;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 3rem;
-            margin: 0 auto 20px auto;
-            box-shadow: var(--shadow-lg);
-        }
-        .profile-card h3 {
-            margin: 0 0 5px 0;
-            color: var(--text-primary);
-            font-size: 1.3rem;
-        }
-        .profile-card p {
-            margin: 0;
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-        }
-
-        .score-box {
-            background: rgba(0,0,0,0.05);
-            border-radius: 20px;
-            padding: 20px;
-            margin-top: 20px;
-        }
-        .score-box p {
-            margin: 0 0 5px 0;
-            font-weight: 600;
-            color: var(--text-secondary);
-        }
-        .score-box h2 {
-            margin: 0;
-            color: var(--accent);
-            font-size: 2.5rem;
-        }
-        .progress-bar-bg {
-            background: rgba(0,0,0,0.1);
-            height: 10px;
-            border-radius: 5px;
-            margin-top: 15px;
-            overflow: hidden;
-        }
-        .progress-bar-fill {
-            background: var(--accent);
-            height: 100%;
-            width: 0%;
-            border-radius: 5px;
-            transition: width 0.5s ease;
-        }
-
-        .content-area {
-            display: flex;
-            flex-direction: column;
-            gap: 30px;
-        }
-
-        .section-header {
-            font-size: 1.3rem;
-            font-weight: 700;
-            color: var(--text-primary);
-            border-bottom: 3px solid var(--accent);
-            padding-bottom: 12px;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 12px;
-        }
-
-        .task-card {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border-radius: 20px;
-            padding: 20px;
-            box-shadow: var(--shadow-sm);
-            border: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            transition: all 0.3s;
-            margin-bottom: 15px;
-        }
-        .task-card:hover {
-            border-color: var(--accent);
-            transform: translateY(-3px);
-            box-shadow: var(--shadow-md);
-        }
-        .task-info h4 {
-            margin: 0 0 8px 0;
-            font-size: 1.1rem;
-            color: var(--text-primary);
-        }
-        .task-info p {
-            margin: 0;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-        }
-        .task-meta {
-            text-align: right;
-            min-width: 120px;
-        }
-        .badge {
-            padding: 5px 12px;
-            border-radius: 20px;
-            font-size: 0.75rem;
-            font-weight: 600;
-            display: inline-block;
-            margin-bottom: 8px;
-        }
-        .badge.done {
-            background: #d1fae5;
-            color: #059669;
-        }
-        .badge.pending {
-            background: #fef3c7;
-            color: #d97706;
-        }
-        .badge.locked {
-            background: #f1f5f9;
-            color: #64748b;
-        }
-        .score-text {
-            font-size: 0.85rem;
-            font-weight: 600;
-            color: var(--accent);
-            display: block;
-            margin-bottom: 8px;
-        }
-        .btn-action {
-            background: var(--accent);
-            color: white;
-            text-decoration: none;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            display: inline-block;
-            transition: 0.2s;
-            border: none;
-            cursor: pointer;
-            font-family: 'Prompt';
-        }
-        .btn-action:hover {
-            background: var(--accent-hover);
-            transform: translateY(-2px);
-        }
-        .btn-locked {
-            background: #cbd5e1;
-            cursor: not-allowed;
-            color: white;
-            padding: 8px 20px;
-            border-radius: 30px;
-            font-size: 0.85rem;
-            display: inline-block;
-        }
-
-        .announcement {
-            background: linear-gradient(135deg, var(--accent), var(--accent-hover));
-            border-radius: 20px;
-            padding: 20px;
-            color: white;
-            margin-bottom: 20px;
-        }
-        .announcement h4 {
-            margin: 0 0 8px 0;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .announcement p {
-            margin: 0;
-            font-size: 0.9rem;
-            opacity: 0.95;
-        }
+        .task-card { background: rgba(0,0,0,0.2); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; transition: all 0.3s; margin-bottom: 15px; color: inherit; }
+        body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        .task-card:hover { border-color: #3b82f6; transform: translateY(-3px); background: rgba(59,130,246,0.1); }
+        
+        .task-info h4 { margin: 0 0 8px 0; font-size: 1.1rem; }
+        .task-info p { margin: 0; font-size: 0.85rem; opacity: 0.8; }
+        .task-meta { text-align: right; min-width: 130px; }
+        
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 8px; }
+        .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); }
+        body[data-theme="snow"] .badge.done, body[data-theme="love"] .badge.done { background: #d1fae5; color: #059669; }
+        .badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
+        body[data-theme="snow"] .badge.pending, body[data-theme="love"] .badge.pending { background: #fef3c7; color: #d97706; }
+        .badge.locked { background: rgba(255, 255, 255, 0.1); color: #cbd5e1; border: 1px solid rgba(255, 255, 255, 0.2); }
+        body[data-theme="snow"] .badge.locked, body[data-theme="love"] .badge.locked { background: #f1f5f9; color: #64748b; border: none; }
+        
+        .score-text { font-size: 0.85rem; font-weight: 600; color: #60a5fa; display: block; margin-bottom: 8px; }
+        body[data-theme="snow"] .score-text, body[data-theme="love"] .score-text { color: #3b82f6; }
+        
+        .btn-action { background: #3b82f6; color: white; text-decoration: none; padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; display: inline-block; transition: 0.2s; border: none; cursor: pointer; font-family: 'Prompt'; }
+        .btn-action:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+        .btn-locked { background: rgba(255,255,255,0.1); cursor: not-allowed; color: #94a3b8; padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; display: inline-block; }
+        body[data-theme="snow"] .btn-locked, body[data-theme="love"] .btn-locked { background: #cbd5e1; color: white; }
 
         @media (max-width: 768px) {
-            .container {
-                grid-template-columns: 1fr;
-                margin: 20px auto;
-            }
-            nav {
-                padding: 0 16px;
-                height: auto;
-            }
-            .nav-menu {
-                display: none;
-            }
-            .task-card {
-                flex-direction: column;
-                text-align: center;
-                gap: 15px;
-            }
-            .task-meta {
-                text-align: center;
-            }
+            header { padding: 12px 20px; flex-direction: column; }
+            .dashboard-container { grid-template-columns: 1fr; }
+            .task-card { flex-direction: column; text-align: center; gap: 15px; }
+            .task-meta { text-align: center; }
         }
     </style>
 </head>
-<body data-theme="light">
-
-<nav>
-    <a href="student.html" class="logo">
-        <i class="fas fa-robot"></i>
-        <span>PROT Smart Workspace</span>
-    </a>
-    
-    <div class="nav-menu">
-        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="student.html" class="nav-item active"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
-        <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
-        <a href="student_portfolio.html" class="nav-item"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
-        <a href="extra_subjects.html" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
-        <a href="contact.html" class="nav-item"><i class="fas fa-envelope"></i> ติดต่อ</a>
+<body data-theme="default">
+    <div class="bg-animation">
+        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
     </div>
-    
-    <div class="header-right">
-        <div class="theme-picker">
-            <button class="theme-btn" onclick="setTheme('light')" title="สว่าง"><i class="fas fa-sun"></i></button>
-            <button class="theme-btn" onclick="setTheme('dark')" title="มืด"><i class="fas fa-moon"></i></button>
-            <button class="theme-btn" onclick="setTheme('forest')" title="ธรรมชาติ"><i class="fas fa-leaf"></i></button>
-            <button class="theme-btn" onclick="setTheme('ocean')" title="ท้องทะเล"><i class="fas fa-water"></i></button>
-        </div>
-        
-        <div class="user-menu">
-            <span id="user-name-display">กำลังโหลด...</span>
-            <button class="btn-logout" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
-        </div>
-    </div>
-</nav>
+    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
 
-<div class="container">
-    <div class="profile-card">
-        <div class="profile-pic">
-            <i class="fas fa-user-graduate"></i>
-        </div>
-        <h3 id="profile-name">ชื่อนักเรียน</h3>
-        <p id="profile-email">email@prot.ac.th</p>
-        
-        <div class="score-box">
-            <p><i class="fas fa-chart-line"></i> คะแนนเก็บรวม</p>
-            <h2 id="total-score">0 <span style="font-size: 1rem;">/ 100</span></h2>
-            <div class="progress-bar-bg">
-                <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+    <div class="content-layer">
+        <header>
+            <a href="index.html" class="logo">
+                <i class="fas fa-robot"></i>
+                <span>PROT Smart Workspace</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
+                <ul class="nav-links">
+                    <li><a href="index.html">หน้าหลัก</a></li>
+                    <li><a href="student.html" class="active">ห้องเรียนของฉัน</a></li>
+                    <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
+                    <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
+                    <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
+                    <li><a href="contact.html">ติดต่อ</a></li>
+                </ul>
+                <div class="login-area" id="loginArea">
+                    <button class="login-btn" id="showLoginBtn">
+                        <i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน
+                    </button>
+                </div>
             </div>
-            <p style="margin: 10px 0 0 0; font-size: 0.8rem;" id="progress-text">ความคืบหน้า 0%</p>
+        </header>
+
+        <div class="theme-switcher">
+            <button class="theme-btn" data-theme="default" title="เริ่มต้น">🤖</button>
+            <button class="theme-btn" data-theme="snow" title="หิมะ">❄️</button>
+            <button class="theme-btn" data-theme="forest" title="ธรรมชาติ">🌿</button>
+            <button class="theme-btn" data-theme="halloween" title="ฮัลโลวีน">🎃</button>
+            <button class="theme-btn" data-theme="love" title="ความรัก">🌸</button>
         </div>
-        
-        <div style="margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);">
-            <p><i class="fas fa-calendar-alt"></i> เข้าร่วมเมื่อ: <span id="join-date">มกราคม 2026</span></p>
-            <p><i class="fas fa-trophy"></i> จำนวนกิจกรรมที่เข้าร่วม: <span id="activity-count">3</span> กิจกรรม</p>
+
+        <div class="page-content-wrapper">
+            <div class="dashboard-container">
+                <div class="profile-card">
+                    <div class="profile-pic">
+                        <i class="fas fa-user-graduate"></i>
+                    </div>
+                    <h3 id="profile-name">ชื่อนักเรียน</h3>
+                    <p id="profile-email">email@prot.ac.th</p>
+                    
+                    <div class="score-box">
+                        <p><i class="fas fa-chart-line"></i> คะแนนเก็บรวม</p>
+                        <h2 id="total-score">0 <span style="font-size: 1rem;">/ 100</span></h2>
+                        <div class="progress-bar-bg">
+                            <div class="progress-bar-fill" id="progress-fill" style="width: 0%;"></div>
+                        </div>
+                        <p style="margin: 10px 0 0 0; font-size: 0.8rem;" id="progress-text">ความคืบหน้า 0%</p>
+                    </div>
+                    
+                    <div class="profile-meta">
+                        <p><i class="fas fa-calendar-alt"></i> เข้าร่วมเมื่อ: <span id="join-date">มกราคม 2026</span></p>
+                        <p><i class="fas fa-trophy"></i> จำนวนกิจกรรมที่เข้าร่วม: <span id="activity-count">3</span> กิจกรรม</p>
+                    </div>
+                </div>
+
+                <div class="content-area">
+                    <div class="announcement">
+                        <h4><i class="fas fa-bullhorn"></i> ประกาศจากครูผู้สอน</h4>
+                        <p>📢 นักเรียนทุกคนเตรียมตัวสอบเก็บคะแนนบทที่ 2 ในวันที่ 10 เมษายน 2569 เวลา 13:00 น. ณ ห้องปฏิบัติการคอมพิวเตอร์ ศึกษาบทเรียนผ่าน Smart Workspace ให้ครบถ้วนนะครับ</p>
+                    </div>
+                    
+                    <div>
+                        <div class="section-header">
+                            <i class="fas fa-clipboard-check"></i> แบบทดสอบวัดผล (Exam)
+                        </div>
+                        
+                        <div class="task-card">
+                            <div class="task-info">
+                                <h4>📝 แบบทดสอบก่อนเรียน (Pre-test) บทที่ 1-2</h4>
+                                <p>ประเมินความรู้พื้นฐานก่อนเริ่มเรียน (ไม่มีผลต่อคะแนนเก็บ)</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="badge done">✅ ทำแล้ว</span>
+                                <span class="score-text">📊 ได้ 8 / 10 คะแนน</span>
+                            </div>
+                        </div>
+
+                        <div class="task-card">
+                            <div class="task-info">
+                                <h4>📋 แบบทดสอบหลังเรียน (Post-test) บทที่ 2</h4>
+                                <p><i class="fas fa-lock"></i> ครูยังไม่เปิดเผยแพร่ข้อสอบชุดนี้ (จะเปิดหลังเรียนจบบทเรียน)</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="badge locked">🔒 รอเปิดสอบ</span>
+                                <span class="btn-locked">ยังไม่เปิดระบบ</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="section-header">
+                            <i class="fas fa-book-open"></i> บทเรียนและกิจกรรม (Modules)
+                        </div>
+                        
+                        <div class="task-card">
+                            <div class="task-info">
+                                <h4>📘 บทที่ 1: แนวคิดเชิงคำนวณ</h4>
+                                <p>ใบงานที่ 1.1 การแยกส่วนประกอบ (Decomposition) และการจับคู่รูปแบบ (Pattern Recognition)</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="badge done">✅ ตรวจแล้ว</span>
+                                <span class="score-text">⭐ 10 / 10 คะแนน</span>
+                            </div>
+                        </div>
+
+                        <div class="task-card" style="border-left: 4px solid #3b82f6;">
+                            <div class="task-info">
+                                <h4 style="color: #60a5fa;">🐍 บทที่ 2: โลกแห่งการเขียนโปรแกรม Python (กำลังเรียน)</h4>
+                                <p>ฝึกเขียน Python และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
+                                <p style="font-size: 0.8rem; margin-top: 5px; opacity:0.8;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="badge pending">⏳ ค้างส่งงาน</span>
+                                <span class="score-text">🎯 คะแนนเต็ม 15</span>
+                                <a href="python.html" class="btn-action">เข้าเรียน Python <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="task-card" style="border-left: 4px solid #3b82f6;">
+                            <div class="task-info">
+                                <h4 style="color: #60a5fa;">🤖 บทที่ 2: โลกแห่งการเขียนโปรแกรม Arduino (กำลังเรียน)</h4>
+                                <p>ฝึกเขียน Arduino และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
+                                <p style="font-size: 0.8rem; margin-top: 5px; opacity:0.8;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="badge pending">⏳ ค้างส่งงาน</span>
+                                <span class="score-text">🎯 คะแนนเต็ม 15</span>
+                                <a href="robotics.html" class="btn-action">เข้าเรียน Arduino <i class="fas fa-arrow-right"></i></a>
+                            </div>
+                        </div>
+
+                        <div class="task-card" style="opacity: 0.7;">
+                            <div class="task-info">
+                                <h4>🚀 บทที่ 3: โครงงาน PROT ROBOT</h4>
+                                <p>การประยุกต์ใช้บอร์ดไมโครคอนโทรลเลอร์สร้างนวัตกรรมหุ่นยนต์อัตโนมัติ</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="badge locked">🔒 ยังไม่ถึงกำหนด</span>
+                                <span class="score-text">เริ่มเรียน เมษายน 2569</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | วิทยาการคำนวณเพื่ออนาคต</p>
+        </footer>
+    </div>
+
+    <div id="loginModal" class="login-modal">
+        <button class="close-modal" onclick="closeLoginModal()">×</button>
+        <div class="login-modal-content">
+            <h3><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
+            <p>กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
+            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
         </div>
     </div>
 
-    <div class="content-area">
+    <script>
+        // ==================== THEME & PARTICLE SYSTEM ====================
+        const themes = {
+            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
+            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
+            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
+            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
+            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
+        };
+        let particleInterval = null;
         
-        <div class="announcement">
-            <h4><i class="fas fa-bullhorn"></i> ประกาศจากครูผู้สอน</h4>
-            <p>📢 นักเรียนทุกคนเตรียมตัวสอบเก็บคะแนนบทที่ 2 ในวันที่ 10 เมษายน 2569 เวลา 13:00 น. ณ ห้องปฏิบัติการคอมพิวเตอร์ ศึกษาบทเรียนผ่าน Smart Workspace ให้ครบถ้วนนะครับ</p>
-        </div>
-        
-        <div>
-            <div class="section-header">
-                <i class="fas fa-clipboard-check"></i> แบบทดสอบวัดผล (Exam)
-            </div>
+        function applyTheme(themeKey) {
+            document.body.setAttribute("data-theme", themeKey);
+            localStorage.setItem('smart_theme', themeKey);
             
-            <div class="task-card">
-                <div class="task-info">
-                    <h4>📝 แบบทดสอบก่อนเรียน (Pre-test) บทที่ 1-2</h4>
-                    <p>ประเมินความรู้พื้นฐานก่อนเริ่มเรียน (ไม่มีผลต่อคะแนนเก็บ)</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge done">✅ ทำแล้ว</span>
-                    <span class="score-text">📊 ได้ 8 / 10 คะแนน</span>
-                </div>
-            </div>
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
+            if(activeBtn) activeBtn.classList.add("active");
 
-            <div class="task-card">
-                <div class="task-info">
-                    <h4>📋 แบบทดสอบหลังเรียน (Post-test) บทที่ 2</h4>
-                    <p><i class="fas fa-lock"></i> ครูยังไม่เปิดเผยแพร่ข้อสอบชุดนี้ (จะเปิดหลังเรียนจบบทเรียน)</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge locked">🔒 รอเปิดสอบ</span>
-                    <span class="btn-locked">ยังไม่เปิดระบบ</span>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <div class="section-header">
-                <i class="fas fa-book-open"></i> บทเรียนและกิจกรรม (Modules)
-            </div>
+            startThemeParticles(themeKey);
             
-            <div class="task-card">
-                <div class="task-info">
-                    <h4>📘 บทที่ 1: แนวคิดเชิงคำนวณ</h4>
-                    <p>ใบงานที่ 1.1 การแยกส่วนประกอบ (Decomposition) และการจับคู่รูปแบบ (Pattern Recognition)</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge done">✅ ตรวจแล้ว</span>
-                    <span class="score-text">⭐ 10 / 10 คะแนน</span>
-                </div>
-            </div>
-
-            <div class="task-card" style="border-left: 4px solid var(--accent);">
-                <div class="task-info">
-                    <h4 style="color: var(--accent);">🐍 บทที่ 2: โลกแห่งการเขียนโปรแกรม Python (กำลังเรียน)</h4>
-                    <p>ฝึกเขียน Python และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
-                    <p style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge pending">⏳ ค้างส่งงาน</span>
-                    <span class="score-text">🎯 คะแนนเต็ม 15</span>
-                    <a href="python.html" class="btn-action">เข้าเรียน Python <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <div class="task-card" style="border-left: 4px solid var(--accent);">
-                <div class="task-info">
-                    <h4 style="color: var(--accent);">🤖 บทที่ 2: โลกแห่งการเขียนโปรแกรม Arduino (กำลังเรียน)</h4>
-                    <p>ฝึกเขียน Arduino และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
-                    <p style="font-size: 0.8rem; margin-top: 5px;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge pending">⏳ ค้างส่งงาน</span>
-                    <span class="score-text">🎯 คะแนนเต็ม 15</span>
-                    <a href="robotics.html" class="btn-action">เข้าเรียน Arduino <i class="fas fa-arrow-right"></i></a>
-                </div>
-            </div>
-
-            <div class="task-card" style="opacity: 0.8;">
-                <div class="task-info">
-                    <h4>🚀 บทที่ 3: โครงงาน PROT ROBOT</h4>
-                    <p>การประยุกต์ใช้บอร์ดไมโครคอนโทรลเลอร์สร้างนวัตกรรมหุ่นยนต์อัตโนมัติ</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge locked">🔒 ยังไม่ถึงกำหนด</span>
-                    <span class="score-text">เริ่มเรียน เมษายน 2569</span>
-                </div>
-            </div>
-
-            <div class="task-card">
-                <div class="task-info">
-                    <h4>🎨 กิจกรรมเสริม: การออกแบบ UI/UX เบื้องต้น</h4>
-                    <p>เรียนรู้หลักการออกแบบอินเทอร์เฟซสำหรับแอปพลิเคชันควบคุมหุ่นยนต์</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge pending">📌 กำลังเปิดรับสมัคร</span>
-                    <button class="btn-action" onclick="alert('🎉 ลงทะเบียนเข้าร่วมกิจกรรมสำเร็จ! ตรวจสอบอีเมลเพื่อรับรายละเอียดเพิ่มเติม')">ลงทะเบียน</button>
-                </div>
-            </div>
-        </div>
-
-        <div>
-            <div class="section-header">
-                <i class="fas fa-history"></i> กิจกรรมที่เข้าร่วมแล้ว
-            </div>
-            
-            <div class="task-card">
-                <div class="task-info">
-                    <h4>🧪 ค่ายปฏิบัติการ Arduino เบื้องต้น</h4>
-                    <p>เรียนรู้การเขียนโปรแกรมควบคุม LED และเซนเซอร์พื้นฐาน</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge done">✅ เข้าร่วมแล้ว</span>
-                    <span class="score-text">📅 5 กุมภาพันธ์ 2569</span>
-                </div>
-            </div>
-
-            <div class="task-card">
-                <div class="task-info">
-                    <h4>🐍 Python Workshop: From Zero to Hero</h4>
-                    <p>อบรมการเขียนโปรแกรม Python สำหรับผู้เริ่มต้น</p>
-                </div>
-                <div class="task-meta">
-                    <span class="badge done">✅ เข้าร่วมแล้ว</span>
-                    <span class="score-text">📅 15 มกราคม 2569</span>
-                </div>
-            </div>
-        </div>
-    </div>
-</div>
-
-<script>
-    function setTheme(themeName) {
-        document.body.setAttribute('data-theme', themeName);
-        localStorage.setItem('smart_theme', themeName);
-    }
-    const savedTheme = localStorage.getItem('smart_theme');
-    if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
-    else document.body.setAttribute('data-theme', 'light');
-
-    window.onload = function() {
-        const isLoggedIn = localStorage.getItem('is_logged_in');
-        
-        if (isLoggedIn !== 'true') {
-            alert('⚠️ กรุณาลงชื่อเข้าใช้งานก่อนครับ');
-            window.location.href = 'index.html';
-            return;
-        }
-
-        const studentName = localStorage.getItem('student_name');
-        const studentEmail = localStorage.getItem('student_email');
-        
-        if (studentName) {
-            document.getElementById('user-name-display').innerText = studentName;
-            document.getElementById('profile-name').innerText = studentName;
-            document.getElementById('profile-email').innerText = studentEmail || 'student@prot.ac.th';
-        } else {
-            document.getElementById('user-name-display').innerText = 'นักเรียน';
-            document.getElementById('profile-name').innerText = 'นักเรียน';
+            // Adjust specific colors for light/dark themes dynamically if needed
+            const h4BlueTexts = document.querySelectorAll('h4[style*="color: #60a5fa;"]');
+            if (themeKey === 'snow' || themeKey === 'love') {
+                h4BlueTexts.forEach(el => el.style.color = '#3b82f6');
+            } else {
+                h4BlueTexts.forEach(el => el.style.color = '#60a5fa');
+            }
         }
         
-        let totalScore = localStorage.getItem('student_total_score');
-        if (!totalScore) {
-            totalScore = 25;
-            localStorage.setItem('student_total_score', totalScore);
+        function startThemeParticles(theme) {
+            const container = document.getElementById("particleContainer");
+            if(particleInterval) clearInterval(particleInterval);
+            container.innerHTML = "";
+            const themeData = themes[theme];
+            
+            function createParticle() {
+                const particle = document.createElement("div");
+                particle.className = "theme-particle";
+                particle.style.position = "absolute";
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
+                particle.style.opacity = Math.random() * 0.6 + 0.3;
+                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
+                particle.style.animationDelay = Math.random() * 5 + "s";
+                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                particle.innerHTML = themeData.particleChar;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 10000);
+            }
+            for(let i = 0; i < 15; i++) setTimeout(() => createParticle(), i * 150);
+            particleInterval = setInterval(() => createParticle(), 800);
+        }
+
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+        });
+
+        // ==================== LOGIN SYSTEM ====================
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join('')));
         }
         
-        const percentage = (totalScore / 100) * 100;
-        document.getElementById('total-score').innerHTML = totalScore + ' <span style="font-size: 1rem;">/ 100</span>';
-        document.getElementById('progress-fill').style.width = percentage + '%';
-        document.getElementById('progress-text').innerHTML = `ความคืบหน้า ${percentage}%`;
+        function handleCredentialResponse(response) {
+            const userData = decodeJwtResponse(response.credential);
+            if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userData.email);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                closeLoginModal();
+                updateLoginUI(userData.name, userData.picture);
+                loadStudentData();
+            } else {
+                alert('อีเมลนี้ไม่ได้รับอนุญาต');
+            }
+        }
         
-        const joinDate = localStorage.getItem('student_join_date');
-        if (!joinDate) {
-            localStorage.setItem('student_join_date', 'มกราคม 2026');
-            document.getElementById('join-date').innerText = 'มกราคม 2026';
-        } else {
+        function updateLoginUI(userName, userPic) {
+            const loginArea = document.getElementById('loginArea');
+            loginArea.innerHTML = `
+                <div class="user-info">
+                    <img src="${userPic}" class="user-avatar" alt="avatar">
+                    <span class="user-name">${userName.split(' ')[0]}</span>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            `;
+        }
+        
+        function logout() {
+            if(confirm('⚠️ คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                localStorage.removeItem('is_logged_in');
+                localStorage.removeItem('student_name');
+                localStorage.removeItem('student_email');
+                localStorage.removeItem('student_pic');
+                window.location.href = 'index.html';
+            }
+        }
+        
+        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+
+        // ==================== LOAD STUDENT DATA ====================
+        function loadStudentData() {
+            const studentName = localStorage.getItem('student_name');
+            const studentEmail = localStorage.getItem('student_email');
+            
+            if (studentName) {
+                document.getElementById('profile-name').innerText = studentName;
+                document.getElementById('profile-email').innerText = studentEmail || 'student@prot.ac.th';
+            } else {
+                document.getElementById('profile-name').innerText = 'นักเรียน';
+            }
+            
+            let totalScore = localStorage.getItem('student_total_score');
+            if (!totalScore) {
+                totalScore = 25; // ค่าเริ่มต้น
+                localStorage.setItem('student_total_score', totalScore);
+            }
+            
+            const percentage = (totalScore / 100) * 100;
+            document.getElementById('total-score').innerHTML = totalScore + ' <span style="font-size: 1rem;">/ 100</span>';
+            document.getElementById('progress-fill').style.width = percentage + '%';
+            document.getElementById('progress-text').innerHTML = `ความคืบหน้า ${percentage}%`;
+            
+            const joinDate = localStorage.getItem('student_join_date') || 'มกราคม 2026';
             document.getElementById('join-date').innerText = joinDate;
-        }
-        
-        const activityCount = localStorage.getItem('student_activity_count');
-        if (activityCount) {
+            
+            const activityCount = localStorage.getItem('student_activity_count') || '3';
             document.getElementById('activity-count').innerText = activityCount;
         }
-    };
-    
-    function logout() {
-        if(confirm('⚠️ คุณต้องการออกจากระบบใช่หรือไม่?')) {
-            localStorage.removeItem('is_logged_in');
-            window.location.href = 'index.html';
-        }
-    }
-    
-    function updateScore(points) {
-        let currentScore = parseInt(localStorage.getItem('student_total_score') || '0');
-        let newScore = Math.min(currentScore + points, 100);
-        localStorage.setItem('student_total_score', newScore);
-        
-        let activityCount = parseInt(localStorage.getItem('student_activity_count') || '0');
-        localStorage.setItem('student_activity_count', activityCount + 1);
-        
-        alert(`🎉 ได้รับ ${points} คะแนน! คะแนนรวมปัจจุบัน: ${newScore} คะแนน`);
-        location.reload();
-    }
-</script>
 
+        // ==================== INITIALIZE ====================
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('smart_theme') || "default";
+            applyTheme(savedTheme);
+            
+            if (localStorage.getItem('is_logged_in') === 'true') {
+                updateLoginUI(localStorage.getItem('student_name'), localStorage.getItem('student_pic'));
+                loadStudentData();
+            } else {
+                alert('⚠️ กรุณาลงชื่อเข้าใช้งานก่อนครับ');
+                window.location.href = 'index.html'; // หากยังไม่ล็อกอิน ให้เด้งกลับไปหน้าหลัก
+            }
+        };
+    </script>
 </body>
 </html>
