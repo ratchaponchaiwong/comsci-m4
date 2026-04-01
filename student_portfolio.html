@@ -27,7 +27,6 @@
             min-height: 100vh;
         }
 
-        /* ธีมที่สอดคล้องกับ Smart Workspace */
         :root {
             --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --header-bg: linear-gradient(135deg, #1e3a5f 0%, #2c4e6e 100%);
@@ -45,7 +44,6 @@
             --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Dark Mode */
         body[data-theme="dark"] {
             --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2d3a4e 100%);
             --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
@@ -57,7 +55,6 @@
             --accent: #60a5fa;
         }
 
-        /* Forest Theme */
         body[data-theme="forest"] {
             --bg-body: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
             --header-bg: linear-gradient(135deg, #065f46 0%, #047857 100%);
@@ -69,7 +66,6 @@
             --accent: #10b981;
         }
 
-        /* Ocean Theme */
         body[data-theme="ocean"] {
             --bg-body: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);
             --header-bg: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
@@ -86,7 +82,6 @@
             color: var(--text-secondary);
         }
 
-        /* Navbar - เหมือนกับ Smart Workspace */
         nav {
             background: var(--header-bg);
             padding: 0 32px;
@@ -98,6 +93,8 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .logo {
@@ -113,7 +110,6 @@
             font-size: 1.5rem;
         }
 
-        /* Navigation Menu */
         .nav-menu {
             display: flex;
             gap: 8px;
@@ -121,6 +117,8 @@
             padding: 6px 20px;
             border-radius: 50px;
             backdrop-filter: blur(8px);
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .nav-item {
             padding: 8px 20px;
@@ -150,6 +148,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
         .theme-picker {
@@ -178,7 +177,6 @@
             background: rgba(255,255,255,0.2);
         }
 
-        /* User Profile */
         .user-info {
             display: flex;
             align-items: center;
@@ -208,14 +206,12 @@
             font-size: 0.7rem;
         }
 
-        /* Main Container */
         .container {
             max-width: 1200px;
             margin: 50px auto;
             padding: 0 20px;
         }
 
-        /* Header Title */
         .header-title {
             text-align: center;
             margin-bottom: 50px;
@@ -234,7 +230,6 @@
             font-size: 1rem;
         }
 
-        /* Gallery Grid */
         .gallery {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -294,7 +289,6 @@
             margin-top: 12px;
         }
 
-        /* Stats Section */
         .stats-section {
             background: var(--card-bg);
             backdrop-filter: blur(12px);
@@ -323,7 +317,6 @@
             color: var(--text-secondary);
         }
 
-        /* Add Project Button */
         .add-project {
             text-align: center;
             margin: 40px 0;
@@ -349,7 +342,6 @@
             box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
 
-        /* Footer Buttons */
         .footer-buttons {
             text-align: center;
             margin-top: 40px;
@@ -385,7 +377,7 @@
         }
 
         @media (max-width: 768px) {
-            nav { padding: 0 16px; flex-wrap: wrap; height: auto; gap: 10px; }
+            nav { padding: 0 16px; height: auto; }
             .nav-menu { display: none; }
             .header-title h1 { font-size: 1.6rem; flex-direction: column; }
             .gallery { grid-template-columns: 1fr; }
@@ -402,12 +394,12 @@
     </a>
     
     <div class="nav-menu">
-        <a href="student.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="#" class="nav-item"><i class="fas fa-book"></i> บทเรียน</a>
+        <a href="index.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="student.html" class="nav-item"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
         <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
         <a href="student_portfolio.html" class="nav-item active"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
-        <a href="#" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
-        <a href="#" class="nav-item"><i class="fas fa-envelope"></i> ติดต่อ</a>
+        <a href="extra_subjects.html" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
+        <a href="contact.html" class="nav-item"><i class="fas fa-envelope"></i> ติดต่อ</a>
     </div>
     
     <div class="header-right">
@@ -424,7 +416,7 @@
             <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
         </div>
         <div id="login-section">
-            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID_HERE" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
             <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="medium"></div>
         </div>
     </div>
@@ -527,7 +519,6 @@
 </div>
 
 <script>
-    // ==================== THEME MANAGEMENT ====================
     function setTheme(themeName) {
         document.body.setAttribute('data-theme', themeName);
         localStorage.setItem('smart_theme', themeName);
@@ -536,7 +527,6 @@
     if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
     else document.body.setAttribute('data-theme', 'light');
 
-    // ==================== GOOGLE LOGIN ====================
     function decodeJwtResponse(token) {
         let base64Url = token.split('.')[1];
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -593,7 +583,6 @@
         }
     }
     
-    // ฟังก์ชันส่งผลงาน
     function showSubmitForm() {
         if (!localStorage.getItem('is_logged_in')) {
             alert('⚠️ กรุณาเข้าสู่ระบบก่อนส่งผลงานครับ');
@@ -610,14 +599,13 @@
         
         alert(`✅ ส่งผลงานเรียบร้อยแล้ว!\n\nชื่อ: ${projectName}\nโดย: ${studentName}\nคำอธิบาย: ${projectDesc}\n\n🎉 ขอบคุณที่ร่วมแบ่งปันผลงาน! ครูจะตรวจสอบและนำไปแสดงในเว็บไซต์ต่อไป`);
         
-        // สามารถเพิ่มโค้ดสำหรับส่งข้อมูลไปยังเซิร์ฟเวอร์ได้ในอนาคต
+        let activityCount = parseInt(localStorage.getItem('student_activity_count') || '0');
+        localStorage.setItem('student_activity_count', activityCount + 1);
     }
     
-    // เริ่มต้นตรวจสอบการ Login
     window.addEventListener('DOMContentLoaded', () => {
         checkExistingLogin();
         
-        // แอนิเมชันเลื่อนสำหรับ gallery items
         const observer = new IntersectionObserver((entries) => {
             entries.forEach((entry, index) => {
                 if(entry.isIntersecting) {
