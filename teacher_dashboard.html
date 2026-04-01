@@ -24,19 +24,14 @@
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
         body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
-        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
-        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-
+        
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 10px; }
         
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #3b82f6;}
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: white;}
         .logout-btn { background: rgba(239, 68, 68, 0.8); border: none; padding: 6px 15px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; font-family: 'Prompt'; }
         
         .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
@@ -89,7 +84,7 @@
         @media (max-width: 1000px) { .admin-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
-<body data-theme="default">
+<body data-theme="default" style="display: none;" id="bodyContent">
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
     <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
 
@@ -98,7 +93,7 @@
             <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Admin Hub</a>
             <div id="teacherInfoUI">
                 <div class="user-info">
-                    <img id="teacherAvatar" src="" class="user-avatar" alt="avatar">
+                    <img id="teacherAvatar" src="https://ui-avatars.com/api/?name=TC&background=3b82f6&color=fff" class="user-avatar" alt="avatar">
                     <span id="teacherName" class="user-name">TECHNOLOGY COMPUTER</span>
                     <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
@@ -138,7 +133,7 @@
                                     <option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option>
                                 </select>
                                 <select id="act-room-num" style="display: none; color: black;">
-                                    <option value="1">ห้อง 1</option><option value="2">ห้อง 2</option><option value="3">ห้อง 3</option><option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option><option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option><option value="10">ห้อง 10</option><option value="11">ห้อง 11</option><option value="12">ห้อง 12</option>
+                                    <option value="1">ห้อง 1</option><option value="2">ห้อง 2</option><option value="3">ห้อง 3</option><option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option><option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option><option value="10">ห้อง 10</option>
                                 </select>
                             </div>
                         </div>
@@ -165,7 +160,11 @@
                     <div class="glass-panel">
                         <div class="panel-title"><i class="fas fa-list"></i> บทเรียนที่มอบหมายแล้ว</div>
                         <div id="activities-list-container" style="max-height: 600px; overflow-y: auto;">
+                            <div style="text-align:center; padding: 40px; color: #60a5fa;">
+                                <i class="fas fa-spinner fa-spin fa-2x"></i>
+                                <p style="margin-top: 15px;">กำลังเตรียมข้อมูล...</p>
                             </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -300,27 +299,35 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
-        // ==================== FETCH ACTIVITIES (เพิ่มสถานะกำลังโหลด) ====================
+        // ==================== FETCH ACTIVITIES (แก้ปัญหางานหาย) ====================
         async function fetchActivitiesFromServer() {
             const container = document.getElementById('activities-list-container');
+            container.innerHTML = '<div style="text-align:center; padding: 40px; color: #60a5fa;"><i class="fas fa-spinner fa-spin fa-2x"></i><p style="margin-top: 15px;">กำลังเชื่อมต่อฐานข้อมูล...</p></div>';
             
-            // 1. ใส่ตัวโหลดให้เห็นชัดเจนก่อนเลย
-            container.innerHTML = '<div style="text-align:center; padding: 40px; opacity: 0.9; color: #60a5fa;"><i class="fas fa-spinner fa-spin fa-3x"></i><p style="margin-top: 15px; font-weight: 500;">กำลังดึงข้อมูลบทเรียนจากระบบ...</p></div>';
-            
-            // 2. แอบไปดึงอัปเดตจาก Google Sheets
-            if(GOOGLE_SCRIPT_URL) {
-                try {
+            try {
+                if(GOOGLE_SCRIPT_URL) {
                     const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
-                    const parsedData = await response.json();
+                    const text = await response.text();
+                    const parsedData = JSON.parse(text);
+                    
                     if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
-                        localStorage.setItem('global_activities', JSON.stringify(parsedData.data));
+                        let localActs = JSON.parse(localStorage.getItem('global_activities') || '[]');
+                        let serverActs = parsedData.data;
+                        
+                        // ถ้าระบบหลังบ้านส่งค่าว่างมา แต่หน้าบ้านมีข้อมูล (แปลว่าหลังบ้านเซฟไม่ติด) ให้ใช้หน้าบ้าน
+                        if (serverActs.length === 0 && localActs.length > 0) {
+                            console.log("เซิร์ฟเวอร์ไม่มีข้อมูล ดันข้อมูลในเครื่องขึ้นแทน");
+                            syncActivities();
+                        } else {
+                            localStorage.setItem('global_activities', JSON.stringify(serverActs));
+                        }
                     }
-                } catch(e) { 
-                    console.log("โหลดจาก Server ไม่สำเร็จ จะใช้ข้อมูลที่บันทึกไว้ในเครื่องแทน"); 
                 }
+            } catch(e) { 
+                console.log("เกิดข้อผิดพลาดในการโหลดข้อมูล จะใช้ข้อมูลจากในเครื่อง"); 
             }
             
-            // 3. นำข้อมูลมาแสดงผล (ไม่ว่าจะโหลดติดหรือไม่ติด ก็จะแสดงของเดิมที่มี)
+            // แสดงข้อมูลทันที
             loadActivities(); 
         }
 
@@ -337,7 +344,7 @@
             } catch(e) { acts = []; }
             
             if(!acts || acts.length === 0) {
-                container.innerHTML = '<p style="opacity:0.5; text-align:center; padding: 20px;">ยังไม่มีบทเรียนที่มอบหมาย (หรือเชื่อมต่อฐานข้อมูลไม่ได้)</p>';
+                container.innerHTML = '<p style="opacity:0.5; text-align:center; padding: 40px;">ยังไม่มีบทเรียนที่มอบหมาย</p>';
                 return;
             }
 
@@ -580,19 +587,33 @@
         }
 
         function checkTeacherAccess() {
-            const email = localStorage.getItem('student_email');
-            if (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th' && email !== 'ratchapon.p@prot.ac.th') {
-                window.location.href = 'index.html'; return false;
+            try {
+                const email = localStorage.getItem('student_email');
+                if (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th' && email !== 'ratchapon.p@prot.ac.th') {
+                    window.location.href = 'index.html'; 
+                    return false;
+                }
+                
+                // ถ้ารูปพัง ให้ใช้รูประบุตัวตนสำรองแทน ป้องกันสคริปต์หยุดทำงาน
+                let pic = localStorage.getItem('student_pic');
+                if (!pic || pic === 'undefined' || pic === 'null' || pic.trim() === '') {
+                    pic = 'https://ui-avatars.com/api/?name=TC&background=3b82f6&color=fff'; 
+                }
+                
+                const avatarEl = document.getElementById('teacherAvatar');
+                if (avatarEl) avatarEl.src = pic;
+                
+                const nameEl = document.getElementById('teacherName');
+                if (nameEl) nameEl.innerText = 'TECHNOLOGY COMPUTER';
+                
+                const bodyEl = document.getElementById('bodyContent');
+                if (bodyEl) bodyEl.style.display = 'block';
+                
+                return true;
+            } catch(e) {
+                console.log("Check Auth Error:", e);
+                return false;
             }
-            document.getElementById('bodyContent').style.display = 'block';
-            
-            let pic = localStorage.getItem('student_pic');
-            if (!pic || pic === 'undefined' || pic === 'null') {
-                pic = 'https://ui-avatars.com/api/?name=Teacher&background=3b82f6&color=fff';
-            }
-            document.getElementById('teacherAvatar').src = pic;
-            document.getElementById('teacherName').innerText = 'TECHNOLOGY COMPUTER';
-            return true;
         }
 
         function logout() { localStorage.removeItem('is_logged_in'); window.location.href = 'index.html'; }
