@@ -300,23 +300,28 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
-        // ==================== FETCH ACTIVITIES ====================
+        // ==================== FETCH ACTIVITIES (เพิ่มสถานะกำลังโหลด) ====================
         async function fetchActivitiesFromServer() {
-            // โหลดข้อมูลในเครื่องให้เห็นทันที
-            loadActivities();
+            const container = document.getElementById('activities-list-container');
             
-            // ดึงอัปเดตจาก Google Sheets
+            // 1. ใส่ตัวโหลดให้เห็นชัดเจนก่อนเลย
+            container.innerHTML = '<div style="text-align:center; padding: 40px; opacity: 0.9; color: #60a5fa;"><i class="fas fa-spinner fa-spin fa-3x"></i><p style="margin-top: 15px; font-weight: 500;">กำลังดึงข้อมูลบทเรียนจากระบบ...</p></div>';
+            
+            // 2. แอบไปดึงอัปเดตจาก Google Sheets
             if(GOOGLE_SCRIPT_URL) {
                 try {
                     const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
-                    const text = await response.text();
-                    const parsedData = JSON.parse(text);
+                    const parsedData = await response.json();
                     if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(parsedData.data));
-                        loadActivities(); 
                     }
-                } catch(e) { console.log("โหลดจาก Server ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทน"); }
+                } catch(e) { 
+                    console.log("โหลดจาก Server ไม่สำเร็จ จะใช้ข้อมูลที่บันทึกไว้ในเครื่องแทน"); 
+                }
             }
+            
+            // 3. นำข้อมูลมาแสดงผล (ไม่ว่าจะโหลดติดหรือไม่ติด ก็จะแสดงของเดิมที่มี)
+            loadActivities(); 
         }
 
         function toggleRoomSelect(gid, rid) {
@@ -332,7 +337,7 @@
             } catch(e) { acts = []; }
             
             if(!acts || acts.length === 0) {
-                container.innerHTML = '<p style="opacity:0.5; text-align:center; padding: 20px;">ยังไม่มีบทเรียนที่มอบหมาย</p>';
+                container.innerHTML = '<p style="opacity:0.5; text-align:center; padding: 20px;">ยังไม่มีบทเรียนที่มอบหมาย (หรือเชื่อมต่อฐานข้อมูลไม่ได้)</p>';
                 return;
             }
 
