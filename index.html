@@ -6,7 +6,6 @@
     <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | หุ่นยนต์โต้ตอบสุดล้ำ</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
-    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
@@ -48,34 +47,61 @@
         .stat-number { font-size: 2rem; font-weight: 800; color: #60a5fa; }
         .stat-label { font-size: 0.8rem; color: #94a3b8; }
         
-        /* Robot Container */
+        /* Robot Container - Enhanced */
         .hero-robot { flex: 1; min-width: 300px; text-align: center; cursor: pointer; position: relative; }
-        .robot-container { position: relative; display: inline-block; transition: transform 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
-        .robot-container:hover { transform: scale(1.02); }
-        .robot-container:active { transform: scale(0.98); }
+        .robot-container { position: relative; display: inline-block; transition: transform 0.2s cubic-bezier(0.68, -0.55, 0.265, 1.55); }
         .robot-main { width: 100%; max-width: 400px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3)); transition: all 0.2s ease; cursor: pointer; pointer-events: none; }
         .robot-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120%; height: 120%; background: radial-gradient(circle, rgba(59,130,246,0.3) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: glowPulse 3s infinite; pointer-events: none; }
         @keyframes glowPulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
         
-        /* Animation Classes */
+        /* Enhanced Animation Classes - More Reactions */
         .robot-shake { animation: shakeAnim 0.5s ease-in-out !important; }
-        @keyframes shakeAnim { 0%, 100% { transform: translateX(0) rotate(0deg); } 25% { transform: translateX(-12px) rotate(-5deg); } 75% { transform: translateX(12px) rotate(5deg); } }
-        .robot-bounce { animation: bounceAnim 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important; }
-        @keyframes bounceAnim { 0%, 100% { transform: translateY(0) rotate(0deg); } 50% { transform: translateY(-40px) rotate(12deg); } }
-        .robot-spin { animation: spinAnim 0.5s ease-in-out !important; }
-        @keyframes spinAnim { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .robot-wobble { animation: wobbleAnim 0.4s ease-in-out !important; }
-        @keyframes wobbleAnim { 0%, 100% { transform: translateX(0px) rotate(0deg); } 25% { transform: translateX(-15px) rotate(-10deg); } 75% { transform: translateX(15px) rotate(10deg); } }
-        .robot-pop { animation: popAnim 0.3s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important; }
-        @keyframes popAnim { 0% { transform: scale(1); } 50% { transform: scale(1.3); } 100% { transform: scale(1); } }
-        .robot-tilt { animation: tiltAnim 0.4s ease-in-out !important; }
-        @keyframes tiltAnim { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-15deg); } 75% { transform: rotate(15deg); } }
+        @keyframes shakeAnim { 0%, 100% { transform: translateX(0) rotate(0deg); } 20% { transform: translateX(-10px) rotate(-3deg); } 40% { transform: translateX(10px) rotate(3deg); } 60% { transform: translateX(-5px) rotate(-2deg); } 80% { transform: translateX(5px) rotate(2deg); } }
         
-        /* Click Effect */
+        .robot-bounce { animation: bounceAnim 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important; }
+        @keyframes bounceAnim { 0%, 100% { transform: translateY(0) rotate(0deg); } 30% { transform: translateY(-25px) rotate(5deg); } 60% { transform: translateY(-10px) rotate(-3deg); } 80% { transform: translateY(-5px); } }
+        
+        .robot-spin { animation: spinAnim 0.6s ease-in-out !important; }
+        @keyframes spinAnim { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        
+        .robot-wobble { animation: wobbleAnim 0.5s ease-in-out !important; }
+        @keyframes wobbleAnim { 0%, 100% { transform: translateX(0px) rotate(0deg); } 15% { transform: translateX(-12px) rotate(-8deg); } 30% { transform: translateX(10px) rotate(6deg); } 45% { transform: translateX(-6px) rotate(-4deg); } 60% { transform: translateX(4px) rotate(3deg); } 75% { transform: translateX(-2px) rotate(-1deg); } }
+        
+        .robot-pop { animation: popAnim 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important; }
+        @keyframes popAnim { 0% { transform: scale(1); } 50% { transform: scale(1.25); } 100% { transform: scale(1); } }
+        
+        .robot-tilt { animation: tiltAnim 0.4s ease-in-out !important; }
+        @keyframes tiltAnim { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
+        
+        .robot-flip { animation: flipAnim 0.6s ease-in-out !important; }
+        @keyframes flipAnim { 0% { transform: rotateY(0deg); } 50% { transform: rotateY(180deg); } 100% { transform: rotateY(360deg); } }
+        
+        .robot-swing { animation: swingAnim 0.5s ease-in-out !important; }
+        @keyframes swingAnim { 0%, 100% { transform: rotate(0deg); } 25% { transform: rotate(15deg); } 75% { transform: rotate(-15deg); } }
+        
+        .robot-vibrate { animation: vibrateAnim 0.2s ease-in-out infinite !important; animation-iteration-count: 3 !important; }
+        @keyframes vibrateAnim { 0% { transform: translate(0px, 0px); } 25% { transform: translate(3px, -2px); } 50% { transform: translate(-3px, 2px); } 75% { transform: translate(2px, -1px); } 100% { transform: translate(0px, 0px); } }
+        
+        .robot-dance { animation: danceAnim 0.8s ease-in-out !important; }
+        @keyframes danceAnim { 0%, 100% { transform: translateY(0) rotate(0deg); } 20% { transform: translateY(-15px) rotate(-8deg); } 40% { transform: translateY(5px) rotate(6deg); } 60% { transform: translateY(-10px) rotate(-4deg); } 80% { transform: translateY(3px) rotate(2deg); } }
+        
+        .robot-zoom { animation: zoomAnim 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55) !important; }
+        @keyframes zoomAnim { 0% { transform: scale(1); } 50% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        
+        .robot-headbang { animation: headbangAnim 0.3s ease-in-out !important; animation-iteration-count: 4 !important; }
+        @keyframes headbangAnim { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px) rotate(3deg); } }
+        
+        /* Speech Bubble */
+        .speech-bubble { position: absolute; background: white; color: #1e293b; padding: 12px 20px; border-radius: 30px; font-weight: 600; font-size: 1rem; white-space: nowrap; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 200; animation: bubblePop 0.3s ease-out; pointer-events: none; font-family: 'Prompt'; max-width: 250px; white-space: normal; text-align: center; }
+        .speech-bubble::before { content: ''; position: absolute; bottom: -12px; left: 50%; transform: translateX(-50%); border-width: 12px 12px 0 12px; border-style: solid; border-color: white transparent transparent transparent; }
+        @keyframes bubblePop { 0% { opacity: 0; transform: scale(0.8) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
+        
+        /* Floating Emoji */
+        .floating-emoji { position: fixed; font-size: 2rem; pointer-events: none; animation: floatEmoji 1s ease-out forwards; z-index: 1000; text-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+        @keyframes floatEmoji { 0% { opacity: 1; transform: translateY(0) scale(0.5); } 100% { opacity: 0; transform: translateY(-80px) scale(1.2); } }
+        
         .click-effect { position: fixed; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.8) 0%, rgba(59,130,246,0) 70%); pointer-events: none; animation: clickRipple 0.6s ease-out forwards; z-index: 1000; }
         @keyframes clickRipple { 0% { transform: scale(0); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
-        .floating-message { position: fixed; font-size: 1.3rem; font-weight: bold; white-space: nowrap; pointer-events: none; animation: floatUp 1s ease-out forwards; z-index: 1000; text-shadow: 0 0 10px rgba(0,0,0,0.5); background: rgba(0,0,0,0.6); padding: 5px 15px; border-radius: 40px; backdrop-filter: blur(5px); }
-        @keyframes floatUp { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.2); } }
         
         /* Login Card */
         .login-section { padding: 40px 80px 80px; }
@@ -95,7 +121,6 @@
         .feature-card h4 { font-size: 1.3rem; margin-bottom: 12px; }
         .feature-card p { color: #94a3b8; line-height: 1.5; }
         
-        /* Particles */
         .particles { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; }
         .particle { position: absolute; background: rgba(59,130,246,0.4); border-radius: 50%; animation: particleFloat 15s infinite linear; }
         @keyframes particleFloat { from { transform: translateY(100vh) rotate(0deg); opacity: 0; } to { transform: translateY(-100vh) rotate(360deg); opacity: 1; } }
@@ -111,7 +136,8 @@
             .features { padding: 40px 20px; } 
             header { padding: 12px 20px; } 
             .nav-links { justify-content: center; gap: 12px; } 
-            .hero-stats { justify-content: center; } 
+            .hero-stats { justify-content: center; }
+            .speech-bubble { font-size: 0.8rem; white-space: normal; max-width: 180px; }
         }
     </style>
 </head>
@@ -130,12 +156,12 @@
                 <span>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</span>
             </div>
             <ul class="nav-links">
-                <li><a href="index.html" class="active">หน้าหลัก</a></li>
-                <li><a href="student.html">ห้องเรียนของฉัน</a></li>
-                <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
-                <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
-                <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
-                <li><a href="contact.html">ติดต่อ</a></li>
+                <li><a href="#" class="active">หน้าหลัก</a></li>
+                <li><a href="#">ห้องเรียนของฉัน</a></li>
+                <li><a href="#">ข้อมูลผู้สอน</a></li>
+                <li><a href="#">ผลงานนักเรียน</a></li>
+                <li><a href="#">วิชาเพิ่มเติม</a></li>
+                <li><a href="#">ติดต่อ</a></li>
             </ul>
         </header>
 
@@ -175,7 +201,7 @@
                         </defs>
                     </svg>
                 </div>
-                <div class="click-instruction" id="clickInstruction"><i class="fas fa-mouse-pointer"></i> คลิกที่หุ่นยนต์สิ! มันจะมีท่าทางน่ารักๆ</div>
+                <div class="click-instruction" id="clickInstruction"><i class="fas fa-mouse-pointer"></i> คลิกที่หุ่นยนต์สิ! มีท่าทางน่ารักๆ และคำพูดดีๆ เยอะมาก</div>
             </div>
         </div>
 
@@ -200,22 +226,22 @@
         <div class="features">
             <h2 class="section-title">✨ ทำไมต้อง ห้องเรียนวิทยาการคำนวณ By ครูรัชพล?</h2>
             <div class="features-grid">
-                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='python.html'; else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
+                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') alert('ไปหน้า Python'); else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
                     <div class="feature-icon"><i class="fas fa-code"></i></div>
                     <h4>เรียนรู้ผ่านการลงมือทำ</h4>
                     <p>ฝึกเขียน Python และ Arduino จำลองวงจรด้วย Wokwi แบบเรียลไทม์</p>
                 </div>
-                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='robotics.html'; else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
+                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') alert('ไปหน้า Robotics'); else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
                     <div class="feature-icon"><i class="fas fa-robot"></i></div>
                     <h4>PROT ROBOT Innovation</h4>
                     <p>ออกแบบและสร้างหุ่นยนต์อัตโนมัติด้วยโครงงานจริง พร้อมแข่งขันระดับชั้น</p>
                 </div>
-                <div class="feature-card" onclick="window.location.href='teacher_profile.html';">
+                <div class="feature-card" onclick="alert('ข้อมูลผู้สอน: ครูรัชพล ผู้เชี่ยวชาญด้านวิทยาการคอมพิวเตอร์');">
                     <div class="feature-icon"><i class="fas fa-chalkboard-user"></i></div>
                     <h4>ผู้สอนมืออาชีพ</h4>
                     <p>ครูผู้เชี่ยวชาญด้านวิทยาการคอมพิวเตอร์และวิศวกรรมหุ่นยนต์</p>
                 </div>
-                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='student_portfolio.html'; else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
+                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') alert('ไปหน้าวุฒิบัตร'); else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
                     <div class="feature-icon"><i class="fas fa-certificate"></i></div>
                     <h4>รับวุฒิบัตร</h4>
                     <p>ผ่านเกณฑ์การประเมินรับประกาศนียบัตรรับรองทักษะการเขียนโปรแกรม</p>
@@ -229,14 +255,59 @@
     </div>
 
     <script>
-        // ==================== ส่วนที่ 1: ระบบหุ่นยนต์โต้ตอบ ====================
-        const animations = ['robot-shake', 'robot-bounce', 'robot-spin', 'robot-wobble', 'robot-pop', 'robot-tilt'];
-        const messages = [
-            '🤖 สวัสดีจ้า!', '⚡ โอ้โห! โดนตัว', '🔧 ฮิฮิ ขยับหน่อย', '💙 สบายดีไหม?', 
-            '🎉 เย้! มีคนเล่นด้วย', '🤖 อยากเรียนโปรแกรมมิ่งมั้ย?', '✨ มาสนุกกัน!', 
-            '🚀 พร้อมเรียนรู้แล้ว!', '💡 คลิกอีกสิครับ', '😊 รักเลย!', 
-            '🐍 Python สนุกนะ!', '🔌 Arduino กำลังรออยู่', '🎯 เก่งมาก!', '💪 สู้ๆ นะครับ'
+        // ==================== Enhanced Robot Interaction System ====================
+        // 12 different animations for more variety
+        const animations = [
+            'robot-shake', 'robot-bounce', 'robot-spin', 'robot-wobble', 
+            'robot-pop', 'robot-tilt', 'robot-flip', 'robot-swing', 
+            'robot-vibrate', 'robot-dance', 'robot-zoom', 'robot-headbang'
         ];
+        
+        // 40+ inspiring and cute messages
+        const messages = [
+            "🤖 สวัสดีจ้า! ยินดีต้อนรับสู่ห้องเรียนนะคะ", 
+            "⚡ เก่งมาก! ตั้งใจเรียนกันนะ", 
+            "🔧 คลิกมาอีกแล้ว สนุกจังเลย", 
+            "💙 เธอคือสุดยอดนักเรียนเลย", 
+            "🎉 เย้! มีเพื่อนมาเล่นด้วย", 
+            "🤖 อยากเรียน Python มั้ย? สนุกนะ", 
+            "✨ มาสร้างนวัตกรรมไปด้วยกัน!", 
+            "🚀 พร้อมเรียนรู้แล้วหรือยัง?", 
+            "💡 คลิกสิครับ มีเซอร์ไพรส์", 
+            "😊 รักนักเรียนทุกคนเลยนะ", 
+            "🐍 Python สนุกสุดๆ เลย", 
+            "🔌 Arduino กำลังรอเธออยู่", 
+            "🎯 เก่งมาก! พัฒนาต่อไปนะ", 
+            "💪 สู้ๆ นะครับ เป็นกำลังใจให้", 
+            "🌟 เธอทำได้ดีมากเลย", 
+            "📚 วิทยาการคำนวณคืออนาคต", 
+            "🤗 ขอบคุณที่สนใจนะ", 
+            "🎓 ครูรัชพลภูมิใจในตัวเธอ", 
+            "💖 ตั้งใจเรียนนะคะ พร้อมช่วยเหลือเสมอ", 
+            "🦾 หุ่นยนต์เป็นเพื่อนเธอตลอดไป", 
+            "🧠 สมองดี มีความสุขกับการเรียน", 
+            "🌈 ฝันให้ไกล แล้วไปให้ถึง", 
+            "⭐ ความพยายามไม่เคยทรยศ", 
+            "🎯 วันนี้มีความสุขกับการเรียนนะ", 
+            "🤝 เราไปด้วยกัน เรียนรู้ไปด้วยกัน", 
+            "💡 ไอเดียเจ๋งๆ รอเธออยู่นะ", 
+            "🔮 อนาคตสดใส รออยู่ข้างหน้า", 
+            "🎨 สร้างสรรค์ผลงานได้ตามใจ", 
+            "🏆 เป็นแชมป์ด้านโค้ดดิ้งได้นะ", 
+            "🌱 เรียนรู้ทุกวัน เติบโตทุกวัน", 
+            "🤖 ติ๊งต๊อง! มีคนคลิกหุ่นยนต์", 
+            "💬 ถ้าสงสัยถามได้เลยนะ", 
+            "🎵 เต้นไปกับโค้ดดิ้งกันเถอะ", 
+            "✨ เธอเก่งมากๆ เลย", 
+            "💪 อย่าท้อ นะ สู้ต่อไป", 
+            "🎁 มี惊喜รออยู่นะ คลิกอีกสิ", 
+            "🧸 รักเธอนะ นักเรียนคนเก่ง", 
+            "🌻 วันที่สดใส เริ่มต้นที่การเรียนรู้", 
+            "🤗 กอดหุ่นยนต์ให้กำลังใจ"
+        ];
+        
+        // Emojis for floating effects
+        const emojis = ['🤖', '💙', '⭐', '🎉', '✨', '🚀', '💡', '🎯', '🌟', '💪', '🤗', '🌈', '🦾', '🧠', '🎨', '🏆', '🌱', '💬', '🎵', '🎁'];
         
         const robotContainer = document.getElementById('robotContainer');
         const interactiveRobot = document.getElementById('interactiveRobot');
@@ -250,20 +321,46 @@
             setTimeout(() => ripple.remove(), 600);
         }
         
-        function createFloatingMessage(event, message) {
-            const msgDiv = document.createElement('div');
-            msgDiv.classList.add('floating-message');
-            msgDiv.textContent = message;
-            msgDiv.style.left = (event.clientX - 60) + 'px';
-            msgDiv.style.top = (event.clientY - 40) + 'px';
-            document.body.appendChild(msgDiv);
-            setTimeout(() => msgDiv.remove(), 1000);
+        function createFloatingEmoji(event) {
+            const emoji = emojis[Math.floor(Math.random() * emojis.length)];
+            const emojiDiv = document.createElement('div');
+            emojiDiv.classList.add('floating-emoji');
+            emojiDiv.textContent = emoji;
+            emojiDiv.style.left = (event.clientX - 20) + 'px';
+            emojiDiv.style.top = (event.clientY - 30) + 'px';
+            document.body.appendChild(emojiDiv);
+            setTimeout(() => emojiDiv.remove(), 1000);
+        }
+        
+        function createSpeechBubble(message, event) {
+            // Remove any existing bubble
+            const existingBubble = document.querySelector('.speech-bubble');
+            if(existingBubble) existingBubble.remove();
+            
+            const bubble = document.createElement('div');
+            bubble.classList.add('speech-bubble');
+            bubble.textContent = message;
+            
+            // Position near robot
+            const robotRect = interactiveRobot.getBoundingClientRect();
+            bubble.style.position = 'absolute';
+            bubble.style.left = (robotRect.left + robotRect.width / 2 - 100) + 'px';
+            bubble.style.top = (robotRect.top - 60) + 'px';
+            bubble.style.bottom = 'auto';
+            
+            document.body.appendChild(bubble);
+            
+            // Auto remove after 2 seconds
+            setTimeout(() => {
+                if(bubble) bubble.style.opacity = '0';
+                setTimeout(() => bubble.remove(), 300);
+            }, 2000);
         }
         
         function animateRobot() {
             if (!robotContainer) return;
             robotContainer.classList.remove(...animations);
-            void robotContainer.offsetWidth;
+            void robotContainer.offsetWidth; // Force reflow
             const randomAnim = animations[Math.floor(Math.random() * animations.length)];
             robotContainer.classList.add(randomAnim);
             setTimeout(() => {
@@ -272,10 +369,11 @@
         }
         
         function blinkEyes() {
-            const eyes = document.querySelectorAll('#robotSvg circle[r="8"]');
-            eyes.forEach(eye => {
-                eye.setAttribute('r', '2');
-                setTimeout(() => eye.setAttribute('r', '8'), 150);
+            const pupils = document.querySelectorAll('#robotSvg circle[r="8"]');
+            pupils.forEach(pupil => {
+                const originalR = pupil.getAttribute('r');
+                pupil.setAttribute('r', '3');
+                setTimeout(() => pupil.setAttribute('r', originalR), 150);
             });
         }
         
@@ -283,13 +381,15 @@
             const antenna = document.getElementById('antenna');
             const antennaBall = document.getElementById('antennaBall');
             if (antenna) {
-                antenna.style.transform = 'translateX(5px)';
-                antennaBall.style.transform = 'translateX(5px)';
+                antenna.style.transformOrigin = '200px 100px';
+                antennaBall.style.transformOrigin = '200px 70px';
+                antenna.style.transform = 'rotate(10deg)';
+                antennaBall.style.transform = 'translateX(3px)';
                 setTimeout(() => {
-                    antenna.style.transform = 'translateX(-5px)';
-                    antennaBall.style.transform = 'translateX(-5px)';
+                    antenna.style.transform = 'rotate(-8deg)';
+                    antennaBall.style.transform = 'translateX(-2px)';
                     setTimeout(() => {
-                        antenna.style.transform = 'translateX(0)';
+                        antenna.style.transform = 'rotate(0deg)';
                         antennaBall.style.transform = 'translateX(0)';
                     }, 100);
                 }, 100);
@@ -305,27 +405,83 @@
             }
         }
         
+        function changeExpression(happy = true) {
+            const leftEye = document.querySelector('#robotSvg circle[r="8"]');
+            const rightEye = document.querySelectorAll('#robotSvg circle[r="8"]')[1];
+            if (leftEye && rightEye) {
+                if (happy) {
+                    // Smile - normal eyes
+                    leftEye.setAttribute('cy', '158');
+                    rightEye.setAttribute('cy', '158');
+                } else {
+                    // Surprised - bigger eyes briefly
+                    leftEye.setAttribute('r', '10');
+                    rightEye.setAttribute('r', '10');
+                    setTimeout(() => {
+                        leftEye.setAttribute('r', '8');
+                        rightEye.setAttribute('r', '8');
+                    }, 200);
+                }
+            }
+        }
+        
+        let clickCount = 0;
         function handleRobotClick(event) {
             event.stopPropagation();
+            clickCount++;
+            
+            // Create effects
             createRipple(event);
-            createFloatingMessage(event, messages[Math.floor(Math.random() * messages.length)]);
+            createFloatingEmoji(event);
+            
+            // Random message from the big list
+            const randomMessage = messages[Math.floor(Math.random() * messages.length)];
+            createSpeechBubble(randomMessage, event);
+            
+            // Animate robot
             animateRobot();
             blinkEyes();
             antennaWiggle();
             flashChestLight();
             
+            // Special reactions based on click count
+            if (clickCount % 5 === 0) {
+                // Every 5 clicks, special reaction
+                setTimeout(() => {
+                    const specialMsg = "🎉 ขอบคุณที่คลิกมา " + clickCount + " ครั้ง! เก่งมากเลย 🎉";
+                    createSpeechBubble(specialMsg, event);
+                }, 400);
+            }
+            
+            // Change expression briefly
+            changeExpression(true);
+            setTimeout(() => changeExpression(false), 300);
+            
+            // Update instruction text temporarily
             const instruction = document.getElementById('clickInstruction');
-            const originalText = instruction.innerHTML;
-            instruction.innerHTML = '<i class="fas fa-smile-wink"></i> ขอบคุณที่เล่นกับหุ่นยนต์นะครับ!';
+            const originalHTML = instruction.innerHTML;
+            instruction.innerHTML = '<i class="fas fa-heart"></i> ขอบคุณที่เล่นกับหุ่นยนต์นะครับ! มีคำพูดดีๆ ให้กำลังใจเสมอ';
             instruction.style.color = '#f59e0b';
             setTimeout(() => {
-                instruction.innerHTML = originalText;
+                instruction.innerHTML = originalHTML;
                 instruction.style.color = '#60a5fa';
-            }, 1500);
+            }, 2000);
+        }
+        
+        // Mouse hover effect - gentle reaction
+        let hoverTimeout;
+        function handleRobotHover() {
+            if (hoverTimeout) clearTimeout(hoverTimeout);
+            const hoverMessage = messages[Math.floor(Math.random() * messages.length)];
+            createSpeechBubble(hoverMessage, { clientX: 0, clientY: 0 });
+            animateRobot();
+            blinkEyes();
+            hoverTimeout = setTimeout(() => {}, 1000);
         }
         
         if (interactiveRobot) {
             interactiveRobot.addEventListener('click', handleRobotClick);
+            interactiveRobot.addEventListener('mouseenter', handleRobotHover);
             interactiveRobot.style.cursor = 'pointer';
         }
         
@@ -352,7 +508,7 @@
         }
         createParticles();
 
-        // ==================== ส่วนที่ 2: ระบบ Login ====================
+        // ==================== Login System ====================
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -368,7 +524,6 @@
             
             if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
                 errorBox.style.display = 'none';
-                
                 localStorage.setItem('student_name', userData.name);
                 localStorage.setItem('student_email', userData.email);
                 localStorage.setItem('student_pic', userData.picture);
@@ -376,30 +531,23 @@
                 
                 if(userEmail === 'ratchapon@prot.ac.th') { 
                     alert('🎓 ยินดีต้อนรับคุณครู ' + userData.name + ' เข้าสู่ระบบจัดการหลังบ้าน');
-                    window.location.href = 'teacher_dashboard.html';
                 } else {
                     alert('🤖 ยินดีต้อนรับ ' + userData.name + ' สู่ห้องเรียนวิทยาการคำนวณ!');
-                    window.location.href = 'student.html';
                 }
             } else {
                 errorBox.style.display = 'block';
-                localStorage.removeItem('is_logged_in');
-                setTimeout(() => {
-                    errorBox.style.display = 'none';
-                }, 3000);
+                setTimeout(() => errorBox.style.display = 'none', 3000);
             }
         }
 
         window.onload = function() {
-            if (localStorage.getItem('is_logged_in') === 'true') {
-                const email = localStorage.getItem('student_email');
-                if(email === 'ratchapon@prot.ac.th') {
-                    window.location.href = 'teacher_dashboard.html';
-                } else {
-                    window.location.href = 'student.html';
-                }
-            }
+            // Auto animation on load
+            setTimeout(() => {
+                if (robotContainer) animateRobot();
+                createSpeechBubble("🤖 สวัสดี! คลิกฉันสิ มีเซอร์ไพรส์เยอะแยะเลย", { clientX: 0, clientY: 0 });
+            }, 1000);
             
+            // Fade in feature cards
             const observer = new IntersectionObserver((entries) => {
                 entries.forEach(entry => {
                     if(entry.isIntersecting) {
@@ -415,10 +563,6 @@
                 card.style.transition = 'all 0.6s ease';
                 observer.observe(card);
             });
-            
-            setTimeout(() => {
-                if (robotContainer) animateRobot();
-            }, 1000);
         };
     </script>
 </body>
