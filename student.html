@@ -199,7 +199,7 @@
 
     <script>
         // ⚠️ ใส่ URL Google Apps Script ของคุณที่นี่ (สำคัญมาก) ⚠️
-        const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec"; 
 
         // ==================== THEME & PARTICLES ====================
         const themes = {
@@ -467,7 +467,7 @@
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
             let enrolledString = enrolledArray.join(", ");
 
-            if(GOOGLE_SCRIPT_URL === "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec" || GOOGLE_SCRIPT_URL === "") {
+            if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE" || GOOGLE_SCRIPT_URL === "") {
                 alert("✅ บันทึกในเครื่องสำเร็จ! (กรุณานำ URL จาก Apps Script มาใส่ในโค้ดบรรทัดที่ 262 เพื่อส่งเข้า Google Sheets ครับ)");
                 document.getElementById('saving-status').style.display = 'none';
                 closeEditProfileModal(); 
