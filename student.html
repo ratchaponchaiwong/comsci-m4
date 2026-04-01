@@ -15,6 +15,7 @@
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
@@ -24,63 +25,80 @@
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px;}
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px;}
+        
         .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; flex-wrap: wrap;}
         .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
         body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
         .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        
         .login-area { display: flex; align-items: center; gap: 15px; }
         .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; font-family: 'Prompt'; display: flex; align-items: center; gap: 10px;}
+        
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
         .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
         body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
         .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; cursor: pointer; color: inherit; font-size: 0.8rem;}
+        
         .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
         .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
         .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
         .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
         .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
+        
         .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 28px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content;}
         body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
+        
         .profile-pic-large { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto 15px auto; border: 4px solid #3b82f6; object-fit: cover; display: none; }
         .student-details { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px; margin-bottom: 15px; font-size: 0.9rem; text-align: left; }
         body[data-theme="snow"] .student-details, body[data-theme="love"] .student-details { background: rgba(255,255,255,0.5); }
+        
         .btn-edit-profile { background: rgba(59,130,246,0.2); border: 1px solid #3b82f6; color: inherit; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; font-family: 'Prompt'; width: 100%; font-weight: 600; margin-bottom: 15px;}
+        
         .score-box { background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; margin-top: 15px; }
         body[data-theme="snow"] .score-box, body[data-theme="love"] .score-box { background: rgba(255,255,255,0.5); }
         .score-box h2 { color: #60a5fa; font-size: 2.5rem; margin: 5px 0; }
         .progress-bar-bg { background: rgba(0,0,0,0.3); height: 10px; border-radius: 5px; overflow: hidden; }
         .progress-bar-fill { background: #3b82f6; height: 100%; width: 0%; transition: 0.5s; }
+        
         .content-area { display: flex; flex-direction: column; gap: 30px; }
         .section-header { font-size: 1.3rem; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: inherit;}
+        
         .task-card { background: rgba(0,0,0,0.2); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; transition: 0.3s; }
         body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
         .task-card:hover { border-color: #3b82f6; transform: translateY(-3px); }
         .task-info h4 { margin: 0 0 8px 0; font-size: 1.1rem; color: #60a5fa; }
         body[data-theme="snow"] .task-info h4, body[data-theme="love"] .task-info h4 { color: #3b82f6; }
         .task-meta { text-align: right; min-width: 150px; }
+        
         .badge { padding: 6px 14px; border-radius: 30px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 8px; }
         .badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
         .badge.submitted { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); }
         .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); }
         .badge.late { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); }
+        
         .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; border: none; cursor: pointer; font-family: 'Prompt'; }
         .btn-action.btn-edit { background: #f59e0b; }
-        .btn-action.btn-locked { background: #64748b; cursor: not-allowed; opacity: 0.7; }
+        .btn-action.btn-locked { background: #64748b; cursor: not-allowed; opacity: 0.8; color: #fff;}
         .btn-action:hover:not(.btn-locked) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
         .modal-content { background: rgba(30, 41, 59, 0.95); border-radius: 25px; padding: 40px; width: 90%; max-width: 450px; border: 1px solid rgba(59,130,246,0.5); position: relative; text-align: center; color: inherit;}
         body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1);}
+        
         .form-group-edit { text-align: left; margin-bottom: 15px; }
         .form-group-edit label { display: block; font-size: 0.85rem; margin-bottom: 5px; opacity: 0.9; }
         .form-group-edit input, .form-group-edit select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
         body[data-theme="snow"] .form-group-edit input, body[data-theme="snow"] .form-group-edit select, body[data-theme="love"] .form-group-edit input, body[data-theme="love"] .form-group-edit select { background: white; border-color: #cbd5e1; color: #1e293b; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
+        
         @media (max-width: 768px) { header { padding: 12px 20px; flex-direction: column; } .dashboard-container { grid-template-columns: 1fr; } .task-card { flex-direction: column; text-align: center; gap: 15px; } .task-meta { text-align: center; } }
     </style>
 </head>
@@ -139,7 +157,8 @@
 
                 <div class="content-area">
                     <div style="background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 10px;">
-                        <strong>💡 ระบบส่งงาน:</strong> เมื่อกดส่งงานแล้ว สถานะจะเปลี่ยนเป็น <span style="color:#60a5fa;">"✅ ส่งแล้ว"</span> และสามารถกด <strong>"✏️ แก้ไขงาน"</strong> ได้เรื่อยๆ จนกว่าครูจะให้คะแนนหรือหมดเวลา
+                        <strong>💡 ระบบส่งงาน:</strong> เมื่อกดส่งงาน สถานะจะขึ้น <span style="color:#60a5fa;">"รอตรวจ"</span> (แก้ไขได้)<br>
+                        <strong>⭐ ตรวจแล้ว:</strong> หากครูตรวจและให้คะแนนแล้ว ระบบจะทำการ <strong>ล็อกการแก้ไขงานทันที</strong>
                     </div>
 
                     <div>
@@ -174,7 +193,6 @@
                         <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option>
                         <option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option>
                         <option value="10">ห้อง 10</option><option value="11">ห้อง 11</option><option value="12">ห้อง 12</option>
-                        <option value="13">ห้อง 13</option><option value="14">ห้อง 14</option><option value="15">ห้อง 15</option>
                     </select>
                 </div>
             </div>
@@ -196,6 +214,7 @@
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec"; 
 
+        // ==================== THEME & EFFECTS ====================
         const themes = {
             default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
             snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
@@ -240,6 +259,7 @@
             btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
         });
 
+        // ==================== UTILS & AUTH ====================
         function getUserData(keyName, defaultValue = null) {
             const email = localStorage.getItem('student_email');
             const key = email ? email + '_' + keyName : null;
@@ -277,6 +297,7 @@
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
+        // ==================== LOAD & SYNC DATA (อัปเดตใหม่) ====================
         function loadStudentData() {
             const email = localStorage.getItem('student_email');
             if (!email) { document.getElementById('showLoginBtn').style.display = 'flex'; return; }
@@ -294,26 +315,59 @@
             document.getElementById('editProfileBtn').style.display = 'inline-block';
             document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
 
-            fetchActivitiesFromServer(email);
+            // เริ่มกระบวนการซิงค์ข้อมูลจาก Google Sheets
+            fetchDataFromServer(email);
             loadEnrolledSubjects(email);
         }
 
-        async function fetchActivitiesFromServer(email) {
+        async function fetchDataFromServer(email) {
             const container = document.getElementById('dynamic-modules-container');
-            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลบทเรียนล่าสุดจากระบบ...</div>';
+            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์คะแนนและกิจกรรมล่าสุดจากระบบ...</div>';
+            
             if(GOOGLE_SCRIPT_URL) {
                 try {
-                    const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
-                    const parsedData = await response.json();
-                    if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
-                        localStorage.setItem('global_activities', JSON.stringify(parsedData.data));
+                    // 1. ดึงข้อมูลกิจกรรม (Activities)
+                    const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
+                    const actData = await actRes.json();
+                    if(actData && actData.type === 'activities' && Array.isArray(actData.data)) {
+                        localStorage.setItem('global_activities', JSON.stringify(actData.data));
                     }
-                } catch(e) { console.log("ใช้งานข้อมูลในเครื่อง", e); }
+
+                    // 2. ดึงข้อมูลคะแนนนักเรียน เพื่อมาอัปเดตสถานะและผลคะแนน
+                    const stdRes = await fetch(GOOGLE_SCRIPT_URL);
+                    const allStudents = await stdRes.json();
+                    
+                    // ค้นหานักเรียนคนปัจจุบัน
+                    const myData = allStudents.find(s => s.email === email);
+                    
+                    if(myData) {
+                        // อัปเดตสถานะว่าส่งงานไหนไปแล้วบ้าง
+                        if(myData.works) {
+                            for(let actId in myData.works) {
+                                localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
+                            }
+                        }
+                        
+                        // อัปเดตคะแนน ถ้ามีคะแนนแปลว่า "ตรวจแล้ว" (ล็อกปุ่มทันที)
+                        if(myData.scores) {
+                            for(let actId in myData.scores) {
+                                if(myData.scores[actId] !== "" && myData.scores[actId] !== null) {
+                                    localStorage.setItem(email + '_act_' + actId + '_score', myData.scores[actId]);
+                                    localStorage.setItem(email + '_act_' + actId + '_status', 'graded');
+                                }
+                            }
+                        }
+                    }
+                } catch(e) { 
+                    console.log("ไม่สามารถเชื่อมต่อ Server ได้ ระบบจะใช้ข้อมูลที่บันทึกในเครื่องแทน"); 
+                }
             }
-            loadDynamicModules(email);
+            
+            // เมื่อซิงค์เสร็จแล้ว ค่อยนำมาแสดงผล
+            renderModules(email);
         }
 
-        function loadDynamicModules(email) {
+        function renderModules(email) {
             const container = document.getElementById('dynamic-modules-container');
             let allActivities = [];
             try { allActivities = JSON.parse(localStorage.getItem('global_activities')) || []; } catch(e) { }
@@ -352,15 +406,23 @@
                 let badgeHtml = '', btnHtml = '', scoreHtml = '';
                 let linkPath = act.link && act.link !== '#' ? `${act.link}?actid=${act.id}` : '#';
 
+                // ==================== เงื่อนไขตรวจสอบสถานะ ====================
                 if (status === 'graded') {
+                    // ตรวจแล้ว โชว์คะแนน และ ปิดปุ่มแก้ไข (Lock)
                     badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
                     scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">ได้คะแนน: ${score} / ${act.points}</div>`;
                     btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดการแก้ไขแล้ว</button>`;
+                
                 } else if (status === 'submitted') {
-                    badgeHtml = `<span class="badge submitted">✅ ส่งแล้ว (รอตรวจ)</span>`;
-                    scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">รอคะแนน (เต็ม ${act.points})</div>`;
-                    btnHtml = isPastDeadline ? `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> หมดเวลาแก้ไข</button>` : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
+                    // ส่งแล้ว (รอคะแนน)
+                    badgeHtml = `<span class="badge submitted">✅ รอตรวจ</span>`;
+                    scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${act.points})</div>`;
+                    btnHtml = isPastDeadline 
+                        ? `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> หมดเวลาแก้ไข</button>` 
+                        : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
+                
                 } else {
+                    // ยังไม่ส่ง
                     scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.points}</div>`;
                     if (isPastDeadline && act.strict) {
                         badgeHtml = `<span class="badge late">❌ ปิดรับงาน</span>`;
@@ -402,6 +464,7 @@
             }
         }
 
+        // ==================== PROFILE ====================
         function openEditProfileModal() {
             document.getElementById('edit-name').value = getUserData('custom_name') || localStorage.getItem('student_name') || "";
             const storedRoom = getUserData('room') || 'ม.4/1';
