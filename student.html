@@ -10,83 +10,192 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* CSS หลัก (ตัดย่อเพื่อให้โฟกัสโครงสร้างได้ง่าย โค้ดเดิมทั้งหมด) */
+        /* ==================== CSS โครงสร้างหลัก (จัดเต็มไม่ตัดย่อ) ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; cursor: default; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; }
+        
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
         
         .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
+        
+        /* Theme Switcher */
+        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
+        .theme-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.4); }
+        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
+        /* Header & Navigation */
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
-        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
-        .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; }
-        .nav-links a { text-decoration: none; color: #e2e8f0; padding: 8px 12px; border-radius: 30px; transition: 0.3s; }
-        body[data-theme="snow"] .nav-links a { color: #2d3748; }
-        .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        body[data-theme="forest"] header { background: rgba(30, 60, 30, 0.8); border-bottom-color: rgba(100,200,100,0.3); }
+        body[data-theme="halloween"] header { background: rgba(40, 20, 40, 0.8); border-bottom-color: rgba(255,100,0,0.3); }
+        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
         
+        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px;}
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
+        body[data-theme="forest"] .logo { background: linear-gradient(135deg, #90ee90, #6b8e23); -webkit-background-clip: text; }
+        body[data-theme="halloween"] .logo { background: linear-gradient(135deg, #ff8c00, #ff4500); -webkit-background-clip: text; }
+        
+        .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; flex-wrap: wrap;}
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        body[data-theme="forest"] .nav-links a { color: #d4ffd4; }
+        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        
+        /* Login Area */
+        .login-area { display: flex; align-items: center; gap: 15px; }
+        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Prompt'; font-size: 0.95rem; display: flex; align-items: center; gap: 10px;}
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
-        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; cursor: pointer; color: inherit; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; cursor: pointer; color: inherit; transition: 0.2s;}
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.8); color: white; }
         
-        .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-        .profile-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); padding: 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255,255,255,0.1); height: fit-content; }
-        body[data-theme="snow"] .profile-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
+        /* Layout CSS */
+        .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; max-width: 1200px; margin: 40px auto; padding: 0 20px; width: 100%;}
+        
+        .profile-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); padding: 30px; border-radius: 28px; text-align: center; border: 1px solid rgba(255,255,255,0.1); height: fit-content; color: inherit;}
+        body[data-theme="snow"] .profile-card, body[data-theme="love"] .profile-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
         .profile-pic { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px auto; border: 3px solid #60a5fa; object-fit: cover; display: none; }
         
+        .student-details { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px; margin-bottom: 15px; font-size: 0.9rem; text-align: left; }
+        body[data-theme="snow"] .student-details, body[data-theme="love"] .student-details { background: rgba(255,255,255,0.5); }
+        
+        .btn-edit-profile { background: rgba(59,130,246,0.2); border: 1px solid #3b82f6; color: inherit; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; font-family: 'Prompt'; transition: 0.3s; margin-bottom: 15px; width: 100%; font-weight: 600;}
+        .btn-edit-profile:hover { background: #3b82f6; color: white; }
+
         .score-box { background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; margin-top: 15px; }
-        body[data-theme="snow"] .score-box { background: rgba(255,255,255,0.5); }
+        body[data-theme="snow"] .score-box, body[data-theme="love"] .score-box { background: rgba(255,255,255,0.5); }
         .score-box h2 { color: #60a5fa; font-size: 2.5rem; margin: 5px 0; }
-        body[data-theme="snow"] .score-box h2 { color: #3b82f6; }
+        body[data-theme="snow"] .score-box h2, body[data-theme="love"] .score-box h2 { color: #3b82f6; }
+        
         .progress-bar-bg { background: rgba(0,0,0,0.3); height: 10px; border-radius: 5px; overflow: hidden; }
+        body[data-theme="snow"] .progress-bar-bg, body[data-theme="love"] .progress-bar-bg { background: rgba(0,0,0,0.1); }
         .progress-bar-fill { background: #3b82f6; height: 100%; width: 0%; transition: 0.5s; }
         
         .content-area { display: flex; flex-direction: column; gap: 30px; }
-        .section-header { font-size: 1.3rem; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px; }
+        .section-header { font-size: 1.3rem; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px; color: inherit;}
         
-        .task-card { background: rgba(0,0,0,0.2); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; }
-        body[data-theme="snow"] .task-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        .task-card { background: rgba(0,0,0,0.2); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; color: inherit; transition: 0.3s;}
+        body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        .task-card:hover { border-color: #3b82f6; transform: translateY(-3px); }
+        
         .task-info h4 { margin: 0 0 8px 0; font-size: 1.1rem; color: #60a5fa; }
-        body[data-theme="snow"] .task-info h4 { color: #3b82f6; }
-        .task-meta { text-align: right; min-width: 130px; }
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 8px; }
-        .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); }
-        .badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
-        .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-family: 'Prompt'; }
+        body[data-theme="snow"] .task-info h4, body[data-theme="love"] .task-info h4 { color: #3b82f6; }
         
-        @media (max-width: 768px) { .dashboard-container { grid-template-columns: 1fr; } .task-card { flex-direction: column; text-align: center; gap: 15px; } }
+        .task-meta { text-align: right; min-width: 150px; }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 8px; }
+        
+        /* สถานะสีของ Badge */
+        .badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
+        .badge.submitted { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); }
+        .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); }
+        
+        body[data-theme="snow"] .badge.pending { background: #fef3c7; color: #d97706; }
+        body[data-theme="snow"] .badge.submitted { background: #dbeafe; color: #2563eb; }
+        body[data-theme="snow"] .badge.done { background: #d1fae5; color: #059669; }
+        
+        .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-family: 'Prompt'; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s;}
+        .btn-action.btn-edit { background: #f59e0b; }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
+        
+        /* Modal Style */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .modal.active { visibility: visible; opacity: 1; }
+        .modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); position: relative; color: white;}
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1);}
+        
+        .form-group-edit { text-align: left; margin-bottom: 15px; }
+        .form-group-edit label { display: block; font-size: 0.85rem; margin-bottom: 5px; opacity: 0.9; }
+        .form-group-edit input { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
+        body[data-theme="snow"] .form-group-edit input, body[data-theme="love"] .form-group-edit input { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; }
+        
+        footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); margin-top: auto; color: inherit; opacity: 0.8;}
+        
+        @media (max-width: 768px) { header { padding: 12px 20px; flex-direction: column; } .dashboard-container { grid-template-columns: 1fr; } .task-card { flex-direction: column; text-align: center; gap: 15px; } .task-meta { text-align: center; } }
     </style>
 </head>
 <body data-theme="default">
+    <div class="bg-animation">
+        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
+    </div>
+    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+
     <div class="content-layer">
         <header>
-            <a href="index.html" class="logo"><i class="fas fa-robot"></i><span>PROT Smart Workspace</span></a>
-            <div style="display: flex; align-items: center; gap: 30px;">
+            <a href="index.html" class="logo">
+                <i class="fas fa-robot"></i>
+                <span>PROT Smart Workspace</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
                 <ul class="nav-links">
                     <li><a href="index.html">หน้าหลัก</a></li>
                     <li><a href="student.html" class="active">ห้องเรียนของฉัน</a></li>
+                    <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
+                    <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
                     <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
+                    <li><a href="contact.html">ติดต่อ</a></li>
                 </ul>
-                <div class="login-area" id="loginArea"></div>
+                <div class="login-area" id="loginArea">
+                    <button class="login-btn" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน</button>
+                </div>
             </div>
         </header>
 
+        <div class="theme-switcher">
+            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
+            <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
+            <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
+            <button class="theme-btn" data-theme="halloween">🎃 ฮัลโลวีน</button>
+            <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
+        </div>
+
         <div class="page-content-wrapper">
             <div class="dashboard-container">
+                
                 <div class="profile-card">
                     <img src="" id="profile-pic-img" class="profile-pic" alt="Avatar">
                     <h3 id="profile-name">นักเรียน</h3>
-                    <p id="profile-email" style="opacity:0.8; font-size:0.85rem; margin-bottom:15px;">กรุณาเข้าสู่ระบบ</p>
+                    <p id="profile-email" style="font-size:0.85rem; opacity:0.8; margin-bottom:15px;">กรุณาเข้าสู่ระบบ</p>
+                    
+                    <div class="student-details" id="student-details-box" style="display: none;">
+                        <div><i class="fas fa-door-open"></i> ห้อง: <span id="display-room">-</span></div>
+                        <div><i class="fas fa-list-ol"></i> เลขที่: <span id="display-number">-</span></div>
+                    </div>
+                    
+                    <button class="btn-edit-profile" id="editProfileBtn" onclick="openEditProfileModal()" style="display: none;">
+                        <i class="fas fa-edit"></i> แก้ไขข้อมูล / ส่งเข้าตารางครู
+                    </button>
                     
                     <div class="score-box">
-                        <p><i class="fas fa-chart-line"></i> คะแนนเก็บรวมของคุณ</p>
+                        <p><i class="fas fa-chart-line"></i> คะแนนเก็บรวม (ของฉัน)</p>
                         <h2 id="total-score">0 <span style="font-size: 1rem;">/ 100</span></h2>
                         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
+                        <p style="margin: 10px 0 0 0; font-size: 0.8rem;" id="progress-text">ความคืบหน้า 0%</p>
                     </div>
                 </div>
 
                 <div class="content-area">
                     
+                    <div style="background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 10px;">
+                        <strong>💡 ระบบส่งงาน:</strong> เมื่อกดส่งงานในห้อง Lab สถานะจะเปลี่ยนเป็น <span style="color:#60a5fa;">"✅ ส่งแล้ว"</span> และนักเรียนสามารถกด <strong>"✏️ แก้ไขงาน"</strong> เพื่อส่งข้อมูลใหม่ได้ตลอดเวลา <u>จนกว่าครูจะกดตรวจให้คะแนนหรือหมดเวลาส่งครับ</u>
+                    </div>
+
                     <div>
                         <div class="section-header"><i class="fas fa-book-open"></i> บทเรียนภาคปฏิบัติ (Modules)</div>
                         <div id="dynamic-modules-container">
@@ -94,96 +203,217 @@
                     </div>
 
                     <div style="margin-top: 30px;">
-                        <div class="section-header"><i class="fas fa-history"></i> วิชาเพิ่มเติมของคุณ</div>
+                        <div class="section-header"><i class="fas fa-history"></i> วิชาเพิ่มเติมที่ฉันลงทะเบียนไว้</div>
                         <div id="enrolled-container"></div>
                     </div>
 
                 </div>
             </div>
         </div>
+
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By TECHNOLOGY COMPUTER</p>
+        </footer>
+    </div>
+
+    <div id="editProfileModal" class="modal">
+        <button class="close-modal" onclick="closeEditProfileModal()">×</button>
+        <div class="modal-content">
+            <h3 style="color: inherit;"><i class="fas fa-user-edit"></i> แก้ไขข้อมูลนักเรียน</h3>
+            <p>ข้อมูลจะถูกส่งไปยังตารางคะแนนของครู</p>
+            <div class="form-group-edit">
+                <label>ชื่อ-นามสกุล (ภาษาไทย)</label>
+                <input type="text" id="edit-name" placeholder="ด.ช. รักเรียน สานฝัน">
+            </div>
+            <div class="form-group-edit">
+                <label>ชั้น/ห้อง</label>
+                <input type="text" id="edit-room" placeholder="ม.4/1">
+            </div>
+            <div class="form-group-edit" style="margin-bottom: 25px;">
+                <label>เลขที่</label>
+                <input type="number" id="edit-number" placeholder="15">
+            </div>
+            <button onclick="saveProfileToSheet()" class="btn-action" style="width: 100%; padding: 12px; border-radius: 30px; font-size: 1rem;">
+                <i class="fas fa-save"></i> บันทึกและส่งข้อมูล
+            </button>
+            <div id="saving-status" style="margin-top: 15px; font-size: 0.85rem; color: #10b981; display: none;">กำลังส่งข้อมูล...</div>
+        </div>
+    </div>
+
+    <div id="loginModal" class="modal">
+        <button class="close-modal" onclick="closeLoginModal()">×</button>
+        <div class="modal-content" style="text-align: center;">
+            <h3 style="color: inherit;"><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
+            <p>กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
+            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+        </div>
     </div>
 
     <script>
-        // ==========================================
-        // 1. ฟังก์ชันจัดการข้อมูล "ส่วนตัว" แบบแยกตามอีเมล
-        // ==========================================
-        function getUserKey(keyName) {
-            const email = localStorage.getItem('student_email');
-            if(!email) return null;
-            return email + '_' + keyName; // เช่น student1@gmail.com_total_score
+        const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE"; 
+
+        // ==================== THEME SYSTEM ====================
+        const themes = {
+            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
+            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
+            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
+            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
+            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
+        };
+        let particleInterval = null;
+
+        function applyTheme(themeKey) {
+            document.body.setAttribute("data-theme", themeKey);
+            localStorage.setItem('smart_theme', themeKey);
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            document.querySelector(`.theme-btn[data-theme="${themeKey}"]`)?.classList.add("active");
+            startThemeParticles(themeKey);
         }
 
-        function saveUserData(keyName, value) {
-            const key = getUserKey(keyName);
-            if(key) localStorage.setItem(key, value);
+        function startThemeParticles(theme) {
+            const container = document.getElementById("particleContainer");
+            if(particleInterval) clearInterval(particleInterval);
+            container.innerHTML = "";
+            const themeData = themes[theme];
+            function createParticle() {
+                const particle = document.createElement("div");
+                particle.className = "theme-particle";
+                particle.style.position = "absolute";
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
+                particle.style.opacity = Math.random() * 0.6 + 0.3;
+                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
+                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                particle.innerHTML = themeData.particleChar;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 10000);
+            }
+            for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 150);
+            particleInterval = setInterval(createParticle, 800);
+        }
+
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+        });
+
+        // ==================== UTILS ====================
+        function getUserKey(keyName) {
+            const email = localStorage.getItem('student_email');
+            return email ? email + '_' + keyName : null;
         }
 
         function getUserData(keyName, defaultValue = null) {
             const key = getUserKey(keyName);
-            if(!key) return defaultValue;
-            return localStorage.getItem(key) || defaultValue;
+            return key && localStorage.getItem(key) ? localStorage.getItem(key) : defaultValue;
         }
 
-        // ==========================================
-        // 2. ดึงข้อมูลมาแสดงผล
-        // ==========================================
+        // ==================== AUTH SYSTEM ====================
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join('')));
+        }
+        
+        function handleCredentialResponse(response) {
+            const userData = decodeJwtResponse(response.credential);
+            if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
+                localStorage.setItem('student_email', userData.email);
+                const customName = localStorage.getItem(getUserKey('custom_name'));
+                localStorage.setItem('student_name', customName ? customName : userData.name);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                closeLoginModal();
+                loadStudentData();
+            } else {
+                alert('อีเมลนี้ไม่ได้รับอนุญาต');
+            }
+        }
+
+        function logout() {
+            if(confirm('⚠️ คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                localStorage.removeItem('is_logged_in');
+                window.location.href = 'index.html';
+            }
+        }
+        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+
+        // ==================== LOAD DYNAMIC DATA ====================
         function loadStudentData() {
             const email = localStorage.getItem('student_email');
-            if (!email) {
-                alert('⚠️ กรุณาเข้าสู่ระบบ');
-                window.location.href = 'index.html';
-                return;
-            }
+            if (!email) { alert('⚠️ กรุณาเข้าสู่ระบบ'); window.location.href = 'index.html'; return; }
 
-            // แสดงโปรไฟล์
-            document.getElementById('profile-name').innerText = localStorage.getItem('student_name');
+            const name = getUserData('custom_name', localStorage.getItem('student_name'));
+            document.getElementById('profile-name').innerText = name;
             document.getElementById('profile-email').innerText = email;
             document.getElementById('profile-pic-img').src = localStorage.getItem('student_pic');
             document.getElementById('profile-pic-img').style.display = 'block';
+            
+            document.getElementById('display-room').innerText = getUserData('room', '-');
+            document.getElementById('display-number').innerText = getUserData('number', '-');
+            document.getElementById('student-details-box').style.display = 'block';
+            document.getElementById('editProfileBtn').style.display = 'inline-block';
 
-            // เมนูบาร์
             document.getElementById('loginArea').innerHTML = `
                 <div class="user-info">
                     <img src="${localStorage.getItem('student_pic')}" class="user-avatar">
-                    <span style="color:white; font-size:0.9rem;">${localStorage.getItem('student_name').split(' ')[0]}</span>
-                    <button class="logout-btn" onclick="logout()">ออก</button>
+                    <span style="color:inherit; font-size:0.9rem;">${name.split(' ')[0]}</span>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             `;
 
-            // ดึงคะแนนส่วนตัว (อิงจากอีเมล)
             let score = parseInt(getUserData('total_score', '0'));
             document.getElementById('total-score').innerHTML = score + ' <span style="font-size: 1rem;">/ 100</span>';
             document.getElementById('progress-fill').style.width = Math.min((score/100)*100, 100) + '%';
+            document.getElementById('progress-text').innerHTML = `ความคืบหน้าการส่งงาน ${Math.min((score/100)*100, 100)}%`;
 
-            // ดึงบทเรียนที่ครูโพสต์ไว้ (Global)
             loadDynamicModules();
-
-            // ดึงวิชาที่ตัวเองลงทะเบียน (Personal)
             loadEnrolledSubjects();
         }
 
+        // 🟢 ระบบตรวจสอบสถานะและปุ่ม (หัวใจสำคัญของการส่งงาน) 🟢
         function loadDynamicModules() {
             const container = document.getElementById('dynamic-modules-container');
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
             
             if (activities.length === 0) {
-                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนที่ครูโพสต์ในขณะนี้</p></div>';
+                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนที่ครูโพสต์</p></div>';
                 return;
             }
 
             container.innerHTML = '';
             activities.forEach(act => {
-                // เช็คว่า "เรา" (อีเมลนี้) ส่งงานชิ้นนี้ (id นี้) หรือยัง
-                const isDone = getUserData('act_' + act.id + '_done') === 'true';
+                // ดึง State ของกิจกรรมนี้ของนักเรียนคนนี้ ('submitted', 'graded', หรือ null)
+                // (ในตัวอย่างเดิมเราใช้ 'done' ตอนนี้ปรับให้เป็น status)
+                const status = getUserData('act_' + act.id + '_status'); 
                 
-                const badgeHtml = isDone 
-                    ? `<span class="badge done">✅ ส่งแล้ว</span>` 
-                    : `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
-                
-                const scoreText = isDone ? `รอตรวจ (${act.points} คะแนน)` : `คะแนนเต็ม ${act.points}`;
-                const btnHtml = act.link !== '#' 
-                    ? `<a href="${act.link}" class="btn-action">เข้าห้อง Lab <i class="fas fa-arrow-right"></i></a>` 
-                    : ``;
+                let badgeHtml = '';
+                let btnHtml = '';
+                let scoreHtml = '';
+
+                if (status === 'graded') {
+                    // สถานะ 3: ครูตรวจแล้ว ปิดการแก้ไข
+                    badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
+                    scoreHtml = `<span style="display:block; font-size:0.85rem; margin:8px 0; color:#10b981; font-weight:600;">คะแนนที่ได้: ${getUserData('act_'+act.id+'_score', act.points)} / ${act.points}</span>`;
+                    btnHtml = `<span style="font-size:0.8rem; opacity:0.7;"><i class="fas fa-lock"></i> ปิดรับงานแล้ว</span>`;
+                } else if (status === 'submitted') {
+                    // สถานะ 2: ส่งแล้ว แต่ยังแก้ได้ (ปุ่มเปลี่ยนเป็น แก้ไขงาน)
+                    badgeHtml = `<span class="badge submitted">✅ ส่งแล้ว (รอตรวจ)</span>`;
+                    scoreHtml = `<span style="display:block; font-size:0.8rem; margin:8px 0; opacity:0.8;">รอครูประเมิน (เต็ม ${act.points})</span>`;
+                    if (act.link !== '#') {
+                        btnHtml = `<a href="${act.link}?actid=${act.id}" class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>`;
+                    }
+                } else {
+                    // สถานะ 1: ยังไม่ส่ง (ค้างส่ง)
+                    badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
+                    scoreHtml = `<span style="display:block; font-size:0.8rem; margin:8px 0; opacity:0.8;">คะแนนเต็ม ${act.points}</span>`;
+                    if (act.link !== '#') {
+                        btnHtml = `<a href="${act.link}?actid=${act.id}" class="btn-action">เข้าทำกิจกรรม <i class="fas fa-arrow-right"></i></a>`;
+                    }
+                }
 
                 container.innerHTML += `
                     <div class="task-card" style="border-left: 4px solid #3b82f6;">
@@ -193,7 +423,7 @@
                         </div>
                         <div class="task-meta">
                             ${badgeHtml}
-                            <span style="display:block; font-size:0.8rem; margin:8px 0; color:#60a5fa;">${scoreText}</span>
+                            ${scoreHtml}
                             ${btnHtml}
                         </div>
                     </div>
@@ -204,33 +434,72 @@
         function loadEnrolledSubjects() {
             const container = document.getElementById('enrolled-container');
             const enrolledData = JSON.parse(getUserData('enrolled_subjects', '[]'));
-            
             if (enrolledData.length > 0) {
                 container.innerHTML = '';
-                enrolledData.forEach(subject => {
-                    container.innerHTML += `
-                    <div class="task-card" style="border-left: 4px solid #10b981;">
-                        <div class="task-info">
-                            <h4 style="color:#10b981;"><i class="fas fa-check-circle"></i> ${subject}</h4>
-                            <p>ลงทะเบียนผ่านระบบเรียบร้อย</p>
-                        </div>
-                    </div>`;
+                enrolledData.forEach(subj => {
+                    container.innerHTML += `<div class="task-card" style="border-left: 4px solid #10b981;"><div class="task-info"><h4 style="color:#10b981;"><i class="fas fa-check-circle"></i> ${subj}</h4></div></div>`;
                 });
             } else {
-                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>คุณยังไม่ได้ลงทะเบียนวิชาเพิ่มเติม</p></div>';
+                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่ได้ลงทะเบียนวิชาเพิ่มเติม</p></div>';
             }
         }
 
-        function logout() {
-            localStorage.removeItem('is_logged_in');
-            window.location.href = 'index.html';
+        // ==================== EDIT PROFILE ====================
+        function openEditProfileModal() {
+            document.getElementById('edit-name').value = getUserData('custom_name', localStorage.getItem('student_name'));
+            document.getElementById('edit-room').value = getUserData('room', '');
+            document.getElementById('edit-number').value = getUserData('number', '');
+            document.getElementById('editProfileModal').classList.add('active');
+        }
+        function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('active'); }
+
+        function saveProfileToSheet() {
+            const name = document.getElementById('edit-name').value;
+            const room = document.getElementById('edit-room').value;
+            const number = document.getElementById('edit-number').value;
+            const email = localStorage.getItem('student_email');
+
+            if (!name || !room || !number) { alert('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน'); return; }
+            document.getElementById('saving-status').style.display = 'block';
+
+            localStorage.setItem(getUserKey('custom_name'), name);
+            localStorage.setItem(getUserKey('room'), room);
+            localStorage.setItem(getUserKey('number'), number);
+            
+            if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") {
+                alert("✅ บันทึกในเครื่องสำเร็จ (รอเชื่อม Google Sheets)");
+                document.getElementById('saving-status').style.display = 'none';
+                closeEditProfileModal(); loadStudentData(); return;
+            }
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, name: name, room: room, number: number })
+            }).then(() => {
+                alert('✅ บันทึกและส่งข้อมูลให้ครูเรียบร้อย!');
+                document.getElementById('saving-status').style.display = 'none';
+                closeEditProfileModal(); loadStudentData();
+            });
         }
 
         window.onload = () => {
             const savedTheme = localStorage.getItem('smart_theme') || "default";
-            document.body.setAttribute("data-theme", savedTheme);
-            loadStudentData();
+            applyTheme(savedTheme);
+            if (localStorage.getItem('is_logged_in') === 'true') {
+                loadStudentData();
+            } else {
+                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
+            }
         };
+
+        // * หมายเหตุสำหรับการพัฒนาต่อ:
+        // ในหน้า python.html / robotics.html เมื่อนักเรียนกด "ส่งงาน"
+        // ให้เพิ่มคำสั่งนี้ในฟังก์ชัน submitWork() เพื่อเปลี่ยนสถานะเป็นส่งแล้ว:
+        //
+        // const actId = new URLSearchParams(window.location.search).get('actid');
+        // if(actId) { localStorage.setItem(email + '_act_' + actId + '_status', 'submitted'); }
+        //
     </script>
 </body>
 </html>
