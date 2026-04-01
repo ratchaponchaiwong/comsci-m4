@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ==================== CSS โครงสร้างหลักและธีม (ครบถ้วน) ==================== */
+        /* ==================== CSS โครงสร้างหลักและธีม ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
         
@@ -32,11 +32,6 @@
         
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         
-        /* Theme Switcher */
-        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
-        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
-        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        
         /* Navigation Menu */
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px;}
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
@@ -53,6 +48,11 @@
         .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
         body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
         .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; cursor: pointer; color: inherit; font-size: 0.8rem;}
+
+        /* Theme Switcher */
+        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
+        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
 
         /* Dashboard Layout */
         .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
@@ -73,11 +73,12 @@
         .progress-bar-fill { background: #3b82f6; height: 100%; width: 0%; transition: 0.5s; }
         
         .content-area { display: flex; flex-direction: column; gap: 30px; }
-        .section-header { font-size: 1.3rem; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; }
+        .section-header { font-size: 1.3rem; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: inherit;}
         
         /* Task Cards */
         .task-card { background: rgba(0,0,0,0.2); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; transition: 0.3s; }
         body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        .task-card:hover { border-color: #3b82f6; transform: translateY(-3px); }
         
         .task-info h4 { margin: 0 0 8px 0; font-size: 1.1rem; color: #60a5fa; }
         body[data-theme="snow"] .task-info h4, body[data-theme="love"] .task-info h4 { color: #3b82f6; }
@@ -89,7 +90,7 @@
         .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); }
         .badge.late { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); }
         
-        .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-block; transition: 0.2s; border: none; cursor: pointer; font-family: 'Prompt'; }
+        .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; border: none; cursor: pointer; font-family: 'Prompt'; }
         .btn-action.btn-edit { background: #f59e0b; }
         .btn-action.btn-locked { background: #64748b; cursor: not-allowed; opacity: 0.7; }
         .btn-action:hover:not(.btn-locked) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
@@ -98,7 +99,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
         .modal-content { background: rgba(30, 41, 59, 0.95); border-radius: 25px; padding: 40px; width: 90%; max-width: 450px; border: 1px solid rgba(59,130,246,0.5); position: relative; text-align: center; color: inherit;}
-        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1);}
         
         .form-group-edit { text-align: left; margin-bottom: 15px; }
         .form-group-edit label { display: block; font-size: 0.85rem; margin-bottom: 5px; opacity: 0.9; }
@@ -106,7 +107,7 @@
         body[data-theme="snow"] .form-group-edit input, body[data-theme="love"] .form-group-edit input { background: white; border-color: #cbd5e1; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
         
-        @media (max-width: 768px) { .dashboard-container { grid-template-columns: 1fr; } .task-card { flex-direction: column; text-align: center; gap: 15px; } .task-meta { text-align: center; } }
+        @media (max-width: 768px) { header { padding: 12px 20px; flex-direction: column; } .dashboard-container { grid-template-columns: 1fr; } .task-card { flex-direction: column; text-align: center; gap: 15px; } .task-meta { text-align: center; } }
     </style>
 </head>
 <body data-theme="default">
@@ -158,20 +159,24 @@
                     
                     <div class="score-box">
                         <p><i class="fas fa-chart-line"></i> คะแนนเก็บรวม</p>
-                        <h2 id="total-score">0 <span style="font-size: 1rem;">/ 100</span></h2>
+                        <h2 id="total-score">0 <span style="font-size: 1rem;">/ 0</span></h2>
                         <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
                         <p style="margin: 10px 0 0 0; font-size: 0.8rem;" id="progress-text">ความคืบหน้า 0%</p>
                     </div>
                 </div>
 
                 <div class="content-area">
+                    <div style="background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 10px;">
+                        <strong>💡 ระบบส่งงาน:</strong> เมื่อกดส่งงานแล้ว สถานะจะเปลี่ยนเป็น <span style="color:#60a5fa;">"✅ ส่งแล้ว"</span> และสามารถกด <strong>"✏️ แก้ไขงาน"</strong> ได้เรื่อยๆ จนกว่าครูจะกดให้คะแนนหรือหมดเวลาส่งครับ
+                    </div>
+
                     <div>
                         <div class="section-header"><i class="fas fa-book-open"></i> บทเรียนภาคปฏิบัติ (Modules)</div>
                         <div id="dynamic-modules-container">
                             </div>
                     </div>
 
-                    <div style="margin-top: 20px;">
+                    <div style="margin-top: 30px;">
                         <div class="section-header"><i class="fas fa-history"></i> วิชาเพิ่มเติมที่ลงทะเบียนไว้</div>
                         <div id="enrolled-container"></div>
                     </div>
@@ -184,10 +189,12 @@
         <div class="modal-content">
             <button class="close-modal" onclick="closeEditProfileModal()">×</button>
             <h3 style="color: inherit; margin-bottom: 20px;"><i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว</h3>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px;">ข้อมูลจะถูกส่งไปยังตารางคะแนนของครู</p>
             <div class="form-group-edit"><label>ชื่อ-นามสกุล</label><input type="text" id="edit-name"></div>
             <div class="form-group-edit"><label>ชั้น/ห้อง</label><input type="text" id="edit-room" placeholder="ม.4/1"></div>
             <div class="form-group-edit" style="margin-bottom: 25px;"><label>เลขที่</label><input type="number" id="edit-number"></div>
             <button onclick="saveProfileData()" class="btn-action" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
+            <div id="saving-status" style="margin-top: 15px; font-size: 0.85rem; color: #10b981; display: none;">กำลังส่งข้อมูล...</div>
         </div>
     </div>
 
@@ -201,7 +208,10 @@
     </div>
 
     <script>
-        // Theme & Particles
+        // ⚠️ ใส่ URL ของคุณที่นี่
+        const GOOGLE_SCRIPT_URL = "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE"; 
+
+        // ==================== THEME & PARTICLES ====================
         const themes = {
             default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
             snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
@@ -241,17 +251,18 @@
             particleInterval = setInterval(createParticle, 800);
         }
 
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
-
-        // Utils
-        function getUserData(key) {
+        // ==================== UTILS ====================
+        function getUserKey(keyName) {
             const email = localStorage.getItem('student_email');
-            return email && localStorage.getItem(email + '_' + key) ? localStorage.getItem(email + '_' + key) : null;
+            return email ? email + '_' + keyName : null;
         }
 
-        // Auth
+        function getUserData(keyName, defaultValue = null) {
+            const key = getUserKey(keyName);
+            return key && localStorage.getItem(key) ? localStorage.getItem(key) : defaultValue;
+        }
+
+        // ==================== AUTHENTICATION ====================
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -264,7 +275,8 @@
             const userData = decodeJwtResponse(response.credential);
             if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
                 localStorage.setItem('student_email', userData.email);
-                localStorage.setItem('student_name', userData.name);
+                const customName = localStorage.getItem(getUserKey('custom_name'));
+                localStorage.setItem('student_name', customName ? customName : userData.name);
                 localStorage.setItem('student_pic', userData.picture);
                 localStorage.setItem('is_logged_in', 'true');
                 closeLoginModal();
@@ -275,13 +287,15 @@
         }
 
         function logout() {
-            localStorage.removeItem('is_logged_in');
-            window.location.href = 'index.html';
+            if(confirm('⚠️ คุณต้องการออกจากระบบใช่หรือไม่?')) {
+                localStorage.removeItem('is_logged_in');
+                window.location.href = 'index.html';
+            }
         }
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
-        // Data Loading
+        // ==================== LOAD DATA ====================
         function loadStudentData() {
             const email = localStorage.getItem('student_email');
             if (!email) { alert('⚠️ กรุณาเข้าสู่ระบบ'); window.location.href = 'index.html'; return; }
@@ -305,71 +319,72 @@
                 </div>
             `;
 
-            let score = parseInt(getUserData('total_score') || '0');
-            document.getElementById('total-score').innerHTML = score + ' <span style="font-size: 1rem;">/ 100</span>';
-            document.getElementById('progress-fill').style.width = Math.min((score/100)*100, 100) + '%';
-            document.getElementById('progress-text').innerHTML = `ความคืบหน้า ${Math.min((score/100)*100, 100)}%`;
-
             loadDynamicModules(email);
             loadEnrolledSubjects();
         }
 
-        // 🟢 ระบบตรวจสอบกำหนดเวลา (Deadline Logic) 🟢
+        // ==================== DYNAMIC MODULES (ระบบเวลา & ตรวจงาน) ====================
         function loadDynamicModules(email) {
             const container = document.getElementById('dynamic-modules-container');
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
             
             if (activities.length === 0) {
-                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนที่เปิดสอน</p></div>';
+                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนที่ครูโพสต์</p></div>';
                 return;
             }
 
             container.innerHTML = '';
+            
+            // ตัวแปรสำหรับคำนวณ Progress Bar ใหม่
+            let totalMaxPoints = 0;
+            let submittedCount = 0;
+
             activities.forEach(act => {
-                // ดึงสถานะ
-                const status = localStorage.getItem(email + '_act_' + act.id + '_status');
+                totalMaxPoints += parseInt(act.points || 15);
                 
-                // ตรวจสอบเวลา
+                const status = localStorage.getItem(email + '_act_' + act.id + '_status');
+                if (status === 'submitted' || status === 'graded') submittedCount++;
+
                 const now = new Date();
                 const deadline = new Date(act.date + 'T' + (act.time || '23:59:00'));
                 const isPastDeadline = now > deadline;
 
                 let badgeHtml = '';
                 let btnHtml = '';
+                let scoreHtml = '';
                 let linkPath = act.link && act.link !== '#' ? `${act.link}?actid=${act.id}` : '#';
 
-                // เช็คเงื่อนไขต่างๆ
                 if (status === 'graded') {
-                    // 1. ครูตรวจให้คะแนนแล้ว -> กดแก้ไม่ได้
+                    // 1. ตรวจแล้ว -> โชว์คะแนน ห้ามแก้
+                    let earned = localStorage.getItem(email + '_act_' + act.id + '_score') || 0;
                     badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
-                    btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดรับงานแล้ว</button>`;
+                    scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">ได้คะแนน: ${earned} / ${act.points}</div>`;
+                    btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดการแก้ไขแล้ว</button>`;
                 } 
                 else if (status === 'submitted') {
-                    // 2. นักเรียนกดส่งงานมาแล้ว
+                    // 2. ส่งแล้ว รอตรวจ
                     if (isPastDeadline) {
-                        // เลยเวลาแล้ว -> กดแก้ไม่ได้
                         badgeHtml = `<span class="badge submitted">✅ ส่งแล้ว (รอตรวจ)</span>`;
+                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">รอคะแนน (เต็ม ${act.points})</div>`;
                         btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> หมดเวลาแก้ไข</button>`;
                     } else {
-                        // ยังไม่เลยเวลา -> กดเข้าไปแก้ไขงานได้
                         badgeHtml = `<span class="badge submitted">✅ ส่งแล้ว (รอตรวจ)</span>`;
+                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">รอคะแนน (เต็ม ${act.points})</div>`;
                         btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action btn-edit"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '';
                     }
                 } 
                 else {
-                    // 3. ยังไม่เคยส่งงานเลย (สถานะว่างเปล่า หรือ pending)
+                    // 3. ยังไม่ส่ง
+                    scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.points}</div>`;
                     if (isPastDeadline && act.strict) {
-                        // เลยเวลา + ครูล็อคห้ามส่งเลท -> ปิดปุ่ม
-                        badgeHtml = `<span class="badge late">❌ เลยกำหนดส่ง</span>`;
-                        btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดรับงาน</button>`;
+                        badgeHtml = `<span class="badge late">❌ ปิดรับงาน</span>`;
+                        btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ส่งไม่ทันกำหนด</button>`;
                     } else if (isPastDeadline && !act.strict) {
-                        // เลยเวลา + ครูให้ส่งเลทได้ -> อนุญาตให้ส่งแต่เตือนว่าส่งช้า
                         badgeHtml = `<span class="badge late">⚠️ ส่งช้าได้</span>`;
-                        btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action"><i class="fas fa-arrow-right"></i> ทำกิจกรรม (ส่งช้า)</a>` : '';
+                        btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action"><i class="fas fa-arrow-right"></i> ส่งงาน (ช้า)</a>` : '';
                     } else {
-                        // ยังไม่ถึงเวลาส่ง
                         badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
-                        btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action">ทำกิจกรรม <i class="fas fa-arrow-right"></i></a>` : '';
+                        btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action">เข้าทำกิจกรรม <i class="fas fa-arrow-right"></i></a>` : '';
                     }
                 }
 
@@ -378,17 +393,27 @@
                         <div class="task-info">
                             <h4>${act.title}</h4>
                             <p style="font-size:0.85rem; opacity:0.8;">${act.desc}</p>
-                            <small style="color:#60a5fa; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.date} | ${act.time}</small>
+                            <small style="color:#60a5fa; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.date || '-'} | ${act.time || '-'}</small>
                         </div>
                         <div class="task-meta">
-                            ${badgeHtml}<br>
-                            ${btnHtml}
+                            ${badgeHtml}
+                            ${scoreHtml}
+                            <div style="margin-top:8px;">${btnHtml}</div>
                         </div>
                     </div>
                 `;
             });
+
+            // อัปเดต Progress Bar
+            let totalEarned = parseInt(getUserData('total_score') || '0');
+            let progressPercent = activities.length > 0 ? Math.round((submittedCount / activities.length) * 100) : 0;
+
+            document.getElementById('total-score').innerHTML = totalEarned + ` <span style="font-size: 1rem;">/ ${totalMaxPoints}</span>`;
+            document.getElementById('progress-fill').style.width = progressPercent + '%';
+            document.getElementById('progress-text').innerHTML = `ความคืบหน้าการส่งงาน ${progressPercent}%`;
         }
 
+        // ==================== ENROLLED SUBJECTS ====================
         function loadEnrolledSubjects() {
             const container = document.getElementById('enrolled-container');
             const enrolledData = JSON.parse(getUserData('enrolled_subjects') || '[]');
@@ -402,6 +427,7 @@
             }
         }
 
+        // ==================== PROFILE EDIT ====================
         function openEditProfileModal() {
             document.getElementById('edit-name').value = getUserData('custom_name') || localStorage.getItem('student_name');
             document.getElementById('edit-room').value = getUserData('room') || '';
@@ -418,15 +444,30 @@
 
             if (!name || !room || !number) { alert('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน'); return; }
             
+            document.getElementById('saving-status').style.display = 'block';
+
             localStorage.setItem(email + '_custom_name', name);
             localStorage.setItem(email + '_room', room);
             localStorage.setItem(email + '_number', number);
             
-            alert('✅ บันทึกข้อมูลส่วนตัวเรียบร้อย!');
-            closeEditProfileModal();
-            loadStudentData();
+            if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") {
+                alert("✅ บันทึกในเครื่องสำเร็จ (โปรดนำ URL จาก Apps Script มาใส่ในโค้ดเพื่อซิงค์ข้อมูลครับ)");
+                document.getElementById('saving-status').style.display = 'none';
+                closeEditProfileModal(); loadStudentData(); return;
+            }
+
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ email: email, name: name, room: room, number: number })
+            }).then(() => {
+                alert('✅ บันทึกและส่งข้อมูลให้ครูเรียบร้อย!');
+                document.getElementById('saving-status').style.display = 'none';
+                closeEditProfileModal(); loadStudentData();
+            });
         }
 
+        // ==================== INITIALIZE ====================
         window.onload = () => {
             const savedTheme = localStorage.getItem('smart_theme') || "default";
             applyTheme(savedTheme);
