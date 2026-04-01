@@ -67,7 +67,7 @@
         body[data-theme="snow"] .activity-item { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
         .media-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 5px; margin-top: 5px; background: rgba(255,255,255,0.1); }
 
-        /* Classroom Grid (from previous update) */
+        /* Classroom Grid (ของจริง) */
         .room-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; }
         .room-card { background: linear-gradient(135deg, rgba(59,130,246,0.2), rgba(37,99,235,0.4)); border: 1px solid rgba(59,130,246,0.5); padding: 25px; border-radius: 15px; text-align: center; cursor: pointer; transition: 0.3s; }
         .room-card:hover { transform: translateY(-5px); box-shadow: 0 10px 20px rgba(59,130,246,0.3); background: linear-gradient(135deg, rgba(59,130,246,0.3), rgba(37,99,235,0.5)); }
@@ -75,18 +75,40 @@
         body[data-theme="snow"] .room-card h2 { color: #2563eb; }
         .room-card p { opacity: 0.8; font-size: 0.95rem; }
 
+        /* Student Table */
+        .table-container { overflow-x: auto; display: none; }
+        table { width: 100%; border-collapse: collapse; min-width: 600px; margin-top: 15px; }
+        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        th { font-weight: 600; color: #60a5fa; }
+        body[data-theme="snow"] th { color: #2563eb; border-bottom-color: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] td { border-bottom-color: rgba(0,0,0,0.05); }
+        tr:hover { background: rgba(255,255,255,0.05); cursor: pointer; }
+        body[data-theme="snow"] tr:hover { background: rgba(0,0,0,0.05); }
+        
+        .student-name-col { display: flex; align-items: center; gap: 10px; }
+        .avatar-small { width: 35px; height: 35px; border-radius: 50%; background: #3b82f6; display: flex; align-items: center; justify-content: center; color: white; font-weight: bold; font-size: 0.9rem;}
+
         /* Modal Student Details */
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
         .modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; text-align: left; border: 1px solid rgba(59,130,246,0.5); position: relative; color: white; max-height: 90vh; overflow-y: auto; }
-        body[data-theme="snow"] .modal-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: rgba(255, 255, 255, 0.95); border-color: rgba(0,0,0,0.1); color: #1e293b; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
-
-        /* Custom Scrollbar for lists */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.2); border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); }
+        
+        .student-header-modal { display: flex; align-items: center; gap: 15px; margin-bottom: 25px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
+        body[data-theme="snow"] .student-header-modal { border-bottom-color: rgba(0,0,0,0.1); }
+        .student-header-modal h3 { font-size: 1.4rem; margin: 0; color: #60a5fa; }
+        body[data-theme="snow"] .student-header-modal h3 { color: #3b82f6; }
+        
+        .work-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 15px; }
+        body[data-theme="snow"] .work-box { background: rgba(0,0,0,0.05); }
+        .work-box h4 { margin-bottom: 10px; display: flex; align-items: center; gap: 8px; }
+        .work-list { list-style: none; margin-left: 5px; font-size: 0.9rem;}
+        .work-list li { margin-bottom: 8px; display: flex; align-items: flex-start; gap: 8px; }
+        
+        .progress-bar-bg { background: rgba(0,0,0,0.3); height: 10px; border-radius: 5px; margin-top: 5px; overflow: hidden; margin-bottom: 20px;}
+        body[data-theme="snow"] .progress-bar-bg { background: rgba(0,0,0,0.1); }
+        .progress-bar-fill { background: #10b981; height: 100%; width: 0%; transition: 0.5s; }
 
         @media (max-width: 768px) { .admin-grid { grid-template-columns: 1fr; } }
     </style>
@@ -141,6 +163,8 @@
                                 <option value="robotics.html">ห้อง Lab: Arduino & Robotics</option>
                             </select>
                         </div>
+                        <div class="form-group"><label>คะแนนเต็ม</label><input type="number" id="act-points" value="15"></div>
+                        
                         <button class="btn-action" onclick="postActivity()"><i class="fas fa-paper-plane"></i> บันทึกบทเรียน</button>
                     </div>
 
@@ -151,14 +175,29 @@
                 </div>
 
                 <div class="glass-panel" style="margin-bottom: 40px;">
-                    <div class="panel-title"><span><i class="fas fa-users"></i> ตรวจสอบการส่งงานของนักเรียน (จำลอง)</span></div>
+                    <div class="panel-title" id="class-panel-title">
+                        <span><i class="fas fa-users"></i> ตรวจสอบการส่งงาน (นักเรียนของจริง)</span>
+                        <button id="btn-back-rooms" class="btn-action" style="display: none; width: auto; padding: 6px 15px; font-size: 0.85rem;" onclick="showRoomsGrid()">
+                            <i class="fas fa-arrow-left"></i> กลับไปหน้ารวมห้อง
+                        </button>
+                    </div>
+                    
                     <div id="rooms-view" class="room-grid">
-                        <div class="room-card" onclick="alert('ระบบดูข้อมูลนักเรียนยังเป็นตัวอย่างจำลองครับ')">
-                            <h2>ม.4/1</h2><p><i class="fas fa-user-graduate"></i> นักเรียน 38 คน</p>
                         </div>
-                        <div class="room-card" onclick="alert('ระบบดูข้อมูลนักเรียนยังเป็นตัวอย่างจำลองครับ')">
-                            <h2>ม.4/2</h2><p><i class="fas fa-user-graduate"></i> นักเรียน 40 คน</p>
-                        </div>
+
+                    <div id="students-view" class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th width="15%">เลขที่</th>
+                                    <th width="45%">ชื่อ-นามสกุล</th>
+                                    <th width="20%">ความคืบหน้า</th>
+                                    <th width="20%">คะแนนรวม</th>
+                                </tr>
+                            </thead>
+                            <tbody id="student-tbody">
+                                </tbody>
+                        </table>
                     </div>
                 </div>
             </div>
@@ -184,15 +223,11 @@
                 <div class="admin-grid">
                     <div class="glass-panel">
                         <div class="panel-title"><i class="fas fa-plus-circle"></i> เพิ่มวิชาเพิ่มเติมใหม่</div>
-                        <div class="form-group">
-                            <label>ไอคอน (FontAwesome Class)</label>
-                            <input type="text" id="subj-icon" value="fas fa-robot" placeholder="เช่น fas fa-code">
-                            <small style="opacity:0.7;">อ้างอิงจาก <a href="https://fontawesome.com/icons" target="_blank" style="color:#60a5fa;">FontAwesome</a></small>
-                        </div>
+                        <div class="form-group"><label>ไอคอน (เช่น fas fa-robot)</label><input type="text" id="subj-icon" value="fas fa-robot"></div>
                         <div class="form-group"><label>ชื่อวิชา</label><input type="text" id="subj-title" placeholder="เช่น AI & Machine Learning"></div>
-                        <div class="form-group"><label>รายละเอียดวิชา</label><textarea id="subj-desc" rows="3" placeholder="วิชานี้เรียนเกี่ยวกับอะไร..."></textarea></div>
-                        <div class="form-group"><label>ป้ายกำกับ 1 (เช่น ระดับชั้นที่เปิดรับ)</label><input type="text" id="subj-badge1" placeholder="เช่น เปิดรับสมัคร ม.4 - ม.6"></div>
-                        <div class="form-group"><label>เวลาเรียน (เช่น จันทร์-พุธ 15:00)</label><input type="text" id="subj-time" placeholder="เช่น จันทร์-พุธ 15:00-17:00"></div>
+                        <div class="form-group"><label>รายละเอียดวิชา</label><textarea id="subj-desc" rows="3"></textarea></div>
+                        <div class="form-group"><label>ป้ายกำกับ</label><input type="text" id="subj-badge1" placeholder="เช่น เปิดรับสมัคร ม.4 - ม.6"></div>
+                        <div class="form-group"><label>เวลาเรียน</label><input type="text" id="subj-time" placeholder="เช่น จันทร์-พุธ 15:00-17:00"></div>
                         <button class="btn-action" onclick="saveSubject()"><i class="fas fa-save"></i> บันทึกวิชาเพิ่มเติม</button>
                     </div>
                     <div class="glass-panel">
@@ -217,6 +252,43 @@
         </div>
     </div>
 
+    <div id="studentDetailModal" class="modal">
+        <button class="close-modal" onclick="closeStudentModal()">×</button>
+        <div class="modal-content">
+            <div class="student-header-modal">
+                <div class="avatar-small" id="modal-avatar" style="width: 50px; height: 50px; font-size: 1.2rem;">ด</div>
+                <div>
+                    <h3 id="modal-student-name">ชื่อนักเรียน</h3>
+                    <p style="margin: 5px 0 0 0; font-size: 0.9rem; opacity: 0.8;" id="modal-student-info">ม.4/1 | เลขที่ 1</p>
+                </div>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <div style="display: flex; justify-content: space-between; font-size: 0.9rem; font-weight: 600;">
+                    <span>ความคืบหน้าการส่งงาน</span>
+                    <span id="modal-progress-text" style="color: #10b981;">0%</span>
+                </div>
+                <div class="progress-bar-bg">
+                    <div class="progress-bar-fill" id="modal-progress-fill"></div>
+                </div>
+            </div>
+
+            <div class="work-box">
+                <h4 style="color: #10b981;"><i class="fas fa-check-circle"></i> งานที่ส่งแล้ว</h4>
+                <ul class="work-list" id="submitted-works-list"></ul>
+            </div>
+
+            <div class="work-box">
+                <h4 style="color: #ef4444;"><i class="fas fa-exclamation-circle"></i> งานที่ค้างส่ง</h4>
+                <ul class="work-list" id="missing-works-list" style="opacity: 0.9;"></ul>
+            </div>
+            
+            <div style="text-align: right; font-size: 1.2rem; font-weight: bold; margin-top: 20px; color: #60a5fa;" id="modal-total-score">
+                คะแนนรวม: 0 / 100
+            </div>
+        </div>
+    </div>
+
     <script>
         // ------------------ Tab System ------------------
         function switchTab(tabId) {
@@ -236,7 +308,6 @@
             });
         });
 
-        // ------------------ Auth ------------------
         function checkTeacherAccess() {
             const email = localStorage.getItem('student_email');
             const isLoggedIn = localStorage.getItem('is_logged_in');
@@ -246,22 +317,191 @@
                 return false;
             }
             document.getElementById('bodyContent').style.display = 'block';
-            document.getElementById('teacherName').innerText = 'คุรครูรัชพล  ไชยวงค์';
+            document.getElementById('teacherName').innerText = 'TECHNOLOGY COMPUTER';
             document.getElementById('teacherAvatar').src = localStorage.getItem('student_pic');
             return true;
         }
-        function logout() { localStorage.removeItem('is_logged_in'); window.location.href = 'index.html'; }
+
+        // ==================== ระบบสแกนนักเรียน (Real Student Scanner) ====================
+        function getRealStudents() {
+            let students = [];
+            let emails = new Set();
+            
+            // สแกนหาอีเมลทั้งหมดใน LocalStorage
+            for (let i = 0; i < localStorage.length; i++) {
+                let key = localStorage.key(i);
+                if (key.includes('@')) {
+                    let email = key.split('_')[0];
+                    if (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th' && email.includes('@')) {
+                        emails.add(email);
+                    }
+                }
+            }
+            
+            // ดึงข้อมูลรายบุคคล
+            emails.forEach(email => {
+                let name = localStorage.getItem(email + '_custom_name') || "ยังไม่ตั้งชื่อ (รอกรอกข้อมูล)";
+                let room = localStorage.getItem(email + '_room') || "รอระบุห้อง";
+                let number = parseInt(localStorage.getItem(email + '_number')) || 999; // ถ้าไม่มีให้ไปอยู่ท้ายๆ
+                let totalScore = parseInt(localStorage.getItem(email + '_total_score') || 0);
+                
+                // คำนวณความคืบหน้า
+                let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+                let submitted = [];
+                let missing = [];
+                
+                activities.forEach(act => {
+                    let status = localStorage.getItem(email + '_act_' + act.id + '_status');
+                    if(status === 'submitted' || status === 'graded') {
+                        submitted.push(act.title);
+                    } else {
+                        missing.push(act.title);
+                    }
+                });
+                
+                let progress = activities.length > 0 ? Math.round((submitted.length / activities.length) * 100) : 0;
+                
+                students.push({
+                    email: email, name: name, room: room, number: number,
+                    totalScore: totalScore, progress: progress,
+                    submitted: submitted, missing: missing
+                });
+            });
+            
+            return students;
+        }
+
+        function loadRoomsGrid() {
+            const students = getRealStudents();
+            const roomsView = document.getElementById('rooms-view');
+            roomsView.innerHTML = '';
+            
+            if (students.length === 0) {
+                roomsView.innerHTML = '<div style="grid-column: 1 / -1; text-align: center; padding: 30px; opacity: 0.7;">ยังไม่มีนักเรียนลงทะเบียนในระบบ หรือยังไม่มีใครกรอกข้อมูลห้องครับ</div>';
+                return;
+            }
+            
+            // จัดกลุ่มตามห้อง
+            let rooms = {};
+            students.forEach(s => {
+                if (!rooms[s.room]) rooms[s.room] = [];
+                rooms[s.room].push(s);
+            });
+            
+            // สร้างการ์ดห้อง
+            let sortedRooms = Object.keys(rooms).sort();
+            sortedRooms.forEach(roomName => {
+                let count = rooms[roomName].length;
+                roomsView.innerHTML += `
+                    <div class="room-card" onclick="openRoom('${roomName}')">
+                        <h2>${roomName}</h2>
+                        <p><i class="fas fa-user-graduate"></i> นักเรียน ${count} คน</p>
+                    </div>
+                `;
+            });
+        }
+
+        function showRoomsGrid() {
+            document.getElementById('rooms-view').style.display = 'grid';
+            document.getElementById('students-view').style.display = 'none';
+            document.getElementById('btn-back-rooms').style.display = 'none';
+            document.getElementById('class-panel-title').querySelector('span').innerHTML = '<i class="fas fa-users"></i> ตรวจสอบการส่งงาน (นักเรียนของจริง)';
+        }
+
+        function openRoom(roomName) {
+            document.getElementById('rooms-view').style.display = 'none';
+            document.getElementById('students-view').style.display = 'block';
+            document.getElementById('btn-back-rooms').style.display = 'inline-flex';
+            document.getElementById('class-panel-title').querySelector('span').innerHTML = `<i class="fas fa-door-open"></i> รายชื่อนักเรียนห้อง ${roomName}`;
+
+            const allStudents = getRealStudents();
+            const studentsInRoom = allStudents.filter(s => s.room === roomName);
+            
+            const tbody = document.getElementById('student-tbody');
+            tbody.innerHTML = '';
+
+            studentsInRoom.sort((a,b) => a.number - b.number).forEach(student => {
+                let progressColor = student.progress >= 80 ? '#10b981' : (student.progress >= 50 ? '#f59e0b' : '#ef4444');
+                let initialChar = student.name.replace('ด.ช. ', '').replace('น.ส. ', '').charAt(0) || 'ด';
+
+                let row = `
+                    <tr onclick="openStudentDetails('${student.email}')">
+                        <td>${student.number === 999 ? '-' : student.number}</td>
+                        <td>
+                            <div class="student-name-col">
+                                <div class="avatar-small">${initialChar}</div>
+                                <span>${student.name}</span>
+                            </div>
+                        </td>
+                        <td>
+                            <div style="font-size: 0.8rem; margin-bottom: 3px;">${student.progress}%</div>
+                            <div class="progress-bar-bg" style="margin:0; height:6px;">
+                                <div class="progress-bar-fill" style="width: ${student.progress}%; background: ${progressColor};"></div>
+                            </div>
+                        </td>
+                        <td style="font-weight: 600; color: #60a5fa;">${student.totalScore}</td>
+                    </tr>
+                `;
+                tbody.innerHTML += row;
+            });
+        }
+
+        function openStudentDetails(email) {
+            const allStudents = getRealStudents();
+            const student = allStudents.find(s => s.email === email);
+            if(!student) return;
+
+            document.getElementById('modal-student-name').innerText = student.name;
+            document.getElementById('modal-student-info').innerText = `${student.room} | เลขที่ ${student.number === 999 ? '-' : student.number}`;
+            
+            let initialChar = student.name.replace('ด.ช. ', '').replace('น.ส. ', '').charAt(0) || 'ด';
+            document.getElementById('modal-avatar').innerText = initialChar;
+            
+            document.getElementById('modal-progress-text').innerText = student.progress + '%';
+            document.getElementById('modal-progress-fill').style.width = student.progress + '%';
+            document.getElementById('modal-progress-fill').style.background = student.progress >= 80 ? '#10b981' : (student.progress >= 50 ? '#f59e0b' : '#ef4444');
+            
+            document.getElementById('modal-total-score').innerText = `คะแนนรวม: ${student.totalScore} / 100`;
+
+            const subList = document.getElementById('submitted-works-list');
+            subList.innerHTML = '';
+            if(student.submitted.length > 0) {
+                student.submitted.forEach(work => {
+                    subList.innerHTML += `<li><i class="fas fa-check" style="color: #10b981; margin-top: 3px;"></i> ${work}</li>`;
+                });
+            } else {
+                subList.innerHTML = '<li style="opacity:0.6;">ยังไม่มีงานที่ส่ง</li>';
+            }
+
+            const missList = document.getElementById('missing-works-list');
+            missList.innerHTML = '';
+            if(student.missing.length > 0) {
+                student.missing.forEach(work => {
+                    missList.innerHTML += `<li><i class="fas fa-times" style="color: #ef4444; margin-top: 3px;"></i> ${work}</li>`;
+                });
+            } else {
+                missList.innerHTML = '<li style="opacity:0.6;">เยี่ยมมาก! ไม่มีงานค้างส่ง</li>';
+            }
+
+            document.getElementById('studentDetailModal').classList.add('active');
+        }
+
+        function closeStudentModal() {
+            document.getElementById('studentDetailModal').classList.remove('active');
+        }
 
         // ==================== TAB 1: ACTIVITIES ====================
         function loadActivities() {
             const list = document.getElementById('published-list');
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
             list.innerHTML = activities.length === 0 ? '<li style="text-align:center; opacity:0.7;">ยังไม่มีบทเรียน</li>' : '';
+            
             activities.forEach(act => {
                 let m = '';
                 if(act.yt) m += `<span class="media-badge" style="color:#ef4444"><i class="fab fa-youtube"></i> YouTube</span>`;
                 if(act.doc) m += `<span class="media-badge" style="color:#3b82f6"><i class="fas fa-file-alt"></i> Doc</span>`;
                 if(act.canva) m += `<span class="media-badge" style="color:#8b5cf6"><i class="fas fa-paint-brush"></i> Canva</span>`;
+                
                 list.innerHTML += `<li class="activity-item">
                     <div style="flex-grow:1;">
                         <div style="font-weight:600; color:#60a5fa;">${act.title}</div>
@@ -274,28 +514,36 @@
         }
 
         function postActivity() {
-            const title = document.getElementById('act-title').value;
+            const title = document.getElementById('act-title')?.value || '';
+            const desc = document.getElementById('act-desc')?.value || '';
+            const yt = document.getElementById('act-yt')?.value || '';
+            const doc = document.getElementById('act-doc')?.value || '';
+            const canva = document.getElementById('act-canva')?.value || '';
+            const link = document.getElementById('act-link')?.value || '#';
+            const points = document.getElementById('act-points')?.value || 15;
+
             if (!title) { alert("⚠️ กรุณาใส่ชื่อบทเรียน"); return; }
-            saveData('global_activities', {
-                id: Date.now(), title, desc: document.getElementById('act-desc').value,
-                yt: document.getElementById('act-yt').value, doc: document.getElementById('act-doc').value,
-                canva: document.getElementById('act-canva').value, link: document.getElementById('act-link').value,
-                points: document.getElementById('act-points').value
-            }, loadActivities);
-            document.querySelectorAll('#tab-classroom input[type="text"]').forEach(el => el.value = '');
+
+            saveData('global_activities', { id: Date.now(), title, desc, yt, doc, canva, link, points }, loadActivities);
+            
+            // เคลียร์ฟอร์มแบบปลอดภัย
+            ['act-title','act-desc','act-yt','act-doc','act-canva'].forEach(id => {
+                if(document.getElementById(id)) document.getElementById(id).value = '';
+            });
         }
 
-        // ==================== TAB 2: PORTFOLIOS ====================
+        // ==================== TAB 2 & 3: PORTFOLIOS & SUBJECTS ====================
+        // (ฟังก์ชันบันทึกข้อมูลหน้า Portfolio และ Subject ย้ายมารวมที่ saveData เพื่อลดความซ้ำซ้อน)
+        
         function loadPortfolios() {
             const list = document.getElementById('portfolio-list');
             const ports = JSON.parse(localStorage.getItem('global_portfolios') || '[]');
             list.innerHTML = ports.length === 0 ? '<li style="text-align:center; opacity:0.7;">ยังไม่มีผลงาน</li>' : '';
             ports.forEach(p => {
-                list.innerHTML += `<li class="activity-item">
+                list.innerHTML += `<li class="activity-item" style="flex-direction: row; align-items: center;">
                     <img src="${p.img}" style="width:60px; height:60px; object-fit:cover; border-radius:8px;">
                     <div style="flex-grow:1; margin-left:15px;">
                         <div style="font-weight:600; color:#60a5fa;">${p.title}</div>
-                        <div style="font-size:0.85rem; opacity:0.8;">${p.desc}</div>
                         <span class="media-badge">${p.badge}</span>
                     </div>
                     <button class="btn-delete" onclick="deleteData('global_portfolios', ${p.id}, loadPortfolios)"><i class="fas fa-trash"></i></button>
@@ -305,7 +553,7 @@
 
         function savePortfolio() {
             const title = document.getElementById('port-title').value;
-            if (!title) { alert("⚠️ กรุณาใส่ชื่อผลงาน"); return; }
+            if (!title) return;
             saveData('global_portfolios', {
                 id: Date.now(), title, desc: document.getElementById('port-desc').value,
                 img: document.getElementById('port-img').value || 'https://via.placeholder.com/600x400?text=No+Image',
@@ -314,13 +562,12 @@
             document.querySelectorAll('#tab-portfolio input, #tab-portfolio textarea').forEach(el => el.value = '');
         }
 
-        // ==================== TAB 3: EXTRA SUBJECTS ====================
         function loadSubjects() {
             const list = document.getElementById('subject-list');
             const subjects = JSON.parse(localStorage.getItem('global_subjects') || '[]');
             list.innerHTML = subjects.length === 0 ? '<li style="text-align:center; opacity:0.7;">ยังไม่มีวิชาที่เปิดสอน</li>' : '';
             subjects.forEach(s => {
-                list.innerHTML += `<li class="activity-item">
+                list.innerHTML += `<li class="activity-item" style="flex-direction: row; align-items: center;">
                     <div style="font-size:1.5rem; color:#60a5fa; width:40px; text-align:center;"><i class="${s.icon}"></i></div>
                     <div style="flex-grow:1; margin-left:15px;">
                         <div style="font-weight:600; color:#60a5fa;">${s.title}</div>
@@ -333,25 +580,13 @@
 
         function saveSubject() {
             const title = document.getElementById('subj-title').value;
-            if (!title) { alert("⚠️ กรุณาใส่ชื่อวิชา"); return; }
+            if (!title) return;
             saveData('global_subjects', {
                 id: Date.now(), title, desc: document.getElementById('subj-desc').value,
                 icon: document.getElementById('subj-icon').value || 'fas fa-book',
                 badge1: document.getElementById('subj-badge1').value, time: document.getElementById('subj-time').value
             }, loadSubjects);
             document.querySelectorAll('#tab-subjects input:not(#subj-icon), #tab-subjects textarea').forEach(el => el.value = '');
-        }
-
-        // ==================== TAB 4: TEACHER PROFILE ====================
-        function loadProfileData() {
-            const prof = JSON.parse(localStorage.getItem('global_teacher_profile') || 'null');
-            if(prof) {
-                document.getElementById('prof-name').value = prof.name || '';
-                document.getElementById('prof-position').value = prof.position || '';
-                document.getElementById('prof-quote').value = prof.quote || '';
-                document.getElementById('prof-edu').value = prof.edu || '';
-                document.getElementById('prof-skills').value = prof.skills || '';
-            }
         }
 
         function saveProfileData() {
@@ -363,7 +598,7 @@
                 skills: document.getElementById('prof-skills').value
             };
             localStorage.setItem('global_teacher_profile', JSON.stringify(prof));
-            alert("✅ อัปเดตข้อมูลผู้สอนเรียบร้อย! นักเรียนจะเห็นข้อมูลใหม่ในหน้า ข้อมูลผู้สอน ทันที");
+            alert("✅ อัปเดตข้อมูลผู้สอนเรียบร้อย!");
         }
 
         // ==================== HELPER FUNCTIONS ====================
@@ -384,18 +619,21 @@
             }
         }
 
-        // INITIALIZE
+        function logout() {
+            localStorage.removeItem('is_logged_in');
+            window.location.href = 'index.html';
+        }
+
         window.onload = () => {
             if (checkTeacherAccess()) {
                 const savedTheme = localStorage.getItem('smart_theme') || "default";
                 document.body.setAttribute("data-theme", savedTheme);
                 document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
                 
-                // โหลดข้อมูลทุก Tab เตรียมไว้เลย
                 loadActivities();
                 loadPortfolios();
                 loadSubjects();
-                loadProfileData();
+                loadRoomsGrid();
             }
         };
     </script>
