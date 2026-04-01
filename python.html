@@ -362,39 +362,19 @@ print("Hello, PROT ROBOT!")
 
         // ==================== SUBMIT WORK SYSTEM ====================
         function submitWork() {
-            const wokwiLink = document.getElementById('wokwi-link').value;
-            const fileInput = document.getElementById('file-upload');
-            const statusDiv = document.getElementById('status-msg');
-            
-            if (!wokwiLink && (!fileInput.files || fileInput.files.length === 0)) {
-                statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> กรุณาใส่ลิงก์ Wokwi หรือแนบไฟล์';
-                statusDiv.style.color = '#f97316';
-                setTimeout(() => statusDiv.innerHTML = '', 2500);
-                return;
-            }
-            
-            let message = '✅ ส่งงานสำเร็จ! ';
-            if (wokwiLink) message += ` ลิงก์: ${wokwiLink.substring(0, 40)}... `;
-            if (fileInput.files.length > 0) message += ` ไฟล์: ${fileInput.files[0].name}`;
-            
-            statusDiv.innerHTML = `<i class=\"fas fa-check-circle\"></i> ${message}`;
-            statusDiv.style.color = '#10b981';
-            
-            setTimeout(() => statusDiv.innerHTML = '', 4000);
-            alert("🎉 ระบบบันทึกผลงานของคุณเรียบร้อยแล้ว! ครูจะตรวจสอบให้เร็วที่สุด");
-            
-            // ล้างข้อมูลหลังส่ง
-            document.getElementById('wokwi-link').value = '';
-            document.getElementById('file-upload').value = '';
-            
-            // อัปเดตคะแนนจำลอง
-            let currentScore = parseInt(localStorage.getItem('student_total_score') || '0');
-            let newScore = Math.min(currentScore + 15, 100);
-            localStorage.setItem('student_total_score', newScore);
-            
-            let activityCount = parseInt(localStorage.getItem('student_activity_count') || '3');
-            localStorage.setItem('student_activity_count', activityCount + 1);
-        }
+    const email = localStorage.getItem('student_email');
+    if(!email) return;
+
+    alert("🎉 ส่งงานสำเร็จ! ระบบบันทึกผลงานของคุณเรียบร้อยแล้ว");
+    
+    // 1. เพิ่มคะแนนรวมให้คนนี้
+    const scoreKey = email + '_total_score';
+    let currentScore = parseInt(localStorage.getItem(scoreKey) || '0');
+    localStorage.setItem(scoreKey, Math.min(currentScore + 15, 100));
+
+    // 2. ถ้าอยากตั้งสถานะกิจกรรมว่า "ส่งแล้ว" (สมมติว่ากิจกรรมที่ครูตั้งคือ id: 123456789)
+    // ตรงนี้อาจจะต้องทำระบบรับ ID จาก URL Parameter ในอนาคต แต่ตอนนี้ให้คะแนนขึ้นก็พอครับ!
+}
 
         // ==================== INITIALIZE ====================
         window.onload = function() {
