@@ -78,14 +78,14 @@
         
         .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; z-index: 10; position: relative; }
 
-        /* ==================== CSS เฉพาะของหน้า Student (ปรับปรุงให้เข้ากับธีม) ==================== */
+        /* ==================== CSS เฉพาะของหน้า Student ==================== */
         .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
         
         /* Profile Card */
         .profile-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); padding: 30px; border-radius: 28px; box-shadow: 0 10px 25px rgba(0,0,0,0.2); text-align: center; border: 1px solid rgba(255,255,255,0.1); height: fit-content; color: inherit; }
         body[data-theme="snow"] .profile-card, body[data-theme="love"] .profile-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
         
-        .profile-pic { width: 100px; height: 100px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 20px auto; box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
+        .profile-pic { width: 100px; height: 100px; background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 3rem; margin: 0 auto 20px auto; box-shadow: 0 5px 15px rgba(59,130,246,0.4); object-fit: cover; border: 3px solid #60a5fa;}
         .profile-card h3 { margin: 0 0 5px 0; font-size: 1.3rem; }
         .profile-card p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
 
@@ -134,8 +134,6 @@
         
         .btn-action { background: #3b82f6; color: white; text-decoration: none; padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; display: inline-block; transition: 0.2s; border: none; cursor: pointer; font-family: 'Prompt'; }
         .btn-action:hover { background: #2563eb; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
-        .btn-locked { background: rgba(255,255,255,0.1); cursor: not-allowed; color: #94a3b8; padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; display: inline-block; }
-        body[data-theme="snow"] .btn-locked, body[data-theme="love"] .btn-locked { background: #cbd5e1; color: white; }
 
         @media (max-width: 768px) {
             header { padding: 12px 20px; flex-direction: column; }
@@ -185,11 +183,12 @@
         <div class="page-content-wrapper">
             <div class="dashboard-container">
                 <div class="profile-card">
-                    <div class="profile-pic">
+                    <img src="" id="profile-pic-img" class="profile-pic" style="display:none;" alt="Profile Picture">
+                    <div id="profile-pic-icon" class="profile-pic">
                         <i class="fas fa-user-graduate"></i>
                     </div>
-                    <h3 id="profile-name">ชื่อนักเรียน</h3>
-                    <p id="profile-email">email@prot.ac.th</p>
+                    <h3 id="profile-name">นักเรียน</h3>
+                    <p id="profile-email">กรุณาเข้าสู่ระบบ</p>
                     
                     <div class="score-box">
                         <p><i class="fas fa-chart-line"></i> คะแนนเก็บรวม</p>
@@ -201,98 +200,59 @@
                     </div>
                     
                     <div class="profile-meta">
-                        <p><i class="fas fa-calendar-alt"></i> เข้าร่วมเมื่อ: <span id="join-date">มกราคม 2026</span></p>
-                        <p><i class="fas fa-trophy"></i> จำนวนกิจกรรมที่เข้าร่วม: <span id="activity-count">3</span> กิจกรรม</p>
+                        <p><i class="fas fa-calendar-alt"></i> เข้าร่วมเมื่อ: <span id="join-date">-</span></p>
+                        <p><i class="fas fa-trophy"></i> กิจกรรมที่ทำสำเร็จ: <span id="activity-count">0</span> รายการ</p>
                     </div>
                 </div>
 
                 <div class="content-area">
                     <div class="announcement">
-                        <h4><i class="fas fa-bullhorn"></i> ประกาศจากครูผู้สอน</h4>
-                        <p>📢 นักเรียนทุกคนเตรียมตัวสอบเก็บคะแนนบทที่ 2 ในวันที่ 10 เมษายน 2569 เวลา 13:00 น. ณ ห้องปฏิบัติการคอมพิวเตอร์ ศึกษาบทเรียนผ่าน Smart Workspace ให้ครบถ้วนนะครับ</p>
+                        <h4><i class="fas fa-bullhorn"></i> ยินดีต้อนรับสู่พื้นที่แห่งการเรียนรู้</h4>
+                        <p>📢 หากนักเรียนกดส่งงานในหน้าต่าง Lab ระบบจะทำการคำนวณคะแนนและเปลี่ยนสถานะด้านล่างให้อัตโนมัติ ขอให้สนุกกับการเขียนโปรแกรมนะครับ!</p>
                     </div>
                     
                     <div>
                         <div class="section-header">
-                            <i class="fas fa-clipboard-check"></i> แบบทดสอบวัดผล (Exam)
+                            <i class="fas fa-book-open"></i> บทเรียนภาคปฏิบัติ (Modules)
                         </div>
-                        
-                        <div class="task-card">
+
+                        <div class="task-card" style="border-left: 4px solid #3b82f6;">
                             <div class="task-info">
-                                <h4>📝 แบบทดสอบก่อนเรียน (Pre-test) บทที่ 1-2</h4>
-                                <p>ประเมินความรู้พื้นฐานก่อนเริ่มเรียน (ไม่มีผลต่อคะแนนเก็บ)</p>
+                                <h4 style="color: #60a5fa;">🐍 บทที่ 2: โลกแห่งการเขียนโปรแกรม Python</h4>
+                                <p>ฝึกเขียนโค้ด Python เบื้องต้นและจำลองผ่านเว็บเบราว์เซอร์</p>
                             </div>
                             <div class="task-meta">
-                                <span class="badge done">✅ ทำแล้ว</span>
-                                <span class="score-text">📊 ได้ 8 / 10 คะแนน</span>
+                                <span id="python-badge" class="badge pending">⏳ ค้างส่งงาน</span>
+                                <span id="python-score" class="score-text">🎯 คะแนนเต็ม 15</span>
+                                <a href="python.html" class="btn-action">เข้าห้อง Lab <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
 
-                        <div class="task-card">
+                        <div class="task-card" style="border-left: 4px solid #3b82f6;">
                             <div class="task-info">
-                                <h4>📋 แบบทดสอบหลังเรียน (Post-test) บทที่ 2</h4>
-                                <p><i class="fas fa-lock"></i> ครูยังไม่เปิดเผยแพร่ข้อสอบชุดนี้ (จะเปิดหลังเรียนจบบทเรียน)</p>
+                                <h4 style="color: #60a5fa;">🤖 บทที่ 2: การเขียนโปรแกรม Arduino (Robotics)</h4>
+                                <p>สร้างวงจรและเขียนโปรแกรมควบคุม LED เพื่อพัฒนา PROT ROBOT</p>
                             </div>
                             <div class="task-meta">
-                                <span class="badge locked">🔒 รอเปิดสอบ</span>
-                                <span class="btn-locked">ยังไม่เปิดระบบ</span>
+                                <span id="arduino-badge" class="badge pending">⏳ ค้างส่งงาน</span>
+                                <span id="arduino-score" class="score-text">🎯 คะแนนเต็ม 15</span>
+                                <a href="robotics.html" class="btn-action">เข้าห้อง Lab <i class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
                     </div>
 
                     <div>
                         <div class="section-header">
-                            <i class="fas fa-book-open"></i> บทเรียนและกิจกรรม (Modules)
+                            <i class="fas fa-history"></i> กิจกรรมและวิชาที่ลงทะเบียนแล้ว (อัปเดตอัตโนมัติ)
                         </div>
                         
-                        <div class="task-card">
-                            <div class="task-info">
-                                <h4>📘 บทที่ 1: แนวคิดเชิงคำนวณ</h4>
-                                <p>ใบงานที่ 1.1 การแยกส่วนประกอบ (Decomposition) และการจับคู่รูปแบบ (Pattern Recognition)</p>
-                            </div>
-                            <div class="task-meta">
-                                <span class="badge done">✅ ตรวจแล้ว</span>
-                                <span class="score-text">⭐ 10 / 10 คะแนน</span>
-                            </div>
-                        </div>
-
-                        <div class="task-card" style="border-left: 4px solid #3b82f6;">
-                            <div class="task-info">
-                                <h4 style="color: #60a5fa;">🐍 บทที่ 2: โลกแห่งการเขียนโปรแกรม Python (กำลังเรียน)</h4>
-                                <p>ฝึกเขียน Python และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
-                                <p style="font-size: 0.8rem; margin-top: 5px; opacity:0.8;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
-                            </div>
-                            <div class="task-meta">
-                                <span class="badge pending">⏳ ค้างส่งงาน</span>
-                                <span class="score-text">🎯 คะแนนเต็ม 15</span>
-                                <a href="python.html" class="btn-action">เข้าเรียน Python <i class="fas fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="task-card" style="border-left: 4px solid #3b82f6;">
-                            <div class="task-info">
-                                <h4 style="color: #60a5fa;">🤖 บทที่ 2: โลกแห่งการเขียนโปรแกรม Arduino (กำลังเรียน)</h4>
-                                <p>ฝึกเขียน Arduino และจำลองวงจร Wokwi พัฒนาหุ่นยนต์ PROT ROBOT</p>
-                                <p style="font-size: 0.8rem; margin-top: 5px; opacity:0.8;"><i class="fas fa-hourglass-half"></i> กำหนดส่ง: 15 เมษายน 2569</p>
-                            </div>
-                            <div class="task-meta">
-                                <span class="badge pending">⏳ ค้างส่งงาน</span>
-                                <span class="score-text">🎯 คะแนนเต็ม 15</span>
-                                <a href="robotics.html" class="btn-action">เข้าเรียน Arduino <i class="fas fa-arrow-right"></i></a>
-                            </div>
-                        </div>
-
-                        <div class="task-card" style="opacity: 0.7;">
-                            <div class="task-info">
-                                <h4>🚀 บทที่ 3: โครงงาน PROT ROBOT</h4>
-                                <p>การประยุกต์ใช้บอร์ดไมโครคอนโทรลเลอร์สร้างนวัตกรรมหุ่นยนต์อัตโนมัติ</p>
-                            </div>
-                            <div class="task-meta">
-                                <span class="badge locked">🔒 ยังไม่ถึงกำหนด</span>
-                                <span class="score-text">เริ่มเรียน เมษายน 2569</span>
+                        <div id="enrolled-container">
+                            <div class="task-card" style="justify-content: center; opacity: 0.7;">
+                                <p><i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบข้อมูลในระบบ...</p>
                             </div>
                         </div>
                     </div>
+
                 </div>
             </div>
         </div>
@@ -333,7 +293,6 @@
 
             startThemeParticles(themeKey);
             
-            // Adjust specific colors for light/dark themes dynamically if needed
             const h4BlueTexts = document.querySelectorAll('h4[style*="color: #60a5fa;"]');
             if (themeKey === 'snow' || themeKey === 'love') {
                 h4BlueTexts.forEach(el => el.style.color = '#3b82f6');
@@ -386,9 +345,17 @@
                 localStorage.setItem('student_email', userData.email);
                 localStorage.setItem('student_pic', userData.picture);
                 localStorage.setItem('is_logged_in', 'true');
+                
+                // กำหนดวันที่เข้าร่วมใหม่ ถ้ายังไม่เคยมี
+                if (!localStorage.getItem('student_join_date')) {
+                    const today = new Date();
+                    const monthNames = ["มกราคม", "กุมภาพันธ์", "มีนาคม", "เมษายน", "พฤษภาคม", "มิถุนายน", "กรกฎาคม", "สิงหาคม", "กันยายน", "ตุลาคม", "พฤศจิกายน", "ธันวาคม"];
+                    localStorage.setItem('student_join_date', `${today.getDate()} ${monthNames[today.getMonth()]} ${today.getFullYear() + 543}`);
+                }
+
                 closeLoginModal();
                 updateLoginUI(userData.name, userData.picture);
-                loadStudentData();
+                loadStudentData(); // อัปเดตข้อมูลบนหน้าจอ
             } else {
                 alert('อีเมลนี้ไม่ได้รับอนุญาต');
             }
@@ -418,34 +385,78 @@
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
-        // ==================== LOAD STUDENT DATA ====================
+        // ==================== DYNAMIC DATA LOADER (หัวใจสำคัญ!) ====================
         function loadStudentData() {
+            // 1. จัดการข้อมูลโปรไฟล์ (ชื่อ/รูป/อีเมล)
             const studentName = localStorage.getItem('student_name');
             const studentEmail = localStorage.getItem('student_email');
+            const studentPic = localStorage.getItem('student_pic');
             
             if (studentName) {
                 document.getElementById('profile-name').innerText = studentName;
-                document.getElementById('profile-email').innerText = studentEmail || 'student@prot.ac.th';
-            } else {
-                document.getElementById('profile-name').innerText = 'นักเรียน';
+                document.getElementById('profile-email').innerText = studentEmail;
+                
+                if (studentPic) {
+                    document.getElementById('profile-pic-img').src = studentPic;
+                    document.getElementById('profile-pic-img').style.display = 'block';
+                    document.getElementById('profile-pic-icon').style.display = 'none';
+                }
             }
             
-            let totalScore = localStorage.getItem('student_total_score');
-            if (!totalScore) {
-                totalScore = 25; // ค่าเริ่มต้น
-                localStorage.setItem('student_total_score', totalScore);
-            }
+            // 2. จัดการคะแนน (ถ้าคะแนนรวมเปลี่ยน แถบความคืบหน้าจะเปลี่ยนตาม)
+            let totalScore = parseInt(localStorage.getItem('student_total_score') || '0');
+            const percentage = Math.min((totalScore / 100) * 100, 100);
             
-            const percentage = (totalScore / 100) * 100;
             document.getElementById('total-score').innerHTML = totalScore + ' <span style="font-size: 1rem;">/ 100</span>';
             document.getElementById('progress-fill').style.width = percentage + '%';
-            document.getElementById('progress-text').innerHTML = `ความคืบหน้า ${percentage}%`;
+            document.getElementById('progress-text').innerHTML = `ความคืบหน้าการส่งงาน ${percentage}%`;
             
-            const joinDate = localStorage.getItem('student_join_date') || 'มกราคม 2026';
-            document.getElementById('join-date').innerText = joinDate;
+            document.getElementById('join-date').innerText = localStorage.getItem('student_join_date') || 'กำลังประมวลผล...';
             
-            const activityCount = localStorage.getItem('student_activity_count') || '3';
+            const activityCount = parseInt(localStorage.getItem('student_activity_count') || '0');
             document.getElementById('activity-count').innerText = activityCount;
+
+            // 3. ระบบตรวจจับการส่งงาน (จำลอง) - ถ้านักเรียนส่งงานในหน้า Lab กิจกรรมจะเปลี่ยนสถานะ
+            if (activityCount >= 1) {
+                document.getElementById('python-badge').className = 'badge done';
+                document.getElementById('python-badge').innerHTML = '✅ ส่งแล้ว';
+                document.getElementById('python-score').innerHTML = '⭐ รอครูตรวจ (15 คะแนน)';
+            }
+            if (activityCount >= 2) {
+                document.getElementById('arduino-badge').className = 'badge done';
+                document.getElementById('arduino-badge').innerHTML = '✅ ส่งแล้ว';
+                document.getElementById('arduino-score').innerHTML = '⭐ รอครูตรวจ (15 คะแนน)';
+            }
+
+            // 4. ดึงข้อมูลวิชาที่ลงทะเบียนแล้วแบบอัตโนมัติ
+            const enrolledContainer = document.getElementById('enrolled-container');
+            const enrolledData = localStorage.getItem('enrolled_subjects');
+            
+            if (enrolledData) {
+                const subjects = JSON.parse(enrolledData);
+                if (subjects.length > 0) {
+                    enrolledContainer.innerHTML = ''; // ล้างคำว่ากำลังโหลดออก
+                    
+                    subjects.forEach(subject => {
+                        enrolledContainer.innerHTML += `
+                        <div class="task-card" style="border-left: 4px solid #10b981;">
+                            <div class="task-info">
+                                <h4 style="color: #10b981; margin:0 0 5px 0; font-size:1.1rem;">
+                                    <i class="fas fa-check-circle"></i> ${subject}
+                                </h4>
+                                <p style="margin:0; font-size:0.85rem; opacity:0.8;">ลงทะเบียนผ่านระบบเรียบร้อย รอเรียนในสัปดาห์ถัดไป</p>
+                            </div>
+                            <div class="task-meta">
+                                <span class="badge done">✅ เข้าร่วมแล้ว</span>
+                            </div>
+                        </div>`;
+                    });
+                } else {
+                    enrolledContainer.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีการลงทะเบียนวิชาเพิ่มเติม หรือเข้าร่วมกิจกรรมใดๆ</p></div>';
+                }
+            } else {
+                enrolledContainer.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีการลงทะเบียนวิชาเพิ่มเติม หรือเข้าร่วมกิจกรรมใดๆ</p></div>';
+            }
         }
 
         // ==================== INITIALIZE ====================
@@ -455,10 +466,10 @@
             
             if (localStorage.getItem('is_logged_in') === 'true') {
                 updateLoginUI(localStorage.getItem('student_name'), localStorage.getItem('student_pic'));
-                loadStudentData();
+                loadStudentData(); // เรียกใช้งานเพื่ออัปเดตข้อมูลทุกอย่างให้เป็นของจริง
             } else {
                 alert('⚠️ กรุณาลงชื่อเข้าใช้งานก่อนครับ');
-                window.location.href = 'index.html'; // หากยังไม่ล็อกอิน ให้เด้งกลับไปหน้าหลัก
+                window.location.href = 'index.html';
             }
         };
     </script>
