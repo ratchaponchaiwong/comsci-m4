@@ -12,7 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ==================== 1. CSS โครงสร้างหลักและแอนิเมชัน ==================== */
+        /* ==================== 1. CSS โครงสร้างหลัก ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
         
@@ -22,28 +22,11 @@
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
-        /* วงกลมด้านหลัง */
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
         body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
-        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
-        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
-
-        /* เอฟเฟกต์หิมะ/ดอกไม้ */
-        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-        .theme-particle { position: absolute; top: -10%; pointer-events: none; animation: fall linear forwards; z-index: 1; }
-        @keyframes fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
-        }
-
+        
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
@@ -117,7 +100,7 @@
 </head>
 <body data-theme="default" style="display: none;" id="bodyContent">
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
-    <div id="particleContainer"></div>
+    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
 
     <div class="content-layer">
         <header>
@@ -249,7 +232,7 @@
                     <div class="table-container">
                         <table>
                             <thead>
-                                <tr><th>เลขที่</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr>
+                                <tr><th>รหัสนักเรียน</th><th>เลขที่</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr>
                             </thead>
                             <tbody id="matrix-tbody"></tbody>
                         </table>
@@ -273,7 +256,7 @@
                     <div class="import-box" onclick="document.getElementById('excelInput').click()">
                         <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #3b82f6; margin-bottom: 10px;"></i>
                         <p>คลิกเพื่อเลือกไฟล์ Excel (.xlsx)</p>
-                        <small>หัวตารางต้องมี: email, name, number</small>
+                        <small>หัวตารางต้องมี: email, student_id, name, number</small>
                         <input type="file" id="excelInput" hidden accept=".xlsx" onchange="processExcel(event)">
                     </div>
                     <div id="import-preview-area" style="display:none; margin-top: 30px;">
@@ -313,7 +296,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         let studentsList = []; 
         let tempImportList = [];
         let currentGradeEmail = '';
@@ -391,7 +374,6 @@
             document.getElementById(rid).style.display = (grade === 'all') ? 'none' : 'block';
         }
 
-        // ==================== โหลดกิจกรรม (แยกสี/ไอคอน) ====================
         function loadActivities() {
             const container = document.getElementById('activities-list-container');
             let acts = [];
@@ -533,20 +515,20 @@
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveActivities", activities: JSON.parse(acts) }) });
         }
 
-        // ==================== MATRIX ตรวจงาน (กรองเนื้อหาออก) ====================
+        // ==================== MATRIX ตรวจงาน ====================
         async function loadMatrixData() {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const gradableActs = acts.filter(a => a.type !== 'content');
             
             document.getElementById('matrix-act').innerHTML = gradableActs.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
-            document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</td></tr>';
+            document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</td></tr>';
             
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL);
                 studentsList = await res.json();
                 renderMatrixTable();
             } catch (error) {
-                document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center; color:#ef4444;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
+                document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center; color:#ef4444;">เกิดข้อผิดพลาดในการโหลดข้อมูล</td></tr>';
             }
         }
 
@@ -557,7 +539,7 @@
             const fRoom = document.getElementById('matrix-room').value;
 
             if(!studentsList || studentsList.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">ยังไม่มีข้อมูลนักเรียน</td></tr>';
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">ยังไม่มีข้อมูลนักเรียน</td></tr>';
                 return;
             }
 
@@ -575,6 +557,7 @@
                 const score = (s.scores && s.scores[actId] !== undefined && s.scores[actId] !== "") ? s.scores[actId] : '-';
                 
                 filteredHTML += `<tr>
+                    <td>${s.studentId || '-'}</td>
                     <td>${s.number}</td>
                     <td>${s.name}</td>
                     <td>${s.room}</td>
@@ -583,7 +566,7 @@
                     <td><button onclick="openGradeModal('${s.email}', '${actId}', '${s.name}', '${maxPoints}')" class="btn-action" style="padding:5px 10px; font-size:0.7rem;"><i class="fas fa-search"></i> ตรวจ</button></td>
                 </tr>`;
             });
-            tbody.innerHTML = filteredHTML || '<tr><td colspan="6" style="text-align:center;">ไม่พบนักเรียนในห้องที่เลือก</td></tr>';
+            tbody.innerHTML = filteredHTML || '<tr><td colspan="7" style="text-align:center;">ไม่พบนักเรียนในห้องที่เลือก</td></tr>';
         }
 
         function openGradeModal(email, actId, studentName, maxPoints) {
@@ -640,6 +623,7 @@
             }
         }
 
+        // ==================== EXCEL IMPORT ====================
         function processExcel(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
@@ -662,7 +646,7 @@
             for(let s of tempImportList) {
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
-                    body: JSON.stringify({ email: s.email, name: s.name, room: fullRoom, number: s.number })
+                    body: JSON.stringify({ email: s.email, studentId: s.student_id, name: s.name, room: fullRoom, number: s.number })
                 });
             }
             alert("✅ นำเข้าข้อมูลลง Google Sheets เรียบร้อย!");
