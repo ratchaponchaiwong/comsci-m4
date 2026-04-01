@@ -208,7 +208,28 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
-        // --- ระบบจัดการกิจกรรม (ของเดิมที่ปรับปรุง) ---
+        // --- 1. ระบบซิงค์ข้อมูลบทเรียนจาก Server ตอนเปิดหน้าเว็บ (แก้ปัญหาหน้าครูไม่แสดงงาน) ---
+        async function fetchActivitiesFromServer() {
+            const container = document.getElementById('activities-list-container');
+            container.innerHTML = '<p style="text-align:center; opacity:0.7;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูลจาก Google Sheets...</p>';
+            
+            if(GOOGLE_SCRIPT_URL) {
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
+                    const textData = await response.text();
+                    const parsedData = JSON.parse(textData);
+                    
+                    if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
+                        localStorage.setItem('global_activities', JSON.stringify(parsedData.data));
+                    }
+                } catch(e) {
+                    console.log("ใช้งานข้อมูลในเครื่อง", e);
+                }
+            }
+            loadActivities();
+        }
+
+        // --- ระบบจัดการกิจกรรม ---
         function toggleRoomSelect(gid, rid) {
             const grade = document.getElementById(gid).value;
             document.getElementById(rid).style.display = (grade === 'all') ? 'none' : 'block';
@@ -221,7 +242,7 @@
                 <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center;">
                     <div>
                         <div style="font-weight:600; color:#60a5fa;">${a.title}</div>
-                        <div style="font-size:0.8rem; opacity:0.7;">ห้อง: ${a.targetRoom} | คะแนน: ${a.points}</div>
+                        <div style="font-size:0.8rem; opacity:0.7;">ห้อง: ${a.targetRoom || 'ทุกห้อง'} | คะแนน: ${a.points}</div>
                     </div>
                     <div>
                         <button class="btn-edit" onclick="editAct(${a.id})"><i class="fas fa-edit"></i></button>
@@ -235,7 +256,7 @@
         function saveActivity() {
             const title = document.getElementById('act-title').value;
             const date = document.getElementById('act-date').value;
-            if(!title || !date) return alert("กรุณากรอกข้อมูลสำคัญให้ครบ");
+            if(!title || !date) return alert("⚠️ กรุณากรอกชื่อบทเรียนและกำหนดส่งให้ครบ");
 
             const grade = document.getElementById('act-grade').value;
             const roomNum = document.getElementById('act-room-num').value;
@@ -255,8 +276,66 @@
 
             localStorage.setItem('global_activities', JSON.stringify(acts));
             syncActivities();
-            alert("บันทึกสำเร็จ!");
+            alert("✅ บันทึกกิจกรรมสำเร็จ!");
             resetForm(); loadActivities();
+        }
+
+        // --- 2. ฟังก์ชันแก้ไข ลบ และล้างฟอร์ม (ที่ขาดไป) ---
+        function editAct(id) {
+            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const act = acts.find(a => a.id == id);
+            if(!act) return;
+
+            document.getElementById('edit-id').value = act.id;
+            document.getElementById('act-title').value = act.title;
+            document.getElementById('act-desc').value = act.desc || '';
+            document.getElementById('act-date').value = act.date || '';
+            document.getElementById('act-time').value = act.time || '23:59';
+            document.getElementById('act-link').value = act.link || '#';
+            document.getElementById('act-doc').value = act.doc || '';
+            document.getElementById('act-points').value = act.points || 15;
+
+            if(act.targetRoom && act.targetRoom !== 'ทุกห้อง') {
+                const parts = act.targetRoom.split('/');
+                if(parts.length === 2) {
+                    document.getElementById('act-grade').value = parts[0];
+                    document.getElementById('act-room-num').value = parts[1];
+                    document.getElementById('act-room-num').style.display = 'block';
+                }
+            } else {
+                document.getElementById('act-grade').value = 'all';
+                document.getElementById('act-room-num').style.display = 'none';
+            }
+
+            document.getElementById('btn-save-main').innerHTML = '<i class="fas fa-save"></i> บันทึกการแก้ไข';
+            document.getElementById('btn-cancel-edit').style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteAct(id) {
+            if(confirm("⚠️ คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?")) {
+                let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+                acts = acts.filter(a => a.id !== id);
+                localStorage.setItem('global_activities', JSON.stringify(acts));
+                syncActivities();
+                loadActivities();
+            }
+        }
+
+        function resetForm() {
+            document.getElementById('edit-id').value = '';
+            document.getElementById('act-title').value = '';
+            document.getElementById('act-desc').value = '';
+            document.getElementById('act-date').value = '';
+            document.getElementById('act-time').value = '23:59';
+            document.getElementById('act-link').value = '#';
+            document.getElementById('act-doc').value = '';
+            document.getElementById('act-points').value = '15';
+            document.getElementById('act-grade').value = 'all';
+            document.getElementById('act-room-num').style.display = 'none';
+            
+            document.getElementById('btn-save-main').innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
+            document.getElementById('btn-cancel-edit').style.display = 'none';
         }
 
         async function syncActivities() {
@@ -335,7 +414,8 @@
             }
             document.getElementById('bodyContent').style.display = 'block';
             document.getElementById('teacherAvatar').src = localStorage.getItem('student_pic');
-            document.getElementById('teacherName').innerText = localStorage.getItem('student_name');
+            // ตรงนี้ตั้งค่าชื่อให้เป็น TECHNOLOGY COMPUTER ตามที่คุณครูตั้งไว้
+            document.getElementById('teacherName').innerText = 'TECHNOLOGY COMPUTER';
             return true;
         }
 
@@ -345,7 +425,8 @@
             if(checkTeacherAccess()) {
                 const savedTheme = localStorage.getItem('smart_theme') || "default";
                 document.body.setAttribute("data-theme", savedTheme);
-                loadActivities();
+                // ดึงข้อมูลใหม่จาก Server ทุกครั้งที่โหลดหน้าเว็บ
+                fetchActivitiesFromServer(); 
             }
         };
     </script>
