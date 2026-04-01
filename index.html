@@ -865,15 +865,19 @@ function handleCredentialResponse(response) {
 }
         
         // Auto redirect if already logged in
-        window.onload = function() {
-            if (localStorage.getItem('is_logged_in') === 'true') {
-                const email = localStorage.getItem('student_email');
-                if(email === 'teacher@prot.ac.th') {
-                    window.location.href = 'teacher_dashboard.html';
-                } else if(email) {
-                    window.location.href = 'student.html';
-                }
-            }
+        // ค้นหา window.onload (บรรทัดที่ประมาณ 442) และแทนที่ด้วยส่วนนี้
+window.onload = function() {
+    if (localStorage.getItem('is_logged_in') === 'true') {
+        const email = localStorage.getItem('student_email');
+        if(email === 'teacher@prot.ac.th' || email === 'ratchapon@gmail.com') {
+            window.location.href = 'teacher_dashboard.html';
+        } else {
+            window.location.href = 'student.html';
+        }
+    }
+    // ... ส่วนการสร้าง Particles และ Observer อื่นๆ ปล่อยไว้ตามเดิมครับ ...
+    createParticles();
+};
             
             // Scroll animation for feature cards
             const observer = new IntersectionObserver((entries) => {
