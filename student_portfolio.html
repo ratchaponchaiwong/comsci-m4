@@ -2,60 +2,641 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ผลงานนักเรียน | PROT CS Hub</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ผลงานนักเรียน | PROT Smart Workspace - ห้องเรียนวิทยาการคำนวณ</title>
+    
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #f1f5f9; margin: 0; padding: 40px 20px; text-align: center; }
-        .header-title { margin-bottom: 40px; }
-        .header-title h1 { color: #1e3a5f; font-size: 2rem; }
-        
-        .gallery { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; max-width: 1200px; margin: 0 auto; }
-        .gallery-item { background: white; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 15px rgba(0,0,0,0.05); transition: 0.3s; border: 1px solid #e2e8f0; }
-        .gallery-item:hover { transform: translateY(-10px); box-shadow: 0 20px 30px rgba(0,0,0,0.1); }
-        .gallery-item img { width: 100%; height: 220px; object-fit: cover; }
-        .item-info { padding: 20px; text-align: left; }
-        .item-info h4 { margin: 0 0 10px 0; color: #1e3a5f; }
-        .item-info p { margin: 0; font-size: 0.85rem; color: #64748b; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
 
-        .btn-back { margin-top: 50px; display: inline-block; padding: 12px 25px; background: #1e3a5f; color: white; text-decoration: none; border-radius: 10px; font-weight: 600; }
+        body {
+            font-family: 'Prompt', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        /* ธีมที่สอดคล้องกับ Smart Workspace */
+        :root {
+            --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --header-bg: linear-gradient(135deg, #1e3a5f 0%, #2c4e6e 100%);
+            --header-text: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Mode */
+        body[data-theme="dark"] {
+            --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2d3a4e 100%);
+            --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --header-text: #e2e8f0;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --border-color: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #60a5fa;
+        }
+
+        /* Forest Theme */
+        body[data-theme="forest"] {
+            --bg-body: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
+            --header-bg: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            --header-text: #f0fdf4;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #a7f3d0;
+            --text-primary: #064e3b;
+            --text-secondary: #047857;
+            --accent: #10b981;
+        }
+
+        /* Ocean Theme */
+        body[data-theme="ocean"] {
+            --bg-body: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);
+            --header-bg: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+            --header-text: #f0f9ff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #bae6fd;
+            --text-primary: #075985;
+            --text-secondary: #0284c7;
+            --accent: #0ea5e9;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-secondary);
+        }
+
+        /* Navbar - เหมือนกับ Smart Workspace */
+        nav {
+            background: var(--header-bg);
+            padding: 0 32px;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--header-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(8px);
+        }
+        .nav-item {
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--header-text);
+            background: transparent;
+            border: none;
+            font-family: 'Prompt', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        .nav-item.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .theme-picker {
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.25);
+            padding: 5px 12px;
+            border-radius: 40px;
+        }
+        .theme-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            color: var(--header-text);
+        }
+        .theme-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* User Profile */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.15);
+            padding: 5px 15px;
+            border-radius: 40px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--header-text);
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1200px;
+            margin: 50px auto;
+            padding: 0 20px;
+        }
+
+        /* Header Title */
+        .header-title {
+            text-align: center;
+            margin-bottom: 50px;
+        }
+        .header-title h1 {
+            color: var(--text-primary);
+            font-size: 2.2rem;
+            margin-bottom: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .header-title p {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        /* Gallery Grid */
+        .gallery {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 30px;
+            margin-bottom: 50px;
+        }
+
+        .gallery-item {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+            cursor: pointer;
+        }
+        .gallery-item:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-lg);
+            border-color: var(--accent);
+        }
+        .gallery-item img {
+            width: 100%;
+            height: 220px;
+            object-fit: cover;
+            transition: transform 0.3s;
+        }
+        .gallery-item:hover img {
+            transform: scale(1.05);
+        }
+        .item-info {
+            padding: 20px;
+            text-align: left;
+        }
+        .item-info h4 {
+            margin: 0 0 10px 0;
+            color: var(--text-primary);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .item-info p {
+            margin: 0;
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+            line-height: 1.5;
+        }
+        .item-badge {
+            display: inline-block;
+            background: var(--accent);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 0.7rem;
+            margin-top: 12px;
+        }
+
+        /* Stats Section */
+        .stats-section {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 30px;
+            margin: 40px 0;
+            border: 1px solid var(--border-color);
+            text-align: center;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 30px;
+            margin-top: 20px;
+        }
+        .stat-card {
+            text-align: center;
+        }
+        .stat-number {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--accent);
+        }
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-secondary);
+        }
+
+        /* Add Project Button */
+        .add-project {
+            text-align: center;
+            margin: 40px 0;
+        }
+        .btn-add {
+            background: var(--accent);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+            font-family: 'Prompt', sans-serif;
+        }
+        .btn-add:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+
+        /* Footer Buttons */
+        .footer-buttons {
+            text-align: center;
+            margin-top: 40px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .btn-back, .btn-workspace {
+            background: var(--accent);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-back:hover, .btn-workspace:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-workspace {
+            background: var(--text-primary);
+        }
+        .btn-workspace:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 16px; flex-wrap: wrap; height: auto; gap: 10px; }
+            .nav-menu { display: none; }
+            .header-title h1 { font-size: 1.6rem; flex-direction: column; }
+            .gallery { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: 1fr; }
+        }
     </style>
 </head>
-<body>
+<body data-theme="light">
 
+<nav>
+    <a href="student.html" class="logo">
+        <i class="fas fa-robot"></i>
+        <span>PROT Smart Workspace</span>
+    </a>
+    
+    <div class="nav-menu">
+        <a href="student.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="#" class="nav-item"><i class="fas fa-book"></i> บทเรียน</a>
+        <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
+        <a href="student_portfolio.html" class="nav-item active"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
+        <a href="#" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
+        <a href="#" class="nav-item"><i class="fas fa-envelope"></i> ติดต่อ</a>
+    </div>
+    
+    <div class="header-right">
+        <div class="theme-picker">
+            <button class="theme-btn" onclick="setTheme('light')" title="สว่าง"><i class="fas fa-sun"></i></button>
+            <button class="theme-btn" onclick="setTheme('dark')" title="มืด"><i class="fas fa-moon"></i></button>
+            <button class="theme-btn" onclick="setTheme('forest')" title="ธรรมชาติ"><i class="fas fa-leaf"></i></button>
+            <button class="theme-btn" onclick="setTheme('ocean')" title="ท้องทะเล"><i class="fas fa-water"></i></button>
+        </div>
+        
+        <div id="user-info" class="user-info" style="display: none;">
+            <img id="user-avatar" class="user-avatar" src="" alt="">
+            <span id="user-name" class="user-name"></span>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+        <div id="login-section">
+            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID_HERE" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="medium"></div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
     <div class="header-title">
         <h1><i class="fas fa-images"></i> คลังกิจกรรมและผลงานนักเรียน</h1>
-        <p>บันทึกการเรียนรู้และการทำโครงงานของนักเรียน ม.4</p>
+        <p>บันทึกการเรียนรู้ การทำโครงงาน และผลงานสร้างสรรค์ของนักเรียน ม.4</p>
     </div>
 
     <div class="gallery">
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=600" alt="ทัศนศึกษา">
+            <img src="https://images.unsplash.com/photo-1581092160562-40aa08e78837?auto=format&fit=crop&w=600&h=400" alt="ทัศนศึกษา">
             <div class="item-info">
-                <h4>ทัศนศึกษา ม.เกษตรฯ ศรีราชา</h4>
-                <p>นักเรียน 122 คน เข้าศึกษาดูงานด้านวิศวกรรมคอมพิวเตอร์และหุ่นยนต์ เมื่อวันที่ 17 ม.ค. 2026</p>
+                <h4><i class="fas fa-bus"></i> ทัศนศึกษา ม.เกษตรฯ ศรีราชา</h4>
+                <p>นักเรียน 122 คน เข้าศึกษาดูงานด้านวิศวกรรมคอมพิวเตอร์และหุ่นยนต์ เมื่อวันที่ 17 ม.ค. 2026 พร้อมเรียนรู้ระบบอัตโนมัติในโรงงานอุตสาหกรรม</p>
+                <span class="item-badge"><i class="fas fa-calendar"></i> มกราคม 2026</span>
             </div>
         </div>
 
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=600" alt="Coding">
+            <img src="https://images.unsplash.com/photo-1517048676732-d65bc937f952?auto=format&fit=crop&w=600&h=400" alt="Python Workshop">
             <div class="item-info">
-                <h4>Workshop: Python For Robot</h4>
-                <p>การเขียนโปรแกรมควบคุมบอร์ด ESP32 เบื้องต้นเพื่อเตรียมพร้อมสำหรับโครงงาน PROT ROBOT</p>
+                <h4><i class="fab fa-python"></i> Workshop: Python For Robotics</h4>
+                <p>การเขียนโปรแกรมควบคุมบอร์ด ESP32 เบื้องต้นเพื่อเตรียมพร้อมสำหรับโครงงาน PROT ROBOT นักเรียนได้เรียนรู้การเขียนโค้ดควบคุมเซนเซอร์และมอเตอร์</p>
+                <span class="item-badge"><i class="fas fa-calendar"></i> กุมภาพันธ์ 2026</span>
             </div>
         </div>
 
         <div class="gallery-item">
-            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600" alt="Smart Farm">
+            <img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=600&h=400" alt="Smart Farm Project">
             <div class="item-info">
-                <h4>นำเสนอโครงงานเกษตรอัจฉริยะ</h4>
-                <p>นักเรียนนำเสนอไอเดียการใช้เซนเซอร์วัดความชื้นในดินเชื่อมต่อกับระบบอัตโนมัติ</p>
+                <h4><i class="fas fa-tractor"></i> โครงงานเกษตรอัจฉริยะ</h4>
+                <p>นักเรียนนำเสนอไอเดียการใช้เซนเซอร์วัดความชื้นในดินเชื่อมต่อกับระบบอัตโนมัติ ผ่านแอปพลิเคชันบนมือถือ ควบคุมการรดน้ำอัตโนมัติ</p>
+                <span class="item-badge"><i class="fas fa-trophy"></i> รางวัลชนะเลิศระดับโรงเรียน</span>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1581091226033-d5c48150dbaa?auto=format&fit=crop&w=600&h=400" alt="Arduino Workshop">
+            <div class="item-info">
+                <h4><i class="fas fa-microchip"></i> Arduino Coding Camp</h4>
+                <p>ค่ายปฏิบัติการเขียนโปรแกรมควบคุม Arduino Uno นักเรียนได้เรียนรู้การต่อวงจรและการเขียนโปรแกรมควบคุม LED, เซนเซอร์ และมอเตอร์เบื้องต้น</p>
+                <span class="item-badge"><i class="fas fa-calendar"></i> ธันวาคม 2025</span>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1531482615713-2afd69097998?auto=format&fit=crop&w=600&h=400" alt="Robotics Competition">
+            <div class="item-info">
+                <h4><i class="fas fa-robot"></i> การแข่งขันหุ่นยนต์ PROT CUP</h4>
+                <p>ทีมนักเรียน PROT ROBOT ส่งตัวแทนเข้าร่วมการแข่งขันหุ่นยนต์ระดับภาค ได้รับรางวัลรองชนะเลิศอันดับ 2 ประเภทหุ่นยนต์ไล่ตามเส้น</p>
+                <span class="item-badge"><i class="fas fa-medal"></i> รองชนะเลิศอันดับ 2</span>
+            </div>
+        </div>
+
+        <div class="gallery-item">
+            <img src="https://images.unsplash.com/photo-1516321497487-e288fb19713f?auto=format&fit=crop&w=600&h=400" alt="AI Workshop">
+            <div class="item-info">
+                <h4><i class="fas fa-brain"></i> AI for Beginners</h4>
+                <p>เรียนรู้พื้นฐานปัญญาประดิษฐ์และการประยุกต์ใช้ในการจำแนกรูปภาพ นักเรียนได้ฝึกใช้ Teachable Machine ในการสร้างโมเดล AI</p>
+                <span class="item-badge"><i class="fas fa-calendar"></i> มีนาคม 2026</span>
             </div>
         </div>
     </div>
 
-    <a href="index.html" class="btn-back"><i class="fas fa-home"></i> กลับหน้าหลัก</a>
+    <div class="stats-section">
+        <h3><i class="fas fa-chart-line"></i> ความสำเร็จของเรา</h3>
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number">50+</div>
+                <div class="stat-label">โครงงานที่สำเร็จ</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">15+</div>
+                <div class="stat-label">รางวัลระดับชาติ/ภาค</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">200+</div>
+                <div class="stat-label">นักเรียนเข้าร่วมกิจกรรม</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number">8</div>
+                <div class="stat-label">ค่ายอบรมที่จัดขึ้น</div>
+            </div>
+        </div>
+    </div>
+
+    <div class="add-project">
+        <button class="btn-add" onclick="showSubmitForm()">
+            <i class="fas fa-plus-circle"></i> ส่งผลงาน/กิจกรรมของฉัน
+        </button>
+    </div>
+
+    <div class="footer-buttons">
+        <a href="student.html" class="btn-workspace"><i class="fas fa-robot"></i> กลับสู่ Smart Workspace</a>
+        <a href="index.html" class="btn-back"><i class="fas fa-home"></i> หน้าหลักระบบ</a>
+    </div>
+</div>
+
+<script>
+    // ==================== THEME MANAGEMENT ====================
+    function setTheme(themeName) {
+        document.body.setAttribute('data-theme', themeName);
+        localStorage.setItem('smart_theme', themeName);
+    }
+    const savedTheme = localStorage.getItem('smart_theme');
+    if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
+    else document.body.setAttribute('data-theme', 'light');
+
+    // ==================== GOOGLE LOGIN ====================
+    function decodeJwtResponse(token) {
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    }
+    
+    function handleCredentialResponse(response) {
+        const userData = decodeJwtResponse(response.credential);
+        const userEmail = userData.email;
+        
+        if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+            localStorage.setItem('student_name', userData.name);
+            localStorage.setItem('student_email', userData.email);
+            localStorage.setItem('student_pic', userData.picture);
+            localStorage.setItem('is_logged_in', 'true');
+            
+            document.getElementById('login-section').style.display = 'none';
+            const userInfo = document.getElementById('user-info');
+            userInfo.style.display = 'flex';
+            document.getElementById('user-avatar').src = userData.picture;
+            document.getElementById('user-name').innerText = userData.name;
+            
+            alert('🎉 ยินดีต้อนรับ ' + userData.name + ' สู่หน้าผลงานนักเรียนครับ');
+        } else {
+            alert('❌ อีเมลนี้ไม่ได้รับอนุญาต กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th');
+            localStorage.removeItem('is_logged_in');
+        }
+    }
+    
+    function logout() {
+        localStorage.removeItem('student_name');
+        localStorage.removeItem('student_email');
+        localStorage.removeItem('student_pic');
+        localStorage.removeItem('is_logged_in');
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('user-info').style.display = 'none';
+        alert('ออกจากระบบเรียบร้อย');
+    }
+    
+    function checkExistingLogin() {
+        if (localStorage.getItem('is_logged_in') === 'true') {
+            const savedName = localStorage.getItem('student_name');
+            const savedPic = localStorage.getItem('student_pic');
+            if (savedName) {
+                document.getElementById('login-section').style.display = 'none';
+                const userInfo = document.getElementById('user-info');
+                userInfo.style.display = 'flex';
+                document.getElementById('user-avatar').src = savedPic || 'https://ui-avatars.com/api/?background=3b82f6&color=fff&name=' + encodeURIComponent(savedName);
+                document.getElementById('user-name').innerText = savedName;
+            }
+        }
+    }
+    
+    // ฟังก์ชันส่งผลงาน
+    function showSubmitForm() {
+        if (!localStorage.getItem('is_logged_in')) {
+            alert('⚠️ กรุณาเข้าสู่ระบบก่อนส่งผลงานครับ');
+            return;
+        }
+        
+        const projectName = prompt('📝 กรุณากรอกชื่อผลงาน/กิจกรรมของคุณ:');
+        if (!projectName) return;
+        
+        const projectDesc = prompt('📄 กรุณาเพิ่มคำอธิบายสั้นๆ เกี่ยวกับผลงาน:');
+        if (!projectDesc) return;
+        
+        const studentName = localStorage.getItem('student_name');
+        
+        alert(`✅ ส่งผลงานเรียบร้อยแล้ว!\n\nชื่อ: ${projectName}\nโดย: ${studentName}\nคำอธิบาย: ${projectDesc}\n\n🎉 ขอบคุณที่ร่วมแบ่งปันผลงาน! ครูจะตรวจสอบและนำไปแสดงในเว็บไซต์ต่อไป`);
+        
+        // สามารถเพิ่มโค้ดสำหรับส่งข้อมูลไปยังเซิร์ฟเวอร์ได้ในอนาคต
+    }
+    
+    // เริ่มต้นตรวจสอบการ Login
+    window.addEventListener('DOMContentLoaded', () => {
+        checkExistingLogin();
+        
+        // แอนิเมชันเลื่อนสำหรับ gallery items
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if(entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }, index * 100);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.gallery-item').forEach((item, i) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateY(30px)';
+            item.style.transition = 'all 0.5s ease';
+            observer.observe(item);
+        });
+    });
+</script>
 
 </body>
 </html>
