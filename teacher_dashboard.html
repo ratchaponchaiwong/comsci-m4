@@ -26,11 +26,29 @@
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
         body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        
+        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+
+        /* ==================== อัปเดต: แอนิเมชันให้ตกจากบนลงล่าง ==================== */
+        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .theme-particle { position: absolute; pointer-events: none; animation: fallDown linear forwards; z-index: 1; top: -10vh; }
+        @keyframes fallDown { 
+            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 
+            10% { opacity: 1; } 
+            90% { opacity: 1; } 
+            100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } 
+        }
+
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
+        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
+        
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 10px; }
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
         
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: white;}
@@ -50,14 +68,13 @@
         body[data-theme="snow"] .glass-panel, body[data-theme="love"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
         
         .panel-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 25px; border-bottom: 2px solid rgba(59,130,246,0.3); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; color: #60a5fa; }
-        body[data-theme="snow"] .panel-title { color: #2563eb; }
+        body[data-theme="snow"] .panel-title, body[data-theme="love"] .panel-title { color: #e11d48; border-bottom-color: rgba(225,29,72,0.3); }
 
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; opacity: 0.9; }
         .form-group input[type="text"], .form-group input[type="date"], .form-group input[type="time"], .form-group input[type="number"], .form-group select { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; }
-        body[data-theme="snow"] .form-group input, body[data-theme="snow"] .form-group select { background: white; border-color: #cbd5e1; color: black; }
+        body[data-theme="snow"] .form-group input, body[data-theme="snow"] .form-group select, body[data-theme="love"] .form-group input, body[data-theme="love"] .form-group select { background: white; border-color: #cbd5e1; color: black; }
 
-        /* ตัวเลือกประเภทโพสต์ */
         .type-selector { display: flex; gap: 15px; flex-wrap: wrap; margin-top: 5px;}
         .type-option { padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); cursor: pointer; transition: 0.3s; display: flex; align-items: center; gap: 8px; font-weight: 500; }
         .type-option input { display: none; }
@@ -75,7 +92,9 @@
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
         th { color: #60a5fa; font-weight: 600; background: rgba(59,130,246,0.1); }
+        body[data-theme="snow"] th, body[data-theme="love"] th { color: #e11d48; background: rgba(225,29,72,0.1); }
         tr:hover { background: rgba(255,255,255,0.05); }
+        body[data-theme="snow"] tr:hover, body[data-theme="love"] tr:hover { background: rgba(0,0,0,0.02); }
 
         .btn-action { background: #3b82f6; color: white; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .btn-action:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
@@ -100,7 +119,7 @@
 </head>
 <body data-theme="default" style="display: none;" id="bodyContent">
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
-    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+    <div id="particleContainer"></div>
 
     <div class="content-layer">
         <header>
@@ -296,7 +315,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
         let studentsList = []; 
         let tempImportList = [];
         let currentGradeEmail = '';
@@ -315,6 +334,7 @@
             startThemeParticles(themeKey);
         }
 
+        // ==================== อัปเดต: สคริปต์ให้ร่วงจากบนลงล่าง ====================
         function startThemeParticles(theme) {
             const container = document.getElementById("particleContainer");
             if(!container) return;
@@ -324,7 +344,9 @@
             function createParticle() {
                 const particle = document.createElement("div");
                 particle.className = "theme-particle";
+                // สุ่มตำแหน่งแกน X และบังคับให้แกน Y เริ่มจากบนสุด
                 particle.style.left = Math.random() * 100 + "vw";
+                particle.style.top = "-10vh"; 
                 particle.style.fontSize = (Math.random() * 15 + 15) + "px";
                 particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
                 particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
@@ -335,7 +357,6 @@
             for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 200);
             particleInterval = setInterval(createParticle, 600);
         }
-
         document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         // ==================== SYSTEM & TABS ====================
