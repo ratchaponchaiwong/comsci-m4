@@ -180,9 +180,33 @@
             <button class="close-modal" onclick="closeEditProfileModal()">×</button>
             <h3 style="color: inherit; margin-bottom: 20px;"><i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว</h3>
             <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px;">ข้อมูลจะถูกส่งไปบันทึกที่ Google Sheets ของครู</p>
-            <div class="form-group-edit"><label>ชื่อ-นามสกุล</label><input type="text" id="edit-name"></div>
-            <div class="form-group-edit"><label>ชั้น/ห้อง (พิมพ์ให้ตรงกับที่ครูระบุ)</label><input type="text" id="edit-room" placeholder="เช่น ม.4/1"></div>
-            <div class="form-group-edit" style="margin-bottom: 25px;"><label>เลขที่</label><input type="number" id="edit-number"></div>
+            
+            <div class="form-group-edit">
+                <label>ชื่อ-นามสกุล</label>
+                <input type="text" id="edit-name">
+            </div>
+            
+            <div class="form-group-edit">
+                <label>ชั้นและห้องเรียน</label>
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                    <select id="edit-grade" style="width: 100%; padding: 12px; border-radius: 12px; font-family: 'Prompt';">
+                        <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
+                        <option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option>
+                    </select>
+                    <select id="edit-room-num" style="width: 100%; padding: 12px; border-radius: 12px; font-family: 'Prompt';">
+                        <option value="1">ห้อง 1</option><option value="2">ห้อง 2</option><option value="3">ห้อง 3</option>
+                        <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option>
+                        <option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option>
+                        <option value="10">ห้อง 10</option>
+                    </select>
+                </div>
+            </div>
+            
+            <div class="form-group-edit" style="margin-bottom: 25px;">
+                <label>เลขที่</label>
+                <input type="number" id="edit-number">
+            </div>
+            
             <button onclick="saveProfileData()" class="btn-action" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> บันทึกข้อมูลลงระบบ</button>
             <div id="saving-status" style="margin-top: 15px; font-size: 0.85rem; color: #10b981; display: none;"><i class="fas fa-spinner fa-spin"></i> กำลังบันทึกและส่งข้อมูล...</div>
         </div>
@@ -465,45 +489,64 @@
         }
 
         // ==================== PROFILE EDIT & GOOGLE SHEETS ====================
+        // ==================== อัปเดต JavaScript สำหรับบันทึกข้อมูล ====================
         function openEditProfileModal() {
             const email = localStorage.getItem('student_email');
             document.getElementById('edit-name').value = getUserData('custom_name') || localStorage.getItem('student_name') || "";
-            document.getElementById('edit-room').value = getUserData('room') || '';
+            
+            // ดึงข้อมูลห้องมาแยกใส่ Dropdown
+            const storedRoom = getUserData('room') || 'ม.4/1';
+            if(storedRoom.includes('/')) {
+                const parts = storedRoom.split('/');
+                document.getElementById('edit-grade').value = parts[0];
+                document.getElementById('edit-room-num').value = parts[1];
+            }
+            
             document.getElementById('edit-number').value = getUserData('number') || '';
             document.getElementById('editProfileModal').classList.add('active');
         }
+
         function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('active'); }
 
         function saveProfileData() {
             const name = document.getElementById('edit-name').value;
-            const room = document.getElementById('edit-room').value;
+            // ประกอบร่างห้องเรียน เช่น ม.4 + 1 = ม.4/1
+            const grade = document.getElementById('edit-grade').value;
+            const roomNum = document.getElementById('edit-room-num').value;
+            const room = `${grade}/${roomNum}`;
             const number = document.getElementById('edit-number').value;
             const email = localStorage.getItem('student_email');
 
-            if (!name || !room || !number) { alert('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน'); return; }
+            if (!name || !number) { alert('⚠️ กรุณากรอกข้อมูลชื่อและเลขที่ให้ครบถ้วน'); return; }
             document.getElementById('saving-status').style.display = 'block';
 
             localStorage.setItem(email + '_custom_name', name);
             localStorage.setItem(email + '_room', room);
             localStorage.setItem(email + '_number', number);
             
+            // ดึงวิชาเพิ่มเติมที่เด็กลงทะเบียนไว้
             let enrolledArray = [];
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
             let enrolledString = enrolledArray.join(", ");
 
             if(GOOGLE_SCRIPT_URL === "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE" || GOOGLE_SCRIPT_URL === "") {
-                alert("✅ บันทึกในเครื่องสำเร็จ! (กรุณานำ URL จาก Apps Script มาใส่ในโค้ดบรรทัดที่ 262 เพื่อส่งเข้า Google Sheets ครับ)");
+                alert("✅ บันทึกในเครื่องสำเร็จ! (ยังไม่ได้ใส่ URL Apps Script)");
                 document.getElementById('saving-status').style.display = 'none';
-                closeEditProfileModal(); 
-                loadStudentData();
-                return;
+                closeEditProfileModal(); loadStudentData(); return;
             }
 
             try {
                 fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST', mode: 'no-cors',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, name: name, room: room, number: number, enrolledSubjects: enrolledString })
+                    // ⚠️ ส่งข้อมูลไปให้ครบถ้วน รวมถึง enrolledSubjects
+                    body: JSON.stringify({ 
+                        email: email, 
+                        name: name, 
+                        room: room, 
+                        number: number, 
+                        enrolledSubjects: enrolledString 
+                    })
                 }).then(() => {
                     alert('✅ บันทึกและส่งข้อมูลให้ครูเรียบร้อย!');
                     document.getElementById('saving-status').style.display = 'none';
@@ -512,10 +555,9 @@
                 });
             } catch(e) {
                 console.error(e);
-                alert("⚠️ เกิดข้อผิดพลาดในการส่งข้อมูล แต่บันทึกในเครื่องแล้วครับ");
+                alert("⚠️ บันทึกในเครื่องแล้ว แต่ส่งเข้าส่วนกลางไม่สำเร็จ");
                 document.getElementById('saving-status').style.display = 'none';
-                closeEditProfileModal(); 
-                loadStudentData();
+                closeEditProfileModal(); loadStudentData();
             }
         }
 
