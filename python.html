@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องปฏิบัติการอัจฉริยะ | PROT Smart Workspace</title>
-    
+    <title>ห้องเรียนของฉัน | PROT Smart Workspace</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ==================== CSS โครงสร้างหลักและธีม ==================== */
+        /* CSS หลักคงเดิมทั้งหมดเพื่อให้ธีมไม่เพี้ยน */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; cursor: default; }
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
@@ -19,194 +18,134 @@
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        
         .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
-        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
+        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
+        .nav-links { display: flex; gap: 20px; list-style: none; }
+        .nav-links a { text-decoration: none; color: inherit; padding: 8px 12px; border-radius: 30px; transition: 0.3s; }
+        .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
         
-        .page-content-wrapper { padding: 20px; max-width: 1600px; margin: 0 auto; width: 100%; display: grid; gap: 20px; transition: 0.3s; }
+        .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+        .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); padding: 30px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.1); color: inherit; }
         
-        /* สลับ Layout 1 จอ / 2 จอ */
-        .page-content-wrapper.split-view { grid-template-columns: 450px 1fr; }
-        .page-content-wrapper.single-view { grid-template-columns: 1fr; }
-
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content; }
-        body[data-theme="snow"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
-
-        /* Media Display Area (ส่วนที่เพิ่มใหม่) */
-        .media-container { margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #000; position: relative; aspect-ratio: 16 / 9; display: none; }
-        .media-container iframe { width: 100%; height: 100%; border: none; }
+        .profile-pic { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px; border: 3px solid #60a5fa; display: none; object-fit: cover;}
+        .task-card { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; display: inline-block; }
+        .badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
+        .badge.submitted { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
+        .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; }
         
-        .media-tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .media-tab { padding: 8px 15px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; white-space: nowrap; color: inherit; }
-        .media-tab.active { background: #3b82f6; color: white; border-color: #3b82f6; }
-
-        /* Lab Area */
-        .lab-frame { width: 100%; height: 700px; border-radius: 15px; border: 1px solid rgba(255,255,255,0.1); }
-
-        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 12px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; margin-top: 15px; transition: 0.2s; }
-        .btn-submit:hover { background: #059669; transform: translateY(-2px); }
-
-        .layout-toggle { position: absolute; top: 100px; right: 40px; display: flex; gap: 10px; z-index: 100; }
-        .toggle-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; }
-        
-        @media (max-width: 1000px) { .page-content-wrapper.split-view { grid-template-columns: 1fr; } }
+        .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s;}
+        .btn-action:hover { background: #2563eb; transform: translateY(-2px); }
+        .btn-edit { background: #f59e0b; }
+        .btn-locked { background: #64748b; cursor: not-allowed; opacity: 0.7; }
     </style>
 </head>
 <body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
     <div class="content-layer">
         <header>
-            <a href="student.html" class="logo"><i class="fas fa-chevron-left"></i> <span id="act-title-header">กำลังโหลดกิจกรรม...</span></a>
-            <div class="layout-toggle">
-                <button class="toggle-btn" onclick="setLayout('single')"><i class="fas fa-square"></i> จอเดียว</button>
-                <button class="toggle-btn" onclick="setLayout('split')"><i class="fas fa-columns"></i> สองจอ</button>
-            </div>
+            <a href="index.html" class="logo"><i class="fas fa-robot"></i><span>Smart Workspace</span></a>
+            <ul class="nav-links">
+                <li><a href="index.html">หน้าหลัก</a></li>
+                <li><a href="student.html" class="active">ห้องเรียน</a></li>
+                <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
+            </ul>
         </header>
 
-        <div class="page-content-wrapper split-view" id="mainWrapper">
-            <div class="glass-panel">
-                <div id="media-section">
-                    <div class="media-tabs" id="mediaTabs">
-                        </div>
-                    <div class="media-container" id="mediaBox">
-                        </div>
+        <div class="page-content-wrapper">
+            <div class="dashboard-container">
+                <div class="glass-card">
+                    <img src="" id="profile-pic" class="profile-pic">
+                    <h3 id="profile-name">นักเรียน</h3>
+                    <p id="profile-email" style="font-size:0.8rem; opacity:0.7; margin-bottom:15px;"></p>
+                    <button class="btn-action" style="width:100%" onclick="location.href='index.html'">ออกจากระบบ</button>
                 </div>
 
-                <h3 style="margin-bottom: 10px; color: #60a5fa;"><i class="fas fa-info-circle"></i> คำชี้แจง</h3>
-                <p id="act-desc-body" style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px;">กรุณารอข้อมูลสักครู่...</p>
-
-                <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                    <h4 style="margin-bottom: 10px;"><i class="fas fa-upload"></i> ส่งงาน</h4>
-                    <input type="text" id="work-link" placeholder="วางลิงก์ผลงานของคุณที่นี่ (เช่น Wokwi/Drive)" 
-                           style="width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: inherit; margin-bottom: 10px;">
-                    <button class="btn-submit" onclick="submitWork()">
-                        <i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน
-                    </button>
-                    <p id="status-text" style="font-size: 0.8rem; margin-top: 10px; text-align: center; color: #10b981; display: none;">✅ ส่งงานสำเร็จแล้ว!</p>
+                <div class="content-area">
+                    <h2 style="margin-bottom:20px;"><i class="fas fa-book-open"></i> บทเรียนและภารกิจ</h2>
+                    <div id="dynamic-modules-container">
+                        </div>
                 </div>
-            </div>
-
-            <div class="glass-panel" style="padding: 10px;">
-                <iframe id="labFrame" class="lab-frame" src="about:blank"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        // ==================== ดึงข้อมูลกิจกรรมจาก LocalStorage ====================
-        const urlParams = new URLSearchParams(window.location.search);
-        const actId = urlParams.get('actid');
+        function loadStudentData() {
+            const email = localStorage.getItem('student_email');
+            const name = localStorage.getItem('student_name');
+            const pic = localStorage.getItem('student_pic');
 
-        function loadActivityData() {
+            if (!email) { window.location.href = 'index.html'; return; }
+
+            document.getElementById('profile-name').innerText = name;
+            document.getElementById('profile-email').innerText = email;
+            if(pic) {
+                const img = document.getElementById('profile-pic');
+                img.src = pic; img.style.display = 'block';
+            }
+
+            loadActivities(email);
+        }
+
+        function loadActivities(email) {
+            const container = document.getElementById('dynamic-modules-container');
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const act = activities.find(a => a.id == actId);
-
-            if (!act) {
-                document.getElementById('act-title-header').innerText = "ไม่พบกิจกรรม";
+            
+            if(activities.length === 0) {
+                container.innerHTML = '<p style="opacity:0.5; text-align:center;">ยังไม่มีบทเรียนที่เปิดสอน</p>';
                 return;
             }
 
-            // ตั้งค่าข้อความ
-            document.getElementById('act-title-header').innerText = act.title;
-            document.getElementById('act-desc-body').innerText = act.desc;
-            
-            // ตั้งค่าลิงก์ห้อง Lab (Wokwi หรืออื่นๆ)
-            const labFrame = document.getElementById('labFrame');
-            if (act.link && act.link !== "#") {
-                labFrame.src = act.link.includes('wokwi') ? act.link : "https://wokwi.com/projects/new/arduino-uno"; 
-            } else {
-                // ถ้าเป็นหน้า python ให้โหลด Skulpt หรือ IDE อื่นๆ (ตัวอย่างเป็น Wokwi)
-                labFrame.src = "https://wokwi.com/projects/new/arduino-uno";
-            }
+            container.innerHTML = '';
+            activities.forEach(act => {
+                const status = localStorage.getItem(email + '_act_' + act.id + '_status') || 'pending';
+                const now = new Date();
+                const deadline = new Date(act.date + ' ' + (act.time || '23:59'));
+                const isPastDeadline = now > deadline;
 
-            // จัดการสื่อ (YouTube, PDF, Canva)
-            const tabs = document.getElementById('mediaTabs');
-            let firstMedia = null;
+                let badge = '<span class="badge pending">⏳ ค้างส่ง</span>';
+                let actionBtn = `<a href="${act.link}?actid=${act.id}" class="btn-action">ทำกิจกรรม <i class="fas fa-arrow-right"></i></a>`;
 
-            if (act.yt) {
-                addTab("YouTube", () => showMedia(formatYoutube(act.yt)));
-                if(!firstMedia) firstMedia = formatYoutube(act.yt);
-            }
-            if (act.doc) {
-                addTab("เอกสาร/PDF", () => showMedia(act.doc));
-                if(!firstMedia) firstMedia = act.doc;
-            }
-            if (act.canva) {
-                addTab("Canva", () => showMedia(formatCanva(act.canva)));
-                if(!firstMedia) firstMedia = formatCanva(act.canva);
-            }
+                if (status === 'graded') {
+                    badge = '<span class="badge done">⭐ ตรวจแล้ว</span>';
+                    actionBtn = '<span style="font-size:0.8rem; opacity:0.6;"><i class="fas fa-lock"></i> ปิดการแก้ไขแล้ว</span>';
+                } else if (status === 'submitted') {
+                    badge = '<span class="badge submitted">✅ ส่งแล้ว (รอตรวจ)</span>';
+                    // ถ้ายังไม่ตรวจ หรือ ยังไม่หมดเวลา ให้กดแก้ไขได้
+                    if(!isPastDeadline) {
+                        actionBtn = `<a href="${act.link}?actid=${act.id}" class="btn-action btn-edit">✏️ แก้ไขงาน</a>`;
+                    } else {
+                        actionBtn = '<span style="font-size:0.8rem; opacity:0.6;"><i class="fas fa-history"></i> เลยกำหนดแก้ไข</span>';
+                    }
+                } else if (isPastDeadline && act.strict) {
+                    badge = '<span class="badge" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌ ปิดรับงาน</span>';
+                    actionBtn = '<button class="btn-action btn-locked" disabled>ส่งงานไม่ทัน</button>';
+                }
 
-            if (firstMedia) showMedia(firstMedia);
-        }
-
-        function addTab(label, callback) {
-            const btn = document.createElement('button');
-            btn.className = 'media-tab';
-            btn.innerHTML = label;
-            btn.onclick = (e) => {
-                document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
-                btn.classList.add('active');
-                callback();
-            };
-            document.getElementById('mediaTabs').appendChild(btn);
-            if (document.getElementById('mediaTabs').children.length === 1) btn.classList.add('active');
-        }
-
-        function showMedia(url) {
-            const box = document.getElementById('mediaBox');
-            box.style.display = 'block';
-            box.innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
-        }
-
-        function formatYoutube(url) {
-            let id = "";
-            if(url.includes('v=')) id = url.split('v=')[1].split('&')[0];
-            else if(url.includes('youtu.be/')) id = url.split('youtu.be/')[1];
-            return `https://www.youtube.com/embed/${id}`;
-        }
-
-        function formatCanva(url) {
-            if(url.includes('/view')) return url.replace('/view', '/view?embed');
-            return url;
-        }
-
-        // ==================== ระบบส่งงาน ====================
-        function submitWork() {
-            const email = localStorage.getItem('student_email');
-            const link = document.getElementById('work-link').value;
-            if(!email) return alert("กรุณาล็อกอิน");
-            if(!link) return alert("กรุณาวางลิงก์งานก่อนส่ง");
-
-            // บันทึกสถานะเป็นส่งแล้ว
-            localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
-            localStorage.setItem(email + '_act_' + actId + '_work_link', link);
-            
-            // เพิ่มคะแนน (ตัวอย่าง)
-            let currentScore = parseInt(localStorage.getItem(email + '_total_score') || '0');
-            localStorage.setItem(email + '_total_score', Math.min(currentScore + 15, 100));
-
-            document.getElementById('status-text').style.display = 'block';
-            alert("🎉 ส่งงานสำเร็จ! คุณสามารถกลับไปแก้ไขได้ตลอดเวลาจนกว่าครูจะตรวจครับ");
-        }
-
-        function setLayout(type) {
-            const wrapper = document.getElementById('mainWrapper');
-            if(type === 'single') {
-                wrapper.classList.replace('split-view', 'single-view');
-            } else {
-                wrapper.classList.replace('single-view', 'split-view');
-            }
+                container.innerHTML += `
+                    <div class="task-card">
+                        <div>
+                            <h4>${act.title}</h4>
+                            <p style="font-size:0.85rem; opacity:0.8;">${act.desc}</p>
+                            <small style="color:#60a5fa;">กำหนดส่ง: ${act.date} ${act.time || ''}</small>
+                        </div>
+                        <div style="text-align:right">
+                            ${badge}<br>${actionBtn}
+                        </div>
+                    </div>
+                `;
+            });
         }
 
         window.onload = () => {
-            const savedTheme = localStorage.getItem('smart_theme') || "default";
-            document.body.setAttribute("data-theme", savedTheme);
-            loadActivityData();
-            
-            // เช็คว่าเคยส่งยัง
-            const email = localStorage.getItem('student_email');
-            const savedLink = localStorage.getItem(email + '_act_' + actId + '_work_link');
-            if(savedLink) document.getElementById('work-link').value = savedLink;
+            const theme = localStorage.getItem('smart_theme') || 'default';
+            document.body.setAttribute('data-theme', theme);
+            loadStudentData();
         };
     </script>
 </body>
