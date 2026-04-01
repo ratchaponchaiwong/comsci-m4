@@ -58,7 +58,7 @@
         .work-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; margin-bottom: 10px; }
         body[data-theme="snow"] .work-input { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.2); }
         
-        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; /* ซ่อนไว้ตั้งแต่แรก */ }
+        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; }
         .btn-submit:hover { background: #059669; transform: translateY(-2px); }
         
         .warning-text { font-size: 0.85rem; color: #f59e0b; margin-top: 5px; display: block; }
@@ -111,13 +111,11 @@
     </div>
 
     <script>
-        // ==================== ระบบตรวจสอบลิงก์ (โชว์ปุ่มส่ง) ====================
         function checkInput() {
             const linkVal = document.getElementById('work-link').value.trim();
             const btnSubmit = document.getElementById('btn-submit');
             const warningMsg = document.getElementById('warning-msg');
 
-            // เงื่อนไข: ถ้าช่องพิมพ์ไม่ว่างเปล่า (มีข้อมูล) ให้แสดงปุ่ม
             if (linkVal !== "") {
                 btnSubmit.style.display = "block";
                 warningMsg.style.display = "none";
@@ -127,7 +125,6 @@
             }
         }
 
-        // ==================== โหลดข้อมูลพื้นฐาน ====================
         const urlParams = new URLSearchParams(window.location.search);
         const actId = urlParams.get('actid');
 
@@ -151,7 +148,6 @@
             }
         }
 
-        // ==================== โหลดกิจกรรมและสื่อ ====================
         function loadActivityData() {
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const act = activities.find(a => a.id == actId);
@@ -173,17 +169,17 @@
             let hasMedia = false;
 
             if (act.yt) { addTab("yt-tab", "<i class='fab fa-youtube'></i> YouTube", () => showMedia(formatYT(act.yt))); hasMedia = true; }
-            if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(act.doc)); hasMedia = true; }
+            // ปรับแก้การเรียกใช้ formatDocs ที่นี่
+            if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(formatDocs(act.doc))); hasMedia = true; }
             if (act.canva) { addTab("canva-tab", "<i class='fas fa-paint-brush'></i> Canva", () => showMedia(formatCanva(act.canva))); hasMedia = true; }
 
             if (hasMedia) tabs.children[0].click();
 
-            // เช็คว่าเคยส่งงานหรือยัง
             const email = localStorage.getItem('student_email');
             const savedLink = localStorage.getItem(email + '_act_' + actId + '_work_link');
             if (savedLink) {
                 document.getElementById('work-link').value = savedLink;
-                checkInput(); // สั่งให้ปุ่มแสดงถ้ามีลิงก์เก่า
+                checkInput();
             }
         }
 
@@ -209,15 +205,26 @@
             let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0];
             return `https://www.youtube.com/embed/${id}`;
         }
+        
+        // ฟังก์ชันแก้ไข URL สำหรับ Google Docs/Drive ให้เปิด Preview ได้
+        function formatDocs(url) {
+            if (!url) return "";
+            if (url.includes('docs.google.com/document/d/')) {
+                // ตัดส่วน /edit... ทิ้ง แล้วแทนที่ด้วย /preview
+                return url.split('/edit')[0] + '/preview';
+            } else if (url.includes('docs.google.com/presentation/d/')) {
+                 return url.split('/edit')[0] + '/preview';
+            }
+            return url;
+        }
+
         function formatCanva(url) { return url.includes('/view') && !url.includes('embed') ? url.replace('/view', '/view?embed') : url; }
 
-        // ==================== ระบบส่งงาน ====================
         function submitWork() {
             const email = localStorage.getItem('student_email');
             const link = document.getElementById('work-link').value.trim();
             if(!email) return alert("⚠️ กรุณาล็อกอินก่อนส่งงาน");
             
-            // บันทึกสถานะ
             localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
             localStorage.setItem(email + '_act_' + actId + '_work_link', link);
             
