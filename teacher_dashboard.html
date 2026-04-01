@@ -527,6 +527,40 @@
 
         function closeStudentModal() { document.getElementById('studentDetailModal').classList.remove('active'); }
 
+        // ==================== ฟังก์ชันซิงค์บทเรียนเข้า Google Sheets ====================
+        async function syncActivitiesToServer() {
+            let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            if(GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") {
+                try {
+                    await fetch(GOOGLE_SCRIPT_URL, {
+                        method: 'POST', mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ action: "saveActivities", activities: activities })
+                    });
+                    console.log("ซิงค์ข้อมูลบทเรียนขึ้น Server สำเร็จ");
+                } catch (e) {
+                    console.error("เกิดข้อผิดพลาดในการซิงค์ข้อมูล:", e);
+                }
+            }
+        }
+
+        async function fetchActivitiesFromServer() {
+            if(GOOGLE_SCRIPT_URL && GOOGLE_SCRIPT_URL !== "YOUR_GOOGLE_SCRIPT_WEB_APP_URL_HERE") {
+                try {
+                    const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
+                    const textData = await response.text();
+                    const parsedData = JSON.parse(textData);
+                    
+                    if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
+                        localStorage.setItem('global_activities', JSON.stringify(parsedData.data));
+                    }
+                } catch(e) {
+                    console.log("ใช้งานข้อมูลบทเรียนในเครื่อง");
+                }
+            }
+            loadActivities();
+        }
+
         // ==================== TAB 1: ACTIVITIES (ระบบแยกห้อง) ====================
         function loadActivities() {
             const list = document.getElementById('published-list');
@@ -594,6 +628,10 @@
             else activities.push(actData);
 
             localStorage.setItem('global_activities', JSON.stringify(activities));
+            
+            // เรียกใช้ฟังก์ชันซิงค์ข้อมูลไปเก็บที่ Server
+            syncActivitiesToServer();
+
             alert(editId ? '✅ แก้ไขข้อมูลเรียบร้อย' : '✅ โพสต์กิจกรรมเรียบร้อย');
             resetForm(); loadActivities();
         }
@@ -629,6 +667,10 @@
                 let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
                 activities = activities.filter(a => a.id !== id);
                 localStorage.setItem('global_activities', JSON.stringify(activities));
+                
+                // ลบเสร็จก็ซิงค์ขึ้น Server เช่นกัน
+                syncActivitiesToServer();
+                
                 loadActivities();
             }
         }
@@ -641,7 +683,8 @@
                 document.body.setAttribute("data-theme", savedTheme);
                 document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
                 
-                loadActivities();
+                // โหลดบทเรียนล่าสุดจาก Google Sheets ก่อน
+                fetchActivitiesFromServer();
                 fetchStudents();
             }
         };
