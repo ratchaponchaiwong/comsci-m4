@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>Smart Workspace | PROT Robotics - วิทยาการคำนวณ ม.4</title>
+    <title>Python Lab | PROT Smart Workspace - วิทยาการคำนวณ ม.4</title>
     
     <!-- Google Identity Services -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -29,7 +29,6 @@
             font-family: 'Prompt', 'Inter', 'Tahoma', sans-serif;
         }
 
-        /* ธีมเริ่มต้น (Light Professional) */
         :root {
             --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             --bg-sidebar: rgba(255, 255, 255, 0.95);
@@ -54,7 +53,6 @@
             --workspace-bg: rgba(248, 250, 252, 0.85);
         }
 
-        /* Dark Mode Theme */
         body[data-theme="dark"] {
             --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2d3a4e 100%);
             --bg-sidebar: rgba(30, 41, 59, 0.95);
@@ -74,10 +72,8 @@
             --workspace-bg: rgba(15, 23, 42, 0.85);
         }
 
-        /* Forest / Natural Theme */
         body[data-theme="forest"] {
             --bg-body: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
-            --bg-sidebar: rgba(255, 255, 255, 0.95);
             --header-bg: linear-gradient(135deg, #065f46 0%, #047857 100%);
             --header-text: #f0fdf4;
             --card-bg: #ffffff;
@@ -94,10 +90,8 @@
             --workspace-bg: rgba(236, 253, 245, 0.85);
         }
 
-        /* Ocean Theme */
         body[data-theme="ocean"] {
             --bg-body: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);
-            --bg-sidebar: rgba(255, 255, 255, 0.95);
             --header-bg: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
             --header-text: #f0f9ff;
             --card-bg: #ffffff;
@@ -119,7 +113,6 @@
             color: var(--text-primary);
         }
 
-        /* Header Navigation */
         header {
             background: var(--header-bg);
             color: var(--header-text);
@@ -132,6 +125,8 @@
             position: sticky;
             top: 0;
             z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
         }
 
         .header-left {
@@ -171,7 +166,6 @@
             opacity: 0.9;
         }
 
-        /* Navigation Menu */
         .nav-menu {
             display: flex;
             gap: 8px;
@@ -179,6 +173,8 @@
             padding: 6px 20px;
             border-radius: 50px;
             backdrop-filter: blur(8px);
+            flex-wrap: wrap;
+            justify-content: center;
         }
         .nav-item {
             padding: 8px 20px;
@@ -208,6 +204,7 @@
             display: flex;
             align-items: center;
             gap: 20px;
+            flex-wrap: wrap;
         }
 
         .theme-picker {
@@ -264,14 +261,12 @@
             margin-left: 8px;
         }
 
-        /* Container */
         #app-container {
             display: flex;
             height: calc(100vh - 70px);
             width: 100%;
         }
 
-        /* Sidebar */
         #sidebar {
             width: 340px;
             background: var(--bg-sidebar);
@@ -354,7 +349,6 @@
             background: var(--success-dark);
         }
 
-        /* Workspace */
         #workspace {
             flex: 1;
             display: flex;
@@ -376,16 +370,7 @@
             gap: 16px;
             border: 1px solid var(--border-color);
         }
-        select {
-            background: var(--panel-bg);
-            border: 1px solid var(--border-color);
-            padding: 8px 16px;
-            border-radius: 40px;
-            color: var(--text-primary);
-            cursor: pointer;
-        }
 
-        /* Main Content Area - Python Focus */
         .python-main {
             flex: 1;
             display: flex;
@@ -484,7 +469,7 @@
         @media (max-width: 780px) {
             .python-main { flex-direction: column; }
             .nav-menu { display: none; }
-            header { padding: 0 16px; flex-wrap: wrap; height: auto; gap: 10px; }
+            header { padding: 0 16px; height: auto; }
             #app-container { height: calc(100vh - auto); }
             #sidebar { width: 280px; }
         }
@@ -508,13 +493,13 @@
         <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
         <div class="logo-title">
             <h3><i class="fas fa-robot"></i> PROT Smart Workspace</h3>
-            <p>วิทยาการคำนวณ ม.4 | บทที่ 2 : การแก้ปัญหาและขั้นตอนวิธี</p>
+            <p>วิทยาการคำนวณ ม.4 | Python Programming Lab</p>
         </div>
     </div>
     
     <div class="nav-menu">
         <a href="index.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
-        <a href="my_classroom.html" class="nav-item"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
+        <a href="student.html" class="nav-item"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
         <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
         <a href="student_portfolio.html" class="nav-item"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
         <a href="extra_subjects.html" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
@@ -529,7 +514,7 @@
             <button class="theme-btn" onclick="setTheme('ocean')" title="ท้องทะเล"><i class="fas fa-water"></i></button>
         </div>
         <div id="login-section">
-            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID_HERE" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
             <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="medium"></div>
         </div>
         <div id="user-profile" style="display: none;">
@@ -545,8 +530,7 @@
         <div class="mission-card">
             <h4><i class="fas fa-tasks"></i> ภารกิจเรียนรู้วันนี้</h4>
             <ul class="mission-list">
-                <li><i class="fas fa-play-circle"></i> ชมวิดีโอแนะนำบทเรียน</li>
-                <li><i class="fas fa-microchip"></i> ศึกษาการวิเคราะห์แบตเตอรี่หุ่นยนต์</li>
+                <li><i class="fas fa-play-circle"></i> ศึกษาโจทย์การคำนวณแบตเตอรี่</li>
                 <li><i class="fab fa-python"></i> เขียน Python ตามโจทย์</li>
                 <li><i class="fas fa-check-circle"></i> รันโค้ดให้มีคำว่า SUCCESS</li>
                 <li><i class="fas fa-paper-plane"></i> ส่งงานผ่านระบบ</li>
@@ -565,8 +549,8 @@
 
     <div id="workspace">
         <div class="workspace-toolbar">
-            <i class="fas fa-laptop-code" style="color: var(--accent);"></i>
-            <label><b>📚 บทที่ 2 : การวิเคราะห์ลอจิกและประยุกต์ใช้โค้ด</b></label>
+            <i class="fab fa-python" style="color: var(--accent); font-size: 1.3rem;"></i>
+            <label><b>🐍 Python Lab : การเขียนโปรแกรมเบื้องต้น</b></label>
         </div>
         
         <div class="problem-card">
@@ -607,7 +591,6 @@ print("SUCCESS")</textarea>
 </div>
 
 <script>
-    // ==================== THEME MANAGEMENT ====================
     function setTheme(themeName) {
         document.body.setAttribute('data-theme', themeName);
         localStorage.setItem('smart_theme', themeName);
@@ -616,12 +599,10 @@ print("SUCCESS")</textarea>
     if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
     else document.body.setAttribute('data-theme', 'light');
 
-    // ==================== SIDEBAR TOGGLE ====================
     function toggleSidebar() {
         document.getElementById("sidebar").classList.toggle("collapsed");
     }
 
-    // ==================== PYTHON RUNNER ====================
     let outputContent = "";
     
     function outf(text) {
@@ -668,7 +649,6 @@ print("SUCCESS")</textarea>
         });
     }
 
-    // ==================== GOOGLE LOGIN ====================
     function decodeJwtResponse(token) {
         let base64Url = token.split('.')[1];
         let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -694,7 +674,7 @@ print("SUCCESS")</textarea>
             document.getElementById('user-avatar').src = userData.picture;
             document.getElementById('user-name').innerText = userData.name;
             
-            alert('🎉 ยินดีต้อนรับ ' + userData.name + ' สู่ PROT Smart Workspace!');
+            alert('🎉 ยินดีต้อนรับ ' + userData.name + ' สู่ Python Lab ครับ!');
         } else {
             alert('❌ อีเมลนี้ไม่ได้รับอนุญาต กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th');
         }
@@ -724,7 +704,6 @@ print("SUCCESS")</textarea>
         }
     }
     
-    // ==================== ASSIGNMENT SUBMIT ====================
     function submitAssignment() {
         if (!localStorage.getItem('is_logged_in')) {
             alert('⚠️ กรุณาเข้าสู่ระบบก่อนส่งงานครับ');
@@ -752,17 +731,14 @@ print("SUCCESS")</textarea>
         document.getElementById('wokwi-link').value = '';
         document.getElementById('file-upload').value = '';
         
-        // อัปเดตคะแนนใน localStorage
         let currentScore = parseInt(localStorage.getItem('student_total_score') || '0');
         let newScore = Math.min(currentScore + 15, 100);
         localStorage.setItem('student_total_score', newScore);
         
-        // อัปเดตจำนวนกิจกรรม
         let activityCount = parseInt(localStorage.getItem('student_activity_count') || '0');
         localStorage.setItem('student_activity_count', activityCount + 1);
     }
     
-    // ==================== INITIALIZE ====================
     window.addEventListener('DOMContentLoaded', () => {
         checkExistingLogin();
     });
