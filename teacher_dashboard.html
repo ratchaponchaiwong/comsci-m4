@@ -357,7 +357,6 @@
             for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 200);
             particleInterval = setInterval(createParticle, 600);
         }
-
         document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         // ==================== SYSTEM & TABS ====================
@@ -369,22 +368,30 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
+        // ==================== FETCH ACTIVITIES (เพิ่ม Cache Busting) ====================
         async function fetchActivitiesFromServer() {
             const container = document.getElementById('activities-list-container');
             container.innerHTML = '<div style="text-align:center; padding: 40px; color: #60a5fa;"><i class="fas fa-spinner fa-spin fa-2x"></i><p style="margin-top: 15px;">กำลังเชื่อมต่อฐานข้อมูล...</p></div>';
             try {
                 if(GOOGLE_SCRIPT_URL) {
-                    const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
+                    // เพิ่มรหัสเวลาต่อท้าย URL หลอกให้เบราว์เซอร์คิดว่าเป็นลิงก์ใหม่เสมอ
+                    const cacheBuster = new Date().getTime();
+                    const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
                     const text = await response.text();
                     const parsedData = JSON.parse(text);
+                    
                     if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
                         let localActs = JSON.parse(localStorage.getItem('global_activities') || '[]');
                         let serverActs = parsedData.data;
+                        
                         if (serverActs.length === 0 && localActs.length > 0) {
                             syncActivities();
                         } else {
                             localStorage.setItem('global_activities', JSON.stringify(serverActs));
                         }
+                    } else if (parsedData && parsedData.type === 'activities' && (!parsedData.data || parsedData.data.length === 0)) {
+                        // ถ้าระบบบอกว่าไม่มีข้อมูลเลย (ครูลบหมด) ให้ล้างเครื่องทันที
+                        localStorage.setItem('global_activities', '[]');
                     }
                 }
             } catch(e) { console.log("โหลดจาก Server ไม่สำเร็จ"); }
@@ -445,7 +452,7 @@
             const target = (grade === 'all') ? 'ทุกห้อง' : `${grade}/${roomNum}`;
 
             const actData = {
-                id: document.getElementById('edit-id').value || Date.now().toString(), // บังคับเป็น String
+                id: document.getElementById('edit-id').value || Date.now().toString(),
                 type: type,
                 title: title, 
                 desc: document.getElementById('act-desc').value,
@@ -459,19 +466,18 @@
             };
 
             let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const idx = acts.findIndex(a => String(a.id) === String(actData.id)); // เทียบ String
+            const idx = acts.findIndex(a => String(a.id) === String(actData.id));
             if(idx > -1) acts[idx] = actData; else acts.push(actData);
 
             localStorage.setItem('global_activities', JSON.stringify(acts));
             syncActivities();
             alert("✅ บันทึกโพสต์สำเร็จ!");
             resetForm(); loadActivities();
-            loadMatrixData(); // อัปเดตตารางคะแนนด้วย
         }
 
         function editAct(id) {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const act = acts.find(a => String(a.id) === String(id)); // เทียบ String
+            const act = acts.find(a => String(a.id) === String(id));
             if(!act) return;
 
             document.getElementById('edit-id').value = act.id;
@@ -509,12 +515,11 @@
         function deleteAct(id) {
             if(confirm("⚠️ คุณต้องการลบโพสต์นี้ใช่หรือไม่?")) {
                 let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-                // ใช้การเทียบ String เพื่อแก้บั๊กลบไม่ออก
-                acts = acts.filter(a => String(a.id) !== String(id)); 
+                acts = acts.filter(a => String(a.id) !== String(id));
                 localStorage.setItem('global_activities', JSON.stringify(acts));
                 syncActivities();
                 loadActivities();
-                loadMatrixData(); // อัปเดตตารางตรวจงานด้วย
+                loadMatrixData(); // สั่งให้อัปเดตในแท็บตรวจงานด้วย
             }
         }
 
@@ -540,7 +545,7 @@
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveActivities", activities: JSON.parse(acts) }) });
         }
 
-        // ==================== MATRIX ตรวจงาน ====================
+        // ==================== MATRIX ตรวจงาน (เพิ่ม Cache Busting) ====================
         async function loadMatrixData() {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const gradableActs = acts.filter(a => a.type !== 'content');
@@ -549,7 +554,9 @@
             document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</td></tr>';
             
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL);
+                // เพิ่มรหัสเวลาต่อท้าย URL หลอกให้เบราว์เซอร์คิดว่าเป็นลิงก์ใหม่เสมอ
+                const cacheBuster = new Date().getTime();
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
                 studentsList = await res.json();
                 renderMatrixTable();
             } catch (error) {
