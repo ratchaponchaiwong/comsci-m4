@@ -2,50 +2,652 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ติดต่อ | ครูรัชพล</title>
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>ติดต่อ | PROT Smart Workspace - ครูรัชพล</title>
+    
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
-        body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; margin: 0; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-        .contact-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(10px); border-radius: 30px; padding: 50px; width: 90%; max-width: 500px; text-align: center; border: 1px solid rgba(59,130,246,0.3); box-shadow: 0 25px 50px rgba(0,0,0,0.5); }
-        .contact-card h2 { color: #60a5fa; margin-bottom: 30px; }
-        .contact-item { display: flex; align-items: center; gap: 20px; margin-bottom: 25px; text-align: left; background: rgba(255,255,255,0.05); padding: 15px; border-radius: 15px; }
-        .contact-item i { font-size: 1.5rem; color: #60a5fa; width: 40px; text-align: center; }
-        .contact-item p { margin: 0; font-size: 1rem; }
-        .btn-home { margin-top: 20px; display: inline-block; color: #94a3b8; text-decoration: none; font-size: 0.9rem; }
-        .btn-home:hover { color: white; }
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: all 0.2s ease;
+        }
+
+        body {
+            font-family: 'Prompt', 'Inter', sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #334155;
+            min-height: 100vh;
+        }
+
+        /* ธีมที่สอดคล้องกับ Smart Workspace */
+        :root {
+            --bg-body: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            --header-bg: linear-gradient(135deg, #1e3a5f 0%, #2c4e6e 100%);
+            --header-text: #ffffff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            --shadow-lg: 0 10px 25px -5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Mode */
+        body[data-theme="dark"] {
+            --bg-body: linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #2d3a4e 100%);
+            --header-bg: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
+            --header-text: #e2e8f0;
+            --card-bg: rgba(30, 41, 59, 0.95);
+            --border-color: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #60a5fa;
+        }
+
+        /* Forest Theme */
+        body[data-theme="forest"] {
+            --bg-body: linear-gradient(135deg, #065f46 0%, #10b981 50%, #34d399 100%);
+            --header-bg: linear-gradient(135deg, #065f46 0%, #047857 100%);
+            --header-text: #f0fdf4;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #a7f3d0;
+            --text-primary: #064e3b;
+            --text-secondary: #047857;
+            --accent: #10b981;
+        }
+
+        /* Ocean Theme */
+        body[data-theme="ocean"] {
+            --bg-body: linear-gradient(135deg, #0c4a6e 0%, #0284c7 50%, #38bdf8 100%);
+            --header-bg: linear-gradient(135deg, #0c4a6e 0%, #075985 100%);
+            --header-text: #f0f9ff;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --border-color: #bae6fd;
+            --text-primary: #075985;
+            --text-secondary: #0284c7;
+            --accent: #0ea5e9;
+        }
+
+        body {
+            background: var(--bg-body);
+            color: var(--text-secondary);
+        }
+
+        /* Navbar */
+        nav {
+            background: var(--header-bg);
+            padding: 0 32px;
+            height: 70px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-md);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+
+        .logo {
+            font-weight: 700;
+            font-size: 1.2rem;
+            color: var(--header-text);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        .logo i {
+            font-size: 1.5rem;
+        }
+
+        /* Navigation Menu */
+        .nav-menu {
+            display: flex;
+            gap: 8px;
+            background: rgba(255,255,255,0.15);
+            padding: 6px 20px;
+            border-radius: 50px;
+            backdrop-filter: blur(8px);
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .nav-item {
+            padding: 8px 20px;
+            border-radius: 40px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+            font-size: 0.9rem;
+            color: var(--header-text);
+            background: transparent;
+            border: none;
+            font-family: 'Prompt', sans-serif;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .nav-item:hover {
+            background: rgba(255,255,255,0.2);
+            transform: translateY(-2px);
+        }
+        .nav-item.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+
+        .theme-picker {
+            display: flex;
+            gap: 8px;
+            background: rgba(0,0,0,0.25);
+            padding: 5px 12px;
+            border-radius: 40px;
+        }
+        .theme-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.1rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+            color: var(--header-text);
+        }
+        .theme-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.2);
+        }
+
+        /* User Profile */
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            background: rgba(255,255,255,0.15);
+            padding: 5px 15px;
+            border-radius: 40px;
+        }
+        .user-avatar {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+        .user-name {
+            font-size: 0.85rem;
+            font-weight: 500;
+            color: var(--header-text);
+        }
+        .logout-btn {
+            background: rgba(255,255,255,0.2);
+            border: none;
+            color: white;
+            padding: 4px 10px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 0.7rem;
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 800px;
+            margin: 60px auto;
+            padding: 0 20px;
+        }
+
+        /* Contact Card */
+        .contact-card {
+            background: var(--card-bg);
+            backdrop-filter: blur(12px);
+            border-radius: 40px;
+            padding: 50px;
+            text-align: center;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-lg);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .contact-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 30px 60px -12px rgba(0,0,0,0.3);
+        }
+        .contact-card h2 {
+            color: var(--accent);
+            margin-bottom: 35px;
+            font-size: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+        }
+        .contact-card h2 i {
+            font-size: 2rem;
+        }
+
+        .contact-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 25px;
+            text-align: left;
+            background: rgba(0,0,0,0.03);
+            padding: 18px 25px;
+            border-radius: 20px;
+            transition: all 0.3s;
+            border: 1px solid var(--border-color);
+        }
+        .contact-item:hover {
+            transform: translateX(5px);
+            border-color: var(--accent);
+            background: rgba(59,130,246,0.05);
+        }
+        .contact-item i {
+            font-size: 1.8rem;
+            color: var(--accent);
+            width: 50px;
+            text-align: center;
+        }
+        .contact-item div {
+            flex: 1;
+        }
+        .contact-item strong {
+            display: block;
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-bottom: 5px;
+        }
+        .contact-item p {
+            margin: 0;
+            font-size: 1.1rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+        .contact-item a {
+            color: var(--text-primary);
+            text-decoration: none;
+            transition: color 0.2s;
+        }
+        .contact-item a:hover {
+            color: var(--accent);
+        }
+
+        /* Map Section */
+        .map-section {
+            margin-top: 30px;
+            border-radius: 20px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+        .map-section iframe {
+            width: 100%;
+            height: 250px;
+            border: none;
+        }
+
+        /* Quick Message Form */
+        .message-form {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid var(--border-color);
+        }
+        .message-form h3 {
+            color: var(--text-primary);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        .form-group input, .form-group textarea {
+            width: 100%;
+            padding: 12px 18px;
+            border-radius: 30px;
+            border: 1px solid var(--border-color);
+            background: var(--card-bg);
+            color: var(--text-primary);
+            font-family: 'Prompt', sans-serif;
+            font-size: 0.9rem;
+            transition: all 0.2s;
+        }
+        .form-group input:focus, .form-group textarea:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(59,130,246,0.2);
+        }
+        .form-group textarea {
+            resize: vertical;
+            min-height: 100px;
+            border-radius: 20px;
+        }
+        .btn-send {
+            background: var(--accent);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 40px;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-family: 'Prompt', sans-serif;
+            font-size: 1rem;
+            width: 100%;
+        }
+        .btn-send:hover {
+            background: var(--accent-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Footer Buttons */
+        .footer-buttons {
+            text-align: center;
+            margin-top: 30px;
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            flex-wrap: wrap;
+        }
+        .btn-back, .btn-workspace {
+            background: var(--accent);
+            color: white;
+            padding: 12px 32px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            transition: 0.3s;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-back:hover, .btn-workspace:hover {
+            background: var(--accent-hover);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+        }
+        .btn-workspace {
+            background: var(--text-primary);
+        }
+        .btn-workspace:hover {
+            background: var(--text-secondary);
+        }
+
+        @media (max-width: 768px) {
+            nav { padding: 0 16px; height: auto; }
+            .nav-menu { display: none; }
+            .contact-card { padding: 30px; }
+            .contact-item { flex-direction: column; text-align: center; gap: 10px; }
+            .contact-item i { width: auto; }
+            .contact-item div { text-align: center; }
+        }
     </style>
 </head>
-<body>
+<body data-theme="light">
+
+<nav>
+    <a href="student.html" class="logo">
+        <i class="fas fa-robot"></i>
+        <span>PROT Smart Workspace</span>
+    </a>
+    
+    <div class="nav-menu">
+        <a href="student.html" class="nav-item"><i class="fas fa-home"></i> หน้าหลัก</a>
+        <a href="my_classroom.html" class="nav-item"><i class="fas fa-user-graduate"></i> ห้องเรียนของฉัน</a>
+        <a href="teacher_profile.html" class="nav-item"><i class="fas fa-chalkboard-user"></i> ข้อมูลผู้สอน</a>
+        <a href="student_portfolio.html" class="nav-item"><i class="fas fa-star"></i> ผลงานนักเรียน</a>
+        <a href="extra_subjects.html" class="nav-item"><i class="fas fa-plus-circle"></i> วิชาเพิ่มเติม</a>
+        <a href="contact.html" class="nav-item active"><i class="fas fa-envelope"></i> ติดต่อ</a>
+    </div>
+    
+    <div class="header-right">
+        <div class="theme-picker">
+            <button class="theme-btn" onclick="setTheme('light')" title="สว่าง"><i class="fas fa-sun"></i></button>
+            <button class="theme-btn" onclick="setTheme('dark')" title="มืด"><i class="fas fa-moon"></i></button>
+            <button class="theme-btn" onclick="setTheme('forest')" title="ธรรมชาติ"><i class="fas fa-leaf"></i></button>
+            <button class="theme-btn" onclick="setTheme('ocean')" title="ท้องทะเล"><i class="fas fa-water"></i></button>
+        </div>
+        
+        <div id="user-info" class="user-info" style="display: none;">
+            <img id="user-avatar" class="user-avatar" src="" alt="">
+            <span id="user-name" class="user-name"></span>
+            <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+        </div>
+        <div id="login-section">
+            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID_HERE" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="medium"></div>
+        </div>
+    </div>
+</nav>
+
+<div class="container">
     <div class="contact-card">
         <h2><i class="fas fa-paper-plane"></i> ช่องทางการติดต่อ</h2>
         
         <div class="contact-item">
             <i class="fas fa-envelope"></i>
             <div>
-                <strong>อีเมลส่วนตัว/โรงเรียน</strong>
-                <p>ratchapon@prot.ac.th</p>
+                <strong>📧 อีเมลติดต่อ</strong>
+                <p><a href="mailto:ratchapon@prot.ac.th">ratchapon@prot.ac.th</a></p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">ตอบกลับภายใน 24 ชั่วโมง</p>
             </div>
         </div>
 
         <div class="contact-item">
-            <i class="fas fa-map-marker-alt"></i>
+            <i class="fas fa-phone-alt"></i>
             <div>
-                <strong>สถานที่ติดต่อ</strong>
-                <p>ห้องปฏิบัติการคอมพิวเตอร์ อาคาร 3</p>
+                <strong>📞 โทรศัพท์ติดต่อ</strong>
+                <p>081-234-5678</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">เวลาทำการ: จันทร์-ศุกร์ 09:00 - 16:00 น.</p>
+            </div>
+        </div>
+
+        <div class="contact-item">
+            <i class="fab fa-line"></i>
+            <div>
+                <strong>💬 LINE Official</strong>
+                <p>@prot_cs_teacher</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">แอดไลน์เพื่อรับข่าวสารและปรึกษา</p>
             </div>
         </div>
 
         <div class="contact-item">
             <i class="fab fa-facebook"></i>
             <div>
-                <strong>Facebook Fanpage</strong>
-                <p>วิทยาการคำนวณ By ครูรัชพล</p>
+                <strong>📘 Facebook Fanpage</strong>
+                <p><a href="#" target="_blank">วิทยาการคำนวณ By ครูรัชพล</a></p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">อัปเดตกิจกรรมและข่าวสารล่าสุด</p>
             </div>
         </div>
 
-        <a href="index.html" class="btn-home"><i class="fas fa-home"></i> กลับหน้าหลัก</a>
+        <div class="contact-item">
+            <i class="fab fa-youtube"></i>
+            <div>
+                <strong>🎥 YouTube Channel</strong>
+                <p><a href="#" target="_blank">ครูรัชพล สอน Coding</a></p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">วิดีโอสอนฟรีสำหรับทุกคน</p>
+            </div>
+        </div>
+
+        <div class="contact-item">
+            <i class="fas fa-map-marker-alt"></i>
+            <div>
+                <strong>📍 สถานที่ติดต่อ</strong>
+                <p>ห้องปฏิบัติการคอมพิวเตอร์ ชั้น 3 อาคารวิทยบริการ</p>
+                <p style="font-size: 0.8rem; margin-top: 5px;">โรงเรียน PROT วิทยาคม</p>
+            </div>
+        </div>
+
+        <!-- Map Section -->
+        <div class="map-section">
+            <iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3875.729329215663!2d100.523691!3d13.727276!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x30e299f2e5b1b1b1%3A0x0!2zMTDCsDQzJzM4LjIiTiAxMDDCsDMxJzI1LjMiRQ!5e0!3m2!1sth!2sth!4v1700000000000!5m2!1sth!2sth" 
+                    allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+        </div>
+
+        <!-- Quick Message Form -->
+        <div class="message-form">
+            <h3><i class="fas fa-comment-dots"></i> ส่งข้อความด่วนถึงครู</h3>
+            <div class="form-group">
+                <input type="text" id="msg-name" placeholder="ชื่อ-นามสกุล">
+            </div>
+            <div class="form-group">
+                <input type="email" id="msg-email" placeholder="อีเมลติดต่อกลับ">
+            </div>
+            <div class="form-group">
+                <textarea id="msg-content" placeholder="ข้อความที่ต้องการติดต่อ..."></textarea>
+            </div>
+            <button class="btn-send" onclick="sendMessage()"><i class="fas fa-paper-plane"></i> ส่งข้อความ</button>
+        </div>
     </div>
+
+    <div class="footer-buttons">
+        <a href="student.html" class="btn-workspace"><i class="fas fa-robot"></i> กลับสู่ Smart Workspace</a>
+        <a href="index.html" class="btn-back"><i class="fas fa-home"></i> หน้าหลักระบบ</a>
+    </div>
+</div>
+
+<script>
+    // ==================== THEME MANAGEMENT ====================
+    function setTheme(themeName) {
+        document.body.setAttribute('data-theme', themeName);
+        localStorage.setItem('smart_theme', themeName);
+    }
+    const savedTheme = localStorage.getItem('smart_theme');
+    if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
+    else document.body.setAttribute('data-theme', 'light');
+
+    // ==================== GOOGLE LOGIN ====================
+    function decodeJwtResponse(token) {
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    }
+    
+    function handleCredentialResponse(response) {
+        const userData = decodeJwtResponse(response.credential);
+        const userEmail = userData.email;
+        
+        if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+            localStorage.setItem('student_name', userData.name);
+            localStorage.setItem('student_email', userData.email);
+            localStorage.setItem('student_pic', userData.picture);
+            localStorage.setItem('is_logged_in', 'true');
+            
+            document.getElementById('login-section').style.display = 'none';
+            const userInfo = document.getElementById('user-info');
+            userInfo.style.display = 'flex';
+            document.getElementById('user-avatar').src = userData.picture;
+            document.getElementById('user-name').innerText = userData.name;
+            
+            alert('🎉 ยินดีต้อนรับ ' + userData.name + ' สู่หน้าติดต่อครับ');
+        } else {
+            alert('❌ อีเมลนี้ไม่ได้รับอนุญาต กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th');
+            localStorage.removeItem('is_logged_in');
+        }
+    }
+    
+    function logout() {
+        localStorage.removeItem('student_name');
+        localStorage.removeItem('student_email');
+        localStorage.removeItem('student_pic');
+        localStorage.removeItem('is_logged_in');
+        document.getElementById('login-section').style.display = 'block';
+        document.getElementById('user-info').style.display = 'none';
+        alert('ออกจากระบบเรียบร้อย');
+    }
+    
+    function checkExistingLogin() {
+        if (localStorage.getItem('is_logged_in') === 'true') {
+            const savedName = localStorage.getItem('student_name');
+            const savedPic = localStorage.getItem('student_pic');
+            if (savedName) {
+                document.getElementById('login-section').style.display = 'none';
+                const userInfo = document.getElementById('user-info');
+                userInfo.style.display = 'flex';
+                document.getElementById('user-avatar').src = savedPic || 'https://ui-avatars.com/api/?background=3b82f6&color=fff&name=' + encodeURIComponent(savedName);
+                document.getElementById('user-name').innerText = savedName;
+            }
+        }
+    }
+    
+    // ==================== SEND MESSAGE ====================
+    function sendMessage() {
+        const name = document.getElementById('msg-name').value;
+        const email = document.getElementById('msg-email').value;
+        const message = document.getElementById('msg-content').value;
+        
+        if (!name || !email || !message) {
+            alert('⚠️ กรุณากรอกข้อมูลให้ครบถ้วน');
+            return;
+        }
+        
+        if (!email.includes('@')) {
+            alert('⚠️ กรุณากรอกอีเมลให้ถูกต้อง');
+            return;
+        }
+        
+        // จำลองการส่งข้อความ
+        alert(`✅ ส่งข้อความสำเร็จ!\n\nชื่อ: ${name}\nอีเมล: ${email}\nข้อความ: ${message}\n\n🎉 ครูรัชพลจะตอบกลับภายใน 24 ชั่วโมงครับ`);
+        
+        // เคลียร์ฟอร์ม
+        document.getElementById('msg-name').value = '';
+        document.getElementById('msg-email').value = '';
+        document.getElementById('msg-content').value = '';
+    }
+    
+    // เริ่มต้นตรวจสอบการ Login
+    window.addEventListener('DOMContentLoaded', () => {
+        checkExistingLogin();
+        
+        // แอนิเมชันเลื่อนสำหรับ contact items
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach((entry, index) => {
+                if(entry.isIntersecting) {
+                    setTimeout(() => {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateX(0)';
+                    }, index * 100);
+                }
+            });
+        }, { threshold: 0.1 });
+        
+        document.querySelectorAll('.contact-item').forEach((item, i) => {
+            item.style.opacity = '0';
+            item.style.transform = 'translateX(-20px)';
+            item.style.transition = 'all 0.5s ease';
+            observer.observe(item);
+        });
+    });
+</script>
+
 </body>
 </html>
