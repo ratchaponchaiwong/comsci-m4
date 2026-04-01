@@ -225,8 +225,9 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec"; 
 
+        // ==================== THEME ====================
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
 
@@ -252,6 +253,9 @@
                 particle.style.fontSize = (Math.random() * 15 + 15) + "px";
                 particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
                 particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                
+                particle.style.top = "-10vh";
+                
                 particle.innerHTML = themeData.particleChar;
                 container.appendChild(particle);
                 setTimeout(() => particle.remove(), 12000);
@@ -260,9 +264,7 @@
             particleInterval = setInterval(createParticle, 600);
         }
 
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
+        document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         function getUserData(keyName, defaultValue = null) {
             const email = localStorage.getItem('student_email');
@@ -324,19 +326,27 @@
             loadEnrolledSubjects(email);
         }
 
+        // ==================== อัปเดต: ป้องกันเบราว์เซอร์จำข้อมูลเก่า ====================
         async function fetchDataFromServer(email) {
             const container = document.getElementById('dynamic-modules-container');
             container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์คะแนนและกิจกรรมล่าสุดจากระบบ...</div>';
             
             if(GOOGLE_SCRIPT_URL) {
                 try {
-                    const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
+                    // เติมพารามิเตอร์ t=เวลาปัจจุบัน เพื่อหลอกเบราว์เซอร์ให้โหลดข้อมูลใหม่เสมอ
+                    const cacheBuster = new Date().getTime();
+                    
+                    const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
                     const actData = await actRes.json();
+                    
                     if(actData && actData.type === 'activities' && Array.isArray(actData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(actData.data));
+                    } else {
+                        // ถ้าระบบส่งค่าว่างกลับมาแปลว่าครูลบหมดแล้ว ให้ล้างในเครื่องนักเรียนด้วย
+                        localStorage.setItem('global_activities', '[]');
                     }
 
-                    const stdRes = await fetch(GOOGLE_SCRIPT_URL);
+                    const stdRes = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
                     const allStudents = await stdRes.json();
                     const myData = allStudents.find(s => s.email === email);
                     
@@ -359,7 +369,9 @@
                             }
                         }
                     }
-                } catch(e) { console.log("ใช้ข้อมูลในเครื่องแทน"); }
+                } catch(e) { 
+                    console.log("ใช้ข้อมูลในเครื่องแทน"); 
+                }
             }
             renderModules(email);
         }
@@ -472,7 +484,6 @@
             }
         }
 
-        // ==================== PROFILE ====================
         function openEditProfileModal() {
             document.getElementById('edit-studentid').value = getUserData('studentid') || '';
             document.getElementById('edit-name').value = getUserData('custom_name') || localStorage.getItem('student_name') || "";
