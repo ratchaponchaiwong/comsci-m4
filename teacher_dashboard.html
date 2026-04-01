@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Arduino & Robotics Lab | PROT Smart Workspace</title>
+    <title>ระบบจัดการครูผู้สอน | PROT Smart Workspace</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -14,133 +14,228 @@
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
         .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
+        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
+        
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
         
-        .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; }
-        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
-        .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        .login-area { display: flex; align-items: center; gap: 15px; margin-left: auto; }
+        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; }
+        .logout-btn { background: rgba(239, 68, 68, 0.8); border: none; padding: 6px 15px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; font-family: 'Prompt'; }
         
-        .page-content-wrapper { padding: 20px; max-width: 1500px; margin: 0 auto; width: 100%; z-index: 10; }
+        .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; z-index: 10; }
+        .dashboard-header h1 { font-size: 2.2rem; color: #60a5fa; display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         
-        /* Layout Controls */
-        .layout-controls { display: flex; justify-content: flex-end; margin-bottom: 15px; gap: 10px; }
-        .btn-layout { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); color: inherit; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 0.9rem; transition: 0.3s; }
-        .btn-layout.active, .btn-layout:hover { background: #3b82f6; border-color: #3b82f6; color: white; }
-        body[data-theme="snow"] .btn-layout { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
-        body[data-theme="snow"] .btn-layout.active { background: #3b82f6; color: white; }
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
+        
+        .glass-panel { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; }
+        body[data-theme="snow"] .glass-panel, body[data-theme="love"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+        
+        .panel-title { font-size: 1.3rem; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; justify-content: space-between; }
+        
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; opacity: 0.9; font-weight: 500; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
+        body[data-theme="snow"] .form-group input, body[data-theme="love"] .form-group input { background: white; border-color: #cbd5e1; color: #1e293b; }
+        
+        .btn-action { background: #3b82f6; color: white; border: none; padding: 12px 20px; border-radius: 10px; cursor: pointer; font-family: 'Prompt'; font-size: 1rem; width: 100%; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 10px; font-weight: 600; }
+        .btn-action:hover { background: #2563eb; transform: translateY(-2px); }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
+        
+        .activity-list { list-style: none; margin-top: 20px; }
+        .activity-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: flex-start; border: 1px solid rgba(255,255,255,0.05); flex-direction: column; gap: 10px; }
+        body[data-theme="snow"] .activity-item, body[data-theme="love"] .activity-item { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
+        
+        .media-badges { display: flex; gap: 10px; flex-wrap: wrap; margin-top: 5px; }
+        .media-badge { font-size: 0.75rem; padding: 3px 10px; border-radius: 12px; display: inline-flex; align-items: center; gap: 5px; }
+        .bg-yt { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
+        .bg-doc { background: rgba(59, 130, 246, 0.2); color: #3b82f6; }
+        .bg-canva { background: rgba(139, 92, 246, 0.2); color: #8b5cf6; }
 
-        /* Dynamic Lab Container */
-        .lab-container { display: grid; gap: 20px; transition: all 0.3s ease; }
-        .lab-container.split-view { grid-template-columns: 350px 1fr; }
-        .lab-container.single-view { grid-template-columns: 1fr; }
-        
-        .panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; }
-        body[data-theme="snow"] .panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b;}
-        
-        .panel-title { font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; gap: 10px; color: #10b981; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px; }
-        
-        /* Iframe Wokwi */
-        .wokwi-embed { width: 100%; height: 600px; border: none; border-radius: 12px; background: #1e1e1e; margin-top: 15px; box-shadow: inset 0 0 10px rgba(0,0,0,0.5); }
-        
-        .btn-submit { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 10px; width: 100%; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.2s; margin-top: 20px;}
-        .btn-submit:hover { background: #059669; }
-
-        @media (max-width: 900px) {
-            .lab-container.split-view { grid-template-columns: 1fr; }
-        }
+        @media (max-width: 768px) { .admin-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
-<body data-theme="default">
+<body data-theme="default" style="display: none;" id="bodyContent">
     <div class="content-layer">
         <header>
-            <a href="index.html" class="logo"><i class="fas fa-robot"></i><span>PROT Smart Workspace</span></a>
-            <ul class="nav-links">
-                <li><a href="index.html">หน้าหลัก</a></li>
-                <li><a href="student.html">ห้องเรียนของฉัน</a></li>
-                <li><a href="robotics.html" class="active">ห้อง Lab</a></li>
-            </ul>
+            <a href="index.html" class="logo"><i class="fas fa-user-shield"></i><span>PROT Admin Hub</span></a>
+            <div class="login-area">
+                <div class="user-info">
+                    <img id="teacherAvatar" src="" class="user-avatar" alt="avatar">
+                    <span id="teacherName" class="user-name">TECHNOLOGY COMPUTER</span>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
+                </div>
+            </div>
         </header>
 
+        <div class="theme-switcher">
+            <button class="theme-btn" data-theme="default" title="เริ่มต้น">🤖</button>
+            <button class="theme-btn" data-theme="snow" title="หิมะ">❄️</button>
+            <button class="theme-btn" data-theme="forest" title="ธรรมชาติ">🌿</button>
+            <button class="theme-btn" data-theme="halloween" title="ฮัลโลวีน">🎃</button>
+            <button class="theme-btn" data-theme="love" title="ความรัก">🌸</button>
+        </div>
+
         <div class="page-content-wrapper">
-            <div class="layout-controls">
-                <button class="btn-layout" id="btn-single" onclick="toggleLayout('single')"><i class="fas fa-square"></i> มุมมอง 1 หน้าจอ</button>
-                <button class="btn-layout active" id="btn-split" onclick="toggleLayout('split')"><i class="fas fa-columns"></i> มุมมอง 2 หน้าจอ</button>
+            <div class="dashboard-header">
+                <h1><i class="fas fa-chalkboard-teacher"></i> แดชบอร์ดจัดการระบบ</h1>
             </div>
 
-            <div class="lab-container split-view" id="labGrid">
-                
-                <div class="panel" id="lessonPanel">
-                    <h3 class="panel-title"><i class="fas fa-microchip"></i> โจทย์ประจำบทเรียน</h3>
-                    <div style="font-size: 0.95rem; line-height: 1.6; margin-bottom: 20px;">
-                        <p><strong>จำลองวงจรด้วย Wokwi</strong></p>
-                        <p>ให้นักเรียนออกแบบวงจรและเขียนโปรแกรมควบคุมบอร์ด ESP32/Arduino ที่หน้าต่างจำลองด้านขวามือ</p>
-                        <ul style="margin-left: 20px; margin-top: 10px;">
-                            <li>ต่อ LED 1 ดวง เข้ากับขา D2</li>
-                            <li>ทำให้ LED ติดสลับดับ (Blink)</li>
-                            <li>บันทึก Project ใน Wokwi แล้วนำลิงก์มาส่งที่ปุ่มด้านล่าง</li>
-                        </ul>
+            <div class="admin-grid">
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-plus-circle"></i> โพสต์กิจกรรม/บทเรียนใหม่</div>
+                    <div class="form-group">
+                        <label>ชื่อบทเรียน</label>
+                        <input type="text" id="act-title" placeholder="เช่น บทที่ 1: พื้นฐาน Python">
                     </div>
-
-                    <div style="border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px;">
-                        <button class="btn-submit" onclick="submitWork()"><i class="fas fa-paper-plane"></i> ส่งงานให้ครูตรวจ (จำลอง)</button>
+                    <div class="form-group">
+                        <label>คำอธิบายสั้นๆ</label>
+                        <input type="text" id="act-desc" placeholder="ให้นักเรียนทำอะไร...">
                     </div>
+                    <div class="form-group">
+                        <label><i class="fab fa-youtube" style="color: #ef4444;"></i> ลิงก์ YouTube (ถ้ามี)</label>
+                        <input type="text" id="act-yt" placeholder="https://youtu.be/...">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-file-pdf" style="color: #3b82f6;"></i> ลิงก์เอกสาร Google Drive/Docs/PDF</label>
+                        <input type="text" id="act-doc" placeholder="https://docs.google.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label><i class="fas fa-paint-brush" style="color: #8b5cf6;"></i> ลิงก์ Canva (ถ้ามี)</label>
+                        <input type="text" id="act-canva" placeholder="https://www.canva.com/...">
+                    </div>
+                    <div class="form-group">
+                        <label>ลิงก์ห้อง Lab สำหรับปฏิบัติ</label>
+                        <select id="act-link">
+                            <option value="#">ไม่มีห้อง Lab ปฏิบัติ</option>
+                            <option value="python.html">ห้อง Lab: Python</option>
+                            <option value="robotics.html">ห้อง Lab: Arduino & Robotics (Wokwi)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>คะแนนเต็ม</label>
+                        <input type="number" id="act-points" value="15">
+                    </div>
+                    <button class="btn-action" onclick="postActivity()"><i class="fas fa-paper-plane"></i> โพสต์ให้นักเรียนเห็น</button>
                 </div>
 
-                <div class="panel" id="editorPanel">
-                    <h3 class="panel-title" style="color: #60a5fa;"><i class="fas fa-code"></i> พื้นที่จำลองหุ่นยนต์ (Wokwi)</h3>
-                    <p style="font-size:0.85rem; opacity:0.8;">นักเรียนสามารถเขียนโค้ดภาษา C++ ลงในพื้นที่นี้ และกดปุ่ม Play เพื่อดูผลลัพธ์ได้ทันที</p>
-                    
-                    <iframe class="wokwi-embed" src="https://wokwi.com/projects/new/arduino-uno" title="Wokwi Simulator"></iframe>
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-list"></i> บทเรียนที่เผยแพร่แล้ว</div>
+                    <ul class="activity-list" id="published-list"></ul>
                 </div>
-
             </div>
         </div>
     </div>
 
     <script>
-        // ระบบสลับ Layout 1 หน้าต่าง / 2 หน้าต่าง
-        function toggleLayout(type) {
-            const grid = document.getElementById('labGrid');
-            const btnSingle = document.getElementById('btn-single');
-            const btnSplit = document.getElementById('btn-split');
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.body.setAttribute("data-theme", btn.getAttribute("data-theme"));
+                localStorage.setItem('smart_theme', btn.getAttribute("data-theme"));
+                document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+            });
+        });
 
-            if(type === 'single') {
-                grid.classList.remove('split-view');
-                grid.classList.add('single-view');
-                btnSingle.classList.add('active');
-                btnSplit.classList.remove('active');
-            } else {
-                grid.classList.remove('single-view');
-                grid.classList.add('split-view');
-                btnSplit.classList.add('active');
-                btnSingle.classList.remove('active');
+        function checkTeacherAccess() {
+            const email = localStorage.getItem('student_email');
+            const isLoggedIn = localStorage.getItem('is_logged_in');
+            if (isLoggedIn !== 'true' || (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th')) {
+                alert('⚠️ เฉพาะครูผู้สอนเท่านั้น');
+                window.location.href = 'index.html';
+                return false;
             }
+            document.getElementById('bodyContent').style.display = 'block';
+            document.getElementById('teacherName').innerText = localStorage.getItem('student_name') || 'TECHNOLOGY COMPUTER';
+            document.getElementById('teacherAvatar').src = localStorage.getItem('student_pic');
+            return true;
         }
 
-        // ระบบส่งงานอิงตามอีเมล
-        function submitWork() {
-            const email = localStorage.getItem('student_email');
-            if(!email) {
-                alert('⚠️ กรุณาเข้าสู่ระบบก่อนส่งงาน');
+        function loadActivities() {
+            const list = document.getElementById('published-list');
+            const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            list.innerHTML = '';
+            
+            if (activities.length === 0) {
+                list.innerHTML = '<li style="text-align:center; opacity:0.7;">ยังไม่มีบทเรียนที่เผยแพร่</li>';
                 return;
             }
 
-            alert("🎉 ส่งงานสำเร็จ! ระบบบันทึกผลงานของคุณเรียบร้อยแล้ว");
-            
-            const scoreKey = email + '_total_score';
-            let currentScore = parseInt(localStorage.getItem(scoreKey) || '0');
-            localStorage.setItem(scoreKey, Math.min(currentScore + 15, 100));
+            activities.forEach(act => {
+                let medias = '';
+                if(act.yt) medias += `<span class="media-badge bg-yt"><i class="fab fa-youtube"></i> YouTube</span>`;
+                if(act.doc) medias += `<span class="media-badge bg-doc"><i class="fas fa-file-alt"></i> เอกสาร</span>`;
+                if(act.canva) medias += `<span class="media-badge bg-canva"><i class="fas fa-paint-brush"></i> Canva</span>`;
 
-            // หากมีลิงก์กลับไปหน้า Student สามารถกดกลับไปเช็คคะแนนได้เลย
+                list.innerHTML += `
+                    <li class="activity-item">
+                        <div style="width: 100%; display: flex; justify-content: space-between; align-items: flex-start;">
+                            <div>
+                                <div style="font-weight:600; color:#60a5fa;">${act.title}</div>
+                                <div style="font-size:0.85rem; opacity:0.8;">${act.desc} (คะแนน: ${act.points})</div>
+                                <div class="media-badges">${medias}</div>
+                            </div>
+                            <button class="btn-delete" onclick="deleteActivity(${act.id})"><i class="fas fa-trash"></i> ลบ</button>
+                        </div>
+                    </li>
+                `;
+            });
         }
 
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('smart_theme') || "default";
-            document.body.setAttribute("data-theme", savedTheme);
+        function postActivity() {
+            const title = document.getElementById('act-title').value;
+            const desc = document.getElementById('act-desc').value;
+            const yt = document.getElementById('act-yt').value;
+            const doc = document.getElementById('act-doc').value;
+            const canva = document.getElementById('act-canva').value;
+            const link = document.getElementById('act-link').value;
+            const points = document.getElementById('act-points').value;
+
+            if (!title) { alert("⚠️ กรุณาใส่ชื่อบทเรียน"); return; }
+
+            const newAct = { id: Date.now(), title, desc, yt, doc, canva, link, points };
+            let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            activities.push(newAct);
+            localStorage.setItem('global_activities', JSON.stringify(activities));
+
+            alert('✅ โพสต์สำเร็จ! นักเรียนจะเห็นสื่อทั้งหมดในหน้า Dashboard ทันที');
+            
+            // เคลียร์ข้อมูลฟอร์ม
+            document.querySelectorAll('input[type="text"]').forEach(input => input.value = '');
+            loadActivities();
+        }
+
+        function deleteActivity(id) {
+            if(confirm("แน่ใจหรือไม่ที่จะลบบทเรียนนี้?")) {
+                let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+                activities = activities.filter(act => act.id !== id);
+                localStorage.setItem('global_activities', JSON.stringify(activities));
+                loadActivities();
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('is_logged_in');
+            window.location.href = 'index.html';
+        }
+
+        window.onload = () => {
+            if (checkTeacherAccess()) {
+                const savedTheme = localStorage.getItem('smart_theme') || "default";
+                document.body.setAttribute("data-theme", savedTheme);
+                document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
+                loadActivities();
+            }
         };
     </script>
 </body>
