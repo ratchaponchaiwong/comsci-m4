@@ -148,13 +148,7 @@
         const actId = urlParams.get('actid');
 
         // ==================== THEME ====================
-        const themes = {
-            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
-            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
-            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
-            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
-            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
-        };
+        const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
 
         function applyTheme(themeKey) {
@@ -187,10 +181,7 @@
             for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 150);
             particleInterval = setInterval(createParticle, 800);
         }
-
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
+        document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         // ==================== SYSTEM & LAYOUT ====================
         function loadLoginInfo() {
@@ -203,15 +194,11 @@
         function setLayout(type) {
             const wrapper = document.getElementById('mainWrapper');
             if(type === 'single') {
-                wrapper.classList.remove('split-view');
-                wrapper.classList.add('single-view');
-                document.getElementById('btn-single').classList.add('active');
-                document.getElementById('btn-split').classList.remove('active');
+                wrapper.classList.remove('split-view'); wrapper.classList.add('single-view');
+                document.getElementById('btn-single').classList.add('active'); document.getElementById('btn-split').classList.remove('active');
             } else {
-                wrapper.classList.remove('single-view');
-                wrapper.classList.add('split-view');
-                document.getElementById('btn-split').classList.add('active');
-                document.getElementById('btn-single').classList.remove('active');
+                wrapper.classList.remove('single-view'); wrapper.classList.add('split-view');
+                document.getElementById('btn-split').classList.add('active'); document.getElementById('btn-single').classList.remove('active');
             }
         }
 
@@ -226,7 +213,7 @@
             }
         }
 
-        // ==================== โหลดกิจกรรม (แก้เว็บซ้อนเว็บ) ====================
+        // ==================== โหลดกิจกรรม (ตรวจสอบเวลาหมดเขต) ====================
         function loadActivityData() {
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const act = activities.find(a => a.id == actId);
@@ -239,47 +226,51 @@
             }
 
             document.getElementById('act-title-header').innerHTML = act.title;
-            document.getElementById('act-desc-body').innerText = act.desc;
 
-            // แก้ปัญหาเว็บซ้อนเว็บ (ต้องมีคำว่า http ป้องกันการโหลดหน้าตัวเอง)
-            const labFrame = document.getElementById('labFrame');
-            if (act.link && act.link !== "#" && act.link.includes("http")) {
-                labFrame.src = act.link;
-            } else {
-                labFrame.src = "https://wokwi.com/projects/new/arduino-uno";
+            // ตรวจสอบเวลาหมดเขต
+            let isPastDeadline = false;
+            if (act.date) {
+                const deadline = new Date(act.date + 'T' + (act.time || '23:59:00'));
+                isPastDeadline = new Date() > deadline;
             }
+
+            // ถัาหมดเวลา ให้ซ่อนช่องส่งงาน
+            if(isPastDeadline) {
+                document.getElementById('act-desc-body').innerHTML = act.desc + '<br><br><span style="color:#ef4444; font-weight:bold; background:rgba(239,68,68,0.1); padding:8px 12px; border-radius:8px; display:inline-block;"><i class="fas fa-lock"></i> กิจกรรมนี้หมดเวลาส่งแล้ว ระบบได้ปิดรับการส่งงาน</span>';
+                const submitBox = document.querySelector('.submit-box');
+                if(submitBox) submitBox.style.display = 'none'; 
+            } else {
+                document.getElementById('act-desc-body').innerText = act.desc;
+            }
+
+            const labFrame = document.getElementById('labFrame');
+            if (act.link && act.link !== "#" && act.link.includes("http")) { labFrame.src = act.link; } 
+            else { labFrame.src = "https://wokwi.com/projects/new/arduino-uno"; }
 
             const tabs = document.getElementById('mediaTabs');
             let hasMedia = false;
 
             if (act.yt) { addTab("yt-tab", "<i class='fab fa-youtube'></i> YouTube", () => showMedia(formatYT(act.yt))); hasMedia = true; }
             if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(formatDocs(act.doc))); hasMedia = true; }
-
             if (hasMedia) tabs.children[0].click();
 
             const email = localStorage.getItem('student_email');
             const savedLink = localStorage.getItem(email + '_act_' + actId + '_work_link');
-            if (savedLink) {
+            if (savedLink && !isPastDeadline) {
                 document.getElementById('work-link').value = savedLink;
                 checkInput();
             }
         }
 
         function addTab(className, label, callback) {
-            const btn = document.createElement('button');
-            btn.className = `media-tab ${className}`;
-            btn.innerHTML = label;
-            btn.onclick = () => {
-                document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
-                btn.classList.add('active'); callback();
-            };
+            const btn = document.createElement('button'); btn.className = `media-tab ${className}`; btn.innerHTML = label;
+            btn.onclick = () => { document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); callback(); };
             document.getElementById('mediaTabs').appendChild(btn);
         }
 
         function showMedia(url) {
-            const box = document.getElementById('mediaBox');
-            box.style.display = 'block';
-            box.innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
+            document.getElementById('mediaBox').style.display = 'block';
+            document.getElementById('mediaBox').innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
         }
 
         function formatYT(url) {
@@ -287,16 +278,12 @@
             let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0];
             return `https://www.youtube.com/embed/${id}`;
         }
-        
         function formatDocs(url) {
             if (!url) return "";
-            if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/presentation/d/')) {
-                return url.split('/edit')[0] + '/preview';
-            }
+            if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/presentation/d/')) { return url.split('/edit')[0] + '/preview'; }
             return url;
         }
 
-        // ==================== ส่งงานเข้า Google Sheets ====================
         async function submitWork() {
             const email = localStorage.getItem('student_email');
             const link = document.getElementById('work-link').value.trim();
@@ -306,9 +293,7 @@
             localStorage.setItem(email + '_act_' + actId + '_work_link', link);
             
             document.getElementById('btn-submit').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...';
-            
-            let worksObj = {};
-            worksObj[actId] = link;
+            let worksObj = {}; worksObj[actId] = link;
 
             try {
                 await fetch(GOOGLE_SCRIPT_URL, {
@@ -323,12 +308,7 @@
             }
         }
 
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('smart_theme') || "default";
-            applyTheme(savedTheme);
-            loadLoginInfo();
-            loadActivityData();
-        };
+        window.onload = () => { applyTheme(localStorage.getItem('smart_theme') || "default"); loadLoginInfo(); loadActivityData(); };
     </script>
 </body>
 </html>
