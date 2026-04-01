@@ -146,6 +146,7 @@
                     <p id="profile-email" style="font-size:0.85rem; opacity:0.8; margin-bottom:15px;">กรุณาเข้าสู่ระบบ</p>
                     
                     <div class="student-details" id="student-details-box" style="display: none;">
+                        <div><i class="fas fa-id-badge"></i> รหัสประจำตัว: <span id="display-studentid" style="color:#60a5fa; font-weight:600;">-</span></div>
                         <div><i class="fas fa-door-open"></i> ห้อง: <span id="display-room">-</span></div>
                         <div><i class="fas fa-list-ol"></i> เลขที่: <span id="display-number">-</span></div>
                     </div>
@@ -188,7 +189,10 @@
             <button class="close-modal" onclick="closeEditProfileModal()">×</button>
             <h3 style="color: inherit; margin-bottom: 20px;"><i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว</h3>
             <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px;">ข้อมูลจะถูกส่งไปบันทึกที่ Google Sheets ของครู</p>
+            
+            <div class="form-group-edit"><label>รหัสนักเรียน (ID)</label><input type="text" id="edit-studentid" placeholder="เช่น 65001"></div>
             <div class="form-group-edit"><label>ชื่อ-นามสกุล</label><input type="text" id="edit-name"></div>
+            
             <div class="form-group-edit">
                 <label>ชั้นและห้องเรียน</label>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
@@ -221,7 +225,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
 
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
@@ -308,6 +312,8 @@
             document.getElementById('profile-email').innerText = email;
             document.getElementById('profile-pic-img').src = pic;
             document.getElementById('profile-pic-img').style.display = 'block';
+            
+            document.getElementById('display-studentid').innerText = getUserData('studentid') || '-';
             document.getElementById('display-room').innerText = getUserData('room') || '-';
             document.getElementById('display-number').innerText = getUserData('number') || '-';
             document.getElementById('student-details-box').style.display = 'block';
@@ -318,49 +324,32 @@
             loadEnrolledSubjects(email);
         }
 
-        // ==================== อัปเดต: ระบบดึงข้อมูลข้ามอุปกรณ์ ====================
         async function fetchDataFromServer(email) {
             const container = document.getElementById('dynamic-modules-container');
-            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากระบบ...</div>';
+            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์คะแนนและกิจกรรมล่าสุดจากระบบ...</div>';
             
             if(GOOGLE_SCRIPT_URL) {
                 try {
-                    // 1. ซิงค์กิจกรรมล่าสุด
                     const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
                     const actData = await actRes.json();
                     if(actData && actData.type === 'activities' && Array.isArray(actData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(actData.data));
                     }
 
-                    // 2. ซิงค์ข้อมูลส่วนตัวนักเรียนและคะแนน
                     const stdRes = await fetch(GOOGLE_SCRIPT_URL);
                     const allStudents = await stdRes.json();
                     const myData = allStudents.find(s => s.email === email);
                     
                     if(myData) {
-                        // ดึง ชื่อ ห้อง เลขที่ จากฐานข้อมูลมาทับในเครื่อง (แก้ปัญหาเข้าเครื่องใหม่แล้วข้อมูลหาย)
-                        if (myData.name) {
-                            localStorage.setItem(email + '_custom_name', myData.name);
-                            document.getElementById('profile-name').innerText = myData.name;
-                            document.querySelector('.user-name').innerText = myData.name.split(' ')[0];
+                        if (myData.studentId) {
+                            localStorage.setItem(email + '_studentid', myData.studentId);
+                            document.getElementById('display-studentid').innerText = myData.studentId;
                         }
-                        if (myData.room) {
-                            localStorage.setItem(email + '_room', myData.room);
-                            document.getElementById('display-room').innerText = myData.room;
-                        }
-                        if (myData.number) {
-                            localStorage.setItem(email + '_number', myData.number);
-                            document.getElementById('display-number').innerText = myData.number;
-                        }
-
-                        // ซิงค์สถานะการส่งงาน
                         if(myData.works) {
                             for(let actId in myData.works) {
                                 localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
                             }
                         }
-                        
-                        // ซิงค์คะแนน
                         if(myData.scores) {
                             for(let actId in myData.scores) {
                                 if(myData.scores[actId] !== "" && myData.scores[actId] !== null) {
@@ -370,12 +359,11 @@
                             }
                         }
                     }
-                } catch(e) { console.log("โหลดข้อมูลจาก Server ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทน"); }
+                } catch(e) { console.log("ใช้ข้อมูลในเครื่องแทน"); }
             }
             renderModules(email);
         }
 
-        // ==================== เรนเดอร์แยกสี และ ชนิดกิจกรรม ====================
         function renderModules(email) {
             const container = document.getElementById('dynamic-modules-container');
             let allActivities = [];
@@ -486,6 +474,7 @@
 
         // ==================== PROFILE ====================
         function openEditProfileModal() {
+            document.getElementById('edit-studentid').value = getUserData('studentid') || '';
             document.getElementById('edit-name').value = getUserData('custom_name') || localStorage.getItem('student_name') || "";
             const storedRoom = getUserData('room') || 'ม.4/1';
             if(storedRoom.includes('/')) {
@@ -499,14 +488,16 @@
         function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('active'); }
 
         function saveProfileData() {
+            const studentId = document.getElementById('edit-studentid').value.trim();
             const name = document.getElementById('edit-name').value;
             const room = document.getElementById('edit-grade').value + "/" + document.getElementById('edit-room-num').value;
             const number = document.getElementById('edit-number').value;
             const email = localStorage.getItem('student_email');
 
-            if (!name || !number) return alert('⚠️ กรุณากรอกชื่อและเลขที่ให้ครบถ้วน');
+            if (!name || !number || !studentId) return alert('⚠️ กรุณากรอกรหัสนักเรียน, ชื่อ และเลขที่ให้ครบถ้วน');
             document.getElementById('saving-status').style.display = 'block';
 
+            localStorage.setItem(email + '_studentid', studentId);
             localStorage.setItem(email + '_custom_name', name);
             localStorage.setItem(email + '_room', room);
             localStorage.setItem(email + '_number', number);
@@ -517,7 +508,7 @@
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST', mode: 'no-cors',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ email: email, name: name, room: room, number: number, enrolledSubjects: enrolledArray.join(", ") })
+                body: JSON.stringify({ email: email, studentId: studentId, name: name, room: room, number: number, enrolledSubjects: enrolledArray.join(", ") })
             }).then(() => {
                 alert('✅ บันทึกและส่งข้อมูลให้ครูเรียบร้อย!');
                 document.getElementById('saving-status').style.display = 'none';
