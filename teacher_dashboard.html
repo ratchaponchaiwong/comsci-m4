@@ -12,6 +12,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* ==================== 1. CSS โครงสร้างหลักและแอนิเมชัน ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
         
@@ -21,11 +22,28 @@
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
+        /* วงกลมด้านหลัง */
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
         body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        
+        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
+
+        /* เอฟเฟกต์หิมะ/ดอกไม้ */
+        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .theme-particle { position: absolute; top: -10%; pointer-events: none; animation: fall linear forwards; z-index: 1; }
+        @keyframes fall {
+            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
+            10% { opacity: 1; }
+            90% { opacity: 1; }
+            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
+        }
+
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
@@ -99,7 +117,7 @@
 </head>
 <body data-theme="default" style="display: none;" id="bodyContent">
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
-    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+    <div id="particleContainer"></div>
 
     <div class="content-layer">
         <header>
@@ -138,13 +156,13 @@
                             <label>📌 เลือกประเภท (สำคัญ)</label>
                             <div class="type-selector">
                                 <label class="type-option" data-type="content">
-                                    <input type="radio" name="act-type" value="content"> 📖 เนื้อหา (อ่าน/ดู อย่างเดียว)
+                                    <input type="radio" name="act-type" value="content"> 📖 เนื้อหา (อ่านอย่างเดียว)
                                 </label>
                                 <label class="type-option" data-type="task">
-                                    <input type="radio" name="act-type" value="task" checked> ⚙️ งาน (มีกำหนดส่ง/คะแนน)
+                                    <input type="radio" name="act-type" value="task" checked> ⚙️ งาน (มีคะแนน)
                                 </label>
                                 <label class="type-option" data-type="activity">
-                                    <input type="radio" name="act-type" value="activity"> 💡 กิจกรรม (ส่งผลงาน/คะแนน)
+                                    <input type="radio" name="act-type" value="activity"> 💡 กิจกรรม (ส่งผลงาน)
                                 </label>
                             </div>
                         </div>
@@ -220,7 +238,11 @@
                         <div class="form-group"><label>ห้อง</label>
                             <select id="matrix-room" onchange="renderMatrixTable()">
                                 <option value="all">ทั้งหมด</option>
-                                <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                                <option value="1">1</option><option value="2">2</option><option value="3">3</option>
+                                <option value="4">4</option><option value="5">5</option><option value="6">6</option>
+                                <option value="7">7</option><option value="8">8</option><option value="9">9</option>
+                                <option value="10">10</option><option value="11">11</option><option value="12">12</option>
+                                <option value="13">13</option><option value="14">14</option><option value="15">15</option>
                             </select>
                         </div>
                     </div>
@@ -312,27 +334,25 @@
 
         function startThemeParticles(theme) {
             const container = document.getElementById("particleContainer");
+            if(!container) return;
             if(particleInterval) clearInterval(particleInterval);
             container.innerHTML = "";
-            const themeData = themes[theme];
+            const themeData = themes[theme] || themes['default'];
             function createParticle() {
                 const particle = document.createElement("div");
                 particle.className = "theme-particle";
-                particle.style.position = "absolute";
-                particle.style.left = Math.random() * 100 + "%";
-                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
-                particle.style.opacity = Math.random() * 0.6 + 0.3;
-                
-                particle.style.top = "-10%";
+                particle.style.left = Math.random() * 100 + "vw";
+                particle.style.fontSize = (Math.random() * 15 + 15) + "px";
                 particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
                 particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
                 particle.innerHTML = themeData.particleChar;
                 container.appendChild(particle);
-                setTimeout(() => particle.remove(), 10000);
+                setTimeout(() => particle.remove(), 12000);
             }
-            for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 150);
-            particleInterval = setInterval(createParticle, 800);
+            for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 200);
+            particleInterval = setInterval(createParticle, 600);
         }
+
         document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         // ==================== SYSTEM & TABS ====================
@@ -371,7 +391,7 @@
             document.getElementById(rid).style.display = (grade === 'all') ? 'none' : 'block';
         }
 
-        // ==================== โหลดกิจกรรมมาแสดงฝั่งครู (แยกสี/ไอคอน) ====================
+        // ==================== โหลดกิจกรรม (แยกสี/ไอคอน) ====================
         function loadActivities() {
             const container = document.getElementById('activities-list-container');
             let acts = [];
@@ -383,7 +403,6 @@
             }
 
             container.innerHTML = acts.map(a => {
-                // กำหนดสีและไอคอนตาม Type
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'ทั่วไป';
                 let tScore = `คะแนน: ${a.points}`;
                 if(a.type === 'content') { tColor = '#a855f7'; tIcon = '📖'; tName = 'เนื้อหา'; tScore = 'ไม่มีคะแนน'; }
@@ -411,9 +430,8 @@
         function saveActivity() {
             const title = document.getElementById('act-title').value;
             const typeNode = document.querySelector('input[name="act-type"]:checked');
-            const type = typeNode ? typeNode.value : 'task'; // ค่าเริ่มต้นเป็นงาน
+            const type = typeNode ? typeNode.value : 'task'; 
             
-            // ถ้าเป็น Content ไม่ต้องบังคับใส่วันที่
             const date = document.getElementById('act-date').value;
             if(!title) return alert("⚠️ กรุณากรอกชื่อเรื่อง");
             if(type !== 'content' && !date) return alert("⚠️ กรุณากำหนดส่งงาน");
@@ -433,7 +451,7 @@
                 points: document.getElementById('act-points').value,
                 link: document.getElementById('act-link').value, 
                 doc: document.getElementById('act-doc').value,
-                yt: document.getElementById('act-yt').value // เซฟลิงก์ยูทูป
+                yt: document.getElementById('act-yt').value
             };
 
             let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
@@ -452,8 +470,6 @@
             if(!act) return;
 
             document.getElementById('edit-id').value = act.id;
-            
-            // เซ็ต radio button
             const actType = act.type || 'task';
             document.querySelectorAll('input[name="act-type"]').forEach(r => {
                 if(r.value === actType) r.checked = true;
@@ -517,14 +533,12 @@
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveActivities", activities: JSON.parse(acts) }) });
         }
 
-        // ==================== MATRIX ตรวจงาน ====================
+        // ==================== MATRIX ตรวจงาน (กรองเนื้อหาออก) ====================
         async function loadMatrixData() {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            // กรองเอาเฉพาะ "งาน" และ "กิจกรรม" มาตรวจ (ไม่เอาเนื้อหา)
             const gradableActs = acts.filter(a => a.type !== 'content');
             
             document.getElementById('matrix-act').innerHTML = gradableActs.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
-            
             document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</td></tr>';
             
             try {
@@ -626,7 +640,6 @@
             }
         }
 
-        // ==================== EXCEL IMPORT ====================
         function processExcel(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
