@@ -318,28 +318,49 @@
             loadEnrolledSubjects(email);
         }
 
+        // ==================== อัปเดต: ระบบดึงข้อมูลข้ามอุปกรณ์ ====================
         async function fetchDataFromServer(email) {
             const container = document.getElementById('dynamic-modules-container');
-            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์คะแนนและกิจกรรมล่าสุดจากระบบ...</div>';
+            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากระบบ...</div>';
             
             if(GOOGLE_SCRIPT_URL) {
                 try {
+                    // 1. ซิงค์กิจกรรมล่าสุด
                     const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
                     const actData = await actRes.json();
                     if(actData && actData.type === 'activities' && Array.isArray(actData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(actData.data));
                     }
 
+                    // 2. ซิงค์ข้อมูลส่วนตัวนักเรียนและคะแนน
                     const stdRes = await fetch(GOOGLE_SCRIPT_URL);
                     const allStudents = await stdRes.json();
                     const myData = allStudents.find(s => s.email === email);
                     
                     if(myData) {
+                        // ดึง ชื่อ ห้อง เลขที่ จากฐานข้อมูลมาทับในเครื่อง (แก้ปัญหาเข้าเครื่องใหม่แล้วข้อมูลหาย)
+                        if (myData.name) {
+                            localStorage.setItem(email + '_custom_name', myData.name);
+                            document.getElementById('profile-name').innerText = myData.name;
+                            document.querySelector('.user-name').innerText = myData.name.split(' ')[0];
+                        }
+                        if (myData.room) {
+                            localStorage.setItem(email + '_room', myData.room);
+                            document.getElementById('display-room').innerText = myData.room;
+                        }
+                        if (myData.number) {
+                            localStorage.setItem(email + '_number', myData.number);
+                            document.getElementById('display-number').innerText = myData.number;
+                        }
+
+                        // ซิงค์สถานะการส่งงาน
                         if(myData.works) {
                             for(let actId in myData.works) {
                                 localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
                             }
                         }
+                        
+                        // ซิงค์คะแนน
                         if(myData.scores) {
                             for(let actId in myData.scores) {
                                 if(myData.scores[actId] !== "" && myData.scores[actId] !== null) {
@@ -349,7 +370,7 @@
                             }
                         }
                     }
-                } catch(e) { console.log("ใช้ข้อมูลในเครื่องแทน"); }
+                } catch(e) { console.log("โหลดข้อมูลจาก Server ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทน"); }
             }
             renderModules(email);
         }
@@ -373,14 +394,12 @@
 
             container.innerHTML = '';
             let totalMaxPoints = 0, totalEarned = 0, submittedCount = 0;
-            // นับเฉพาะงานที่มีให้ส่ง (ไม่นับ content)
             let gradableCount = activities.filter(a => a.type !== 'content').length;
 
             activities.forEach(act => {
                 const status = localStorage.getItem(email + '_act_' + act.id + '_status');
                 const score = parseInt(localStorage.getItem(email + '_act_' + act.id + '_score') || 0);
 
-                // ตั้งค่ารูปแบบ สี ไอคอน
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'ทั่วไป';
                 let isContent = false;
                 
