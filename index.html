@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | หุ่นยนต์โต้ตอบสุดล้ำ</title>
+    <title>ห้องเรียนวิทยาการคำนวณ By TECHNOLOGY COMPUTER | หุ่นยนต์โต้ตอบสุดล้ำ</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -60,17 +60,18 @@
         body[data-theme="forest"] .nav-links a { color: #d4ffd4; }
         .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
         
-        /* Login Button in Top Right Corner */
+        /* Login Area */
         .login-area { display: flex; align-items: center; gap: 15px; }
         .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Prompt'; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
         .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; backdrop-filter: blur(4px); }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
         .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
-        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
-        .logout-btn:hover { background: rgba(255,255,255,0.4); }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; transition: 0.2s; display: flex; align-items: center; gap: 5px;}
+        .logout-btn:hover { background: rgba(239, 68, 68, 0.8); }
         body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
         body[data-theme="snow"] .logout-btn, body[data-theme="love"] .logout-btn { color: #1e293b; background: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .logout-btn:hover, body[data-theme="love"] .logout-btn:hover { color: white; background: rgba(239, 68, 68, 0.8); }
         
         /* Hero Section */
         .hero { display: flex; align-items: center; justify-content: space-between; padding: 60px 80px; min-height: 85vh; flex-wrap: wrap; gap: 40px; }
@@ -85,6 +86,7 @@
         .hero-content p { font-size: 1.1rem; margin-bottom: 32px; line-height: 1.6; color: #cbd5e1; }
         body[data-theme="snow"] .hero-content p, body[data-theme="love"] .hero-content p { color: #2d3748; }
         body[data-theme="forest"] .hero-content p { color: #e0ffe0; }
+        
         .hero-stats { display: flex; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
         .stat-item { text-align: center; }
         .stat-number { font-size: 2rem; font-weight: 800; color: #60a5fa; }
@@ -133,6 +135,7 @@
         .feature-card:hover { transform: translateY(-8px); background: rgba(30, 41, 59, 0.8); border-color: rgba(59,130,246,0.5); box-shadow: 0 10px 25px rgba(0,0,0,0.3); }
         body[data-theme="snow"] .feature-card:hover, body[data-theme="love"] .feature-card:hover { background: rgba(255,255,255,0.9); border-color: #3b82f6; box-shadow: 0 10px 25px rgba(59,130,246,0.2); }
         .feature-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: white; }
+        
         footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); position: relative; z-index: 10; color: #94a3b8; }
         body[data-theme="snow"] footer, body[data-theme="love"] footer { color: #475569; border-top-color: rgba(0,0,0,0.1); }
         .click-instruction { font-size: 0.85rem; color: #60a5fa; margin-top: 15px; opacity: 0.8; cursor: pointer; animation: blink 1.5s infinite; }
@@ -143,9 +146,12 @@
         .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
         .login-modal.active { visibility: visible; opacity: 1; }
         .login-modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
-        .login-modal-content h3 { font-size: 1.8rem; margin-bottom: 16px; color: white; }
+        body[data-theme="snow"] .login-modal-content, body[data-theme="love"] .login-modal-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        
+        .login-modal-content h3 { font-size: 1.8rem; margin-bottom: 16px; color: inherit; }
         .login-modal-content p { color: #94a3b8; margin-bottom: 28px; }
-        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: white; background: none; border: none; }
+        body[data-theme="snow"] .login-modal-content p, body[data-theme="love"] .login-modal-content p { color: #475569; }
+        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; }
         .login-error { color: #f87171; font-size: 0.9rem; margin-top: 15px; display: none; }
         
         .theme-particle { position: absolute; pointer-events: none; animation: floatParticle linear forwards; z-index: 1; }
@@ -240,25 +246,25 @@
         <div class="features">
             <h2 class="section-title">✨ ทำไมต้อง ห้องเรียนวิทยาการคำนวณ By ครูรัชพล?</h2>
             <div class="features-grid">
-                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='python.html'; else { alert('⚠️ กรุณาเข้าสู่ระบบก่อนเข้าใช้งานห้องปฏิบัติการครับ'); openLoginModal(); }">
+                <div class="feature-card" onclick="checkLabAccess('python.html')">
                     <div class="feature-icon"><i class="fas fa-code"></i></div>
                     <h4>เรียนรู้ผ่านการลงมือทำ</h4>
-                    <p>ฝึกเขียน Python และ Arduino จำลองวงจรด้วย Wokwi แบบเรียลไทม์ (คลิกเพื่อเข้าห้อง Lab)</p>
+                    <p>ฝึกเขียน Python และ Arduino จำลองวงจรด้วย Wokwi แบบเรียลไทม์</p>
                 </div>
-                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='robotics.html'; else { alert('⚠️ กรุณาเข้าสู่ระบบก่อนเข้าใช้งานห้องปฏิบัติการครับ'); openLoginModal(); }">
+                <div class="feature-card" onclick="checkLabAccess('robotics.html')">
                     <div class="feature-icon"><i class="fas fa-robot"></i></div>
                     <h4>PROT ROBOT Innovation</h4>
-                    <p>ออกแบบและสร้างหุ่นยนต์อัตโนมัติด้วยโครงงานจริง พร้อมแข่งขันระดับชั้น (คลิกเพื่อเข้าห้อง Lab)</p>
+                    <p>ออกแบบและสร้างหุ่นยนต์อัตโนมัติด้วยโครงงานจริง พร้อมแข่งขันระดับชั้น</p>
                 </div>
                 <div class="feature-card" onclick="window.location.href='teacher_profile.html';">
                     <div class="feature-icon"><i class="fas fa-chalkboard-user"></i></div>
                     <h4>ผู้สอนมืออาชีพ</h4>
-                    <p>ครูรัชพล ผู้เชี่ยวชาญด้านวิทยาการคอมพิวเตอร์และวิศวกรรมหุ่นยนต์ (คลิกเพื่อดูประวัติ)</p>
+                    <p>ครูรัชพล ผู้เชี่ยวชาญด้านวิทยาการคอมพิวเตอร์และวิศวกรรมหุ่นยนต์</p>
                 </div>
                 <div class="feature-card" onclick="window.location.href='student_portfolio.html';">
                     <div class="feature-icon"><i class="fas fa-certificate"></i></div>
                     <h4>ผลงานและวุฒิบัตร</h4>
-                    <p>ผ่านเกณฑ์การประเมินรับประกาศนียบัตรรับรองทักษะการเขียนโปรแกรม (คลิกเพื่อดูผลงานรุ่นพี่)</p>
+                    <p>ผ่านเกณฑ์การประเมินรับประกาศนียบัตรรับรองทักษะการเขียนโปรแกรม</p>
                 </div>
             </div>
         </div>
@@ -296,7 +302,6 @@
             currentTheme = themeKey;
             document.body.setAttribute("data-theme", themeKey);
             
-            // 🔥 บันทึกธีมลง localStorage เพื่อให้หน้าอื่นดึงไปใช้ได้ 🔥
             localStorage.setItem('smart_theme', themeKey); 
             
             const theme = themes[themeKey];
@@ -376,7 +381,7 @@
         // ==================== ROBOT INTERACTIONS ====================
         const animations = ['robot-shake', 'robot-bounce', 'robot-spin', 'robot-wobble', 'robot-pop', 'robot-dance'];
         const messages = [
-            "🤖 สวัสดีจ้า! ตั้งใจเรียนนะ", "💙 เธอเก่งมากเลย", "✨ มาสร้างนวัตกรรมไปด้วยกัน", "🚀 พร้อมเรียนรู้แล้ว!", "💡 คลิกอีกสิ มีเซอร์ไพรส์", "😊 รักนักเรียนทุกคนเลย", "🐍 Python สนุกสุดๆ", "🎯 เก่งมาก! พัฒนาต่อไป", "💪 สู้ๆ นะครับ", "🌟 เธอทำได้ดีมาก", "🤗 ขอบคุณที่สนใจนะ", "💖 ครูรัชพลภูมิใจในตัวเธอ", "🌈 ฝันให้ไกล แล้วไปให้ถึง", "⭐ ความพยายามไม่เคยทรยศ"
+            "🤖 สวัสดีจ้า! ตั้งใจเรียนนะ", "💙 เธอเก่งมากเลย", "✨ มาสร้างนวัตกรรมไปด้วยกัน", "🚀 พร้อมเรียนรู้แล้ว!", "💡 คลิกอีกสิ มีเซอร์ไพรส์", "😊 รักนักเรียนทุกคนเลย", "🐍 Python สนุกสุดๆ", "🎯 เก่งมาก! พัฒนาต่อไป", "💪 สู้ๆ นะครับ", "🌟 เธอทำได้ดีมาก", "🤗 ขอบคุณที่สนใจนะ", "💖 ภูมิใจในตัวเธอ", "🌈 ฝันให้ไกล แล้วไปให้ถึง", "⭐ ความพยายามไม่เคยทรยศ"
         ];
         const emojis = ['🤖', '💙', '⭐', '🎉', '✨', '🚀', '💡', '🎯', '🌟', '💪', '🤗', '🌈'];
         
@@ -404,9 +409,7 @@
         }
         
         robotClickArea.addEventListener("click", handleRobotClick);
-        robotClickArea.style.cursor = "pointer";
         
-        // Theme buttons
         document.querySelectorAll(".theme-btn").forEach(btn => {
             btn.addEventListener("click", () => {
                 applyTheme(btn.getAttribute("data-theme"));
@@ -432,12 +435,20 @@
             
             if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
                 errorBox.style.display = 'none';
-                localStorage.setItem('student_name', userData.name);
-                localStorage.setItem('student_email', userData.email);
+                const customName = localStorage.getItem('student_custom_name');
+                localStorage.setItem('student_name', customName ? customName : userData.name);
+                localStorage.setItem('student_email', userEmail);
                 localStorage.setItem('student_pic', userData.picture);
                 localStorage.setItem('is_logged_in', 'true');
+                
+                // 🚀 เช็คว่าเป็นอีเมลครูหรือไม่ ถ้าใช่ให้เด้งไปหน้า Dashboard เลยทันที
+                if (userEmail === 'ratchapon@prot.ac.th' || userEmail === 'teacher@prot.ac.th') {
+                    window.location.href = 'teacher_dashboard.html';
+                    return; // หยุดการทำงาน เพื่อให้เบราว์เซอร์ทำการเปลี่ยนหน้า
+                }
+
                 closeLoginModal();
-                updateLoginUI(userData.name, userData.picture);
+                updateLoginUI(localStorage.getItem('student_name'), userData.picture);
                 createSpeechBubble(`🎉 ยินดีต้อนรับ ${userData.name} สู่ห้องเรียนวิทยาการคำนวณ!`, {clientX:0,clientY:0});
                 animateRobot();
             } else {
@@ -447,12 +458,21 @@
         }
         
         function updateLoginUI(userName, userPic) {
+            const email = localStorage.getItem('student_email');
+            let adminBtn = '';
+            
+            // เพิ่มปุ่มจัดการระบบสำหรับครู กรณีที่เผลอกดกลับมาหน้า index.html
+            if (email === 'ratchapon@prot.ac.th' || email === 'teacher@prot.ac.th') {
+                adminBtn = `<button class="login-btn" onclick="window.location.href='teacher_dashboard.html'" style="padding: 6px 12px; font-size: 0.8rem; background: linear-gradient(135deg, #10b981, #059669);"><i class="fas fa-cogs"></i> จัดการระบบ</button>`;
+            }
+
             const loginArea = document.getElementById('loginArea');
             loginArea.innerHTML = `
                 <div class="user-info">
+                    ${adminBtn}
                     <img src="${userPic}" class="user-avatar" alt="avatar">
                     <span class="user-name">${userName.split(' ')[0]}</span>
-                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
             `;
         }
@@ -460,8 +480,11 @@
         function logout() {
             localStorage.removeItem('is_logged_in');
             localStorage.removeItem('student_name');
+            localStorage.removeItem('student_custom_name');
             localStorage.removeItem('student_email');
             localStorage.removeItem('student_pic');
+            localStorage.removeItem('student_room');
+            localStorage.removeItem('student_number');
             const loginArea = document.getElementById('loginArea');
             loginArea.innerHTML = `<button class="login-btn" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน</button>`;
             document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
@@ -476,8 +499,16 @@
             document.getElementById('loginModal').classList.remove('active');
         }
         
+        function checkLabAccess(url) {
+            if(localStorage.getItem('is_logged_in') === 'true') {
+                window.location.href = url;
+            } else {
+                alert('⚠️ กรุณาเข้าสู่ระบบก่อนเข้าใช้งานห้องปฏิบัติการครับ');
+                openLoginModal();
+            }
+        }
+        
         window.onload = function() {
-            // โหลดธีมที่เคยเลือกไว้ตอนเปิดเข้ามาใหม่
             const savedTheme = localStorage.getItem('smart_theme') || "default";
             applyTheme(savedTheme);
             document.querySelectorAll(".theme-btn").forEach(b=>b.classList.remove("active"));
@@ -485,7 +516,7 @@
             if(activeBtn) activeBtn.classList.add("active");
             
             if (localStorage.getItem('is_logged_in') === 'true') {
-                const name = localStorage.getItem('student_name');
+                const name = localStorage.getItem('student_custom_name') || localStorage.getItem('student_name');
                 const pic = localStorage.getItem('student_pic');
                 updateLoginUI(name, pic);
             } else {
