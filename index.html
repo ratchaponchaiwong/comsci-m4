@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | หุ่นยนต์โต้ตอบสุดล้ำ พร้อมธีมสุดพิเศษ</title>
+    <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | หุ่นยนต์โต้ตอบสุดล้ำ</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -54,25 +54,39 @@
         body[data-theme="forest"] .logo { background: linear-gradient(135deg, #90ee90, #6b8e23); -webkit-background-clip: text; background-clip: text; }
         body[data-theme="halloween"] .logo { background: linear-gradient(135deg, #ff8c00, #ff4500); -webkit-background-clip: text; background-clip: text; }
         
-        .nav-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; }
+        .nav-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; margin: 0; padding: 0; align-items: center; }
         .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
         body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
         body[data-theme="forest"] .nav-links a { color: #d4ffd4; }
         .nav-links a:hover { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        
+        /* Login Button in Top Right Corner */
+        .login-area { display: flex; align-items: center; gap: 15px; }
+        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Prompt'; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; backdrop-filter: blur(4px); }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
+        .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
+        .logout-btn:hover { background: rgba(255,255,255,0.4); }
         
         /* Hero Section */
         .hero { display: flex; align-items: center; justify-content: space-between; padding: 60px 80px; min-height: 85vh; flex-wrap: wrap; gap: 40px; }
         .hero-content { flex: 1; min-width: 300px; animation: fadeInUp 1s ease-out; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
         .hero-badge { display: inline-block; background: rgba(59,130,246,0.2); backdrop-filter: blur(4px); padding: 8px 20px; border-radius: 40px; font-size: 0.85rem; border: 1px solid rgba(59,130,246,0.5); margin-bottom: 24px; }
-        .hero-content h1 { font-size: 3rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; background: linear-gradient(135deg, #fff, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; }
+        .hero-content h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; background: linear-gradient(135deg, #fff, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; }
         body[data-theme="snow"] .hero-content h1 { background: linear-gradient(135deg, #2c3e66, #1e3a8a); -webkit-background-clip: text; background-clip: text; }
         body[data-theme="forest"] .hero-content h1 { background: linear-gradient(135deg, #f0fff0, #98fb98); -webkit-background-clip: text; background-clip: text; }
         body[data-theme="halloween"] .hero-content h1 { background: linear-gradient(135deg, #ffaa66, #ff884d); -webkit-background-clip: text; background-clip: text; }
         body[data-theme="love"] .hero-content h1 { background: linear-gradient(135deg, #ff1493, #ff69b4); -webkit-background-clip: text; background-clip: text; }
-        .hero-content p { font-size: 1.1rem; margin-bottom: 32px; line-height: 1.6; }
+        .hero-content p { font-size: 1.1rem; margin-bottom: 32px; line-height: 1.6; color: #cbd5e1; }
         body[data-theme="snow"] .hero-content p, body[data-theme="love"] .hero-content p { color: #2d3748; }
         body[data-theme="forest"] .hero-content p { color: #e0ffe0; }
+        .hero-stats { display: flex; gap: 30px; margin-top: 30px; flex-wrap: wrap; }
+        .stat-item { text-align: center; }
+        .stat-number { font-size: 2rem; font-weight: 800; color: #60a5fa; }
+        .stat-label { font-size: 0.8rem; color: #94a3b8; }
         
         /* Robot Container */
         .hero-robot { flex: 1; min-width: 300px; text-align: center; cursor: pointer; position: relative; }
@@ -104,25 +118,37 @@
         .click-effect { position: fixed; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(59,130,246,0.8) 0%, rgba(59,130,246,0) 70%); pointer-events: none; animation: clickRipple 0.6s ease-out forwards; z-index: 1000; }
         @keyframes clickRipple { 0% { transform: scale(0); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
         
-        .login-section { padding: 40px 80px 80px; }
-        .login-card { background: rgba(30, 41, 59, 0.8); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 500px; margin: 0 auto; text-align: center; border: 1px solid rgba(59,130,246,0.3); transition: transform 0.3s; }
+        /* Features */
         .features { padding: 60px 80px; background: rgba(0,0,0,0.3); }
         .section-title { text-align: center; font-size: 2.2rem; margin-bottom: 50px; background: linear-gradient(135deg, #fff, #60a5fa); -webkit-background-clip: text; background-clip: text; color: transparent; }
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .feature-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(8px); padding: 32px; border-radius: 24px; text-align: center; transition: all 0.3s; cursor: pointer; }
-        .feature-card:hover { transform: translateY(-8px); background: rgba(30, 41, 59, 0.8); }
-        footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); position: relative; z-index: 10; }
-        .click-instruction { font-size: 0.85rem; color: #60a5fa; margin-top: 15px; opacity: 0.8; cursor: pointer; }
+        .feature-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(8px); padding: 32px; border-radius: 24px; text-align: center; transition: all 0.3s; cursor: pointer; border: 1px solid rgba(59,130,246,0.2); }
+        .feature-card:hover { transform: translateY(-8px); background: rgba(30, 41, 59, 0.8); border-color: rgba(59,130,246,0.5); }
+        .feature-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; }
+        footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); position: relative; z-index: 10; color: #94a3b8; }
+        .click-instruction { font-size: 0.85rem; color: #60a5fa; margin-top: 15px; opacity: 0.8; cursor: pointer; animation: blink 1.5s infinite; }
+        @keyframes blink { 0%,100%{opacity:0.8}50%{opacity:0.3} }
         
-        /* Theme Particles */
+        /* Login Modal */
+        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .login-modal.active { visibility: visible; opacity: 1; }
+        .login-modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+        .login-modal-content h3 { font-size: 1.8rem; margin-bottom: 16px; color: white; }
+        .login-modal-content p { color: #94a3b8; margin-bottom: 28px; }
+        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: white; background: none; border: none; }
+        .login-error { color: #f87171; font-size: 0.9rem; margin-top: 15px; display: none; }
+        
         .theme-particle { position: absolute; pointer-events: none; animation: floatParticle linear forwards; z-index: 1; }
         @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
         
         @media (max-width: 768px) { 
             .hero { padding: 40px 20px; flex-direction: column; text-align: center; }
             .theme-switcher { top: 60px; }
-            .login-section { padding: 20px; }
+            .features { padding: 40px 20px; }
+            header { padding: 12px 20px; flex-direction: column; }
+            .nav-links { justify-content: center; }
             .speech-bubble { font-size: 0.8rem; max-width: 180px; }
+            .hero-content h1 { font-size: 1.8rem; }
         }
     </style>
 </head>
@@ -134,13 +160,23 @@
 
     <div class="content-layer">
         <header>
-            <div class="logo"><i class="fas fa-robot"></i><span>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</span></div>
-            <ul class="nav-links">
-                <li><a href="#" class="active">หน้าหลัก</a></li>
-                <li><a href="#">ห้องเรียนของฉัน</a></li>
-                <li><a href="#">ข้อมูลผู้สอน</a></li>
-                <li><a href="#">ผลงานนักเรียน</a></li>
-            </ul>
+            <div class="logo">
+                <i class="fas fa-robot"></i>
+                <span>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</span>
+            </div>
+            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
+                <ul class="nav-links">
+                    <li><a href="#" class="active">หน้าหลัก</a></li>
+                    <li><a href="#">ห้องเรียนของฉัน</a></li>
+                    <li><a href="#">ข้อมูลผู้สอน</a></li>
+                    <li><a href="#">ผลงานนักเรียน</a></li>
+                </ul>
+                <div class="login-area" id="loginArea">
+                    <button class="login-btn" id="showLoginBtn">
+                        <i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน
+                    </button>
+                </div>
+            </div>
         </header>
 
         <!-- Theme Switcher -->
@@ -155,11 +191,14 @@
         <div class="hero">
             <div class="hero-content">
                 <span class="hero-badge" id="themeBadge"><i class="fas fa-microchip"></i> วิทยาการคำนวณ ม.4</span>
-                <h1 id="themeTitle">เรียนรู้ Coding & Robotics <br>สู่โลกแห่งอนาคต</h1>
-                <p id="themeDesc">พัฒนาทักษะการเขียนโปรแกรม Python, Arduino และนวัตกรรมหุ่นยนต์ PROT ROBOT พร้อมระบบการเรียนรู้แบบ Interactive</p>
+                <!-- หัวข้อหลักคงที่ทุกธีม -->
+                <h1>เรียนรู้ Coding & Robotics <br>สู่โลกแห่งอนาคต</h1>
+                <!-- คำอธิบายคงที่ทุกธีม -->
+                <p>พัฒนาทักษะการเขียนโปรแกรม Python, Arduino และนวัตกรรมหุ่นยนต์ PROT ROBOT พร้อมระบบการเรียนรู้แบบ Interactive ที่จะเปลี่ยนห้องเรียนให้กลายเป็นห้องปฏิบัติการแห่งนวัตกรรม</p>
                 <div class="hero-stats">
                     <div class="stat-item"><div class="stat-number">500+</div><div class="stat-label">นักเรียนที่ผ่านการอบรม</div></div>
                     <div class="stat-item"><div class="stat-number">50+</div><div class="stat-label">โครงงานนวัตกรรม</div></div>
+                    <div class="stat-item"><div class="stat-number">24/7</div><div class="stat-label">ห้องเรียนออนไลน์</div></div>
                 </div>
             </div>
             <div class="hero-robot" id="interactiveRobot">
@@ -189,34 +228,57 @@
             </div>
         </div>
 
-        <div class="login-section">
-            <div class="login-card">
-                <h3><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
-                <p>กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
-                <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse"></div>
-                <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large"></div>
+        <div class="features">
+            <h2 class="section-title">✨ ทำไมต้อง ห้องเรียนวิทยาการคำนวณ By ครูรัชพล?</h2>
+            <div class="features-grid">
+                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') alert('ไปหน้าเรียนรู้ Python'); else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
+                    <div class="feature-icon"><i class="fas fa-code"></i></div>
+                    <h4>เรียนรู้ผ่านการลงมือทำ</h4>
+                    <p>ฝึกเขียน Python และ Arduino จำลองวงจรด้วย Wokwi แบบเรียลไทม์</p>
+                </div>
+                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') alert('ไปหน้า Robotics'); else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
+                    <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                    <h4>PROT ROBOT Innovation</h4>
+                    <p>ออกแบบและสร้างหุ่นยนต์อัตโนมัติด้วยโครงงานจริง พร้อมแข่งขันระดับชั้น</p>
+                </div>
+                <div class="feature-card" onclick="alert('ข้อมูลผู้สอน: ครูรัชพล ผู้เชี่ยวชาญด้านวิทยาการคอมพิวเตอร์');">
+                    <div class="feature-icon"><i class="fas fa-chalkboard-user"></i></div>
+                    <h4>ผู้สอนมืออาชีพ</h4>
+                    <p>ครูผู้เชี่ยวชาญด้านวิทยาการคอมพิวเตอร์และวิศวกรรมหุ่นยนต์</p>
+                </div>
+                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') alert('ไปหน้าวุฒิบัตร'); else alert('กรุณาเข้าสู่ระบบก่อนใช้งาน');">
+                    <div class="feature-icon"><i class="fas fa-certificate"></i></div>
+                    <h4>รับวุฒิบัตร</h4>
+                    <p>ผ่านเกณฑ์การประเมินรับประกาศนียบัตรรับรองทักษะการเขียนโปรแกรม</p>
+                </div>
             </div>
         </div>
 
-        <div class="features">
-            <h2 class="section-title">✨ ทำไมต้องห้องเรียนวิทยาการคำนวณ?</h2>
-            <div class="features-grid">
-                <div class="feature-card" onclick="alert('เรียนรู้ Python และ Arduino')"><div class="feature-icon"><i class="fas fa-code"></i></div><h4>เรียนรู้ผ่านการลงมือทำ</h4></div>
-                <div class="feature-card" onclick="alert('หุ่นยนต์และนวัตกรรม')"><div class="feature-icon"><i class="fas fa-robot"></i></div><h4>PROT ROBOT Innovation</h4></div>
-                <div class="feature-card" onclick="alert('ครูรัชพล ผู้เชี่ยวชาญ')"><div class="feature-icon"><i class="fas fa-chalkboard-user"></i></div><h4>ผู้สอนมืออาชีพ</h4></div>
-            </div>
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | วิทยาการคำนวณเพื่ออนาคต พัฒนาโดยทีมการศึกษาดิจิทัล</p>
+        </footer>
+    </div>
+
+    <!-- Login Modal -->
+    <div id="loginModal" class="login-modal">
+        <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+        <div class="login-modal-content">
+            <h3><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
+            <p>กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th ของโรงเรียน</p>
+            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+            <div id="login-error" class="login-error"><i class="fas fa-exclamation-circle"></i> อีเมลนี้ไม่ได้รับอนุญาตให้เข้าใช้งาน</div>
         </div>
-        <footer><p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</p></footer>
     </div>
 
     <script>
         // ==================== THEME SYSTEM ====================
         const themes = {
-            default: { name: "หุ่นยนต์นักเรียนรู้", title: "ห้องเรียนวิทยาการคำนวณ By ครูรัชพล",  badge: "วิทยาการคำนวณ ม.4", glowColor: "rgba(59,130,246,0.3)", headColor: "#3b82f6", bodyColor: "#2563eb", accentColor: "#f59e0b" },
-            snow: { name: "⛄ ตุ๊กตาหิมะ", title: "❄️ ห้องเรียนวิทยาการคำนวณ By ครูรัชพล ❄️", badge: "วิทยาการคำนวณ ม.4", glowColor: "rgba(255,255,255,0.5)", headColor: "#EFF9FF", bodyColor: "#A0D6FF", accentColor: "#FFA559" },
-            forest: { name: "🌿 เอลฟ์พิทักษ์ป่า", title: "🌳 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล", badge: "วิทยาการคำนวณ ม.4", glowColor: "rgba(100,200,100,0.4)", headColor: "#C5E0B4", bodyColor: "#558B2F", accentColor: "#FFD966" },
-            halloween: { name: "👻 ผีน้อยจอมกวน", title: "🎃 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล", badge: "วิทยาการคำนวณ ม.4", glowColor: "rgba(255,69,0,0.4)", headColor: "#2F1B2F", bodyColor: "#8B4513", accentColor: "#FF6347" },
-            love: { name: "🌸 หุ่นยนต์ซากุระ", title: "🌸 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล", badge: "วิทยาการคำนวณ ม.4", glowColor: "rgba(255,105,180,0.4)", headColor: "#FFE4E1", bodyColor: "#FFB7C5", accentColor: "#FF69B4" }
+            default: { name: "หุ่นยนต์นักเรียนรู้", badge: "🤖 วิทยาการคำนวณ ม.4", glowColor: "rgba(59,130,246,0.3)", headColor: "#3b82f6", bodyColor: "#2563eb", accentColor: "#f59e0b", particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
+            snow: { name: "⛄ ตุ๊กตาหิมะ", badge: "⛄ วิทยาการหิมะ", glowColor: "rgba(255,255,255,0.5)", headColor: "#EFF9FF", bodyColor: "#A0D6FF", accentColor: "#FFA559", particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
+            forest: { name: "🌿 เอลฟ์พิทักษ์ป่า", badge: "🌿 วิทยาการพิทักษ์ป่า", glowColor: "rgba(100,200,100,0.4)", headColor: "#C5E0B4", bodyColor: "#558B2F", accentColor: "#FFD966", particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
+            halloween: { name: "👻 ผีน้อยจอมกวน", badge: "🎃 ฮัลโลวีนสยองขวัญ", glowColor: "rgba(255,69,0,0.4)", headColor: "#2F1B2F", bodyColor: "#8B4513", accentColor: "#FF6347", particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
+            love: { name: "🌸 หุ่นยนต์ซากุระ", badge: "🌸 ซากุระกับวิทยาการ", glowColor: "rgba(255,105,180,0.4)", headColor: "#FFE4E1", bodyColor: "#FFB7C5", accentColor: "#FF69B4", particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
         };
         
         let currentTheme = "default";
@@ -226,13 +288,9 @@
             currentTheme = themeKey;
             document.body.setAttribute("data-theme", themeKey);
             const theme = themes[themeKey];
-            document.getElementById("themeTitle").innerText = theme.title;
-            document.getElementById("themeDesc").innerText = theme.desc;
             document.getElementById("themeBadge").innerHTML = `<i class="fas fa-${themeKey === 'snow' ? 'snowflake' : themeKey === 'forest' ? 'leaf' : themeKey === 'halloween' ? 'ghost' : themeKey === 'love' ? 'heart' : 'microchip'}"></i> ${theme.badge}`;
             
-            // Change robot colors
             const head = document.getElementById("robotHead");
-            const bodyGrad = document.querySelector("#gradBody");
             const antenna = document.getElementById("antenna");
             const antennaBall = document.getElementById("antennaBall");
             const chestLight = document.getElementById("chestLight");
@@ -240,16 +298,12 @@
             const glow = document.getElementById("robotGlow");
             
             head.setAttribute("fill", theme.headColor);
-            if(bodyGrad) {
-                bodyGrad.innerHTML = `<stop stop-color="${theme.bodyColor}"/><stop offset="1" stop-color="${theme.bodyColor === "#FFB7C5" ? "#FF69B4" : theme.bodyColor === "#558B2F" ? "#2E5A2E" : theme.bodyColor === "#8B4513" ? "#5D2E0A" : "#1e3a8a"}"/>`;
-            }
             antenna.setAttribute("fill", theme.accentColor);
             antennaBall.setAttribute("fill", theme.accentColor);
             chestLight.setAttribute("fill", theme.accentColor);
             arms.forEach(arm => arm.setAttribute("fill", theme.bodyColor));
-            glow.style.background = `radial-gradient(circle, ${theme.glowColor} 0%, ${theme.glowColor.replace('0.4','0')} 70%)`;
+            glow.style.background = `radial-gradient(circle, ${theme.glowColor} 0%, ${theme.glowColor.replace('0.4','0').replace('0.5','0')} 70%)`;
             
-            // Add theme-specific decorations
             const svg = document.getElementById("robotSvg");
             const existingDeco = svg.querySelectorAll(".theme-deco");
             existingDeco.forEach(d => d.remove());
@@ -275,8 +329,6 @@
                 flower.setAttribute("fill", "#FFB7C5"); flower.classList.add("theme-deco");
                 svg.querySelector("#robotGroup").appendChild(flower);
             }
-            
-            // Update particles
             startThemeParticles(themeKey);
         }
         
@@ -285,13 +337,8 @@
             if(particleInterval) clearInterval(particleInterval);
             container.innerHTML = "";
             
-            let particleChar = "❄️";
-            let color = "";
-            if(theme === "snow") particleChar = "❄️";
-            else if(theme === "forest") particleChar = "🍃";
-            else if(theme === "halloween") particleChar = "🎃";
-            else if(theme === "love") particleChar = "🌸";
-            else return;
+            const themeData = themes[theme];
+            const particleChar = themeData.particleChar;
             
             function createParticle() {
                 const particle = document.createElement("div");
@@ -302,19 +349,23 @@
                 particle.style.opacity = Math.random() * 0.6 + 0.3;
                 particle.style.animationDuration = Math.random() * 8 + 5 + "s";
                 particle.style.animationDelay = Math.random() * 5 + "s";
+                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
                 particle.innerHTML = particleChar;
                 container.appendChild(particle);
                 setTimeout(() => particle.remove(), 10000);
             }
             
-            for(let i=0;i<30;i++) setTimeout(() => createParticle(), i*200);
-            particleInterval = setInterval(() => createParticle(), 800);
+            // สร้างอนุภาคทันทีและต่อเนื่อง
+            for(let i = 0; i < 25; i++) {
+                setTimeout(() => createParticle(), i * 150);
+            }
+            particleInterval = setInterval(() => createParticle(), 600);
         }
         
         // ==================== ROBOT INTERACTIONS ====================
         const animations = ['robot-shake', 'robot-bounce', 'robot-spin', 'robot-wobble', 'robot-pop', 'robot-dance'];
         const messages = [
-            "🤖 สวัสดีจ้า! ตั้งใจเรียนนะ", "💙 เธอเก่งมากเลย", "✨ มาสร้างนวัตกรรมไปด้วยกัน", "🚀 พร้อมเรียนรู้แล้ว!", "💡 คลิกอีกสิ มีเซอร์ไพรส์", "😊 รักนักเรียนทุกคนเลย", "🐍 Python สนุกสุดๆ", "🎯 เก่งมาก! พัฒนาต่อไป", "💪 สู้ๆ นะครับ", "🌟 เธอทำได้ดีมาก", "🤗 ขอบคุณที่สนใจนะ", "💖 ครูรัชพลภูมิใจในตัวเธอ", "🌈 ฝันให้ไกล แล้วไปให้ถึง", "⭐ ความพยายามไม่เคยทรยศ", "🎨 สร้างสรรค์ผลงานได้ตามใจ", "🌱 เรียนรู้ทุกวัน เติบโตทุกวัน"
+            "🤖 สวัสดีจ้า! ตั้งใจเรียนนะ", "💙 เธอเก่งมากเลย", "✨ มาสร้างนวัตกรรมไปด้วยกัน", "🚀 พร้อมเรียนรู้แล้ว!", "💡 คลิกอีกสิ มีเซอร์ไพรส์", "😊 รักนักเรียนทุกคนเลย", "🐍 Python สนุกสุดๆ", "🎯 เก่งมาก! พัฒนาต่อไป", "💪 สู้ๆ นะครับ", "🌟 เธอทำได้ดีมาก", "🤗 ขอบคุณที่สนใจนะ", "💖 ครูรัชพลภูมิใจในตัวเธอ", "🌈 ฝันให้ไกล แล้วไปให้ถึง", "⭐ ความพยายามไม่เคยทรยศ"
         ];
         const emojis = ['🤖', '💙', '⭐', '🎉', '✨', '🚀', '💡', '🎯', '🌟', '💪', '🤗', '🌈'];
         
@@ -354,10 +405,84 @@
             });
         });
         
-        function handleCredentialResponse(response) { alert("สาธิตเข้าสู่ระบบ (ธีมสวยๆ นะ)"); }
+        // ==================== LOGIN SYSTEM ====================
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join('')));
+        }
         
-        applyTheme("default");
-        setTimeout(() => createSpeechBubble("🤖 สวัสดี! คลิกฉันสิ แล้วลองเปลี่ยนธีมดูนะ", {clientX:0,clientY:0}), 1000);
+        function handleCredentialResponse(response) {
+            const userData = decodeJwtResponse(response.credential);
+            const userEmail = userData.email;
+            const errorBox = document.getElementById('login-error');
+            
+            if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+                errorBox.style.display = 'none';
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userData.email);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                closeLoginModal();
+                updateLoginUI(userData.name, userData.picture);
+                createSpeechBubble(`🎉 ยินดีต้อนรับ ${userData.name} สู่ห้องเรียนวิทยาการคำนวณ!`, {clientX:0,clientY:0});
+                animateRobot();
+            } else {
+                errorBox.style.display = 'block';
+                setTimeout(() => errorBox.style.display = 'none', 3000);
+            }
+        }
+        
+        function updateLoginUI(userName, userPic) {
+            const loginArea = document.getElementById('loginArea');
+            loginArea.innerHTML = `
+                <div class="user-info">
+                    <img src="${userPic}" class="user-avatar" alt="avatar">
+                    <span class="user-name">${userName.split(' ')[0]}</span>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i> ออกจากระบบ</button>
+                </div>
+            `;
+        }
+        
+        function logout() {
+            localStorage.removeItem('is_logged_in');
+            localStorage.removeItem('student_name');
+            localStorage.removeItem('student_email');
+            localStorage.removeItem('student_pic');
+            const loginArea = document.getElementById('loginArea');
+            loginArea.innerHTML = `<button class="login-btn" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน</button>`;
+            document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
+            createSpeechBubble(`👋 ออกจากระบบแล้ว กลับมาใหม่นะครับ`, {clientX:0,clientY:0});
+        }
+        
+        function openLoginModal() {
+            document.getElementById('loginModal').classList.add('active');
+        }
+        
+        function closeLoginModal() {
+            document.getElementById('loginModal').classList.remove('active');
+        }
+        
+        window.onload = function() {
+            applyTheme("default");
+            document.querySelector('.theme-btn[data-theme="default"]').classList.add('active');
+            
+            if (localStorage.getItem('is_logged_in') === 'true') {
+                const name = localStorage.getItem('student_name');
+                const pic = localStorage.getItem('student_pic');
+                updateLoginUI(name, pic);
+            } else {
+                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
+            }
+            
+            document.getElementById('loginModal').addEventListener('click', function(e) {
+                if (e.target === this) closeLoginModal();
+            });
+            
+            setTimeout(() => createSpeechBubble("🤖 สวัสดี! คลิกฉันสิ แล้วลองเปลี่ยนธีมดูนะ", {clientX:0,clientY:0}), 1000);
+        };
     </script>
 </body>
 </html>
