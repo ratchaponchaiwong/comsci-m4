@@ -4,132 +4,70 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <title>ระบบจัดการครูผู้สอน | PROT Smart Workspace</title>
-    
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ==================== CSS โครงสร้างหลัก ==================== */
+        /* CSS โครงสร้างหลักและธีม (ใช้ชุดเดิมเพื่อความต่อเนื่อง) */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; }
-        
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
-        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
-        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
-        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
         
         .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
         
-        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
-        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; backdrop-filter: blur(4px); font-size: 0.9rem; }
-        .theme-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.4); }
-        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; transition: background 0.3s; }
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; }
         body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
-        body[data-theme="forest"] header { background: rgba(30, 60, 30, 0.8); border-bottom-color: rgba(100,200,100,0.3); }
-        body[data-theme="halloween"] header { background: rgba(40, 20, 40, 0.8); border-bottom-color: rgba(255,100,0,0.3); }
-        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
         
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; background-clip: text; }
-        body[data-theme="forest"] .logo { background: linear-gradient(135deg, #90ee90, #6b8e23); -webkit-background-clip: text; background-clip: text; }
-        body[data-theme="halloween"] .logo { background: linear-gradient(135deg, #ff8c00, #ff4500); -webkit-background-clip: text; background-clip: text; }
+        body[data-theme="snow"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; background-clip: text; }
         
         .login-area { display: flex; align-items: center; gap: 15px; margin-left: auto; }
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; backdrop-filter: blur(4px); }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
-        .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
-        body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
-        .logout-btn { background: rgba(239, 68, 68, 0.8); border: none; padding: 6px 15px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; transition: 0.2s; font-family: 'Prompt'; display: flex; align-items: center; gap: 5px; }
-        .logout-btn:hover { background: #dc2626; transform: translateY(-2px); }
+        .logout-btn { background: rgba(239, 68, 68, 0.8); border: none; padding: 6px 15px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; font-family: 'Prompt'; }
         
-        footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); margin-top: auto; position: relative; z-index: 10; }
-        
-        .theme-particle { position: absolute; pointer-events: none; animation: floatParticle linear forwards; z-index: 1; }
-        @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
-        
-        /* ==================== CSS เฉพาะของหน้า Teacher Dashboard ==================== */
         .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; z-index: 10; position: relative; }
-
-        .dashboard-header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; flex-wrap: wrap; gap: 20px; }
-        .dashboard-header h1 { font-size: 2.2rem; color: #60a5fa; display: flex; align-items: center; gap: 15px; }
-        body[data-theme="snow"] .dashboard-header h1, body[data-theme="love"] .dashboard-header h1 { color: #3b82f6; }
+        .dashboard-header h1 { font-size: 2.2rem; color: #60a5fa; display: flex; align-items: center; gap: 15px; margin-bottom: 20px; }
         
-        /* Stats Cards */
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 20px; margin-bottom: 40px; }
-        .stat-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); display: flex; align-items: center; gap: 20px; transition: 0.3s; color: inherit; }
-        body[data-theme="snow"] .stat-card, body[data-theme="love"] .stat-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
-        .stat-card:hover { transform: translateY(-5px); border-color: #3b82f6; }
+        /* Dashboard Layout */
+        .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         
-        .stat-icon { width: 60px; height: 60px; border-radius: 15px; display: flex; align-items: center; justify-content: center; font-size: 2rem; }
-        .stat-icon.blue { background: rgba(59,130,246,0.2); color: #60a5fa; }
-        .stat-icon.orange { background: rgba(245,158,11,0.2); color: #fbbf24; }
-        .stat-icon.green { background: rgba(16,185,129,0.2); color: #34d399; }
-        body[data-theme="snow"] .stat-icon.blue, body[data-theme="love"] .stat-icon.blue { color: #2563eb; background: #dbeafe; }
-        body[data-theme="snow"] .stat-icon.orange, body[data-theme="love"] .stat-icon.orange { color: #d97706; background: #fef3c7; }
-        body[data-theme="snow"] .stat-icon.green, body[data-theme="love"] .stat-icon.green { color: #059669; background: #d1fae5; }
+        .glass-panel { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; }
+        body[data-theme="snow"] .glass-panel { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
         
-        .stat-info h3 { font-size: 2rem; margin: 0 0 5px 0; }
-        .stat-info p { margin: 0; font-size: 0.9rem; opacity: 0.8; }
-
-        /* Glass Table */
-        .glass-panel { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 20px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; overflow-x: auto; }
-        body[data-theme="snow"] .glass-panel, body[data-theme="love"] .glass-panel { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
+        .panel-title { font-size: 1.3rem; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px; display: flex; justify-content: space-between; }
         
-        .panel-title { font-size: 1.3rem; margin-bottom: 20px; display: flex; align-items: center; justify-content: space-between; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; }
-        body[data-theme="snow"] .panel-title, body[data-theme="love"] .panel-title { border-bottom-color: rgba(0,0,0,0.1); }
+        .form-group { margin-bottom: 15px; }
+        .form-group label { display: block; margin-bottom: 5px; font-size: 0.9rem; opacity: 0.9; }
+        .form-group input, .form-group select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
+        body[data-theme="snow"] .form-group input, body[data-theme="snow"] .form-group select { background: white; border-color: #cbd5e1; color: #1e293b; }
         
-        table { width: 100%; border-collapse: collapse; min-width: 800px; }
-        th, td { padding: 15px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
-        body[data-theme="snow"] th, body[data-theme="snow"] td, body[data-theme="love"] th, body[data-theme="love"] td { border-bottom-color: rgba(0,0,0,0.05); }
-        th { font-weight: 600; color: #60a5fa; background: rgba(0,0,0,0.2); }
-        body[data-theme="snow"] th, body[data-theme="love"] th { color: #2563eb; background: rgba(0,0,0,0.05); }
-        tr:hover { background: rgba(255,255,255,0.05); }
-        body[data-theme="snow"] tr:hover, body[data-theme="love"] tr:hover { background: rgba(0,0,0,0.02); }
-        
-        /* Form Elements inside table */
-        input[type="number"] { width: 70px; padding: 8px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; text-align: center; }
-        body[data-theme="snow"] input[type="number"], body[data-theme="love"] input[type="number"] { background: white; border-color: #cbd5e1; }
-        
-        .btn-action { background: #3b82f6; color: white; border: none; padding: 8px 15px; border-radius: 8px; cursor: pointer; font-family: 'Prompt'; font-size: 0.85rem; transition: 0.2s; }
+        .btn-action { background: #3b82f6; color: white; border: none; padding: 10px 20px; border-radius: 10px; cursor: pointer; font-family: 'Prompt'; font-size: 1rem; width: 100%; transition: 0.2s; }
         .btn-action:hover { background: #2563eb; transform: translateY(-2px); }
+        .btn-delete { background: #ef4444; color: white; border: none; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 0.8rem; }
         
-        .link-text { color: #34d399; text-decoration: none; font-weight: 500; display: flex; align-items: center; gap: 5px; }
-        body[data-theme="snow"] .link-text, body[data-theme="love"] .link-text { color: #059669; }
-        .link-text:hover { text-decoration: underline; }
-
-        .loading-text { text-align: center; padding: 40px; opacity: 0.7; font-style: italic; }
-
+        .activity-list { list-style: none; margin-top: 20px; }
+        .activity-item { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 10px; margin-bottom: 10px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
+        body[data-theme="snow"] .activity-item { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
+        
+        @media (max-width: 768px) { .admin-grid { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body data-theme="default" style="display: none;" id="bodyContent">
-    <div class="bg-animation">
-        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
-    </div>
-    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
 
     <div class="content-layer">
         <header>
-            <a href="index.html" class="logo">
-                <i class="fas fa-user-shield"></i>
-                <span>PROT Admin Hub</span>
-            </a>
-            
-            <div class="login-area" id="loginArea">
+            <a href="index.html" class="logo"><i class="fas fa-user-shield"></i><span>PROT Admin Hub</span></a>
+            <div class="login-area">
                 <div class="user-info">
                     <img id="teacherAvatar" src="" class="user-avatar" alt="avatar">
                     <span id="teacherName" class="user-name">ครูผู้สอน</span>
@@ -138,230 +76,122 @@
             </div>
         </header>
 
-        <div class="theme-switcher">
-            <button class="theme-btn" data-theme="default" title="เริ่มต้น">🤖</button>
-            <button class="theme-btn" data-theme="snow" title="หิมะ">❄️</button>
-            <button class="theme-btn" data-theme="forest" title="ธรรมชาติ">🌿</button>
-            <button class="theme-btn" data-theme="halloween" title="ฮัลโลวีน">🎃</button>
-            <button class="theme-btn" data-theme="love" title="ความรัก">🌸</button>
-        </div>
-
         <div class="page-content-wrapper">
-            
             <div class="dashboard-header">
-                <div>
-                    <h1><i class="fas fa-chalkboard-teacher"></i> แดชบอร์ดครูผู้สอน</h1>
-                    <p style="opacity: 0.8; margin-top: 5px;">จัดการชั้นเรียน ตรวจงาน และประเมินผลนักเรียน</p>
-                </div>
-                <div>
-                    <a href="index.html" class="btn-action" style="text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 30px; background: rgba(255,255,255,0.2); border: 1px solid rgba(255,255,255,0.3);">
-                        <i class="fas fa-home"></i> กลับหน้าหลักระบบ
-                    </a>
-                </div>
+                <h1><i class="fas fa-chalkboard-teacher"></i> แดชบอร์ดจัดการระบบ</h1>
             </div>
 
-            <div class="stats-grid">
-                <div class="stat-card">
-                    <div class="stat-icon blue"><i class="fas fa-users"></i></div>
-                    <div class="stat-info">
-                        <h3>122</h3>
-                        <p>นักเรียนทั้งหมด (ม.4)</p>
+            <div class="admin-grid">
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-plus-circle"></i> โพสต์กิจกรรม/บทเรียนใหม่</div>
+                    <div class="form-group">
+                        <label>ชื่อบทเรียน (เช่น บทที่ 1: พื้นฐาน Python)</label>
+                        <input type="text" id="act-title" placeholder="ชื่อบทเรียน">
                     </div>
+                    <div class="form-group">
+                        <label>คำอธิบายสั้นๆ</label>
+                        <input type="text" id="act-desc" placeholder="ให้นักเรียนทำอะไร...">
+                    </div>
+                    <div class="form-group">
+                        <label>ลิงก์ห้อง Lab ที่ต้องการให้ไป</label>
+                        <select id="act-link">
+                            <option value="python.html">ห้อง Lab: Python</option>
+                            <option value="robotics.html">ห้อง Lab: Arduino & Robotics</option>
+                            <option value="#">ไม่มีลิงก์ (กิจกรรมทั่วไป)</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>คะแนนเต็ม</label>
+                        <input type="number" id="act-points" value="15">
+                    </div>
+                    <button class="btn-action" onclick="postActivity()"><i class="fas fa-paper-plane"></i> โพสต์ให้นักเรียนเห็น</button>
                 </div>
-                <div class="stat-card">
-                    <div class="stat-icon orange"><i class="fas fa-file-signature"></i></div>
-                    <div class="stat-info">
-                        <h3 id="count-works">0</h3>
-                        <p>งานที่รอตรวจ</p>
-                    </div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-icon green"><i class="fas fa-check-circle"></i></div>
-                    <div class="stat-info">
-                        <h3>450</h3>
-                        <p>งานที่ตรวจแล้ว (เทอมนี้)</p>
-                    </div>
+
+                <div class="glass-panel">
+                    <div class="panel-title"><i class="fas fa-list"></i> บทเรียนที่เผยแพร่แล้ว</div>
+                    <ul class="activity-list" id="published-list">
+                        </ul>
                 </div>
             </div>
-
-            <div class="glass-panel">
-                <div class="panel-title">
-                    <span><i class="fas fa-tasks"></i> รายการงานที่รอตรวจ (Pending)</span>
-                    <button class="btn-action" onclick="loadStudentData()"><i class="fas fa-sync-alt"></i> รีเฟรชข้อมูล</button>
-                </div>
-                
-                <div id="loading" class="loading-text"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</div>
-                
-                <table id="works-table" style="display:none;">
-                    <thead>
-                        <tr>
-                            <th width="15%">วันที่ส่ง</th>
-                            <th width="25%">ชื่อนักเรียน</th>
-                            <th width="30%">ลิงก์ / ไฟล์งาน</th>
-                            <th width="15%">ให้คะแนน</th>
-                            <th width="15%">จัดการ</th>
-                        </tr>
-                    </thead>
-                    <tbody id="works-body">
-                        </tbody>
-                </table>
-            </div>
-
         </div>
-
-        <footer>
-            <p><i class="fas fa-lock"></i> ระบบสารสนเทศสำหรับครูผู้สอน โรงเรียน PROT วิทยาคม | ห้ามบุคคลภายนอกเข้าถึง</p>
-        </footer>
     </div>
 
     <script>
-        // ==================== SECURITY CHECK ====================
         function checkTeacherAccess() {
             const email = localStorage.getItem('student_email');
             const isLoggedIn = localStorage.getItem('is_logged_in');
-            
             if (isLoggedIn !== 'true' || (email !== 'teacher@prot.ac.th' && email !== 'ratchapon@prot.ac.th')) {
-                alert('⚠️ พื้นที่หวงห้าม: คุณไม่มีสิทธิ์เข้าถึงหน้านี้ ระบบจะพากลับไปหน้าหลัก');
+                alert('⚠️ เฉพาะครูผู้สอนเท่านั้น');
                 window.location.href = 'index.html';
                 return false;
             }
-            
-            // แสดงเนื้อหาหลังจากผ่านการตรวจสอบ
             document.getElementById('bodyContent').style.display = 'block';
-            document.getElementById('teacherName').innerText = localStorage.getItem('student_name');
-            document.getElementById('teacherAvatar').src = localStorage.getItem('student_pic') || 'https://ui-avatars.com/api/?name=Teacher&background=0D8ABC&color=fff';
+            document.getElementById('teacherName').innerText = localStorage.getItem('student_name') || 'ครูรัชพล';
+            document.getElementById('teacherAvatar').src = localStorage.getItem('student_pic') || 'https://ui-avatars.com/api/?name=Teacher';
             return true;
         }
 
-        // ==================== THEME & PARTICLE SYSTEM ====================
-        const themes = {
-            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
-            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
-            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
-            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
-            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
-        };
-        let particleInterval = null;
-        
-        function applyTheme(themeKey) {
-            document.body.setAttribute("data-theme", themeKey);
-            localStorage.setItem('smart_theme', themeKey);
+        function loadActivities() {
+            const list = document.getElementById('published-list');
+            const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            list.innerHTML = '';
             
-            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
-            const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
-            if(activeBtn) activeBtn.classList.add("active");
-
-            startThemeParticles(themeKey);
-        }
-        
-        function startThemeParticles(theme) {
-            const container = document.getElementById("particleContainer");
-            if(particleInterval) clearInterval(particleInterval);
-            container.innerHTML = "";
-            const themeData = themes[theme];
-            
-            function createParticle() {
-                const particle = document.createElement("div");
-                particle.className = "theme-particle";
-                particle.style.position = "absolute";
-                particle.style.left = Math.random() * 100 + "%";
-                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
-                particle.style.opacity = Math.random() * 0.6 + 0.3;
-                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
-                particle.style.animationDelay = Math.random() * 5 + "s";
-                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
-                particle.innerHTML = themeData.particleChar;
-                container.appendChild(particle);
-                setTimeout(() => particle.remove(), 10000);
-            }
-            for(let i = 0; i < 15; i++) setTimeout(() => createParticle(), i * 150);
-            particleInterval = setInterval(() => createParticle(), 800);
-        }
-
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
-
-        // ==================== DATA MANAGEMENT ====================
-        function loadStudentData() {
-            const loading = document.getElementById('loading');
-            const table = document.getElementById('works-table');
-            const tbody = document.getElementById('works-body');
-            
-            loading.style.display = 'block';
-            table.style.display = 'none';
-            
-            // จำลองการดึงข้อมูลจาก Server
-            setTimeout(() => {
-                const mockData = [
-                    { id: 1, date: "01 เม.ย. 2026", name: "ด.ช. สมชาย รักเรียน", task: "Python Input/Output", link: "#" },
-                    { id: 2, date: "01 เม.ย. 2026", name: "น.ส. ใจดี มีสุข", task: "Arduino Blink (Wokwi)", link: "https://wokwi.com/" },
-                    { id: 3, date: "31 มี.ค. 2026", name: "ด.ช. เก่งกาจ สามารถ", task: "โครงงาน PROT ROBOT", link: "#" },
-                    { id: 4, date: "31 มี.ค. 2026", name: "น.ส. เรียนดี สีสด", task: "Python Input/Output", link: "#" },
-                    { id: 5, date: "30 มี.ค. 2026", name: "ด.ช. มุ่งมั่น ขยันยิ่ง", task: "Arduino Blink (Wokwi)", link: "https://wokwi.com/" }
-                ];
-                
-                document.getElementById('count-works').innerText = mockData.length;
-                tbody.innerHTML = '';
-                
-                mockData.forEach(item => {
-                    let row = `<tr>
-                        <td><i class="far fa-calendar-alt"></i> ${item.date}</td>
-                        <td><div style="font-weight: 500;">${item.name}</div><div style="font-size:0.8rem; opacity:0.7;">ม.4/1</div></td>
-                        <td>
-                            <div style="font-size:0.85rem; margin-bottom:5px;">${item.task}</div>
-                            <a href="${item.link}" target="_blank" class="link-text"><i class="fas fa-external-link-alt"></i> เปิดดูผลงาน</a>
-                        </td>
-                        <td><input type="number" placeholder=" / 15" min="0" max="15"></td>
-                        <td><button class="btn-action" onclick="saveScore(this)"><i class="fas fa-save"></i> บันทึก</button></td>
-                    </tr>`;
-                    tbody.innerHTML += row;
-                });
-                
-                loading.style.display = 'none';
-                table.style.display = 'table';
-            }, 800);
-        }
-
-        function saveScore(btn) {
-            const row = btn.closest('tr');
-            const scoreInput = row.querySelector('input[type="number"]').value;
-            
-            if(!scoreInput) {
-                alert('⚠️ กรุณากรอกคะแนนก่อนบันทึก');
+            if (activities.length === 0) {
+                list.innerHTML = '<li style="text-align:center; opacity:0.7;">ยังไม่มีบทเรียนที่เผยแพร่</li>';
                 return;
             }
-            
-            btn.innerHTML = '<i class="fas fa-check"></i> บันทึกแล้ว';
-            btn.style.background = '#10b981';
-            row.style.opacity = '0.5';
-            
-            setTimeout(() => {
-                row.remove();
-                let currentCount = parseInt(document.getElementById('count-works').innerText);
-                document.getElementById('count-works').innerText = currentCount - 1;
-                if(currentCount - 1 === 0) {
-                    document.getElementById('works-body').innerHTML = '<tr><td colspan="5" style="text-align:center; padding:30px; opacity:0.7;">ไม่มีงานค้างตรวจ 🎉</td></tr>';
-                }
-            }, 1000);
+
+            activities.forEach(act => {
+                list.innerHTML += `
+                    <li class="activity-item">
+                        <div>
+                            <div style="font-weight:600; color:#60a5fa;">${act.title}</div>
+                            <div style="font-size:0.85rem; opacity:0.8;">${act.desc} (คะแนน: ${act.points})</div>
+                        </div>
+                        <button class="btn-delete" onclick="deleteActivity(${act.id})"><i class="fas fa-trash"></i> ลบ</button>
+                    </li>
+                `;
+            });
+        }
+
+        function postActivity() {
+            const title = document.getElementById('act-title').value;
+            const desc = document.getElementById('act-desc').value;
+            const link = document.getElementById('act-link').value;
+            const points = document.getElementById('act-points').value;
+
+            if (!title) { alert("⚠️ กรุณาใส่ชื่อบทเรียน"); return; }
+
+            const newAct = { id: Date.now(), title, desc, link, points };
+            let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            activities.push(newAct);
+            localStorage.setItem('global_activities', JSON.stringify(activities));
+
+            alert('✅ โพสต์บทเรียนสำเร็จ! นักเรียนจะเห็นในหน้า Dashboard ทันที');
+            document.getElementById('act-title').value = '';
+            document.getElementById('act-desc').value = '';
+            loadActivities();
+        }
+
+        function deleteActivity(id) {
+            if(confirm("แน่ใจหรือไม่ที่จะลบบทเรียนนี้?")) {
+                let activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+                activities = activities.filter(act => act.id !== id);
+                localStorage.setItem('global_activities', JSON.stringify(activities));
+                loadActivities();
+            }
         }
 
         function logout() {
-            if(confirm('⚠️ ต้องการออกจากระบบครูผู้สอนใช่หรือไม่?')) {
-                localStorage.removeItem('is_logged_in');
-                localStorage.removeItem('student_name');
-                localStorage.removeItem('student_email');
-                localStorage.removeItem('student_pic');
-                window.location.href = 'index.html';
-            }
+            localStorage.removeItem('is_logged_in');
+            window.location.href = 'index.html';
         }
 
-        // ==================== INITIALIZE ====================
-        window.onload = function() {
-            if(checkTeacherAccess()) {
+        window.onload = () => {
+            if (checkTeacherAccess()) {
                 const savedTheme = localStorage.getItem('smart_theme') || "default";
-                applyTheme(savedTheme);
-                loadStudentData();
+                document.body.setAttribute("data-theme", savedTheme);
+                loadActivities();
             }
         };
     </script>
