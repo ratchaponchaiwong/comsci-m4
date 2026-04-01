@@ -519,11 +519,11 @@
                 <span>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</span>
             </div>
             <ul class="nav-links">
-                <li><a href="#" style="color: #60a5fa;">หน้าหลัก</a></li>
-                <li><a href="#">ข้อมูลผู้สอน</a></li>
-                <li><a href="#">ผลงานนักเรียน</a></li>
-                <li><a href="#">วิชาเพิ่มเติม</a></li>
-                <li><a href="#">ติดต่อ</a></li>
+            <li><a href="index.html" style="color: #60a5fa;">หน้าหลัก</a></li>
+            <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
+            <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
+            <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
+            <li><a href="contact.html">ติดต่อ</a></li>
             </ul>
         </header>
 
@@ -835,34 +835,34 @@
             }).join('')));
         }
         
-        function handleCredentialResponse(response) {
-            const userData = decodeJwtResponse(response.credential);
-            const userEmail = userData.email;
-            const errorBox = document.getElementById('login-error');
-            
-            if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
-                errorBox.style.display = 'none';
-                
-                localStorage.setItem('student_name', userData.name);
-                localStorage.setItem('student_email', userData.email);
-                localStorage.setItem('student_pic', userData.picture);
-                localStorage.setItem('is_logged_in', 'true');
-                
-                if(userEmail === 'teacher@prot.ac.th') {
-                    alert('🎓 ยินดีต้อนรับคุณครู ' + userData.name);
-                    window.location.href = 'teacher_dashboard.html';
-                } else {
-                    alert('🤖 ยินดีต้อนรับ ' + userData.name + ' สู่ห้องเรียนวิทยาการคำนวณ By ครูรัชพล!');
-                    window.location.href = 'student.html';
-                }
-            } else {
-                errorBox.style.display = 'block';
-                localStorage.removeItem('is_logged_in');
-                setTimeout(() => {
-                    errorBox.style.display = 'none';
-                }, 3000);
-            }
+        // ค้นหาฟังก์ชัน handleCredentialResponse (บรรทัดที่ประมาณ 418) และแทนที่ด้วยส่วนนี้
+function handleCredentialResponse(response) {
+    const userData = decodeJwtResponse(response.credential);
+    const userEmail = userData.email;
+    const errorBox = document.getElementById('login-error');
+    
+    if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+        errorBox.style.display = 'none';
+        
+        localStorage.setItem('student_name', userData.name);
+        localStorage.setItem('student_email', userData.email);
+        localStorage.setItem('student_pic', userData.picture);
+        localStorage.setItem('is_logged_in', 'true');
+        
+        // --- ส่วนตรวจสอบสิทธิ์ Admin (ครู) ---
+        // คุณครูสามารถเพิ่มอีเมล Gmail ส่วนตัวของคุณครูไว้ในเงื่อนไขนี้ได้ครับ
+        if(userEmail === 'teacher@prot.ac.th' || userEmail === 'ratchapon@gmail.com') { 
+            alert('🎓 ยินดีต้อนรับคุณครู ' + userData.name + ' เข้าสู่ระบบจัดการหลังบ้าน');
+            window.location.href = 'teacher_dashboard.html';
+        } else {
+            alert('🤖 ยินดีต้อนรับ ' + userData.name + ' สู่ห้องเรียนวิทยาการคำนวณ By ครูรัชพล!');
+            window.location.href = 'student.html';
         }
+    } else {
+        errorBox.style.display = 'block';
+        localStorage.removeItem('is_logged_in');
+    }
+}
         
         // Auto redirect if already logged in
         window.onload = function() {
