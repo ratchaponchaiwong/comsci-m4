@@ -12,14 +12,11 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ==================== 1. CSS โครงสร้างหลัก (คงเดิม 100%) ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; cursor: default; }
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
-        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); position: sticky; top: 0; z-index: 100; }
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 10px; }
@@ -30,13 +27,12 @@
         
         .page-content-wrapper { padding: 30px 20px; max-width: 1400px; margin: 0 auto; width: 100%; }
         
-        /* ==================== 2. Admin Tabs & Panels ==================== */
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; }
         .tab-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: inherit; padding: 12px 24px; border-radius: 15px; cursor: pointer; font-family: 'Prompt'; transition: 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
         .tab-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.3); }
 
         .glass-panel { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 24px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        body[data-theme="snow"] .glass-panel, body[data-theme="love"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+        body[data-theme="snow"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
         
         .panel-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 25px; border-bottom: 2px solid rgba(59,130,246,0.3); padding-bottom: 10px; display: flex; justify-content: space-between; align-items: center; color: #60a5fa; }
 
@@ -47,7 +43,6 @@
 
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         
-        /* Table Styles */
         .table-container { overflow-x: auto; margin-top: 15px; }
         table { width: 100%; border-collapse: collapse; min-width: 600px; }
         th, td { padding: 14px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); }
@@ -63,9 +58,15 @@
         .status-none { background: rgba(239, 68, 68, 0.2); color: #ef4444; }
         .status-done { background: rgba(16, 185, 129, 0.2); color: #10b981; }
 
-        /* Import Area */
         .import-box { border: 2px dashed #3b82f6; border-radius: 20px; padding: 40px; text-align: center; cursor: pointer; transition: 0.3s; }
         .import-box:hover { background: rgba(59,130,246,0.1); }
+
+        /* Modal ให้คะแนน */
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .modal.active { visibility: visible; opacity: 1; }
+        .modal-content { background: rgba(30, 41, 59, 0.98); border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; text-align: left; border: 1px solid rgba(59,130,246,0.5); position: relative; color: white; }
+        body[data-theme="snow"] .modal-content { background: rgba(255, 255, 255, 0.98); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
 
         @media (max-width: 1000px) { .admin-grid { grid-template-columns: 1fr; } }
     </style>
@@ -111,7 +112,6 @@
                                 <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option>
                                 <option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option>
                                 <option value="10">ห้อง 10</option><option value="11">ห้อง 11</option><option value="12">ห้อง 12</option>
-                                <option value="13">ห้อง 13</option><option value="14">ห้อง 14</option><option value="15">ห้อง 15</option>
                             </select>
                         </div>
                     </div>
@@ -150,13 +150,16 @@
                     <div class="form-group"><label>ระดับชั้น</label>
                         <select id="matrix-grade" onchange="renderMatrixTable()">
                             <option value="all">ทั้งหมด</option>
+                            <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
                             <option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option>
                         </select>
                     </div>
                     <div class="form-group"><label>ห้อง</label>
                         <select id="matrix-room" onchange="renderMatrixTable()">
                             <option value="all">ทั้งหมด</option>
-                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option>
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                            <option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option>
+                            <option value="9">9</option><option value="10">10</option>
                         </select>
                     </div>
                 </div>
@@ -175,8 +178,8 @@
             <div class="glass-panel">
                 <div class="panel-title"><i class="fas fa-file-excel"></i> นำเข้ารายชื่อนักเรียนจาก Excel</div>
                 <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px;">
-                    <div class="form-group"><label>ระดับชั้น</label><select id="imp-grade"><option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option></select></div>
-                    <div class="form-group"><label>ห้อง</label><select id="imp-room"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="59">9</option><option value="10">10</option><option value="11">11</option><option value="12">12</option><option value="13">13</option><option value="14">14</option><option value="15">15</option></select></div>
+                    <div class="form-group"><label>ระดับชั้น</label><select id="imp-grade"><option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option><option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option></select></div>
+                    <div class="form-group"><label>ห้อง</label><select id="imp-room"><option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option><option value="5">5</option><option value="6">6</option><option value="7">7</option><option value="8">8</option><option value="9">9</option><option value="10">10</option></select></div>
                 </div>
                 <div class="import-box" onclick="document.getElementById('excelInput').click()">
                     <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #3b82f6; margin-bottom: 10px;"></i>
@@ -194,12 +197,40 @@
         </div>
     </div>
 
+    <div id="gradeModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="document.getElementById('gradeModal').classList.remove('active')">×</button>
+            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 5px;">ชื่อนักเรียน</h3>
+            <p id="grade-act-title" style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px;">ชื่องาน</p>
+
+            <div style="background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px; margin-bottom: 20px;">
+                <h4 style="margin-bottom: 10px;">ผลงานที่นักเรียนส่ง:</h4>
+                <div id="grade-work-content" style="font-size: 0.95rem; color: #f59e0b; word-break: break-all;">
+                    ยังไม่ส่งงาน
+                </div>
+            </div>
+
+            <div class="form-group">
+                <label>ให้คะแนน (คะแนนเต็ม <span id="grade-max-points">10</span>)</label>
+                <input type="number" id="grade-input-score" placeholder="กรอกคะแนนที่ได้">
+            </div>
+
+            <button class="btn-action" style="width: 100%; justify-content: center; background: #10b981;" onclick="saveScoreToSheet()">
+                <i class="fas fa-save"></i> บันทึกคะแนน
+            </button>
+            <div id="grading-status" style="margin-top: 15px; font-size: 0.85rem; color: #10b981; display: none; text-align: center;"><i class="fas fa-spinner fa-spin"></i> กำลังบันทึกและส่งข้อมูล...</div>
+        </div>
+    </div>
+
     <script>
+        // ⚠️ อย่าลืมอัปเดตลิงก์ Apps Script ของคุณ ⚠️
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
+        
         let studentsList = []; 
         let tempImportList = [];
+        let currentGradeEmail = '';
+        let currentGradeActId = '';
 
-        // --- ระบบสลับ Tab ---
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -208,28 +239,20 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
-        // --- 1. ระบบซิงค์ข้อมูลบทเรียนจาก Server ตอนเปิดหน้าเว็บ (แก้ปัญหาหน้าครูไม่แสดงงาน) ---
         async function fetchActivitiesFromServer() {
-            const container = document.getElementById('activities-list-container');
-            container.innerHTML = '<p style="text-align:center; opacity:0.7;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูลจาก Google Sheets...</p>';
-            
             if(GOOGLE_SCRIPT_URL) {
                 try {
                     const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
                     const textData = await response.text();
                     const parsedData = JSON.parse(textData);
-                    
                     if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(parsedData.data));
                     }
-                } catch(e) {
-                    console.log("ใช้งานข้อมูลในเครื่อง", e);
-                }
+                } catch(e) { console.log("ใช้งานข้อมูลในเครื่อง"); }
             }
             loadActivities();
         }
 
-        // --- ระบบจัดการกิจกรรม ---
         function toggleRoomSelect(gid, rid) {
             const grade = document.getElementById(gid).value;
             document.getElementById(rid).style.display = (grade === 'all') ? 'none' : 'block';
@@ -256,7 +279,7 @@
         function saveActivity() {
             const title = document.getElementById('act-title').value;
             const date = document.getElementById('act-date').value;
-            if(!title || !date) return alert("⚠️ กรุณากรอกชื่อบทเรียนและกำหนดส่งให้ครบ");
+            if(!title || !date) return alert("กรุณากรอกชื่อและกำหนดส่ง");
 
             const grade = document.getElementById('act-grade').value;
             const roomNum = document.getElementById('act-room-num').value;
@@ -276,11 +299,10 @@
 
             localStorage.setItem('global_activities', JSON.stringify(acts));
             syncActivities();
-            alert("✅ บันทึกกิจกรรมสำเร็จ!");
+            alert("บันทึกสำเร็จ!");
             resetForm(); loadActivities();
         }
 
-        // --- 2. ฟังก์ชันแก้ไข ลบ และล้างฟอร์ม (ที่ขาดไป) ---
         function editAct(id) {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const act = acts.find(a => a.id == id);
@@ -313,7 +335,7 @@
         }
 
         function deleteAct(id) {
-            if(confirm("⚠️ คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?")) {
+            if(confirm("คุณต้องการลบกิจกรรมนี้ใช่หรือไม่?")) {
                 let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
                 acts = acts.filter(a => a.id !== id);
                 localStorage.setItem('global_activities', JSON.stringify(acts));
@@ -333,7 +355,6 @@
             document.getElementById('act-points').value = '15';
             document.getElementById('act-grade').value = 'all';
             document.getElementById('act-room-num').style.display = 'none';
-            
             document.getElementById('btn-save-main').innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
             document.getElementById('btn-cancel-edit').style.display = 'none';
         }
@@ -343,11 +364,12 @@
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveActivities", activities: JSON.parse(acts) }) });
         }
 
-        // --- ระบบ Matrix Check ---
+        // ==================== ระบบ Matrix ตรวจงานจริง ====================
         async function loadMatrixData() {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
             document.getElementById('matrix-act').innerHTML = acts.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
             
+            document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="6" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</td></tr>';
             const res = await fetch(GOOGLE_SCRIPT_URL);
             studentsList = await res.json();
             renderMatrixTable();
@@ -359,25 +381,98 @@
             const fGrade = document.getElementById('matrix-grade').value;
             const fRoom = document.getElementById('matrix-room').value;
 
-            tbody.innerHTML = studentsList.filter(s => {
+            if(!studentsList || studentsList.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">ยังไม่มีข้อมูลนักเรียน</td></tr>';
+                return;
+            }
+
+            let filteredHTML = '';
+            let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            let actData = acts.find(a => a.id == actId);
+            let maxPoints = actData ? actData.points : 0;
+
+            studentsList.filter(s => {
                 if(fGrade !== 'all' && !s.room.includes(fGrade)) return false;
                 if(fRoom !== 'all' && !s.room.endsWith("/" + fRoom)) return false;
                 return true;
-            }).sort((a,b) => a.number - b.number).map(s => {
-                const status = localStorage.getItem(`${s.email}_act_${actId}_status`);
-                const score = localStorage.getItem(`${s.email}_act_${actId}_score`) || '0';
-                return `<tr>
+            }).sort((a,b) => a.number - b.number).forEach(s => {
+                const hasWork = s.works && s.works[actId] ? true : false;
+                const score = (s.scores && s.scores[actId] !== undefined) ? s.scores[actId] : '-';
+                
+                filteredHTML += `<tr>
                     <td>${s.number}</td>
                     <td>${s.name}</td>
                     <td>${s.room}</td>
-                    <td><span class="status-badge ${status ? 'status-done' : 'status-none'}">${status ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
-                    <td>${score}</td>
-                    <td><button onclick="alert('ระบบตรวจคะแนนกำลังเชื่อมต่อ...')" class="btn-action" style="padding:5px 10px; font-size:0.7rem;">ตรวจงาน</button></td>
+                    <td><span class="status-badge ${hasWork ? 'status-done' : 'status-none'}">${hasWork ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
+                    <td>${score} / ${maxPoints}</td>
+                    <td>
+                        <button onclick="openGradeModal('${s.email}', '${actId}', '${s.name}', '${maxPoints}')" class="btn-action" style="padding:5px 10px; font-size:0.7rem;">
+                            <i class="fas fa-search"></i> ตรวจ
+                        </button>
+                    </td>
                 </tr>`;
-            }).join('');
+            });
+            tbody.innerHTML = filteredHTML || '<tr><td colspan="6" style="text-align:center;">ไม่พบนักเรียนในห้องที่เลือก</td></tr>';
         }
 
-        // --- ระบบ Excel Import ---
+        function openGradeModal(email, actId, studentName, maxPoints) {
+            currentGradeEmail = email;
+            currentGradeActId = actId;
+            
+            const student = studentsList.find(s => s.email === email);
+            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const act = acts.find(a => a.id == actId);
+
+            document.getElementById('grade-student-name').innerText = studentName;
+            document.getElementById('grade-act-title').innerText = act ? act.title : 'ไม่พบชื่องาน';
+            document.getElementById('grade-max-points').innerText = maxPoints;
+
+            const workContent = document.getElementById('grade-work-content');
+            if(student.works && student.works[actId]) {
+                const workStr = student.works[actId];
+                if(workStr.startsWith('http')) {
+                    workContent.innerHTML = `<a href="${workStr}" target="_blank" style="color:#60a5fa; text-decoration:underline;"><i class="fas fa-external-link-alt"></i> เปิดดูผลงานลิงก์ที่ส่งมา</a>`;
+                } else {
+                    workContent.innerHTML = `<pre style="background:#0f172a; padding:10px; border-radius:8px; overflow-x:auto; border:1px solid #334155;">${workStr}</pre>`;
+                }
+            } else {
+                workContent.innerHTML = 'นักเรียนยังไม่ได้ส่งงานระบบนี้';
+            }
+
+            document.getElementById('grade-input-score').value = (student.scores && student.scores[actId]) ? student.scores[actId] : '';
+            document.getElementById('gradeModal').classList.add('active');
+        }
+
+        async function saveScoreToSheet() {
+            const score = document.getElementById('grade-input-score').value;
+            if(score === '') return alert('กรุณากรอกคะแนน');
+
+            document.getElementById('grading-status').style.display = 'block';
+
+            // บันทึกเข้า Memory เครื่องชั่วคราวเพื่อให้ตารางอัปเดตเลย
+            const student = studentsList.find(s => s.email === currentGradeEmail);
+            if(!student.scores) student.scores = {};
+            student.scores[currentGradeActId] = score;
+
+            let scoresObj = {};
+            scoresObj[currentGradeActId] = score;
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({ email: currentGradeEmail, scores: scoresObj })
+                });
+                alert('✅ บันทึกคะแนนเรียบร้อย!');
+                document.getElementById('grading-status').style.display = 'none';
+                document.getElementById('gradeModal').classList.remove('active');
+                renderMatrixTable(); // รีเฟรชตาราง
+            } catch(e) {
+                alert('⚠️ เกิดข้อผิดพลาดในการบันทึก');
+                document.getElementById('grading-status').style.display = 'none';
+            }
+        }
+
+        // ==================== ระบบ Excel Import ====================
         function processExcel(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
@@ -414,7 +509,7 @@
             }
             document.getElementById('bodyContent').style.display = 'block';
             document.getElementById('teacherAvatar').src = localStorage.getItem('student_pic');
-            // ตรงนี้ตั้งค่าชื่อให้เป็น TECHNOLOGY COMPUTER ตามที่คุณครูตั้งไว้
+            // นำชื่อบัญชีครูมาจากประวัติที่คุณครูตั้งไว้
             document.getElementById('teacherName').innerText = 'TECHNOLOGY COMPUTER';
             return true;
         }
@@ -425,7 +520,6 @@
             if(checkTeacherAccess()) {
                 const savedTheme = localStorage.getItem('smart_theme') || "default";
                 document.body.setAttribute("data-theme", savedTheme);
-                // ดึงข้อมูลใหม่จาก Server ทุกครั้งที่โหลดหน้าเว็บ
                 fetchActivitiesFromServer(); 
             }
         };
