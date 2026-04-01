@@ -386,20 +386,20 @@
                 return;
             }
 
-            let filteredHTML = '';
             let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
             let actData = acts.find(a => a.id == actId);
             let maxPoints = actData ? actData.points : 0;
 
-            studentsList.filter(s => {
+            tbody.innerHTML = studentsList.filter(s => {
                 if(fGrade !== 'all' && !s.room.includes(fGrade)) return false;
                 if(fRoom !== 'all' && !s.room.endsWith("/" + fRoom)) return false;
                 return true;
-            }).sort((a,b) => a.number - b.number).forEach(s => {
-                const hasWork = s.works && s.works[actId] ? true : false;
+            }).sort((a,b) => a.number - b.number).map(s => {
+                // เปลี่ยนมาอ่านสถานะงานจากข้อมูล Google Sheets (s.works) แทน LocalStorage
+                const hasWork = (s.works && s.works[actId]) ? true : false;
                 const score = (s.scores && s.scores[actId] !== undefined) ? s.scores[actId] : '-';
                 
-                filteredHTML += `<tr>
+                return `<tr>
                     <td>${s.number}</td>
                     <td>${s.name}</td>
                     <td>${s.room}</td>
@@ -411,8 +411,7 @@
                         </button>
                     </td>
                 </tr>`;
-            });
-            tbody.innerHTML = filteredHTML || '<tr><td colspan="6" style="text-align:center;">ไม่พบนักเรียนในห้องที่เลือก</td></tr>';
+            }).join('');
         }
 
         function openGradeModal(email, actId, studentName, maxPoints) {
@@ -428,6 +427,7 @@
             document.getElementById('grade-max-points').innerText = maxPoints;
 
             const workContent = document.getElementById('grade-work-content');
+            // ดึงผลงานจาก Google Sheets มาแสดง
             if(student.works && student.works[actId]) {
                 const workStr = student.works[actId];
                 if(workStr.startsWith('http')) {
