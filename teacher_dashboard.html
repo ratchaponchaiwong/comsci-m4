@@ -300,12 +300,12 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
-        // ==================== FETCH ACTIVITIES (แก้ปัญหางานหาย) ====================
+        // ==================== FETCH ACTIVITIES ====================
         async function fetchActivitiesFromServer() {
-            // โหลดข้อมูลจากในเครื่อง (Offline) มาแสดงทันทีก่อน ไม่ให้หน้าจอว่างเปล่า
+            // โหลดข้อมูลในเครื่องให้เห็นทันที
             loadActivities();
             
-            // แอบไปดึงอัปเดตจาก Google Sheets ถ้าเน็ตดี
+            // ดึงอัปเดตจาก Google Sheets
             if(GOOGLE_SCRIPT_URL) {
                 try {
                     const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities");
@@ -313,7 +313,6 @@
                     const parsedData = JSON.parse(text);
                     if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(parsedData.data));
-                        // อัปเดตข้อมูลใหม่หลังจากดึงเสร็จ
                         loadActivities(); 
                     }
                 } catch(e) { console.log("โหลดจาก Server ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทน"); }
@@ -582,10 +581,9 @@
             }
             document.getElementById('bodyContent').style.display = 'block';
             
-            // แก้ไขปัญหารูปโปรไฟล์พัง
             let pic = localStorage.getItem('student_pic');
             if (!pic || pic === 'undefined' || pic === 'null') {
-                pic = 'https://ui-avatars.com/api/?name=Teacher&background=3b82f6&color=fff'; // รูปสำรอง
+                pic = 'https://ui-avatars.com/api/?name=Teacher&background=3b82f6&color=fff';
             }
             document.getElementById('teacherAvatar').src = pic;
             document.getElementById('teacherName').innerText = 'TECHNOLOGY COMPUTER';
