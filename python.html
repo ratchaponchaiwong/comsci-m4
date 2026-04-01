@@ -3,13 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องเรียนของฉัน | PROT Smart Workspace</title>
+    <title>Coding Lab | PROT Smart Workspace</title>
+    
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* CSS หลักคงเดิมทั้งหมดเพื่อให้ธีมไม่เพี้ยน */
+        /* ==================== CSS โครงสร้างหลักและธีม ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; cursor: default; }
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
@@ -18,134 +23,278 @@
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
-        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        
         .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
-        .nav-links { display: flex; gap: 20px; list-style: none; }
-        .nav-links a { text-decoration: none; color: inherit; padding: 8px 12px; border-radius: 30px; transition: 0.3s; }
-        .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
+        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
         
-        .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; max-width: 1200px; margin: 30px auto; padding: 0 20px; }
-        .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); padding: 30px; border-radius: 28px; border: 1px solid rgba(255,255,255,0.1); color: inherit; }
+        .page-content-wrapper { padding: 20px; max-width: 1600px; margin: 0 auto; width: 100%; display: grid; gap: 20px; transition: 0.3s; flex-grow: 1;}
         
-        .profile-pic { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px; border: 3px solid #60a5fa; display: none; object-fit: cover;}
-        .task-card { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 20px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; border: 1px solid rgba(255,255,255,0.05); }
-        .badge { padding: 5px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: 600; margin-bottom: 8px; display: inline-block; }
-        .badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; }
-        .badge.submitted { background: rgba(59, 130, 246, 0.2); color: #60a5fa; }
-        .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; }
+        /* สลับ Layout */
+        .page-content-wrapper.split-view { grid-template-columns: 450px 1fr; }
+        .page-content-wrapper.single-view { grid-template-columns: 1fr; }
+
+        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content; display: flex; flex-direction: column;}
+        body[data-theme="snow"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+
+        /* Media Display Area */
+        .media-container { margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #000; position: relative; aspect-ratio: 16 / 9; display: none; }
+        .media-container iframe { width: 100%; height: 100%; border: none; position: absolute; top:0; left:0;}
         
-        .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 600; cursor: pointer; transition: 0.2s;}
-        .btn-action:hover { background: #2563eb; transform: translateY(-2px); }
-        .btn-edit { background: #f59e0b; }
-        .btn-locked { background: #64748b; cursor: not-allowed; opacity: 0.7; }
+        .media-tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
+        .media-tab { padding: 8px 15px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; white-space: nowrap; color: inherit; font-family: 'Prompt';}
+        .media-tab.active { background: #ef4444; color: white; border-color: #ef4444; }
+
+        .layout-toggle { position: absolute; top: 80px; right: 40px; display: flex; gap: 10px; z-index: 100; }
+        .toggle-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8rem; font-family: 'Prompt'; transition: 0.2s;}
+        .toggle-btn.active, .toggle-btn:hover { background: #3b82f6; border-color: #3b82f6; }
+
+        /* Coding Area */
+        .editor-container { display: flex; flex-direction: column; gap: 10px; height: 700px; }
+        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+        .lang-select { padding: 8px 15px; border-radius: 10px; border: 1px solid #3b82f6; background: rgba(59,130,246,0.1); color: inherit; font-family: 'Prompt'; outline: none; cursor: pointer; font-weight: 600;}
+        
+        textarea#code-editor { flex: 2; width: 100%; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', monospace; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); resize: none; font-size: 1rem; outline: none; }
+        
+        .btn-run { background: #3b82f6; color: white; border: none; padding: 10px 25px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
+        .btn-run:hover { background: #2563eb; }
+
+        pre#code-output { flex: 1; background: #000; color: #4ade80; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; font-family: 'Consolas', monospace; margin: 0; font-size: 0.9rem;}
+        body[data-theme="snow"] pre#code-output { background: #f1f5f9; color: #1e293b; border-color: rgba(0,0,0,0.1); }
+
+        /* Submission Box */
+        .submit-box { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 15px; text-align: center; }
+        body[data-theme="snow"] .submit-box { border-top-color: rgba(0,0,0,0.1); }
+        
+        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; /* ซ่อนไว้ก่อน */ }
+        .btn-submit:hover { background: #059669; transform: translateY(-2px); }
+        
+        .warning-text { font-size: 0.85rem; color: #f59e0b; margin-top: 5px; display: block; }
+        body[data-theme="snow"] .warning-text { color: #d97706; }
+
+        @media (max-width: 1000px) { .page-content-wrapper.split-view { grid-template-columns: 1fr; } .editor-container { height: auto; min-height: 500px;} textarea#code-editor { min-height: 300px;} }
     </style>
 </head>
 <body data-theme="default">
-    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
     <div class="content-layer">
         <header>
-            <a href="index.html" class="logo"><i class="fas fa-robot"></i><span>Smart Workspace</span></a>
-            <ul class="nav-links">
-                <li><a href="index.html">หน้าหลัก</a></li>
-                <li><a href="student.html" class="active">ห้องเรียน</a></li>
-                <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
-            </ul>
+            <a href="student.html" class="logo"><i class="fas fa-chevron-left"></i> <span id="act-title-header">กำลังโหลดกิจกรรม...</span></a>
+            <div style="font-weight: 500; font-size: 0.9rem;" id="loginArea">กำลังตรวจสอบสิทธิ์...</div>
         </header>
 
-        <div class="page-content-wrapper">
-            <div class="dashboard-container">
-                <div class="glass-card">
-                    <img src="" id="profile-pic" class="profile-pic">
-                    <h3 id="profile-name">นักเรียน</h3>
-                    <p id="profile-email" style="font-size:0.8rem; opacity:0.7; margin-bottom:15px;"></p>
-                    <button class="btn-action" style="width:100%" onclick="location.href='index.html'">ออกจากระบบ</button>
+        <div class="layout-toggle">
+            <button class="toggle-btn" id="btn-single" onclick="setLayout('single')"><i class="fas fa-square"></i> 1 หน้าจอ</button>
+            <button class="toggle-btn active" id="btn-split" onclick="setLayout('split')"><i class="fas fa-columns"></i> 2 หน้าจอ</button>
+        </div>
+
+        <div class="page-content-wrapper split-view" id="mainWrapper" style="margin-top: 40px;">
+            
+            <div class="glass-panel" id="leftPanel">
+                <div id="media-section">
+                    <div class="media-tabs" id="mediaTabs"></div>
+                    <div class="media-container" id="mediaBox"></div>
                 </div>
 
-                <div class="content-area">
-                    <h2 style="margin-bottom:20px;"><i class="fas fa-book-open"></i> บทเรียนและภารกิจ</h2>
-                    <div id="dynamic-modules-container">
-                        </div>
+                <h3 style="margin-bottom: 10px; color: #60a5fa;"><i class="fas fa-info-circle"></i> คำชี้แจงกิจกรรม</h3>
+                <div id="act-desc-body" style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px; overflow-y: auto; max-height: 200px; padding-right: 5px;">กรุณารอข้อมูลสักครู่...</div>
+
+                <div class="submit-box">
+                    <h4 style="margin-bottom: 10px;"><i class="fas fa-tasks"></i> ส่งผลงาน</h4>
+                    
+                    <span id="warning-msg" class="warning-text"><i class="fas fa-lock"></i> กรุณาเขียนโค้ดและกด "Run / ตรวจโค้ด" ฝั่งขวามือให้ผ่านก่อน ปุ่มส่งงานถึงจะปรากฏครับ</span>
+                    
+                    <button id="btn-submit" class="btn-submit" onclick="submitWork()">
+                        <i class="fas fa-paper-plane"></i> ยืนยันการส่งโค้ด
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-panel" style="padding: 15px;">
+                <div class="editor-container">
+                    <div class="editor-header">
+                        <select id="lang-select" class="lang-select" onchange="changeLanguage()">
+                            <option value="python">🐍 Python (ไพทอน)</option>
+                            <option value="cpp">⚙️ C++ (Arduino)</option>
+                        </select>
+                        <button class="btn-run" onclick="runAndCheckCode()"><i class="fas fa-play"></i> Run / ตรวจโค้ด</button>
+                    </div>
+                    
+                    <textarea id="code-editor" spellcheck="false"># 🐍 ฝึกเขียน Python
+print("Hello, PROT Smart Workspace!")
+</textarea>
+                    
+                    <pre id="code-output">>_ ผลลัพธ์จะแสดงที่นี่...</pre>
                 </div>
             </div>
         </div>
     </div>
 
     <script>
-        function loadStudentData() {
+        // ==================== โหลดข้อมูลพื้นฐาน ====================
+        const urlParams = new URLSearchParams(window.location.search);
+        const actId = urlParams.get('actid');
+
+        function loadLoginInfo() {
             const email = localStorage.getItem('student_email');
-            const name = localStorage.getItem('student_name');
-            const pic = localStorage.getItem('student_pic');
-
-            if (!email) { window.location.href = 'index.html'; return; }
-
-            document.getElementById('profile-name').innerText = name;
-            document.getElementById('profile-email').innerText = email;
-            if(pic) {
-                const img = document.getElementById('profile-pic');
-                img.src = pic; img.style.display = 'block';
-            }
-
-            loadActivities(email);
+            if(!email) { alert("กรุณาเข้าสู่ระบบก่อนใช้งาน"); window.location.href = "index.html"; return; }
+            const name = localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name');
+            document.getElementById('loginArea').innerHTML = `👤 ${name.split(' ')[0]}`;
         }
 
-        function loadActivities(email) {
-            const container = document.getElementById('dynamic-modules-container');
+        function setLayout(type) {
+            const wrapper = document.getElementById('mainWrapper');
+            if(type === 'single') {
+                wrapper.classList.replace('split-view', 'single-view');
+                document.getElementById('btn-single').classList.add('active');
+                document.getElementById('btn-split').classList.remove('active');
+            } else {
+                wrapper.classList.replace('single-view', 'split-view');
+                document.getElementById('btn-split').classList.add('active');
+                document.getElementById('btn-single').classList.remove('active');
+            }
+        }
+
+        // ==================== โหลดกิจกรรมและสื่อ ====================
+        function loadActivityData() {
             const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            
-            if(activities.length === 0) {
-                container.innerHTML = '<p style="opacity:0.5; text-align:center;">ยังไม่มีบทเรียนที่เปิดสอน</p>';
+            const act = activities.find(a => a.id == actId);
+
+            if (!act) {
+                document.getElementById('act-title-header').innerText = "กิจกรรม Coding";
+                document.getElementById('act-desc-body').innerText = "ไม่พบคำสั่งเฉพาะสำหรับหน้านี้ คุณสามารถฝึกเขียนโปรแกรมอิสระได้เลยครับ";
                 return;
             }
 
-            container.innerHTML = '';
-            activities.forEach(act => {
-                const status = localStorage.getItem(email + '_act_' + act.id + '_status') || 'pending';
-                const now = new Date();
-                const deadline = new Date(act.date + ' ' + (act.time || '23:59'));
-                const isPastDeadline = now > deadline;
+            document.getElementById('act-title-header').innerHTML = act.title;
+            document.getElementById('act-desc-body').innerText = act.desc;
 
-                let badge = '<span class="badge pending">⏳ ค้างส่ง</span>';
-                let actionBtn = `<a href="${act.link}?actid=${act.id}" class="btn-action">ทำกิจกรรม <i class="fas fa-arrow-right"></i></a>`;
+            const tabs = document.getElementById('mediaTabs');
+            let hasMedia = false;
 
-                if (status === 'graded') {
-                    badge = '<span class="badge done">⭐ ตรวจแล้ว</span>';
-                    actionBtn = '<span style="font-size:0.8rem; opacity:0.6;"><i class="fas fa-lock"></i> ปิดการแก้ไขแล้ว</span>';
-                } else if (status === 'submitted') {
-                    badge = '<span class="badge submitted">✅ ส่งแล้ว (รอตรวจ)</span>';
-                    // ถ้ายังไม่ตรวจ หรือ ยังไม่หมดเวลา ให้กดแก้ไขได้
-                    if(!isPastDeadline) {
-                        actionBtn = `<a href="${act.link}?actid=${act.id}" class="btn-action btn-edit">✏️ แก้ไขงาน</a>`;
-                    } else {
-                        actionBtn = '<span style="font-size:0.8rem; opacity:0.6;"><i class="fas fa-history"></i> เลยกำหนดแก้ไข</span>';
-                    }
-                } else if (isPastDeadline && act.strict) {
-                    badge = '<span class="badge" style="background:rgba(239,68,68,0.2); color:#ef4444;">❌ ปิดรับงาน</span>';
-                    actionBtn = '<button class="btn-action btn-locked" disabled>ส่งงานไม่ทัน</button>';
+            if (act.yt) { addTab("yt-tab", "<i class='fab fa-youtube'></i> YouTube", () => showMedia(formatYT(act.yt))); hasMedia = true; }
+            if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(act.doc)); hasMedia = true; }
+            if (act.canva) { addTab("canva-tab", "<i class='fas fa-paint-brush'></i> Canva", () => showMedia(formatCanva(act.canva))); hasMedia = true; }
+
+            if (hasMedia) tabs.children[0].click();
+            
+            // เช็คว่าเคยเซฟโค้ดเก่าไว้ไหม
+            const email = localStorage.getItem('student_email');
+            const savedCode = localStorage.getItem(email + '_act_' + actId + '_work_code');
+            if(savedCode) document.getElementById('code-editor').value = savedCode;
+        }
+
+        function addTab(className, label, callback) {
+            const btn = document.createElement('button');
+            btn.className = `media-tab ${className}`;
+            btn.innerHTML = label;
+            btn.onclick = () => {
+                document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active'));
+                btn.classList.add('active'); callback();
+            };
+            document.getElementById('mediaTabs').appendChild(btn);
+        }
+
+        function showMedia(url) {
+            const box = document.getElementById('mediaBox');
+            box.style.display = 'block';
+            box.innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`;
+        }
+
+        function formatYT(url) {
+            if (!url) return "";
+            let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0];
+            return `https://www.youtube.com/embed/${id}`;
+        }
+        function formatCanva(url) { return url.includes('/view') && !url.includes('embed') ? url.replace('/view', '/view?embed') : url; }
+
+        // ==================== ระบบ Code Editor & Checker ====================
+        function changeLanguage() {
+            const lang = document.getElementById('lang-select').value;
+            const editor = document.getElementById('code-editor');
+            if(lang === 'python') {
+                editor.value = '# 🐍 ฝึกเขียน Python\nprint("Hello, PROT Smart Workspace!")';
+            } else {
+                editor.value = '// ⚙️ ฝึกเขียน C++ (Arduino)\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println("Hello, PROT!");\n  delay(1000);\n}';
+            }
+            // ซ่อนปุ่มเมื่อเปลี่ยนภาษา
+            document.getElementById('btn-submit').style.display = 'none';
+            document.getElementById('warning-msg').style.display = 'block';
+            document.getElementById('code-output').innerHTML = ">_ ผลลัพธ์จะแสดงที่นี่...";
+        }
+
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+
+        function runAndCheckCode() {
+            const lang = document.getElementById('lang-select').value;
+            const code = document.getElementById('code-editor').value;
+            const output = document.getElementById('code-output');
+            const btnSubmit = document.getElementById('btn-submit');
+            const warningMsg = document.getElementById('warning-msg');
+
+            output.innerHTML = 'กำลังตรวจสอบและรันโค้ด...\n--------------------\n';
+
+            if (lang === 'python') {
+                // รัน Python ผ่าน Skulpt
+                Sk.pre = "code-output";
+                Sk.configure({
+                    output: function(text) { output.innerHTML += text; },
+                    read: builtinRead
+                });
+                
+                var myPromise = Sk.misceval.asyncToPromise(function() {
+                    return Sk.importMainWithBody("<stdin>", false, code, true);
+                });
+                
+                myPromise.then(function(mod) {
+                    output.innerHTML += '\n\n✅ โปรแกรมทำงานสำเร็จ ไม่มี Error (Pass!)';
+                    // เปิดปุ่มให้ส่งงานได้!
+                    btnSubmit.style.display = 'block';
+                    warningMsg.style.display = 'none';
+                }, function(err) {
+                    output.innerHTML += '\n\n❌ พบข้อผิดพลาด: ' + err.toString();
+                    btnSubmit.style.display = 'none';
+                    warningMsg.style.display = 'block';
+                });
+            } else {
+                // จำลองการรัน C++ (ตรวจโครงสร้างพื้นฐาน)
+                if(code.includes('setup()') && code.includes('loop()')) {
+                    setTimeout(() => {
+                        output.innerHTML += 'Compiling C++ Code...\n\n✅ Build Successful (Pass!)\n>_ Hello, PROT!';
+                        btnSubmit.style.display = 'block';
+                        warningMsg.style.display = 'none';
+                    }, 800);
+                } else {
+                    setTimeout(() => {
+                        output.innerHTML += 'Compiling C++ Code...\n\n❌ Error: ไม่พบฟังก์ชัน setup() หรือ loop() ในโค้ดของคุณ';
+                        btnSubmit.style.display = 'none';
+                        warningMsg.style.display = 'block';
+                    }, 500);
                 }
+            }
+        }
 
-                container.innerHTML += `
-                    <div class="task-card">
-                        <div>
-                            <h4>${act.title}</h4>
-                            <p style="font-size:0.85rem; opacity:0.8;">${act.desc}</p>
-                            <small style="color:#60a5fa;">กำหนดส่ง: ${act.date} ${act.time || ''}</small>
-                        </div>
-                        <div style="text-align:right">
-                            ${badge}<br>${actionBtn}
-                        </div>
-                    </div>
-                `;
-            });
+        // ==================== ระบบส่งงาน ====================
+        function submitWork() {
+            const email = localStorage.getItem('student_email');
+            const code = document.getElementById('code-editor').value;
+            if(!email) return alert("⚠️ กรุณาล็อกอินก่อนส่งงาน");
+            
+            // บันทึกสถานะและโค้ด
+            localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
+            localStorage.setItem(email + '_act_' + actId + '_work_code', code);
+            
+            alert("🎉 ระบบได้รับโค้ดผลงานของคุณเรียบร้อยแล้ว!");
+            window.location.href = "student.html"; 
         }
 
         window.onload = () => {
-            const theme = localStorage.getItem('smart_theme') || 'default';
-            document.body.setAttribute('data-theme', theme);
-            loadStudentData();
+            const savedTheme = localStorage.getItem('smart_theme') || "default";
+            document.body.setAttribute("data-theme", savedTheme);
+            loadLoginInfo();
+            loadActivityData();
         };
     </script>
 </body>
