@@ -10,7 +10,8 @@
         .lab-container { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; }
         textarea { width: 100%; height: 200px; padding: 15px; border-radius: 10px; border: 1px solid #3b82f6; background: #1e293b; color: white; font-family: monospace; font-size: 1rem; margin-bottom: 20px;}
         .btn-submit { background: #10b981; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%;}
-        .btn-submit:hover { background: #059669; }
+        .btn-submit:hover:not(:disabled) { background: #059669; }
+        .btn-submit:disabled { background: #64748b; cursor: not-allowed; opacity: 0.8;}
     </style>
 </head>
 <body>
@@ -27,11 +28,50 @@
     </div>
 
     <script>
-        // 🌟 อัปเดตลิงก์เป็นเวอร์ชันใหม่ล่าสุดให้ตรงกับไฟล์อื่นๆ แล้วครับ 🌟
+        // 🌟 1. อัปเดตลิงก์ Web App เป็นตัวใหม่ล่าสุดแล้ว 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         // ==========================================
-        // ฟังก์ชันที่ 1: ดึงข้อความจากกล่อง แล้วสั่งส่งงาน
+        // ระบบยามเฝ้าเวลา: เช็กว่าครูปิดรับงานหรือหมดเวลาหรือยัง
+        // ==========================================
+        function checkDeadlineAndKickOut() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const actId = urlParams.get('actid');
+            if (!actId) return;
+
+            const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const currentAct = activities.find(a => String(a.id) === String(actId));
+
+            if (currentAct) {
+                if (currentAct.status === 'closed') {
+                    alert("⚠️ คุณครูได้ปิดระบบการส่งงาน/กิจกรรมนี้แล้ว!\nระบบจะพากลับไปยังหน้าหลักครับ");
+                    window.location.href = "student.html";
+                    return;
+                }
+
+                if (currentAct.date && currentAct.type !== 'content') {
+                    try {
+                        let timeStr = currentAct.time ? currentAct.time : '23:59';
+                        if (timeStr.split(':').length === 2) { timeStr += ':00'; }
+                        
+                        const deadlineTime = new Date(`${currentAct.date}T${timeStr}`).getTime();
+                        const nowTime = new Date().getTime();
+
+                        if (nowTime > deadlineTime) {
+                            alert("⏳ หมดเวลาทำงานแล้วครับ!\nระบบกำลังพาคุณกลับไปยังหน้าหลัก");
+                            window.location.href = "student.html"; 
+                        }
+                    } catch(e) {}
+                }
+            }
+        }
+        
+        // เช็กเวลาทันทีที่เปิดหน้าต่าง และตั้งเวลาเช็กทุกๆ 5 วินาที
+        checkDeadlineAndKickOut();
+        setInterval(checkDeadlineAndKickOut, 5000);
+
+        // ==========================================
+        // ฟังก์ชันดึงข้อความจากกล่อง
         // ==========================================
         function prepareToSubmit() {
             const answerText = document.getElementById('student-answer').value.trim();
@@ -40,17 +80,14 @@
                 alert("⚠️ กรุณาพิมพ์คำตอบก่อนกดส่งงานครับ!");
                 return;
             }
-
             submitWork(answerText);
         }
 
         // ==========================================
-        // ฟังก์ชันที่ 2: ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (Google Sheets)
+        // ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (Google Sheets)
         // ==========================================
         async function submitWork(workContent) {
             const email = localStorage.getItem('student_email');
-            
-            // อ่าน ID ของงานจาก URL (เช่น python.html?actid=1712345678)
             const urlParams = new URLSearchParams(window.location.search);
             const actId = urlParams.get('actid'); 
 
@@ -67,16 +104,15 @@
 
             // เปลี่ยนหน้าตาปุ่มเพื่อบอกนักเรียนว่ากำลังประมวลผล
             const submitBtn = document.getElementById('submitBtn');
-            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...';
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกส่งข้อมูล...';
             submitBtn.style.background = '#f59e0b';
             submitBtn.disabled = true;
 
-            // จัดโครงสร้างข้อมูลให้ตรงกับฐานข้อมูล
             let worksObj = {};
             worksObj[actId] = workContent; 
 
             try {
-                // ส่งข้อมูลไปที่ Google Sheets ด้วยลิงก์ใหม่
+                // ส่งข้อมูลด้วยลิงก์ใหม่
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -89,11 +125,11 @@
                     })
                 });
                 
-                // ให้เครื่องจำสถานะไว้ด้วยหน้าเว็บจะได้ขึ้น "รอตรวจ" ทันที
+                // จำสถานะไว้เบื้องต้น
                 localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
                 
                 alert('✅ ส่งงานสำเร็จเรียบร้อยแล้ว!');
-                window.location.href = 'student.html'; // เตะกลับหน้าหลักอัตโนมัติ
+                window.location.href = 'student.html'; 
                 
             } catch(e) {
                 alert('❌ เกิดข้อผิดพลาดในการส่งงาน กรุณาลองใหม่อีกครั้ง');
