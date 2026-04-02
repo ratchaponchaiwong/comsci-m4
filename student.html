@@ -402,11 +402,7 @@
                         localStorage.setItem(email + '_room', room !== '-' ? room : '');
                         localStorage.setItem(email + '_number', number !== '-' ? number : '');
 
-                        const allActs = JSON.parse(localStorage.getItem('global_activities') || '[]');
-                        allActs.forEach(a => {
-                            localStorage.removeItem(email + '_act_' + a.id + '_status');
-                            localStorage.removeItem(email + '_act_' + a.id + '_score');
-                        });
+                        // 💡 ลบคำสั่งลบความจำทิ้งไปแล้วตรงนี้ครับ จะได้ไม่เด้งกลับไปเป็นค้างส่ง!
 
                         if(myData.works) {
                             for(let actId in myData.works) {
