@@ -19,10 +19,6 @@
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); }
         
-        body[data-theme="snow"] .hero-content p { color: #2d3748; }
-        body[data-theme="snow"] .hero-content h1 { background: linear-gradient(135deg, #2c3e66, #1e3a8a); -webkit-background-clip: text; color: transparent; }
-        body[data-theme="forest"] .hero-content p { color: #d4ffd4; }
-        
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
@@ -59,26 +55,32 @@
         .robot-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120%; height: 120%; border-radius: 50%; animation: glowPulse 3s infinite; pointer-events: none; }
         @keyframes glowPulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
         
-        /* ไอคอนเสื้อผ้าเล็กๆ ข้างหุ่นยนต์ */
-        .outfit-icon { position: absolute; bottom: -30px; right: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-radius: 30px; padding: 8px 15px; display: flex; gap: 12px; cursor: pointer; border: 1px solid #ffd700; transition: 0.2s; }
+        .outfit-icon { position: absolute; bottom: -30px; right: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-radius: 30px; padding: 8px 15px; display: flex; gap: 12px; cursor: pointer; border: 1px solid #ffd700; transition: 0.2s; z-index: 20; }
         .outfit-icon:hover { transform: scale(1.05); background: rgba(0,0,0,0.8); }
         .outfit-icon i { font-size: 1.3rem; color: #ffd700; }
         .outfit-icon span { font-size: 0.7rem; color: white; }
         
-        /* ท่าเต้น */
-        @keyframes dance1 { 0%,100%{transform:translateY(0)} 25%{transform:translateY(-10px)} 75%{transform:translateY(5px)} }
-        @keyframes dance2 { 0%,100%{transform:translateY(0) scale(1)} 30%{transform:translateY(-15px) scale(1.05)} 70%{transform:translateY(8px) scale(0.98)} }
-        @keyframes dance3 { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-10px)} 75%{transform:translateX(10px)} }
-        @keyframes dance4 { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(-5deg)} 75%{transform:rotate(5deg)} }
-        .dance1 { animation: dance1 0.6s ease-in-out infinite !important; }
-        .dance2 { animation: dance2 0.5s ease-in-out infinite !important; }
-        .dance3 { animation: dance3 0.4s ease-in-out infinite !important; }
-        .dance4 { animation: dance4 0.7s ease-in-out infinite !important; }
+        @keyframes bounce1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-20px)} }
+        @keyframes bounce2 { 0%,100%{transform:translateY(0) rotate(0deg)} 25%{transform:translateY(-15px) rotate(-5deg)} 75%{transform:translateY(5px) rotate(5deg)} }
+        @keyframes bounce3 { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+        @keyframes shake { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-8px)} 75%{transform:translateX(8px)} }
+        @keyframes wiggle { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(-8deg)} 75%{transform:rotate(8deg)} }
+        .bounce1 { animation: bounce1 0.4s ease-in-out !important; }
+        .bounce2 { animation: bounce2 0.5s ease-in-out !important; }
+        .bounce3 { animation: bounce3 0.3s ease-in-out !important; }
+        .shake { animation: shake 0.3s ease-in-out !important; }
+        .wiggle { animation: wiggle 0.4s ease-in-out !important; }
+        
+        @keyframes autoDance1 { 0%,100%{transform:translateY(0)} 25%{transform:translateY(-8px)} 75%{transform:translateY(5px)} }
+        @keyframes autoDance2 { 0%,100%{transform:translateX(0)} 25%{transform:translateX(-6px)} 75%{transform:translateX(6px)} }
+        @keyframes autoDance3 { 0%,100%{transform:rotate(0deg)} 25%{transform:rotate(-4deg)} 75%{transform:rotate(4deg)} }
+        .autoDance1 { animation: autoDance1 0.8s ease-in-out infinite; }
+        .autoDance2 { animation: autoDance2 0.6s ease-in-out infinite; }
+        .autoDance3 { animation: autoDance3 0.7s ease-in-out infinite; }
         
         .speech-bubble { position: fixed; background: white; color: #1e293b; padding: 12px 20px; border-radius: 30px; font-weight: 600; font-size: 1rem; box-shadow: 0 8px 20px rgba(0,0,0,0.2); z-index: 200; animation: bubblePop 0.3s ease-out; pointer-events: none; white-space: nowrap; }
         @keyframes bubblePop { 0% { opacity: 0; transform: scale(0.8) translateY(10px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         
-        /* Popup Modal ตู้เสื้อผ้า */
         .wardrobe-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
         .wardrobe-modal.active { visibility: visible; opacity: 1; }
         .wardrobe-content { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 40px; padding: 30px; max-width: 550px; width: 90%; border: 2px solid #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.3); }
@@ -167,8 +169,7 @@
                         <ellipse id="rightShoe" cx="220" cy="378" rx="20" ry="8" fill="#4a4a4a"/>
                     </svg>
                 </div>
-                <!-- ไอคอนเสื้อผ้าเล็กๆ -->
-                <div class="outfit-icon" id="openWardrobeBtn">
+                <div id="outfitIcon" class="outfit-icon" style="display: none;">
                     <i class="fas fa-tshirt"></i>
                     <i class="fas fa-shoe-prints"></i>
                     <i class="fas fa-crown"></i>
@@ -193,7 +194,6 @@
         </div>
     </div>
 
-    <!-- Popup ตู้เสื้อผ้า -->
     <div id="wardrobeModal" class="wardrobe-modal">
         <div class="wardrobe-content">
             <button class="close-wardrobe" onclick="closeWardrobe()">&times;</button>
@@ -212,12 +212,11 @@
                 <div class="dressup-category"><label><i class="fas fa-crown"></i> หมวก/ผม</label>
                     <select id="hatStyle"><option value="none">🚫 ไม่มี</option><option value="cap">🧢 แคป</option><option value="crown">👑 มงกุฎ</option><option value="flower">🌸 ดอกไม้</option><option value="bow">🎀 โบว์</option></select></div>
             </div>
-            <button class="save-outfit-btn" onclick="saveOutfitToCloud()"><i class="fas fa-cloud-upload-alt"></i> 💾 บันทึกชุดลงคลาวด์ (แชร์ข้ามเครื่องได้!)</button>
-            <p style="font-size: 0.7rem; margin-top: 15px; text-align: center; color: #ffd700;">✨ ข้อมูลจะถูกบันทึกด้วยอีเมลของคุณ สามารถเข้าใช้จากเครื่องไหนก็ได้!</p>
+            <button class="save-outfit-btn" onclick="saveOutfit()"><i class="fas fa-cloud-upload-alt"></i> 💾 บันทึกชุดลงคลาวด์ (แชร์ข้ามเครื่องได้!)</button>
+            <p style="font-size: 0.7rem; margin-top: 15px; text-align: center; color: #ffd700;">✨ ข้อมูลถูกบันทึกด้วยอีเมลของคุณ สามารถเข้าใช้จากเครื่องไหนก็ได้!</p>
         </div>
     </div>
 
-    <!-- Login Modal -->
     <div id="loginModal" class="login-modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeLoginModal()">&times;</button>
@@ -229,25 +228,20 @@
     </div>
 
     <script>
-        // ========== Google Sheets Configuration ==========
-        // 🔴 IMPORTANT: คุณต้อง deploy Web App จาก Google Apps Script แล้วนำ URL มาใส่ตรงนี้
-        // ขั้นตอน: 1. สร้าง Google Sheet 2. ไปที่ Extensions > Apps Script 
-        // 3. วางโค้ด Google Apps Script (ส่งให้แล้ว) 4. Deploy > Deploy as web app
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6LgfZ1EMcKAh8shNWgqHzqHJgF76GFA79jECZbketXpu_r0ghIOUCu1LH0TICLmZj1A/exec"; // <- แก้เป็น URL ของคุณ
+        // ========== Google Sheets Web App URL (ใส่ URL ของคุณตรงนี้) ==========
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6LgfZ1EMcKAh8shNWgqHzqHJgF76GFA79jECZbketXpu_r0ghIOUCu1LH0TICLmZj1A/exec";
         
-        // ========== ฟังก์ชันบันทึกข้อมูลไป Google Sheets ==========
-        async function saveOutfitToCloud() {
+        // ========== บันทึกข้อมูลไป Google Sheets ==========
+        async function saveOutfit() {
             if (!localStorage.getItem('is_logged_in')) {
-                alert('⚠️ กรุณาเข้าสู่ระบบก่อนบันทึกชุดหุ่นยนต์');
+                alert('⚠️ กรุณาเข้าสู่ระบบก่อนบันทึกชุด');
                 openLoginModal();
                 return;
             }
             
             const email = localStorage.getItem('student_email');
-            const name = localStorage.getItem('student_name');
             const outfitData = {
                 email: email,
-                name: name,
                 skinColor: document.getElementById('skinColor').value,
                 shirtColor: document.getElementById('shirtColor').value,
                 shoeColor: document.getElementById('shoeColor').value,
@@ -261,66 +255,63 @@
             localStorage.setItem(`robot_outfit_${email}`, JSON.stringify(outfitData));
             
             // บันทึกไป Google Sheets
-            if (SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
-                try {
-                    const response = await fetch(SCRIPT_URL, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(outfitData)
-                    });
-                    showSpeechBubble('💾 บันทึกชุดลงคลาวด์สำเร็จ! ใช้เครื่องไหนก็ได้นะ 💕');
-                } catch(e) {
-                    showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย (คลาวด์ยังไม่เชื่อม)');
-                }
-            } else {
-                showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย! (รอเชื่อมต่อคลาวด์)');
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(outfitData)
+                });
+                showSpeechBubble('💾 บันทึกชุดเรียบร้อย! (ซิงค์กับคลาวด์แล้ว) 💕');
+            } catch(e) {
+                showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
             }
-            
             closeWardrobe();
-            startRandomDance();
         }
         
         // ========== โหลดข้อมูลจาก Google Sheets ==========
-        async function loadOutfitFromCloud() {
+        async function loadOutfit() {
             const email = localStorage.getItem('student_email');
             if (!email) return;
             
             // ลองโหลดจากคลาวด์ก่อน
-            if (SCRIPT_URL !== "YOUR_GOOGLE_APPS_SCRIPT_URL_HERE") {
-                try {
-                    const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
-                    const data = await response.json();
-                    if (data && data.skinColor) {
-                        applyOutfitToUI(data);
-                        showSpeechBubble('🎉 โหลดชุดจากคลาวด์สำเร็จ! น่ารักมากกก 💖');
-                        startRandomDance();
-                        return;
-                    }
-                } catch(e) {}
+            try {
+                const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+                const data = await response.json();
+                if (data && data.skinColor && data.skinColor !== undefined) {
+                    document.getElementById('skinColor').value = data.skinColor;
+                    document.getElementById('shirtColor').value = data.shirtColor;
+                    document.getElementById('shoeColor').value = data.shoeColor;
+                    document.getElementById('faceMouth').value = data.faceMouth;
+                    document.getElementById('pattern').value = data.pattern;
+                    document.getElementById('hatStyle').value = data.hatStyle;
+                    updateRobotOutfit();
+                    showSpeechBubble('🎉 โหลดชุดจากคลาวด์สำเร็จ! น่ารักมากกก 💖');
+                    startAutoDance();
+                    return;
+                }
+            } catch(e) {
+                console.log("โหลดจากคลาวด์ไม่สำเร็จ", e);
             }
             
-            // ถ้าไม่มีในคลาวด์ ให้โหลดจาก localStorage
+            // ถ้าไม่มีในคลาวด์ โหลดจาก localStorage
             const saved = localStorage.getItem(`robot_outfit_${email}`);
             if (saved) {
                 const outfit = JSON.parse(saved);
-                applyOutfitToUI(outfit);
+                document.getElementById('skinColor').value = outfit.skinColor;
+                document.getElementById('shirtColor').value = outfit.shirtColor;
+                document.getElementById('shoeColor').value = outfit.shoeColor;
+                document.getElementById('faceMouth').value = outfit.faceMouth;
+                document.getElementById('pattern').value = outfit.pattern;
+                document.getElementById('hatStyle').value = outfit.hatStyle;
+                updateRobotOutfit();
                 showSpeechBubble('🎉 ยินดีต้อนรับกลับ! นี่คือหุ่นยนต์ของคุณนะคะ 💖');
-                startRandomDance();
+                startAutoDance();
             } else {
                 updateRobotOutfit();
                 showSpeechBubble('🤖 สวัสดี! กดที่ไอคอนเสื้อผ้าเพื่อแต่งตัวหุ่นยนต์ของคุณเลย 🎨');
+                startAutoDance();
             }
-        }
-        
-        function applyOutfitToUI(outfit) {
-            document.getElementById('skinColor').value = outfit.skinColor;
-            document.getElementById('shirtColor').value = outfit.shirtColor;
-            document.getElementById('shoeColor').value = outfit.shoeColor;
-            document.getElementById('faceMouth').value = outfit.faceMouth;
-            document.getElementById('pattern').value = outfit.pattern;
-            document.getElementById('hatStyle').value = outfit.hatStyle;
-            updateRobotOutfit();
         }
         
         // ========== อัปเดตหน้าตาหุ่นยนต์ ==========
@@ -384,20 +375,50 @@
             rightCheek.setAttribute('opacity', faceMouth === 'love' ? '0.8' : '0.3');
         }
         
-        // ========== ระบบอื่นๆ ==========
-        let danceInterval = null;
-        function startRandomDance() {
-            if(danceInterval) clearInterval(danceInterval);
-            const dances = ['dance1', 'dance2', 'dance3', 'dance4'];
+        // ========== ท่ากระโดด/ขยับแบบสุ่มเมื่อคลิก ==========
+        const bounceAnimations = ['bounce1', 'bounce2', 'bounce3', 'shake', 'wiggle'];
+        const clickMessages = [
+            '🤪 อย่ามาจั๊กจี้สิ!', '💙 ชอบจัง~', '✨ กระโดดโลดเต้น', '🎵 เต้นไปกับเรา~', 
+            '🤖 หวัดดีจ้า!', '😊 สวัสดีครับ', '⚡ โอ๊ย! ตกใจ', '💃 หนุกหนาน~', 
+            '🌟 เก่งจังเลย', '🎉 เย้ๆๆ', '🤗 คิดถึงจัง', '💕 รักเลย'
+        ];
+        
+        function playRandomBounce() {
             const robot = document.getElementById('robotContainer');
-            robot.classList.add('dance1');
-            danceInterval = setInterval(() => {
-                const newDance = dances[Math.floor(Math.random() * dances.length)];
-                dances.forEach(d => robot.classList.remove(d));
-                robot.classList.add(newDance);
-            }, 3500);
+            const randomAnim = bounceAnimations[Math.floor(Math.random() * bounceAnimations.length)];
+            bounceAnimations.forEach(anim => robot.classList.remove(anim));
+            void robot.offsetWidth;
+            robot.classList.add(randomAnim);
+            setTimeout(() => {
+                robot.classList.remove(randomAnim);
+            }, 500);
+            
+            const msg = clickMessages[Math.floor(Math.random() * clickMessages.length)];
+            showSpeechBubble(msg);
         }
         
+        // ========== เต้นอัตโนมัติ ==========
+        let autoDanceInterval = null;
+        const autoDances = ['autoDance1', 'autoDance2', 'autoDance3'];
+        
+        function startAutoDance() {
+            if(autoDanceInterval) clearInterval(autoDanceInterval);
+            const robot = document.getElementById('robotContainer');
+            robot.classList.add('autoDance1');
+            autoDanceInterval = setInterval(() => {
+                const newDance = autoDances[Math.floor(Math.random() * autoDances.length)];
+                autoDances.forEach(d => robot.classList.remove(d));
+                robot.classList.add(newDance);
+            }, 3000);
+        }
+        
+        function stopAutoDance() {
+            if(autoDanceInterval) clearInterval(autoDanceInterval);
+            const robot = document.getElementById('robotContainer');
+            autoDances.forEach(d => robot.classList.remove(d));
+        }
+        
+        // ========== Speech Bubble ==========
         function showSpeechBubble(msg) {
             const existing = document.querySelector('.speech-bubble');
             if(existing) existing.remove();
@@ -408,10 +429,18 @@
             bubble.style.left = (rect.left + rect.width/2 - 100) + 'px';
             bubble.style.top = (rect.top - 60) + 'px';
             document.body.appendChild(bubble);
-            setTimeout(() => bubble.remove(), 3000);
+            setTimeout(() => bubble.remove(), 2500);
         }
         
-        function openWardrobe() { document.getElementById('wardrobeModal').classList.add('active'); }
+        // ========== ตู้เสื้อผ้า Popup ==========
+        function openWardrobe() { 
+            if(!localStorage.getItem('is_logged_in')) {
+                showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะแต่งตัวให้หนูได้เลย!');
+                openLoginModal();
+                return;
+            }
+            document.getElementById('wardrobeModal').classList.add('active'); 
+        }
         function closeWardrobe() { document.getElementById('wardrobeModal').classList.remove('active'); }
         
         // ========== Login System ==========
@@ -435,7 +464,8 @@
                 }
                 closeLoginModal();
                 updateLoginUI();
-                loadOutfitFromCloud();
+                document.getElementById('outfitIcon').style.display = 'flex';
+                loadOutfit();
             } else {
                 alert('❌ อีเมลนี้ไม่ได้รับอนุญาต');
             }
@@ -448,7 +478,7 @@
         }
         
         function logout() {
-            if(danceInterval) clearInterval(danceInterval);
+            stopAutoDance();
             localStorage.removeItem('is_logged_in');
             window.location.reload();
         }
@@ -462,23 +492,50 @@
             document.body.setAttribute("data-theme", themeKey);
             localStorage.setItem('smart_theme', themeKey);
             document.getElementById("robotGlow").style.background = `radial-gradient(circle, ${themes[themeKey].glowColor} 0%, rgba(0,0,0,0) 70%)`;
+            const msg = themeKey === 'snow' ? '❄️ ธีมหิมะ เย็นสบาย~' : themeKey === 'forest' ? '🌿 ธีมป่าเขียว สดชื่น!' : themeKey === 'halloween' ? '🎃 ธีมฮัลโลวีน สนุกสุดๆ!' : themeKey === 'love' ? '🌸 ธีมซากุระ หวานละมุน~' : '🤖 ธีมเริ่มต้น คลาสสิค!';
+            showSpeechBubble(msg);
         }
         
         // ========== Event Listeners ==========
-        document.getElementById('heroRobot')?.addEventListener('click', () => {
-            if(localStorage.getItem('is_logged_in')) openWardrobe();
-            else { showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะแต่งตัวให้หนูได้เลย!'); openLoginModal(); }
+        document.getElementById('heroRobot')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(localStorage.getItem('is_logged_in')) {
+                playRandomBounce();
+            } else {
+                showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะมาเล่นด้วยกันได้เลย!');
+                openLoginModal();
+            }
         });
-        document.getElementById('openWardrobeBtn')?.addEventListener('click', (e) => { e.stopPropagation(); if(localStorage.getItem('is_logged_in')) openWardrobe(); else openLoginModal(); });
-        ['skinColor', 'shirtColor', 'shoeColor', 'faceMouth', 'pattern', 'hatStyle'].forEach(id => document.getElementById(id)?.addEventListener('change', updateRobotOutfit));
-        document.querySelectorAll(".theme-btn").forEach(btn => btn.addEventListener("click", () => { applyTheme(btn.getAttribute("data-theme")); document.querySelectorAll(".theme-btn").forEach(b=>b.classList.remove("active")); btn.classList.add("active"); }));
+        
+        document.getElementById('outfitIcon')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openWardrobe();
+        });
+        
+        ['skinColor', 'shirtColor', 'shoeColor', 'faceMouth', 'pattern', 'hatStyle'].forEach(id => 
+            document.getElementById(id)?.addEventListener('change', updateRobotOutfit)
+        );
+        
+        document.querySelectorAll(".theme-btn").forEach(btn => btn.addEventListener("click", () => { 
+            applyTheme(btn.getAttribute("data-theme")); 
+            document.querySelectorAll(".theme-btn").forEach(b=>b.classList.remove("active")); 
+            btn.classList.add("active"); 
+        }));
         
         window.onload = function() {
             const savedTheme = localStorage.getItem('smart_theme') || "default";
             applyTheme(savedTheme);
             document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
-            if (localStorage.getItem('is_logged_in') === 'true') { updateLoginUI(); loadOutfitFromCloud(); }
-            else { document.getElementById('showLoginBtn').addEventListener('click', openLoginModal); startRandomDance(); }
+            
+            if (localStorage.getItem('is_logged_in') === 'true') { 
+                updateLoginUI(); 
+                document.getElementById('outfitIcon').style.display = 'flex';
+                loadOutfit(); 
+            } else { 
+                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
+                document.getElementById('outfitIcon').style.display = 'none';
+                startAutoDance();
+            }
         };
     </script>
 </body>
