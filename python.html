@@ -3,6 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <title>ห้อง Lab ทำงาน | PROT Smart Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; padding: 20px; }
         .lab-container { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; }
@@ -25,34 +27,27 @@
     </div>
 
     <script>
-        // ⚠️ 1. เอาลิงก์ Web App URL ตัวล่าสุดของครูมาใส่ตรงนี้ ⚠️
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
+        // 🌟 อัปเดตลิงก์เป็นเวอร์ชันใหม่ล่าสุดให้ตรงกับไฟล์อื่นๆ แล้วครับ 🌟
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         // ==========================================
         // ฟังก์ชันที่ 1: ดึงข้อความจากกล่อง แล้วสั่งส่งงาน
         // ==========================================
         function prepareToSubmit() {
-            // ดึงข้อความที่นักเรียนพิมพ์ใน <textarea>
             const answerText = document.getElementById('student-answer').value.trim();
 
-            // เช็กว่านักเรียนพิมพ์อะไรมาหรือยัง
             if (answerText === "") {
                 alert("⚠️ กรุณาพิมพ์คำตอบก่อนกดส่งงานครับ!");
                 return;
             }
 
-            // ถ้านักเรียนพิมพ์แล้ว ให้ส่งข้อความนั้นเข้าฟังก์ชันหลัก
             submitWork(answerText);
         }
 
         // ==========================================
         // ฟังก์ชันที่ 2: ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (Google Sheets)
         // ==========================================
-        // ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (Google Sheets)
         async function submitWork(workContent) {
-            // ⚠️ เอาลิงก์ Web App URL ตัวล่าสุดของครูมาใส่ตรงนี้ ⚠️
-            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
-            
             const email = localStorage.getItem('student_email');
             
             // อ่าน ID ของงานจาก URL (เช่น python.html?actid=1712345678)
@@ -70,17 +65,23 @@
                 return;
             }
 
+            // เปลี่ยนหน้าตาปุ่มเพื่อบอกนักเรียนว่ากำลังประมวลผล
+            const submitBtn = document.getElementById('submitBtn');
+            submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...';
+            submitBtn.style.background = '#f59e0b';
+            submitBtn.disabled = true;
+
             // จัดโครงสร้างข้อมูลให้ตรงกับฐานข้อมูล
             let worksObj = {};
             worksObj[actId] = workContent; 
 
             try {
-                // ส่งข้อมูลไปที่ Google Sheets
+                // ส่งข้อมูลไปที่ Google Sheets ด้วยลิงก์ใหม่
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
-                        'Content-Type': 'text/plain;charset=utf-8' // 🌟 ต้องมีบรรทัดนี้ ข้อมูลถึงจะเข้า Sheets!
+                        'Content-Type': 'text/plain;charset=utf-8' 
                     },
                     body: JSON.stringify({
                         email: email,
@@ -96,6 +97,9 @@
                 
             } catch(e) {
                 alert('❌ เกิดข้อผิดพลาดในการส่งงาน กรุณาลองใหม่อีกครั้ง');
+                submitBtn.innerHTML = '<i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน';
+                submitBtn.style.background = '#10b981';
+                submitBtn.disabled = false;
             }
         }
     </script>
