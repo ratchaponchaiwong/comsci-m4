@@ -238,7 +238,7 @@
     </div>
 
     <script>
-        // ⚠️ ลิงก์ Apps Script ของคุณครู ⚠️
+        // ⚠️ เอาลิงก์ใหม่ที่ได้จากการกด New Version มาวางตรงนี้ครับ ⚠️
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec"; 
 
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
@@ -279,6 +279,12 @@
             btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
         });
 
+        function getUserData(keyName, defaultValue = null) {
+            const email = localStorage.getItem('student_email');
+            const key = email ? email + '_' + keyName : null;
+            try { return key && localStorage.getItem(key) ? localStorage.getItem(key) : defaultValue; } catch(e) { return defaultValue; }
+        }
+
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -310,13 +316,11 @@
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
-        // ==================== อัปเดต: ดึงข้อมูลจาก Sheets ทุกครั้งที่โหลดเว็บ ====================
         function loadStudentData() {
             const email = localStorage.getItem('student_email');
             if (!email) { document.getElementById('showLoginBtn').style.display = 'flex'; return; }
 
-            // 1. โชว์สถานะกำลังโหลดที่รูปโปรไฟล์เพื่อรอข้อมูลจาก Sheets
-            document.getElementById('profile-name').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...';
+            document.getElementById('profile-name').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูล...';
             document.getElementById('display-studentid').innerText = '...';
             document.getElementById('display-room').innerText = '...';
             document.getElementById('display-number').innerText = '...';
@@ -324,19 +328,17 @@
             document.getElementById('profile-pic-img').src = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
             document.getElementById('profile-pic-img').style.display = 'block';
             
-            // 2. เรียกฟังก์ชันวิ่งไปดึงข้อมูลใหม่จากฐานข้อมูล
             fetchDataFromServer(email);
         }
 
         async function fetchDataFromServer(email) {
             const container = document.getElementById('dynamic-modules-container');
-            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลล่าสุดจากฐานข้อมูล...</div>';
+            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังดึงข้อมูลล่าสุดจากฐานข้อมูล...</div>';
             
             if(GOOGLE_SCRIPT_URL) {
                 try {
-                    const cacheBuster = new Date().getTime(); // ทลาย Cache
+                    const cacheBuster = new Date().getTime(); 
                     
-                    // ดึงกิจกรรมทั้งหมดจากระบบ
                     const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
                     const actData = await actRes.json();
                     
@@ -346,13 +348,11 @@
                         localStorage.setItem('global_activities', '[]');
                     }
 
-                    // ดึงข้อมูลนักเรียนจากระบบ (ดึงใหม่สดๆ ร้อนๆ ทุกครั้ง)
                     const stdRes = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
                     const allStudents = await stdRes.json();
                     const myData = allStudents.find(s => s.email === email);
                     
                     if(myData) {
-                        // อัปเดตข้อมูลประวัติลงหน้าจอแบบบังคับทับของเก่า
                         const studentId = myData.studentId || '-';
                         const fullName = myData.name || localStorage.getItem('student_name') || 'นักเรียน';
                         const room = myData.room || '-';
@@ -366,17 +366,13 @@
                         document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${localStorage.getItem('student_pic')}" class="user-avatar"><span class="user-name">${fullName.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
                         document.getElementById('editProfileBtn').style.display = 'inline-block';
 
-                        // บันทึกลงเครื่องเผื่อไว้ใช้หน้าอื่น (เช่น หน้าส่งงาน)
                         localStorage.setItem(email + '_studentid', studentId !== '-' ? studentId : '');
                         localStorage.setItem(email + '_custom_name', fullName !== 'นักเรียน' ? fullName : '');
                         localStorage.setItem(email + '_room', room !== '-' ? room : '');
                         localStorage.setItem(email + '_number', number !== '-' ? number : '');
 
-                        // ล้างสถานะเก่าในเครื่อง แล้วอัปเดตใหม่ตาม Sheets
                         if(myData.works) {
-                            for(let actId in myData.works) {
-                                localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
-                            }
+                            for(let actId in myData.works) localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
                         }
                         if(myData.scores) {
                             for(let actId in myData.scores) {
@@ -387,7 +383,13 @@
                             }
                         }
                     } else {
-                        // กรณีหาอีเมลไม่เจอในฐานข้อมูล (นักเรียนใหม่เพิ่งล็อกอิน)
+                        // 🚨 อัปเดตใหม่: ถ้าครูลบข้อมูลจาก Sheets แล้ว ให้ล้างความจำในเครื่องเด็กทิ้งทันที!
+                        console.log("ไม่พบข้อมูลในฐานข้อมูล: กำลังล้างแคชในเครื่อง...");
+                        localStorage.removeItem(email + '_studentid');
+                        localStorage.removeItem(email + '_custom_name');
+                        localStorage.removeItem(email + '_room');
+                        localStorage.removeItem(email + '_number');
+
                         const defaultName = localStorage.getItem('student_name') || "นักเรียน";
                         document.getElementById('profile-name').innerText = defaultName;
                         document.getElementById('display-studentid').innerText = '-';
@@ -399,9 +401,8 @@
                 } catch(e) { 
                     console.error("Fetch Error:", e);
                     document.getElementById('status-msg').style.display = 'block';
-                    document.getElementById('status-msg').innerHTML = '⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ <br>ระบบกำลังแสดงข้อมูลล่าสุดที่อยู่ในเครื่อง';
+                    document.getElementById('status-msg').innerHTML = '⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ <br>กรุณารีเฟรชหน้าเว็บ หรือตรวจสอบอินเทอร์เน็ต';
                     
-                    // ถ้าเน็ตหลุด ให้ดึงของเก่าในเครื่องมาโชว์แก้ขัดไปก่อน
                     document.getElementById('profile-name').innerText = localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name') || "นักเรียน";
                     document.getElementById('display-studentid').innerText = localStorage.getItem(email + '_studentid') || '-';
                     document.getElementById('display-room').innerText = localStorage.getItem(email + '_room') || '-';
@@ -412,7 +413,6 @@
             renderModules(email);
         }
 
-        // ระบบกรองห้อง แยกสี และล็อกปุ่มถ้าครูปิดรับงาน
         function renderModules(email) {
             const container = document.getElementById('dynamic-modules-container');
             let allActivities = [];
@@ -460,7 +460,6 @@
 
                 let badgeHtml = '', btnHtml = '', scoreHtml = '', deadlineText = '';
                 let linkPath = act.link && act.link !== '#' ? `${act.link}?actid=${act.id}` : '#';
-
                 const isClosedByTeacher = (act.status === 'closed');
 
                 if (isContent) {
@@ -527,7 +526,17 @@
             document.getElementById('progress-text').innerHTML = `ความคืบหน้า ${progressPercent}%`;
         }
 
-        // ==================== PROFILE ====================
+        function loadEnrolledSubjects(email) {
+            const container = document.getElementById('enrolled-container');
+            let enrolledData = [];
+            try { enrolledData = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e) {}
+            if (enrolledData.length > 0) {
+                container.innerHTML = enrolledData.map(subj => `<div class="task-card" style="border-left: 4px solid #10b981;"><div class="task-info"><h4 style="color:#10b981;"><i class="fas fa-check-circle"></i> ${subj}</h4></div></div>`).join('');
+            } else {
+                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่ได้ลงทะเบียนวิชาเพิ่มเติม</p></div>';
+            }
+        }
+
         function openEditProfileModal() {
             const email = localStorage.getItem('student_email');
             document.getElementById('edit-studentid').value = localStorage.getItem(email + '_studentid') || '';
@@ -551,8 +560,15 @@
             const email = localStorage.getItem('student_email');
 
             if (!name || !number || !studentId) return alert('⚠️ กรุณากรอกรหัสนักเรียน, ชื่อ และเลขที่ให้ครบถ้วน');
+            
             document.getElementById('saving-status').style.display = 'block';
+            document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูลไปยังฐานข้อมูล...';
 
+            localStorage.setItem(email + '_studentid', studentId);
+            localStorage.setItem(email + '_custom_name', name);
+            localStorage.setItem(email + '_room', room);
+            localStorage.setItem(email + '_number', number);
+            
             let enrolledArray = [];
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
 
@@ -561,15 +577,15 @@
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ email: email, studentId: studentId, name: name, room: room, number: number, enrolledSubjects: enrolledArray.join(", ") })
             }).then(() => {
-                alert('✅ บันทึกและส่งข้อมูลให้ครูเรียบร้อย!');
-                document.getElementById('saving-status').style.display = 'none';
-                closeEditProfileModal(); 
-                // รีโหลดใหม่เพื่อให้มันดึงข้อมูลที่เพิ่งเซฟลงไปกลับมาโชว์
-                loadStudentData();
+                document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ! กำลังรีเฟรช...';
+                setTimeout(() => {
+                    closeEditProfileModal(); 
+                    location.reload(); // บังคับรีเฟรชหน้าเพื่อดึงข้อมูลใหม่ทันที
+                }, 1000);
             }).catch(e => {
                 alert("⚠️ บันทึกในเครื่องแล้ว แต่ส่งเข้าส่วนกลางไม่สำเร็จ");
                 document.getElementById('saving-status').style.display = 'none';
-                closeEditProfileModal(); 
+                closeEditProfileModal(); loadStudentData();
             });
         }
 
