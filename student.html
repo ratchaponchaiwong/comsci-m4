@@ -21,34 +21,32 @@
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
         body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
         body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
         
         #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-        .theme-particle { position: absolute; top: -10%; pointer-events: none; animation: fall linear forwards; z-index: 1; }
-        @keyframes fall {
-            0% { transform: translateY(0) rotate(0deg); opacity: 0; }
-            10% { opacity: 1; }
-            90% { opacity: 1; }
-            100% { transform: translateY(120vh) rotate(360deg); opacity: 0; }
-        }
+        .theme-particle { position: absolute; top: -10vh; pointer-events: none; animation: fallDown linear forwards; z-index: 1; }
+        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } }
         
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px;}
-        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px;}
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #e11d48, #f43f5e); -webkit-background-clip: text; }
         
         .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; flex-wrap: wrap;}
         .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
         body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
         .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        body[data-theme="love"] .nav-links a:hover, body[data-theme="love"] .nav-links a.active { color: #e11d48; background: rgba(225,29,72,0.1); }
         
         .login-area { display: flex; align-items: center; gap: 15px; }
         .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; font-family: 'Prompt'; display: flex; align-items: center; gap: 10px;}
         
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
+        body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); }
         .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; background: white; }
         .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
         body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
@@ -57,30 +55,40 @@
         .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
         .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
         .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        
+
         .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
         .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
         
         .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 28px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content;}
-        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); }
         
         .profile-pic-large { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto 15px auto; border: 4px solid #3b82f6; object-fit: cover; display: none; background: white;}
-        .student-details { background: rgba(0,0,0,0.2); padding: 10px; border-radius: 15px; margin-bottom: 15px; font-size: 0.9rem; text-align: left; }
-        body[data-theme="snow"] .student-details, body[data-theme="love"] .student-details { background: rgba(255,255,255,0.5); }
+        body[data-theme="love"] .profile-pic-large { border-color: #e11d48; }
+
+        .student-details { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 0.95rem; text-align: left; }
+        body[data-theme="snow"] .student-details, body[data-theme="love"] .student-details { background: rgba(0,0,0,0.05); }
+        .student-details div { margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; }
+        body[data-theme="snow"] .student-details div, body[data-theme="love"] .student-details div { border-bottom-color: rgba(0,0,0,0.1); }
+        .student-details div:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
         
         .btn-edit-profile { background: rgba(59,130,246,0.2); border: 1px solid #3b82f6; color: inherit; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; font-family: 'Prompt'; width: 100%; font-weight: 600; margin-bottom: 15px;}
+        body[data-theme="love"] .btn-edit-profile { background: rgba(225,29,72,0.1); border-color: #e11d48; color: #e11d48; }
         
         .score-box { background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; margin-top: 15px; }
-        body[data-theme="snow"] .score-box, body[data-theme="love"] .score-box { background: rgba(255,255,255,0.5); }
+        body[data-theme="snow"] .score-box, body[data-theme="love"] .score-box { background: rgba(0,0,0,0.05); }
         .score-box h2 { color: #60a5fa; font-size: 2.5rem; margin: 5px 0; }
+        body[data-theme="love"] .score-box h2 { color: #e11d48; }
         .progress-bar-bg { background: rgba(0,0,0,0.3); height: 10px; border-radius: 5px; overflow: hidden; }
+        body[data-theme="snow"] .progress-bar-bg, body[data-theme="love"] .progress-bar-bg { background: rgba(0,0,0,0.1); }
         .progress-bar-fill { background: #3b82f6; height: 100%; width: 0%; transition: 0.5s; }
+        body[data-theme="love"] .progress-bar-fill { background: #e11d48; }
         
         .content-area { display: flex; flex-direction: column; gap: 30px; }
         .section-header { font-size: 1.3rem; font-weight: 700; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px; display: flex; align-items: center; gap: 12px; color: inherit;}
+        body[data-theme="love"] .section-header { border-bottom-color: #e11d48; color: #e11d48; }
         
         .task-card { background: rgba(0,0,0,0.2); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; transition: 0.3s; }
-        body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.7); border-color: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .task-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
         .task-info h4 { margin: 0 0 8px 0; font-size: 1.1rem; }
         .task-meta { text-align: right; min-width: 150px; }
@@ -122,7 +130,6 @@
                     <li><a href="student.html" class="active">ห้องเรียนของฉัน</a></li>
                     <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
                     <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
-                    <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
                 </ul>
                 <div class="login-area" id="loginArea">
                     <button class="login-btn" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน</button>
@@ -164,17 +171,23 @@
                 </div>
 
                 <div class="content-area">
+                    <div id="status-msg" style="display:none; background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 15px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 10px; border-left: 4px solid #ef4444;"></div>
+
                     <div style="background: rgba(59,130,246,0.1); border-left: 4px solid #3b82f6; padding: 15px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 10px;">
                         <strong>📖 เนื้อหา:</strong> ไว้อ่านและทบทวน ไม่มีคะแนน<br>
                         <strong>⚙️/💡 งานและกิจกรรม:</strong> ทำเสร็จแล้วส่ง สถานะจะขึ้น <span style="color:#60a5fa;">"รอตรวจ"</span><br>
-                        <strong>⭐ ตรวจแล้ว:</strong> หากครูให้คะแนนแล้ว จะไม่สามารถกลับไปแก้ได้
+                        <strong>🔒 ปิดชั่วคราว:</strong> กรุณารอคุณครูกดเปิดระบบ ถึงจะเข้าทำกิจกรรมได้
                     </div>
 
                     <div>
                         <div class="section-header"><i class="fas fa-book-open"></i> บทเรียนและแบบฝึกหัด (ของห้องฉัน)</div>
-                        <div id="dynamic-modules-container"></div>
+                        <div id="dynamic-modules-container">
+                            <div style="text-align: center; padding: 20px; opacity: 0.6;">
+                                <i class="fas fa-spinner fa-spin"></i> กำลังโหลดบทเรียน...
+                            </div>
+                        </div>
                     </div>
-
+                    
                     <div style="margin-top: 30px;">
                         <div class="section-header"><i class="fas fa-history"></i> วิชาเพิ่มเติมที่ลงทะเบียนไว้</div>
                         <div id="enrolled-container"></div>
@@ -225,6 +238,7 @@
     </div>
 
     <script>
+        // ⚠️ อย่าลืมเช็กลิงก์ว่าตรงกับชีตใหม่หรือไม่ ⚠️
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec"; 
 
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
@@ -249,7 +263,6 @@
                 const particle = document.createElement("div");
                 particle.className = "theme-particle";
                 particle.style.left = Math.random() * 100 + "vw";
-                particle.style.top = "-10vh";
                 particle.style.fontSize = (Math.random() * 15 + 15) + "px";
                 particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
                 particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
@@ -261,9 +274,7 @@
             particleInterval = setInterval(createParticle, 600);
         }
 
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
+        document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
         function getUserData(keyName, defaultValue = null) {
             const email = localStorage.getItem('student_email');
@@ -302,6 +313,7 @@
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
+        // ==================== ดึงข้อมูลและเรนเดอร์ UI (ฉบับเต็ม ไม่ตัดย่อ) ====================
         function loadStudentData() {
             const email = localStorage.getItem('student_email');
             if (!email) { document.getElementById('showLoginBtn').style.display = 'flex'; return; }
@@ -314,7 +326,6 @@
             document.getElementById('profile-pic-img').src = pic;
             document.getElementById('profile-pic-img').style.display = 'block';
             
-            // โหลดรหัสนักเรียนมาแสดงด้วย
             document.getElementById('display-studentid').innerText = getUserData('studentid') || '-';
             document.getElementById('display-room').innerText = getUserData('room') || '-';
             document.getElementById('display-number').innerText = getUserData('number') || '-';
@@ -326,15 +337,13 @@
             loadEnrolledSubjects(email);
         }
 
-        // ==================== ระบบดึงข้อมูลจาก Server พร้อม Cache Buster ====================
         async function fetchDataFromServer(email) {
             const container = document.getElementById('dynamic-modules-container');
-            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากระบบ...</div>';
+            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์คะแนนและกิจกรรมล่าสุดจากระบบ...</div>';
             
             if(GOOGLE_SCRIPT_URL) {
                 try {
-                    const cacheBuster = new Date().getTime(); // ป้องกันเบราว์เซอร์จำค่าเก่า
-                    
+                    const cacheBuster = new Date().getTime(); 
                     const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
                     const actData = await actRes.json();
                     
@@ -349,7 +358,6 @@
                     const myData = allStudents.find(s => s.email === email);
                     
                     if(myData) {
-                        // อัปเดตข้อมูลประวัติลง DOM ทันที
                         if (myData.studentId) {
                             localStorage.setItem(email + '_studentid', myData.studentId);
                             document.getElementById('display-studentid').innerText = myData.studentId;
@@ -382,12 +390,16 @@
                             }
                         }
                     }
-                } catch(e) { console.log("โหลดข้อมูลจาก Server ไม่สำเร็จ ใช้ข้อมูลในเครื่องแทน"); }
+                } catch(e) { 
+                    console.error("Fetch Error:", e);
+                    document.getElementById('status-msg').style.display = 'block';
+                    document.getElementById('status-msg').innerHTML = '⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ <br>ระบบกำลังแสดงข้อมูล "ล่าสุด" ที่บันทึกไว้ในเครื่องของคุณ';
+                }
             }
             renderModules(email);
         }
 
-        // ==================== เรนเดอร์แยกสี และ ชนิดกิจกรรมฉบับสมบูรณ์ ====================
+        // ระบบกรองห้อง แยกสี และล็อกปุ่มถ้าครูปิดรับงาน
         function renderModules(email) {
             const container = document.getElementById('dynamic-modules-container');
             let allActivities = [];
@@ -400,7 +412,9 @@
             });
             
             if (activities.length === 0) {
-                container.innerHTML = '<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนที่เปิดสอนสำหรับห้องของคุณ</p></div>';
+                container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.7; border-left:4px solid #ef4444;"><p>
+                    ${studentRoom === "" ? "⚠️ กรุณากดปุ่ม 'แก้ไขข้อมูลส่วนตัว' เพื่อเลือกห้องเรียนก่อน" : "ยังไม่มีบทเรียนที่เปิดสอนสำหรับห้องของคุณ"}
+                </p></div>`;
                 return;
             }
 
@@ -434,20 +448,35 @@
                 let badgeHtml = '', btnHtml = '', scoreHtml = '', deadlineText = '';
                 let linkPath = act.link && act.link !== '#' ? `${act.link}?actid=${act.id}` : '#';
 
+                // เช็กว่าครูปิดระบบไว้หรือไม่
+                const isClosedByTeacher = (act.status === 'closed');
+
                 if (isContent) {
                     badgeHtml = `<span class="badge" style="background:${tColor}33; color:${tColor}; border:1px solid ${tColor}80;">${tIcon} ${tName}</span>`;
                     scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ไม่มีการเก็บคะแนน</div>`;
-                    btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:${tColor};">เปิดอ่าน <i class="fas fa-book-reader"></i></a>` : '';
-                    deadlineText = `<small style="color:${tColor}; display:block; margin-top:5px;"><i class="fas fa-eye"></i> ไม่จำกัดเวลา</small>`;
+                    
+                    if (isClosedByTeacher) {
+                        btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดเข้าชมชั่วคราว</button>`;
+                        deadlineText = `<small style="color:#ef4444; display:block; margin-top:5px;"><i class="fas fa-eye-slash"></i> ยังไม่เปิดให้อ่านเนื้อหา</small>`;
+                    } else {
+                        btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:${tColor};">เปิดอ่าน <i class="fas fa-book-reader"></i></a>` : '';
+                        deadlineText = `<small style="color:${tColor}; display:block; margin-top:5px;"><i class="fas fa-eye"></i> ไม่จำกัดเวลา</small>`;
+                    }
                 } 
                 else {
                     deadlineText = `<small style="color:${isPastDeadline ? '#ef4444' : tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.date || '-'} | ${act.time || '-'}</small>`;
                     
-                    if (status === 'graded') {
+                    if (isClosedByTeacher) {
+                        badgeHtml = `<span class="badge" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.5);">🔒 ปิดระบบ</span>`;
+                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.points}</div>`;
+                        btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ยังไม่เปิดให้ทำ</button>`;
+                    }
+                    else if (status === 'graded') {
                         badgeHtml = `<span class="badge done" style="background:#10b98133; color:#10b981; border:1px solid #10b981;">⭐ ตรวจแล้ว</span>`;
                         scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">ได้คะแนน: ${score} / ${act.points}</div>`;
                         btnHtml = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดการแก้ไขแล้ว</button>`;
-                    } else if (status === 'submitted') {
+                    } 
+                    else if (status === 'submitted') {
                         badgeHtml = `<span class="badge submitted" style="background:#3b82f633; color:#60a5fa; border:1px solid #3b82f6;">✅ รอตรวจ</span>`;
                         scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${act.points})</div>`;
                         
@@ -456,7 +485,8 @@
                         } else {
                             btnHtml = linkPath !== '#' ? `<a href="${linkPath}" class="btn-action btn-edit" style="background:#f59e0b;"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '';
                         }
-                    } else { 
+                    } 
+                    else { 
                         scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.points}</div>`;
                         if (isPastDeadline) {
                             badgeHtml = `<span class="badge late" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.5);">❌ หมดเวลา</span>`;
@@ -469,9 +499,9 @@
                 }
 
                 container.innerHTML += `
-                    <div class="task-card" style="border-left: 5px solid ${tColor};">
+                    <div class="task-card" style="border-left: 5px solid ${isClosedByTeacher ? '#ef4444' : tColor};">
                         <div class="task-info">
-                            <h4 style="color:${tColor};">${tIcon} ${act.title}</h4>
+                            <h4 style="color:${isClosedByTeacher ? '#ef4444' : tColor};">${tIcon} ${act.title}</h4>
                             <p style="font-size:0.85rem; opacity:0.8;">${act.desc}</p>
                             ${deadlineText}
                         </div>
