@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>Smart Workspace | วิทยาการคำนวณ ม.4 – บทเรียนอัจฉริยะ</title>
+    
+    <!-- Google Identity Services -->
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+    
+    <!-- Google Fonts & Icons -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            transition: background-color 0.2s ease, border-color 0.2s, color 0.2s;
+        }
+
+        body, html {
+            height: 100vh;
+            overflow: hidden;
+            font-family: 'Inter', 'Tahoma', sans-serif;
+        }
+
+        /* ธีมเริ่มต้น (Light Professional) */
+        :root {
+            --bg-primary: #f8fafc;
+            --bg-sidebar: #ffffff;
+            --header-bg: #1e3a5f;
+            --header-text: #ffffff;
+            --card-bg: #ffffff;
+            --border-color: #e2e8f0;
+            --text-primary: #0f172a;
+            --text-secondary: #334155;
+            --accent: #3b82f6;
+            --accent-hover: #2563eb;
+            --success: #10b981;
+            --success-dark: #059669;
+            --toolbar-bg: #f1f5f9;
+            --panel-bg: #ffffff;
+            --python-editor-bg: #1e293b;
+            --output-bg: #0f172a;
+            --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+            --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Dark Mode Theme */
+        body[data-theme="dark"] {
+            --bg-primary: #0f172a;
+            --bg-sidebar: #1e293b;
+            --header-bg: #0f172a;
+            --header-text: #e2e8f0;
+            --card-bg: #1e293b;
+            --border-color: #334155;
+            --text-primary: #f1f5f9;
+            --text-secondary: #cbd5e1;
+            --accent: #60a5fa;
+            --accent-hover: #3b82f6;
+            --toolbar-bg: #111827;
+            --panel-bg: #1e293b;
+            --python-editor-bg: #0f172a;
+            --output-bg: #000000;
+        }
+
+        /* Forest / Natural Theme */
+        body[data-theme="forest"] {
+            --bg-primary: #ecfdf5;
+            --bg-sidebar: #ffffff;
+            --header-bg: #065f46;
+            --header-text: #f0fdf4;
+            --card-bg: #ffffff;
+            --border-color: #a7f3d0;
+            --text-primary: #064e3b;
+            --text-secondary: #047857;
+            --accent: #10b981;
+            --accent-hover: #059669;
+            --toolbar-bg: #d1fae5;
+            --panel-bg: #ffffff;
+            --python-editor-bg: #064e3b;
+            --output-bg: #022c22;
+        }
+
+        /* Ocean Theme */
+        body[data-theme="ocean"] {
+            --bg-primary: #eff6ff;
+            --bg-sidebar: #ffffff;
+            --header-bg: #0c4a6e;
+            --header-text: #f0f9ff;
+            --card-bg: #ffffff;
+            --border-color: #bae6fd;
+            --text-primary: #075985;
+            --text-secondary: #0284c7;
+            --accent: #0ea5e9;
+            --accent-hover: #0284c7;
+            --toolbar-bg: #e0f2fe;
+            --panel-bg: #ffffff;
+            --python-editor-bg: #082f49;
+            --output-bg: #0c4a6e;
+        }
+
+        body {
+            background-color: var(--bg-primary);
+            color: var(--text-primary);
+        }
+
+        /* Header */
+        header {
+            background: var(--header-bg);
+            color: var(--header-text);
+            padding: 0 24px;
+            height: 64px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: var(--shadow-sm);
+            backdrop-filter: blur(0px);
+        }
+
+        .header-left {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+        }
+
+        .toggle-btn {
+            background: rgba(255,255,255,0.15);
+            border: none;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 12px;
+            cursor: pointer;
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .toggle-btn:hover {
+            background: rgba(255,255,255,0.3);
+        }
+
+        .logo-title h3 {
+            font-weight: 600;
+            font-size: 1.2rem;
+            letter-spacing: -0.3px;
+        }
+        .logo-title p {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        /* Theme Picker */
+        .theme-picker {
+            display: flex;
+            gap: 10px;
+            background: rgba(0,0,0,0.2);
+            padding: 5px 12px;
+            border-radius: 40px;
+            backdrop-filter: blur(4px);
+        }
+        .theme-btn {
+            background: transparent;
+            border: none;
+            font-size: 1.2rem;
+            cursor: pointer;
+            border-radius: 50%;
+            width: 32px;
+            height: 32px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.2s;
+        }
+        .theme-btn:hover {
+            transform: scale(1.1);
+            background: rgba(255,255,255,0.2);
+        }
+
+        #user-profile {
+            background: rgba(255,255,255,0.2);
+            padding: 6px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        /* Container */
+        #app-container {
+            display: flex;
+            height: calc(100vh - 64px);
+            width: 100%;
+        }
+
+        /* Sidebar */
+        #sidebar {
+            width: 340px;
+            background: var(--bg-sidebar);
+            overflow-y: auto;
+            padding: 24px;
+            border-right: 1px solid var(--border-color);
+            transition: width 0.3s ease, padding 0.2s;
+            box-shadow: var(--shadow-sm);
+        }
+        #sidebar.collapsed {
+            width: 0;
+            padding: 0;
+            overflow: hidden;
+            border: none;
+        }
+
+        .mission-card {
+            background: var(--card-bg);
+            border-radius: 24px;
+            padding: 20px;
+            margin-bottom: 28px;
+            box-shadow: var(--shadow-sm);
+            border: 1px solid var(--border-color);
+        }
+        .mission-card h4 {
+            font-weight: 700;
+            margin-bottom: 12px;
+            color: var(--accent);
+            display: flex;
+            gap: 8px;
+        }
+        .mission-list {
+            list-style: none;
+            padding-left: 0;
+        }
+        .mission-list li {
+            margin: 12px 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-size: 0.9rem;
+        }
+        .mission-list i {
+            width: 24px;
+            color: var(--accent);
+        }
+
+        .upload-section {
+            background: rgba(16, 185, 129, 0.1);
+            border-radius: 24px;
+            padding: 20px;
+            border: 1px solid var(--success);
+            margin-top: 10px;
+        }
+        .upload-section input, .upload-section button {
+            width: 100%;
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            background: var(--panel-bg);
+            color: var(--text-primary);
+            font-family: 'Inter', monospace;
+        }
+        .btn-submit {
+            background: var(--success);
+            color: white;
+            font-weight: bold;
+            border: none;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .btn-submit:hover {
+            background: var(--success-dark);
+            transform: translateY(-1px);
+        }
+
+        /* Workspace */
+        #workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            padding: 20px;
+            gap: 16px;
+            overflow: hidden;
+        }
+
+        .workspace-toolbar {
+            background: var(--toolbar-bg);
+            border-radius: 28px;
+            padding: 12px 20px;
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 16px;
+            backdrop-filter: blur(4px);
+            border: 1px solid var(--border-color);
+        }
+        .workspace-toolbar label {
+            font-weight: 500;
+            font-size: 0.85rem;
+        }
+        select {
+            background: var(--panel-bg);
+            border: 1px solid var(--border-color);
+            padding: 8px 16px;
+            border-radius: 40px;
+            font-weight: 500;
+            color: var(--text-primary);
+            cursor: pointer;
+        }
+        .divider {
+            width: 1px;
+            height: 28px;
+            background: var(--border-color);
+        }
+
+        /* Grid */
+        #main-grid {
+            flex: 1;
+            display: grid;
+            gap: 18px;
+            min-height: 0;
+        }
+        .grid-single {
+            grid-template-columns: 1fr;
+        }
+        .grid-split {
+            grid-template-columns: 1fr 1fr;
+        }
+
+        .tool-panel {
+            background: var(--panel-bg);
+            border-radius: 28px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            box-shadow: var(--shadow-md);
+            backdrop-filter: blur(2px);
+        }
+        .tool-hidden {
+            display: none !important;
+        }
+        .tool-panel iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background: white;
+        }
+
+        /* Python  custom */
+        .python-container {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            gap: 12px;
+        }
+        .python-container h4 {
+            color: var(--accent);
+            font-weight: 600;
+            display: flex;
+            gap: 8px;
+        }
+        textarea {
+            background: var(--python-editor-bg);
+            color: #e2e8f0;
+            font-family: 'JetBrains Mono', 'Courier New', monospace;
+            border: 1px solid var(--border-color);
+            border-radius: 20px;
+            padding: 16px;
+            font-size: 14px;
+            resize: none;
+            flex: 1;
+        }
+        .btn-run {
+            background: var(--accent);
+            color: white;
+            padding: 12px;
+            border: none;
+            border-radius: 40px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.2s;
+        }
+        .output-box {
+            background: var(--output-bg);
+            color: #86efac;
+            padding: 14px;
+            height: 130px;
+            overflow-y: auto;
+            border-radius: 20px;
+            font-family: monospace;
+            font-size: 13px;
+            border: 1px solid var(--border-color);
+        }
+        
+        /* Responsive */
+        @media (max-width: 780px) {
+            .workspace-toolbar { flex-wrap: wrap; }
+            .grid-split { grid-template-columns: 1fr; }
+            #sidebar { width: 280px; }
+        }
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: var(--bg-primary);
+        }
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body data-theme="light">
+
+<header>
+    <div class="header-left">
+        <button class="toggle-btn" onclick="toggleSidebar()"><i class="fas fa-bars"></i></button>
+        <div class="logo-title">
+            <h3><i class="fas fa-microchip"></i> Smart Workspace · ม.4</h3>
+            <p>วิทยาการคำนวณ | บทที่ 2 : โลกแห่งการเขียนโปรแกรม</p>
+        </div>
+    </div>
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div class="theme-picker">
+            <button class="theme-btn" onclick="setTheme('light')" title="สว่าง"><i class="fas fa-sun"></i></button>
+            <button class="theme-btn" onclick="setTheme('dark')" title="มืด"><i class="fas fa-moon"></i></button>
+            <button class="theme-btn" onclick="setTheme('forest')" title="ธรรมชาติ"><i class="fas fa-leaf"></i></button>
+            <button class="theme-btn" onclick="setTheme('ocean')" title="ท้องทะเล"><i class="fas fa-water"></i></button>
+        </div>
+        <div id="login-section">
+            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID_HERE" data-context="signin" data-ux_mode="popup" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="medium"></div>
+        </div>
+        <div id="user-profile" style="display: none;"><i class="fas fa-graduation-cap"></i> <span id="user-name"></span></div>
+    </div>
+</header>
+
+<div id="app-container">
+    <div id="sidebar">
+        <div class="mission-card">
+            <h4><i class="fas fa-tasks"></i> ภารกิจเรียนรู้วันนี้</h4>
+            <ul class="mission-list">
+                <li><i class="fas fa-play-circle"></i> ชมวิดีโอแนะนำบทเรียน</li>
+                <li><i class="fas fa-book-open"></i> อ่านใบความรู้ PDF ประกอบ</li>
+                <li><i class="fas fa-question-circle"></i> ทำแบบทดสอบเก็บคะแนน</li>
+                <li><i class="fas fa-microchip"></i> จำลอง Arduino บน Wokwi</li>
+                <li><i class="fab fa-python"></i> เขียน Python ฝึกฝนด้วยตนเอง</li>
+            </ul>
+        </div>
+        <div class="upload-section">
+            <h4 style="color: var(--success); margin-bottom: 12px;"><i class="fas fa-paper-plane"></i> ส่งผลงาน</h4>
+            <p style="font-size: 13px; opacity: 0.8;"><i class="fas fa-link"></i> ลิงก์โปรเจค Wokwi ของคุณ</p>
+            <input type="text" id="wokwi-link" placeholder="https://wokwi.com/projects/...">
+            <p style="font-size: 13px; margin-top: 10px;"><i class="fas fa-file-code"></i> แนบไฟล์เพิ่มเติม (.ino, .py)</p>
+            <input type="file" id="file-upload">
+            <button class="btn-submit" onclick="submitAssignment()"><i class="fas fa-check-circle"></i> ส่งงานเข้าระบบ</button>
+            <div id="upload-status" style="font-size:12px; margin-top: 10px; color: var(--accent);"></div>
+        </div>
+    </div>
+
+    <div id="workspace">
+        <div class="workspace-toolbar">
+            <i class="fas fa-th-large" style="color: var(--accent);"></i>
+            <label><b>รูปแบบจอ:</b></label>
+            <select id="layout-select" onchange="updateLayout()">
+                <option value="single">🖥️ จอเดียวเต็มตา</option>
+                <option value="split" selected>🔄 แบ่ง 2 จอ (เรียนรู้คู่ปฏิบัติ)</option>
+            </select>
+            <div class="divider"></div>
+            <label><b>📌 ฝั่งซ้าย:</b></label>
+            <select id="content-left" onchange="updateLayout()">
+                <option value="video">🎥 วิดีโอสอน</option>
+                <option value="pdf">📄 ใบความรู้ (PDF)</option>
+                <option value="quiz">📝 แบบทดสอบ</option>
+                <option value="wokwi">🤖 Arduino Wokwi</option>
+                <option value="python">🐍 Python Lab</option>
+            </select>
+            <label id="label-right"><b>📌 ฝั่งขวา:</b></label>
+            <select id="content-right" onchange="updateLayout()">
+                <option value="wokwi" selected>🤖 Arduino Wokwi</option>
+                <option value="python">🐍 Python Lab</option>
+                <option value="quiz">📝 แบบทดสอบ</option>
+                <option value="video">🎥 วิดีโอสอน</option>
+                <option value="pdf">📄 ใบความรู้</option>
+            </select>
+        </div>
+
+        <div id="main-grid" class="grid-split">
+            <!-- video panel -->
+            <div id="tool-video" class="tool-panel">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0" allowfullscreen></iframe>
+            </div>
+            <div id="tool-pdf" class="tool-panel tool-hidden">
+                <iframe src="https://docs.google.com/viewer?url=https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf&embedded=true"></iframe>
+            </div>
+            <div id="tool-quiz" class="tool-panel tool-hidden">
+                <iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeE4pWksL-c-4T-tE_uJ8hP6fQj-hL-_F_EwM-1-wBv-1Q41g/viewform?embedded=true"></iframe>
+            </div>
+            <div id="tool-wokwi" class="tool-panel">
+                <iframe src="https://wokwi.com/projects/new/arduino-uno" title="Arduino Simulator"></iframe>
+            </div>
+            <div id="tool-python" class="tool-panel tool-hidden">
+                <div class="python-container">
+                    <h4><i class="fab fa-python"></i> โค้ดฝึกเขียน Python</h4>
+                    <textarea id="python-code"># 🚀 เขียนโค้ด Python ของคุณได้เลย!
+# ตัวอย่าง: รับ input และคำนวณพื้นที่สี่เหลี่ยม
+print("🎉 สวัสดี Smart Learner!")
+name = input("กรุณาพิมพ์ชื่อของคุณ: ")
+print(f"ยินดีต้อนรับ {name} สู่โลกการเขียนโปรแกรม")</textarea>
+                    <button class="btn-run" onclick="runPython()"><i class="fas fa-play"></i> รันโค้ดเลย!</button>
+                    <div class="output-box" id="output">⚡ รอผลลัพธ์...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    // Theme switcher
+    function setTheme(themeName) {
+        document.body.setAttribute('data-theme', themeName);
+        localStorage.setItem('smart_theme', themeName);
+    }
+    const savedTheme = localStorage.getItem('smart_theme');
+    if (savedTheme) document.body.setAttribute('data-theme', savedTheme);
+    else document.body.setAttribute('data-theme', 'light');
+
+    function toggleSidebar() {
+        document.getElementById("sidebar").classList.toggle("collapsed");
+    }
+
+    function updateLayout() {
+        const layout = document.getElementById('layout-select').value;
+        const leftTool = document.getElementById('content-left').value;
+        const rightTool = document.getElementById('content-right').value;
+
+        if (layout === 'split' && leftTool === rightTool) {
+            alert("⚠️ กรุณาเลือกเนื้อหาฝั่งซ้ายและขวาให้ต่างกัน เพื่อการเรียนรู้ที่หลากหลายครับ");
+            return;
+        }
+
+        const tools = ['video', 'pdf', 'quiz', 'wokwi', 'python'];
+        tools.forEach(tool => {
+            const el = document.getElementById('tool-' + tool);
+            if (el) el.classList.add('tool-hidden');
+        });
+
+        const grid = document.getElementById('main-grid');
+        if (layout === 'single') {
+            grid.className = 'grid-single';
+            document.getElementById('label-right').style.display = 'none';
+            document.getElementById('content-right').style.display = 'none';
+            const leftPanel = document.getElementById('tool-' + leftTool);
+            if (leftPanel) leftPanel.classList.remove('tool-hidden');
+        } else {
+            grid.className = 'grid-split';
+            document.getElementById('label-right').style.display = 'inline';
+            document.getElementById('content-right').style.display = 'inline-block';
+            const leftElem = document.getElementById('tool-' + leftTool);
+            const rightElem = document.getElementById('tool-' + rightTool);
+            if (leftElem) leftElem.classList.remove('tool-hidden');
+            if (rightElem) rightElem.classList.remove('tool-hidden');
+        }
+    }
+
+    // Python runner (Skulpt)
+    let outputContent = "";
+    function outf(text) {
+        outputContent += text;
+        const outputDiv = document.getElementById("output");
+        if (outputDiv) outputDiv.innerHTML = outputContent;
+    }
+    function builtinRead(x) {
+        if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined)
+            throw "File not found: '" + x + "'";
+        return Sk.builtinFiles["files"][x];
+    }
+    function runPython() {
+        const code = document.getElementById("python-code").value;
+        const outputDiv = document.getElementById("output");
+        outputDiv.innerHTML = "";
+        outputContent = "";
+        Sk.pre = "output";
+        Sk.configure({ output: outf, read: builtinRead });
+        const myPromise = Sk.misceval.asyncToPromise(function() {
+            return Sk.importMainWithBody("<stdin>", false, code, true);
+        });
+        myPromise.then(function(mod) {
+            if(outputContent === "") outputDiv.innerHTML = "✅ โค้ดทำงานสำเร็จ (ไม่มี output)";
+        }, function(err) {
+            outputDiv.innerHTML = `<span style="color: #f87171;">❌ ข้อผิดพลาด: ${err.toString()}</span>`;
+        });
+    }
+
+    // Google login handler
+    let studentData = {};
+    function decodeJwtResponse(token) {
+        let base64Url = token.split('.')[1];
+        let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+        let jsonPayload = decodeURIComponent(atob(base64).split('').map(function(c) {
+            return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+        }).join(''));
+        return JSON.parse(jsonPayload);
+    }
+    function handleCredentialResponse(response) {
+        studentData = decodeJwtResponse(response.credential);
+        document.getElementById('login-section').style.display = 'none';
+        const profileDiv = document.getElementById('user-profile');
+        profileDiv.style.display = 'flex';
+        document.getElementById('user-name').innerText = `${studentData.name}`;
+        profileDiv.innerHTML = `<i class="fas fa-user-check"></i> ${studentData.name}`;
+    }
+    
+    // Assignment submission (demo)
+    function submitAssignment() {
+        const wokwiLink = document.getElementById('wokwi-link').value;
+        const fileInput = document.getElementById('file-upload');
+        const statusDiv = document.getElementById('upload-status');
+        if (!wokwiLink && (!fileInput.files || fileInput.files.length === 0)) {
+            statusDiv.innerHTML = '<i class="fas fa-exclamation-triangle"></i> กรุณาใส่ลิงก์ Wokwi หรือแนบไฟล์';
+            statusDiv.style.color = '#f97316';
+            setTimeout(() => statusDiv.innerHTML = '', 2000);
+            return;
+        }
+        let message = '✅ ส่งงานสำเร็จ! ';
+        if (wokwiLink) message += ` ลิงก์: ${wokwiLink.substring(0, 40)}... `;
+        if (fileInput.files.length > 0) message += ` ไฟล์: ${fileInput.files[0].name}`;
+        statusDiv.innerHTML = `<i class="fas fa-check-circle"></i> ${message}`;
+        statusDiv.style.color = 'var(--success)';
+        setTimeout(() => statusDiv.innerHTML = '', 3500);
+        // reset placeholder? ไม่ล้างข้อมูลเพื่อความสะดวก
+        alert("ระบบบันทึกข้อมูลเรียบร้อย (จำลอง) ครูจะตรวจสอบผลงานค่ะ 🎉");
+    }
+
+    // initial load: make sure panels are correct
+    window.addEventListener('DOMContentLoaded', () => {
+        updateLayout();
+        // ปรับแต่ง input placeholder 
+        const wLink = document.getElementById('wokwi-link');
+        if(wLink) wLink.placeholder = "https://wokwi.com/projects/... (วางลิงก์ของคุณ)";
+        // python initial sample
+        const defaultCode = `# 🐍 ฝึกเขียน Python กับ Smart Workspace
+# ตัวอย่าง: เครื่องคิดเลขง่ายๆ
+a = int(input("ป้อนตัวเลขที่ 1: "))
+b = int(input("ป้อนตัวเลขที่ 2: "))
+print(f"ผลรวม = {a+b}")
+print(f"ผลต่าง = {a-b}")
+print("ยอดเยี่ยม! ฝึกต่อไปนะครับ 🚀")`;
+        const pyArea = document.getElementById('python-code');
+        if(pyArea && pyArea.value.trim() === "# พิมพ์โค้ด Python ที่นี่...\nprint(\"Hello, PROT ROBOT!\")") {
+            pyArea.value = defaultCode;
+        }
+    });
+    
+    // Force right panel visibility on resize
+    window.addEventListener('resize', () => updateLayout());
+</script>
+
+</body>
+</html>
