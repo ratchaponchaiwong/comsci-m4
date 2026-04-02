@@ -111,13 +111,10 @@
             worksObj[actId] = workContent; 
 
             try {
-                // ส่งข้อมูลด้วยลิงก์ใหม่
+                // ส่งข้อมูลด้วยลิงก์ใหม่ (ไม่ต้องมี headers)
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
-                    headers: {
-                        'Content-Type': 'application/json' // 🌟 เปลี่ยนตรงนี้ครับ ใช้งานได้แน่นอน!
-                    },
                     body: JSON.stringify({
                         email: email,
                         works: worksObj
