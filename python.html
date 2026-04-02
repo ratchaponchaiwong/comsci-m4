@@ -28,6 +28,7 @@
     </div>
 
     <script>
+        // 🌟 สำคัญ: นำลิงก์ Web App URL ตัวใหม่ล่าสุดที่ได้จากการ Deploy มาวางแทนที่ตรงนี้นะครับ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         // ==========================================
@@ -69,6 +70,9 @@
         checkDeadlineAndKickOut();
         setInterval(checkDeadlineAndKickOut, 5000);
 
+        // ==========================================
+        // ฟังก์ชันเตรียมข้อมูลก่อนส่ง
+        // ==========================================
         function prepareToSubmit() {
             const answerText = document.getElementById('student-answer').value.trim();
 
@@ -80,7 +84,7 @@
         }
 
         // ==========================================
-        // ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (ลบ headers ออกแล้ว)
+        // ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล
         // ==========================================
         async function submitWork(workContent) {
             const email = localStorage.getItem('student_email');
@@ -98,16 +102,18 @@
                 return;
             }
 
+            // เปลี่ยนหน้าตาปุ่มเพื่อบอกนักเรียนว่ากำลังประมวลผล
             const submitBtn = document.getElementById('submitBtn');
             submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึกส่งข้อมูล...';
             submitBtn.style.background = '#f59e0b';
             submitBtn.disabled = true;
 
+            // จัดโครงสร้างข้อมูลให้ตรงกับฐานข้อมูล
             let worksObj = {};
             worksObj[actId] = workContent; 
 
             try {
-                // ส่งข้อมูลโดยไม่มีการบล็อกจาก Header
+                // ส่งข้อมูลไปที่ Google Sheets (ลบ Header ออก เพื่อป้องกันการบล็อกข้อมูล)
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -117,7 +123,7 @@
                     })
                 });
                 
-                // จำสถานะไว้เบื้องต้น
+                // จำสถานะไว้เบื้องต้น หน้าเว็บจะได้แสดงผลไวขึ้น
                 localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
                 
                 alert('✅ ส่งงานสำเร็จเรียบร้อยแล้ว!');
