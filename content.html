@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ห้องเรียนเนื้อหา | PROT Smart Workspace</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* CSS หลักจาก Template */
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s, color 0.3s;}
+        body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; }
+        
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        
+        .content-layer { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; }
+        
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
+        
+        .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 4px 12px 4px 8px; border-radius: 50px; }
+        body[data-theme="snow"] .user-info, body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3b82f6; }
+        .user-name { font-size: 0.85rem; font-weight: 500; color: inherit; }
+
+        :root { --panel-bg: rgba(30, 41, 59, 0.6); --border-ws: rgba(255,255,255,0.1); --accent: #a855f7; }
+        body[data-theme="snow"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(0,0,0,0.1); --accent: #9333ea; }
+        body[data-theme="forest"] { --panel-bg: rgba(30, 60, 30, 0.6); --accent: #a855f7; }
+        body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(255,105,180,0.3); --accent: #d946ef; }
+
+        .workspace-wrapper { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
+        
+        .sidebar { width: 250px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; }
+        .task-title { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; }
+        .task-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; }
+        
+        .btn-submit { background: rgba(255,255,255,0.2); color: inherit; border: 1px solid var(--border-ws); padding: 12px; width: 100%; border-radius: 10px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; margin-top: auto; transition: 0.3s;}
+        body[data-theme="snow"] .btn-submit, body[data-theme="love"] .btn-submit { background: rgba(0,0,0,0.05); }
+        .btn-submit:hover { background: var(--accent); color: white; border-color: var(--accent);}
+        
+        .main-panel { flex: 1; background: var(--panel-bg); border-radius: 20px; border: 1px solid var(--border-ws); overflow: hidden;}
+        .main-panel iframe { width: 100%; height: 100%; border: none; background: white; }
+    </style>
+</head>
+<body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
+    
+    <div class="content-layer">
+        <header>
+            <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
+            <div class="user-info" id="loginArea"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</div>
+        </header>
+
+        <div class="workspace-wrapper">
+            <div class="sidebar">
+                <div class="task-title" id="task-title"><i class="fas fa-book-open"></i> บทเรียนและเนื้อหา</div>
+                <div class="task-desc" id="task-desc">ศึกษาเนื้อหาจากสื่อที่คุณครูแนบมาให้ เมื่อเข้าใจแล้วสามารถกลับไปทำกิจกรรมอื่นต่อได้เลย</div>
+                
+                <button class="btn-submit" onclick="window.location.href='student.html'">
+                    <i class="fas fa-arrow-left"></i> กลับห้องเรียน
+                </button>
+            </div>
+
+            <div class="main-panel">
+                <iframe id="content-frame" src="" title="Learning Content"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function loadUserData() {
+            const email = localStorage.getItem('student_email');
+            if (!email) { window.location.href = "student.html"; return; }
+            document.getElementById('loginArea').innerHTML = `<img src="${localStorage.getItem('student_pic')}" class="user-avatar"><span class="user-name">${localStorage.getItem('student_name').split(' ')[0]}</span>`;
+            document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
+
+            const actId = new URLSearchParams(window.location.search).get('actid');
+            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const currentAct = acts.find(a => String(a.id) === String(actId));
+            
+            if(currentAct) {
+                document.getElementById('task-title').innerHTML = `<i class="fas fa-book-open"></i> ${currentAct.title}`;
+                document.getElementById('task-desc').innerText = currentAct.desc;
+                
+                // เลือกว่าจะโชว์ Youtube หรือ เอกสาร
+                let targetUrl = currentAct.yt || currentAct.doc || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+                if(targetUrl.includes("youtube.com/watch?v=")) {
+                    targetUrl = targetUrl.replace("watch?v=", "embed/");
+                }
+                document.getElementById('content-frame').src = targetUrl;
+            }
+        }
+        window.onload = loadUserData;
+    </script>
+</body>
+</html>
