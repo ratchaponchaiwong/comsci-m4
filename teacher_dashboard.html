@@ -351,6 +351,7 @@
                 particle.style.fontSize = (Math.random() * 15 + 15) + "px";
                 particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
                 particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                particle.style.top = "-10vh";
                 particle.innerHTML = themeData.particleChar;
                 container.appendChild(particle);
                 setTimeout(() => particle.remove(), 12000);
@@ -400,6 +401,7 @@
             document.getElementById(rid).style.display = (grade === 'all') ? 'none' : 'block';
         }
 
+        // ==================== โหลดกิจกรรม (อัปเดตเช็กเวลาหมดเขต) ====================
         function loadActivities() {
             const container = document.getElementById('activities-list-container');
             let acts = [];
@@ -417,15 +419,39 @@
                 else if(a.type === 'task') { tColor = '#f59e0b'; tIcon = '⚙️'; tName = 'งาน'; }
                 else if(a.type === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
 
-                let openStatusBadge = (!a.status || a.status === 'open') ? `<span style="color:#10b981; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye"></i> 🟢 เปิดอยู่</span>` : `<span style="color:#ef4444; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye-slash"></i> 🔴 ปิดชั่วคราว</span>`;
+                // เช็กเวลาหมดเขต
+                let isPastDeadline = false;
+                if (a.date && a.type !== 'content') { 
+                    try {
+                        let timeStr = a.time ? a.time : '23:59';
+                        if (timeStr.split(':').length === 2) { timeStr += ':00'; }
+                        const deadlineTime = new Date(`${a.date}T${timeStr}`).getTime();
+                        const nowTime = new Date().getTime();
+                        if (nowTime > deadlineTime) { isPastDeadline = true; }
+                    } catch(e) {}
+                }
+
+                // สร้างป้ายสถานะแบบอัจฉริยะ
+                let openStatusBadge = '';
+                if (a.type === 'content') {
+                     openStatusBadge = (!a.status || a.status === 'open') ? `<span style="color:#10b981; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye"></i> 🟢 เปิดอยู่</span>` : `<span style="color:#ef4444; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye-slash"></i> 🔴 ปิดชั่วคราว</span>`;
+                } else {
+                     if (isPastDeadline) {
+                         openStatusBadge = `<span style="color:#ef4444; font-size:0.8rem; font-weight:600;"><i class="fas fa-clock"></i> 🔴 ปิดรับงาน (หมดเวลา)</span>`;
+                     } else if (a.status === 'closed') {
+                         openStatusBadge = `<span style="color:#ef4444; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye-slash"></i> 🔴 ปิดชั่วคราว</span>`;
+                     } else {
+                         openStatusBadge = `<span style="color:#10b981; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye"></i> 🟢 เปิดรับงาน</span>`;
+                     }
+                }
 
                 return `
-                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid ${tColor};">
+                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid ${isPastDeadline && a.type !== 'content' ? '#ef4444' : tColor};">
                     <div>
-                        <div style="font-weight:600; color:${tColor}; font-size:1.1rem; margin-bottom:5px;">${tIcon} ${a.title}</div>
+                        <div style="font-weight:600; color:${isPastDeadline && a.type !== 'content' ? '#ef4444' : tColor}; font-size:1.1rem; margin-bottom:5px;">${tIcon} ${a.title}</div>
                         <div style="font-size:0.8rem; opacity:0.8;">
                             <span style="background:${tColor}33; color:${tColor}; padding:2px 8px; border-radius:10px; margin-right:5px; font-weight:600;">${tName}</span> 
-                            ห้อง: ${a.targetRoom || 'ทุกห้อง'} | ${tScore} | ${openStatusBadge}
+                            ห้อง: ${a.targetRoom || 'ทุกห้อง'} | ${tScore} <br><div style="margin-top:8px;">${openStatusBadge}</div>
                         </div>
                     </div>
                     <div>
@@ -441,7 +467,7 @@
             const title = document.getElementById('act-title').value;
             const typeNode = document.querySelector('input[name="act-type"]:checked');
             const type = typeNode ? typeNode.value : 'task'; 
-            const status = document.getElementById('act-status').value; // บันทึกค่าเปิด/ปิด
+            const status = document.getElementById('act-status').value; 
             
             const date = document.getElementById('act-date').value;
             if(!title) return alert("⚠️ กรุณากรอกชื่อเรื่อง");
@@ -454,7 +480,7 @@
             const actData = {
                 id: document.getElementById('edit-id').value || Date.now().toString(),
                 type: type,
-                status: status, // เก็บสถานะการมองเห็น
+                status: status,
                 title: title, 
                 desc: document.getElementById('act-desc').value,
                 date: date, 
@@ -489,7 +515,7 @@
                 if(r.value === actType) r.checked = true;
             });
             
-            document.getElementById('act-status').value = act.status || 'open'; // โหลดสถานะเปิดปิด
+            document.getElementById('act-status').value = act.status || 'open';
             document.getElementById('act-title').value = act.title;
             document.getElementById('act-desc').value = act.desc || '';
             document.getElementById('act-date').value = act.date || '';
@@ -530,7 +556,7 @@
         function resetForm() {
             document.getElementById('edit-id').value = '';
             document.querySelector('input[name="act-type"][value="task"]').checked = true;
-            document.getElementById('act-status').value = 'open'; // รีเซ็ตสถานะเป็นเปิดเสมอ
+            document.getElementById('act-status').value = 'open'; 
             document.getElementById('act-title').value = '';
             document.getElementById('act-desc').value = '';
             document.getElementById('act-date').value = '';
@@ -719,6 +745,11 @@
                 const savedTheme = localStorage.getItem('smart_theme') || "default";
                 applyTheme(savedTheme);
                 fetchActivitiesFromServer(); 
+                
+                // สั่งให้หน้าครูอัปเดตเวลาเรื่อยๆ เผื่อเปิดทิ้งไว้แล้วเวลาเลยกำหนด
+                setInterval(() => {
+                    loadActivities();
+                }, 60000); // อัปเดตทุกๆ 1 นาที
             }
         };
     </script>
