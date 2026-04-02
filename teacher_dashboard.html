@@ -317,7 +317,7 @@
     </div>
 
     <script>
-        // ⚠️ ลิงก์ Apps Script ของคุณครู ⚠️
+        // 🌟 อัปเดตลิงก์เป็นตัวใหม่ล่าสุดแล้วครับ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         let studentsList = []; 
@@ -325,7 +325,6 @@
         let currentGradeEmail = '';
         let currentGradeActId = '';
 
-        // ==================== THEME & ANIMATION ====================
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
 
@@ -370,7 +369,6 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
-        // ==================== FETCH ACTIVITIES ====================
         async function fetchActivitiesFromServer() {
             const container = document.getElementById('activities-list-container');
             container.innerHTML = '<div style="text-align:center; padding: 40px; color: #60a5fa;"><i class="fas fa-spinner fa-spin fa-2x"></i><p style="margin-top: 15px;">กำลังเชื่อมต่อฐานข้อมูล...</p></div>';
@@ -401,7 +399,6 @@
             document.getElementById(rid).style.display = (grade === 'all') ? 'none' : 'block';
         }
 
-        // ==================== โหลดกิจกรรม (อัปเดตเช็กเวลาหมดเขต) ====================
         function loadActivities() {
             const container = document.getElementById('activities-list-container');
             let acts = [];
@@ -419,7 +416,6 @@
                 else if(a.type === 'task') { tColor = '#f59e0b'; tIcon = '⚙️'; tName = 'งาน'; }
                 else if(a.type === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
 
-                // เช็กเวลาหมดเขต
                 let isPastDeadline = false;
                 if (a.date && a.type !== 'content') { 
                     try {
@@ -431,7 +427,6 @@
                     } catch(e) {}
                 }
 
-                // สร้างป้ายสถานะแบบอัจฉริยะ
                 let openStatusBadge = '';
                 if (a.type === 'content') {
                      openStatusBadge = (!a.status || a.status === 'open') ? `<span style="color:#10b981; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye"></i> 🟢 เปิดอยู่</span>` : `<span style="color:#ef4444; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye-slash"></i> 🔴 ปิดชั่วคราว</span>`;
@@ -576,7 +571,6 @@
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveActivities", activities: JSON.parse(acts) }) });
         }
 
-        // ==================== MATRIX ตรวจงาน ====================
         async function loadMatrixData() {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const gradableActs = acts.filter(a => a.type !== 'content');
@@ -616,7 +610,7 @@
                 return true;
             }).sort((a,b) => a.number - b.number).forEach(s => {
                 
-                // อัปเกรดการเช็กงาน ป้องกันการสับสนระหว่าง String กับ Number
+                // ระบบดึงข้อมูลงานที่ฉลาดขึ้น
                 const actIdStr = String(actId);
                 let workContent = null;
                 let scoreData = '-';
@@ -658,12 +652,19 @@
             document.getElementById('grade-max-points').innerText = maxPoints;
 
             const workContent = document.getElementById('grade-work-content');
-            if(student.works && student.works[actId]) {
-                const workStr = student.works[actId];
-                if(workStr.startsWith('http')) {
-                    workContent.innerHTML = `<a href="${workStr}" target="_blank" style="color:#60a5fa; text-decoration:underline;"><i class="fas fa-external-link-alt"></i> เปิดดูผลงานลิงก์ที่ส่งมา</a>`;
+            
+            // ดึงผลงานมาโชว์ตอนตรวจ
+            let studentWork = null;
+            if(student.works) {
+                if(student.works[actId] !== undefined) studentWork = student.works[actId];
+                else if(student.works[Number(actId)] !== undefined) studentWork = student.works[Number(actId)];
+            }
+
+            if(studentWork) {
+                if(String(studentWork).startsWith('http')) {
+                    workContent.innerHTML = `<a href="${studentWork}" target="_blank" style="color:#60a5fa; text-decoration:underline;"><i class="fas fa-external-link-alt"></i> เปิดดูผลงานลิงก์ที่ส่งมา</a>`;
                 } else {
-                    workContent.innerHTML = `<pre style="background:#0f172a; padding:10px; border-radius:8px; overflow-x:auto; border:1px solid #334155;">${workStr}</pre>`;
+                    workContent.innerHTML = `<pre style="background:#0f172a; padding:10px; border-radius:8px; overflow-x:auto; border:1px solid #334155;">${studentWork}</pre>`;
                 }
             } else {
                 workContent.innerHTML = 'นักเรียนยังไม่ได้ส่งงานระบบนี้';
@@ -761,10 +762,9 @@
                 applyTheme(savedTheme);
                 fetchActivitiesFromServer(); 
                 
-                // สั่งให้หน้าครูอัปเดตเวลาเรื่อยๆ เผื่อเปิดทิ้งไว้แล้วเวลาเลยกำหนด
                 setInterval(() => {
                     loadActivities();
-                }, 60000); // อัปเดตทุกๆ 1 นาที
+                }, 60000); 
             }
         };
     </script>
