@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องเรียนของฉัน | PROT Smart Workspace</title>
+    <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -248,7 +248,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
@@ -335,7 +335,6 @@
             const email = localStorage.getItem('student_email');
             if (!email) { document.getElementById('showLoginBtn').style.display = 'flex'; return; }
 
-            // 🌟 ให้สิทธิข้อมูลที่อยู่ในเครื่องแสดงผลทันที ไม่ต้องรอ Database
             const name = getUserData('custom_name') || localStorage.getItem('student_name') || "นักเรียน";
             const studentId = getUserData('studentid') || '-';
             const room = getUserData('room') || '-';
@@ -377,25 +376,26 @@
                 try {
                     const cacheBuster = new Date().getTime(); 
                     
+                    // 🌟 ดึงข้อมูลอย่างปลอดภัย (เปลี่ยนจาก .json() เป็น .text() เพื่อไม่ให้ระบบพังถ้าเชื่อมต่อไม่ได้) 🌟
                     const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
-                    const actData = await actRes.json();
+                    const actText = await actRes.text();
+                    const actData = JSON.parse(actText);
                     
                     if(actData && actData.type === 'activities' && Array.isArray(actData.data)) {
                         localStorage.setItem('global_activities', JSON.stringify(actData.data));
-                    } else {
-                        localStorage.setItem('global_activities', '[]');
                     }
 
                     const stdRes = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
-                    const allStudents = await stdRes.json();
+                    const stdText = await stdRes.text();
+                    const allStudents = JSON.parse(stdText);
+                    
                     const myData = allStudents.find(s => s.email === email);
                     
                     if(myData) {
-                        // ดึงข้อมูลจากฐานข้อมูลมาอัปเดต ถ้าในฐานข้อมูลว่างให้ใช้ข้อมูลในเครื่อง
-                        const dbStudentId = myData.studentId || localStorage.getItem(email + '_studentid') || '-';
-                        const dbFullName = myData.name || localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name') || 'นักเรียน';
-                        const dbRoom = myData.room || localStorage.getItem(email + '_room') || '-';
-                        const dbNumber = myData.number || localStorage.getItem(email + '_number') || '-';
+                        const dbStudentId = (myData.studentId && myData.studentId !== "") ? myData.studentId : localStorage.getItem(email + '_studentid') || '-';
+                        const dbFullName = (myData.name && myData.name !== "") ? myData.name : localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name') || 'นักเรียน';
+                        const dbRoom = (myData.room && myData.room !== "") ? myData.room : localStorage.getItem(email + '_room') || '-';
+                        const dbNumber = (myData.number && myData.number !== "") ? myData.number : localStorage.getItem(email + '_number') || '-';
 
                         document.getElementById('display-studentid').innerText = dbStudentId;
                         document.getElementById('profile-name').innerText = dbFullName;
@@ -423,14 +423,12 @@
                                 localStorage.removeItem(email + '_act_' + a.id + '_score');
                             }
                         });
-
                         document.getElementById('status-msg').style.display = 'none';
-                    } 
-                    // 🌟 จุดสำคัญที่ผมเอาออก: ไม่ให้มันลบข้อมูลตัวเองทิ้ง ถ้าหาชื่อในฐานข้อมูลไม่เจอ 🌟
+                    }
                 } catch(e) { 
                     console.error("Fetch Error:", e);
                     document.getElementById('status-msg').style.display = 'block';
-                    document.getElementById('status-msg').innerHTML = '⚠️ ไม่สามารถเชื่อมต่อฐานข้อมูลได้ ระบบแสดงผลข้อมูลเก่าในเครื่อง';
+                    document.getElementById('status-msg').innerHTML = '⚠️ ขัดข้องในการดึงข้อมูลจากฐานข้อมูล ระบบจะแสดงผลข้อมูลล่าสุดที่มีในเครื่อง';
                 }
             }
             renderModules(email);
@@ -450,15 +448,24 @@
             try { allActivities = JSON.parse(localStorage.getItem('global_activities')) || []; } catch(e) { }
             
             const studentRoom = localStorage.getItem(email + '_room') || "";
+            
+            // 🌟 แก้ปัญหาการเชื่อมโยงห้องเรียน 🌟
+            if (studentRoom === "" || studentRoom === "-") {
+                container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.8; border-left:4px solid #f59e0b; flex-direction: column; text-align: center;">
+                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b; margin-bottom: 10px;"></i>
+                    <h3 style="color: #f59e0b; margin-bottom: 5px;">ยังไม่ได้ตั้งค่าห้องเรียน</h3>
+                    <p>กรุณากดปุ่ม <b>"แก้ไขข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุห้องเรียนของคุณ ระบบจึงจะแสดงบทเรียนให้ครับ</p>
+                </div>`;
+                return;
+            }
+
             const activities = allActivities.filter(act => {
                 const target = act.targetRoom || 'ทุกห้อง';
                 return target === 'ทุกห้อง' || target === studentRoom;
             });
             
             if (activities.length === 0) {
-                container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.7; border-left:4px solid #ef4444;"><p>
-                    ${studentRoom === "" ? "⚠️ กรุณากดปุ่ม 'แก้ไขข้อมูลส่วนตัว' ด้านซ้าย เพื่อเลือกห้องเรียนก่อน ระบบถึงจะแสดงบทเรียนให้ครับ" : "ยังไม่มีบทเรียนที่เปิดสอนสำหรับห้องของคุณ"}
-                </p></div>`;
+                container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.7; border-left:4px solid #3b82f6;"><p>ยังไม่มีบทเรียนที่เปิดสอนสำหรับห้องของคุณ</p></div>`;
                 return;
             }
 
@@ -590,7 +597,6 @@
         }
         function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('active'); }
 
-        // 🌟 อัปเดตหน้าจอทันที ไม่ต้องรอรีเฟรช 🌟
         function saveProfileData() {
             const studentId = document.getElementById('edit-studentid').value.trim();
             const name = document.getElementById('edit-name').value;
@@ -603,14 +609,12 @@
             document.getElementById('saving-status').style.display = 'block';
             document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูลไปยังฐานข้อมูล...';
 
-            // บันทึกลงเครื่องทันที
             localStorage.setItem(email + '_studentid', studentId);
             localStorage.setItem(email + '_custom_name', name);
             localStorage.setItem(email + '_room', room);
             localStorage.setItem(email + '_number', number);
             localStorage.setItem('student_name', name);
 
-            // อัปเดตหน้าจอทันทีโดยไม่กระตุก!
             document.getElementById('display-studentid').innerText = studentId;
             document.getElementById('profile-name').innerText = name;
             document.getElementById('display-room').innerText = room;
@@ -620,11 +624,10 @@
             let enrolledArray = [];
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
 
-            // 🌟 แก้ปัญหาบล็อกข้อมูลด้วยการระบุ content-type ให้ถูกต้อง 🌟
+            // 🌟 ลบคำสั่ง Headers ตัวก่อกวนออก ทำให้เหมือน teacher_dashboard.html 🌟
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST', 
                 mode: 'no-cors',
-                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ email: email, studentId: studentId, name: name, room: room, number: number, enrolledSubjects: enrolledArray.join(", ") })
             }).then(() => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
