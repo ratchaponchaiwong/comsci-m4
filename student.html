@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</title>
+    <title>ห้องเรียนของฉัน | PROT Smart Workspace</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -248,7 +248,7 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
 
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
@@ -376,7 +376,6 @@
                 try {
                     const cacheBuster = new Date().getTime(); 
                     
-                    // 🌟 ดึงข้อมูลอย่างปลอดภัย (เปลี่ยนจาก .json() เป็น .text() เพื่อไม่ให้ระบบพังถ้าเชื่อมต่อไม่ได้) 🌟
                     const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
                     const actText = await actRes.text();
                     const actData = JSON.parse(actText);
@@ -449,7 +448,6 @@
             
             const studentRoom = localStorage.getItem(email + '_room') || "";
             
-            // 🌟 แก้ปัญหาการเชื่อมโยงห้องเรียน 🌟
             if (studentRoom === "" || studentRoom === "-") {
                 container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.8; border-left:4px solid #f59e0b; flex-direction: column; text-align: center;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b; margin-bottom: 10px;"></i>
@@ -599,10 +597,15 @@
 
         function saveProfileData() {
             const studentId = document.getElementById('edit-studentid').value.trim();
-            const name = document.getElementById('edit-name').value;
+            const name = document.getElementById('edit-name').value.trim();
             const room = document.getElementById('edit-grade').value + "/" + document.getElementById('edit-room-num').value;
-            const number = document.getElementById('edit-number').value;
+            const number = document.getElementById('edit-number').value.trim();
             const email = localStorage.getItem('student_email');
+
+            if (!email) {
+                alert("⚠️ ไม่พบอีเมลของนักเรียน กรุณาออกจากระบบแล้วล็อกอินใหม่ครับ");
+                return;
+            }
 
             if (!name || !number || !studentId) return alert('⚠️ กรุณากรอกรหัสนักเรียน, ชื่อ และเลขที่ให้ครบถ้วน');
             
@@ -624,11 +627,20 @@
             let enrolledArray = [];
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
 
-            // 🌟 ลบบรรทัด headers ทิ้งไปแล้ว ส่งผ่าน 100% แน่นอนครับ 🌟
+            // 🌟 แก้โค้ดส่วนนี้ให้เหมือนของ Teacher เป๊ะ 100% 🌟
+            const payloadData = { 
+                email: email, 
+                studentId: studentId, 
+                name: name, 
+                room: room, 
+                number: number, 
+                enrolledSubjects: enrolledArray.join(", ") 
+            };
+
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST', 
                 mode: 'no-cors',
-                body: JSON.stringify({ email: email, studentId: studentId, name: name, room: room, number: number, enrolledSubjects: enrolledArray.join(", ") })
+                body: JSON.stringify(payloadData)
             }).then(() => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
                 setTimeout(() => {
@@ -637,7 +649,8 @@
                     renderModules(email); 
                 }, 1000);
             }).catch(e => {
-                alert("⚠️ บันทึกในเครื่องแล้ว แต่ส่งเข้าส่วนกลางไม่สำเร็จ");
+                console.error("Error saving:", e);
+                alert("⚠️ เกิดข้อผิดพลาดในการส่งข้อมูลเข้า Google Sheets");
                 document.getElementById('saving-status').style.display = 'none';
                 closeEditProfileModal();
             });
