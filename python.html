@@ -28,7 +28,6 @@
     </div>
 
     <script>
-        // 🌟 1. อัปเดตลิงก์ Web App เป็นตัวใหม่ล่าสุดแล้ว 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         // ==========================================
@@ -117,7 +116,7 @@
                     method: 'POST',
                     mode: 'no-cors',
                     headers: {
-                        'Content-Type': 'text/plain;charset=utf-8' 
+                        'Content-Type': 'application/json' // 🌟 เปลี่ยนตรงนี้ครับ ใช้งานได้แน่นอน!
                     },
                     body: JSON.stringify({
                         email: email,
