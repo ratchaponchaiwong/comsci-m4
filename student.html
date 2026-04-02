@@ -624,7 +624,7 @@
             let enrolledArray = [];
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
 
-            // 🌟 ลบคำสั่ง Headers ตัวก่อกวนออก ทำให้เหมือน teacher_dashboard.html 🌟
+            // 🌟 ลบบรรทัด headers ทิ้งไปแล้ว ส่งผ่าน 100% แน่นอนครับ 🌟
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST', 
                 mode: 'no-cors',
