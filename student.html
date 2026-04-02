@@ -402,23 +402,25 @@
                         localStorage.setItem(email + '_room', room !== '-' ? room : '');
                         localStorage.setItem(email + '_number', number !== '-' ? number : '');
 
-                        // 💡 ลบคำสั่งลบความจำทิ้งไปแล้วตรงนี้ครับ จะได้ไม่เด้งกลับไปเป็นค้างส่ง!
+                        // 🌟 ระบบซิงค์สถานะงาน: จะยึดฐานข้อมูล Google Sheets เป็นหลัก 100% 🌟
+                        const allActs = JSON.parse(localStorage.getItem('global_activities') || '[]');
+                        allActs.forEach(a => {
+                            let dbHasWork = (myData.works && myData.works[a.id] !== undefined && myData.works[a.id] !== "");
+                            let dbHasScore = (myData.scores && myData.scores[a.id] !== undefined && myData.scores[a.id] !== "");
 
-                        if(myData.works) {
-                            for(let actId in myData.works) {
-                                if(myData.works[actId] !== "" && myData.works[actId] !== null) {
-                                    localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
-                                }
+                            if (dbHasScore) {
+                                localStorage.setItem(email + '_act_' + a.id + '_status', 'graded');
+                                localStorage.setItem(email + '_act_' + a.id + '_score', myData.scores[a.id]);
+                            } else if (dbHasWork) {
+                                localStorage.setItem(email + '_act_' + a.id + '_status', 'submitted');
+                                localStorage.removeItem(email + '_act_' + a.id + '_score');
+                            } else {
+                                // ถ้าในฐานข้อมูลไม่มีงาน ให้ล้างสถานะหลอกในเครื่องทิ้ง! (แก้ปัญหา Ghost Data)
+                                localStorage.removeItem(email + '_act_' + a.id + '_status');
+                                localStorage.removeItem(email + '_act_' + a.id + '_score');
                             }
-                        }
-                        if(myData.scores) {
-                            for(let actId in myData.scores) {
-                                if(myData.scores[actId] !== "" && myData.scores[actId] !== null) {
-                                    localStorage.setItem(email + '_act_' + actId + '_score', myData.scores[actId]);
-                                    localStorage.setItem(email + '_act_' + actId + '_status', 'graded');
-                                }
-                            }
-                        }
+                        });
+
                         document.getElementById('status-msg').style.display = 'none';
                     } else {
                         localStorage.removeItem(email + '_studentid');
