@@ -201,13 +201,15 @@
                         <div class="form-group"><label><i class="fas fa-file-pdf" style="color:#3b82f6;"></i> ลิงก์ Drive/Docs/PDF</label><input type="text" id="act-doc" placeholder="วางลิงก์เอกสารที่นี่"></div>
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                            <div class="form-group"><label>ลิงก์ห้อง Lab</label>
-                                <select id="act-link">
-                                    <option value="#">ไม่มีห้อง Lab</option>
-                                    <option value="python.html">ห้อง Lab: Python</option>
-                                    <option value="robotics.html">ห้อง Lab: Arduino & Robotics</option>
-                                </select>
-                            </div>
+                            <div class="form-group"><label>ลิงก์ไปยังหน้าเรียน/ส่งงาน</label>
+                            <select id="act-link">
+                                <option value="#">ไม่มีลิงก์ (ปิดปุ่มเข้าทำ)</option>
+                                <option value="content.html">📖 หน้าเนื้อหา (วิดีโอ/PDF)</option>
+                                <option value="python.html">🐍 ห้อง Lab: เขียน Python</option>
+                                <option value="robotics.html">🤖 ห้อง Lab: หุ่นยนต์ Wokwi</option>
+                                <option value="python.html">🐍 ห้อง Lab: เขียน Python</option>
+                        </select>
+                        </div>
                             <div class="form-group"><label>คะแนนเต็ม</label><input type="number" id="act-points" value="10"></div>
                         </div>
                         
