@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</title>
+    <title>ห้องเรียนของฉัน | PROT Smart Workspace</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -387,7 +387,6 @@
                     const myData = allStudents.find(s => s.email === email);
                     
                     if(myData) {
-                        // 🌟 ดึงข้อมูลจากฐานข้อมูล แต่ถ้าว่างให้ใช้ของในเครื่องแทน จะได้ไม่กะพริบหาย 🌟
                         const studentId = myData.studentId || localStorage.getItem(email + '_studentid') || '-';
                         const fullName = myData.name || localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name') || 'นักเรียน';
                         const room = myData.room || localStorage.getItem(email + '_room') || '-';
@@ -422,7 +421,6 @@
 
                         document.getElementById('status-msg').style.display = 'none';
                     } 
-                    // 🌟 เอาการลบข้อมูล (localStorage.removeItem) ออกจากตรงนี้ เพื่อกันไม่ให้ข้อมูลผีมาลบหน้าจอเราครับ 🌟
                 } catch(e) { 
                     console.error("Fetch Error:", e);
                     document.getElementById('status-msg').style.display = 'block';
@@ -586,7 +584,6 @@
         }
         function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('active'); }
 
-        // 🌟 อัปเดตหน้าจอทันที ไม่ต้องรอรีเฟรช 🌟
         function saveProfileData() {
             const studentId = document.getElementById('edit-studentid').value.trim();
             const name = document.getElementById('edit-name').value;
@@ -599,14 +596,12 @@
             document.getElementById('saving-status').style.display = 'block';
             document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูลไปยังฐานข้อมูล...';
 
-            // บันทึกลงเครื่องทันที
             localStorage.setItem(email + '_studentid', studentId);
             localStorage.setItem(email + '_custom_name', name);
             localStorage.setItem(email + '_room', room);
             localStorage.setItem(email + '_number', number);
             localStorage.setItem('student_name', name);
 
-            // อัปเดตหน้าจอทันทีโดยไม่กระตุก!
             document.getElementById('display-studentid').innerText = studentId;
             document.getElementById('profile-name').innerText = name;
             document.getElementById('display-room').innerText = room;
@@ -626,7 +621,7 @@
                 setTimeout(() => {
                     closeEditProfileModal(); 
                     document.getElementById('saving-status').style.display = 'none';
-                    renderModules(email); // โหลดบทเรียนใหม่เผื่อเด็กเปลี่ยนห้อง
+                    renderModules(email); 
                 }, 1000);
             }).catch(e => {
                 alert("⚠️ บันทึกในเครื่องแล้ว แต่ส่งเข้าส่วนกลางไม่สำเร็จ");
