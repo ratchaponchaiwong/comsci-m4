@@ -212,8 +212,8 @@
                 <div class="dressup-category"><label><i class="fas fa-crown"></i> หมวก/ผม</label>
                     <select id="hatStyle"><option value="none">🚫 ไม่มี</option><option value="cap">🧢 แคป</option><option value="crown">👑 มงกุฎ</option><option value="flower">🌸 ดอกไม้</option><option value="bow">🎀 โบว์</option></select></div>
             </div>
-            <button class="save-outfit-btn" onclick="saveOutfit()"><i class="fas fa-cloud-upload-alt"></i> 💾 บันทึกชุดลงคลาวด์ (แชร์ข้ามเครื่องได้!)</button>
-            <p style="font-size: 0.7rem; margin-top: 15px; text-align: center; color: #ffd700;">✨ ข้อมูลถูกบันทึกด้วยอีเมลของคุณ สามารถเข้าใช้จากเครื่องไหนก็ได้!</p>
+            <button class="save-outfit-btn" onclick="saveOutfit()"><i class="fas fa-cloud-upload-alt"></i> 💾 บันทึกแล้วจ้า</button>
+            <p style="font-size: 0.7rem; margin-top: 15px; text-align: center; color: #ffd700;">✨ ข้อมูลถูกบันทึกแล้ว</p>
         </div>
     </div>
 
@@ -262,7 +262,7 @@
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(outfitData)
                 });
-                showSpeechBubble('💾 บันทึกชุดเรียบร้อย! (ซิงค์กับคลาวด์แล้ว) 💕');
+                showSpeechBubble('💾 บันทึกชุดเรียบร้อย! 💕');
             } catch(e) {
                 showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
             }
@@ -291,7 +291,7 @@
                     return;
                 }
             } catch(e) {
-                console.log("โหลดจากคลาวด์ไม่สำเร็จ", e);
+                console.log("โหลดข้อมูลไม่สำเร็จ", e);
             }
             
             // ถ้าไม่มีในคลาวด์ โหลดจาก localStorage
