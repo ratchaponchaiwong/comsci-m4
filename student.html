@@ -426,7 +426,7 @@
 
                         document.getElementById('status-msg').style.display = 'none';
                     } 
-                    // 🌟 จุดสำคัญ: ไม่ให้มันลบข้อมูลตัวเองทิ้ง ถ้าหาชื่อในฐานข้อมูลไม่เจอ
+                    // 🌟 จุดสำคัญที่ผมเอาออก: ไม่ให้มันลบข้อมูลตัวเองทิ้ง ถ้าหาชื่อในฐานข้อมูลไม่เจอ 🌟
                 } catch(e) { 
                     console.error("Fetch Error:", e);
                     document.getElementById('status-msg').style.display = 'block';
@@ -603,14 +603,14 @@
             document.getElementById('saving-status').style.display = 'block';
             document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูลไปยังฐานข้อมูล...';
 
-            // 1. บันทึกลงเครื่องทันที (ข้อมูลจะไม่หายไปไหน)
+            // บันทึกลงเครื่องทันที
             localStorage.setItem(email + '_studentid', studentId);
             localStorage.setItem(email + '_custom_name', name);
             localStorage.setItem(email + '_room', room);
             localStorage.setItem(email + '_number', number);
             localStorage.setItem('student_name', name);
 
-            // 2. อัปเดตหน้าจอทันทีโดยไม่กระตุก!
+            // อัปเดตหน้าจอทันทีโดยไม่กระตุก!
             document.getElementById('display-studentid').innerText = studentId;
             document.getElementById('profile-name').innerText = name;
             document.getElementById('display-room').innerText = room;
@@ -620,7 +620,7 @@
             let enrolledArray = [];
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
 
-            // 3. แอบส่งข้อมูลไปที่ Google Sheets หลังบ้าน
+            // 🌟 แก้ปัญหาบล็อกข้อมูลด้วยการระบุ content-type ให้ถูกต้อง 🌟
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST', 
                 mode: 'no-cors',
