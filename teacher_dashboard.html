@@ -12,7 +12,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* ==================== 1. CSS โครงสร้างหลัก ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
         
@@ -26,32 +25,22 @@
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
         body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
-        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
-        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-
-        /* ==================== อัปเดต: แอนิเมชันให้ตกจากบนลงล่าง ==================== */
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
+        
         #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
         .theme-particle { position: absolute; pointer-events: none; animation: fallDown linear forwards; z-index: 1; top: -10vh; }
-        @keyframes fallDown { 
-            0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 
-            10% { opacity: 1; } 
-            90% { opacity: 1; } 
-            100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } 
-        }
+        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } }
 
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
-        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
         
         .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #e11d48, #f43f5e); -webkit-background-clip: text; }
         
         .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: white;}
+        body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); }
+        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; background: #3b82f6;}
         .logout-btn { background: rgba(239, 68, 68, 0.8); border: none; padding: 6px 15px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; font-family: 'Prompt'; }
         
         .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
@@ -62,13 +51,16 @@
         
         .admin-tabs { display: flex; gap: 10px; margin-bottom: 25px; overflow-x: auto; padding-bottom: 10px; }
         .tab-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); color: inherit; padding: 12px 24px; border-radius: 15px; cursor: pointer; font-family: 'Prompt'; transition: 0.3s; white-space: nowrap; display: flex; align-items: center; gap: 8px; }
+        body[data-theme="love"] .tab-btn { background: rgba(255,255,255,0.6); border-color: rgba(0,0,0,0.1); }
         .tab-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.3); }
+        body[data-theme="love"] .tab-btn.active { background: #e11d48; border-color: #e11d48; box-shadow: 0 0 15px rgba(225,29,72,0.3); }
 
-        .glass-panel { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 24px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: inherit;}
-        body[data-theme="snow"] .glass-panel, body[data-theme="love"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+        .glass-panel { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 24px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.2); color: inherit; }
+        body[data-theme="snow"] .glass-panel, body[data-theme="love"] .glass-panel { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); color: #1e293b; box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
         .panel-title { font-size: 1.3rem; font-weight: 700; margin-bottom: 25px; border-bottom: 2px solid rgba(59,130,246,0.3); padding-bottom: 10px; display: flex; align-items: center; gap: 10px; color: #60a5fa; }
-        body[data-theme="snow"] .panel-title, body[data-theme="love"] .panel-title { color: #e11d48; border-bottom-color: rgba(225,29,72,0.3); }
+        body[data-theme="snow"] .panel-title { color: #2563eb; }
+        body[data-theme="love"] .panel-title { color: #e11d48; border-bottom-color: rgba(225,29,72,0.3); }
 
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; font-weight: 500; opacity: 0.9; }
@@ -81,10 +73,10 @@
         .type-option:has(input:checked)[data-type="content"] { background: rgba(168, 85, 247, 0.2); border-color: #a855f7; color: #d8b4fe; }
         .type-option:has(input:checked)[data-type="task"] { background: rgba(245, 158, 11, 0.2); border-color: #f59e0b; color: #fcd34d; }
         .type-option:has(input:checked)[data-type="activity"] { background: rgba(16, 185, 129, 0.2); border-color: #10b981; color: #6ee7b7; }
-        body[data-theme="snow"] .type-option { background: white; border-color: #cbd5e1; color: #475569;}
-        body[data-theme="snow"] .type-option:has(input:checked)[data-type="content"] { background: rgba(168, 85, 247, 0.1); border-color: #a855f7; color: #9333ea; }
-        body[data-theme="snow"] .type-option:has(input:checked)[data-type="task"] { background: rgba(245, 158, 11, 0.1); border-color: #f59e0b; color: #d97706; }
-        body[data-theme="snow"] .type-option:has(input:checked)[data-type="activity"] { background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #059669; }
+        body[data-theme="snow"] .type-option, body[data-theme="love"] .type-option { background: white; border-color: #cbd5e1; color: #475569;}
+        body[data-theme="snow"] .type-option:has(input:checked)[data-type="content"], body[data-theme="love"] .type-option:has(input:checked)[data-type="content"] { background: rgba(168, 85, 247, 0.1); border-color: #a855f7; color: #9333ea; }
+        body[data-theme="snow"] .type-option:has(input:checked)[data-type="task"], body[data-theme="love"] .type-option:has(input:checked)[data-type="task"] { background: rgba(245, 158, 11, 0.1); border-color: #f59e0b; color: #d97706; }
+        body[data-theme="snow"] .type-option:has(input:checked)[data-type="activity"], body[data-theme="love"] .type-option:has(input:checked)[data-type="activity"] { background: rgba(16, 185, 129, 0.1); border-color: #10b981; color: #059669; }
 
         .admin-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 30px; }
         
@@ -97,6 +89,7 @@
         body[data-theme="snow"] tr:hover, body[data-theme="love"] tr:hover { background: rgba(0,0,0,0.02); }
 
         .btn-action { background: #3b82f6; color: white; border: none; padding: 12px 25px; border-radius: 12px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
+        body[data-theme="love"] .btn-action { background: #e11d48; }
         .btn-action:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
         .btn-delete { background: #ef4444; padding: 6px 12px; border-radius: 8px; color: white; border:none; cursor: pointer; }
         .btn-edit { background: #f59e0b; padding: 6px 12px; border-radius: 8px; color: white; border:none; cursor: pointer; }
@@ -106,12 +99,13 @@
         .status-done { background: rgba(16, 185, 129, 0.2); color: #10b981; }
 
         .import-box { border: 2px dashed #3b82f6; border-radius: 20px; padding: 40px; text-align: center; cursor: pointer; transition: 0.3s; }
+        body[data-theme="love"] .import-box { border-color: #e11d48; }
         .import-box:hover { background: rgba(59,130,246,0.1); }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
         .modal-content { background: rgba(30, 41, 59, 0.98); border-radius: 20px; padding: 40px; max-width: 500px; width: 90%; text-align: left; border: 1px solid rgba(59,130,246,0.5); position: relative; color: white; }
-        body[data-theme="snow"] .modal-content { background: rgba(255, 255, 255, 0.98); border-color: rgba(0,0,0,0.1); color: #1e293b; }
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: rgba(255, 255, 255, 0.98); border-color: rgba(0,0,0,0.1); color: #1e293b; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
 
         @media (max-width: 1000px) { .admin-grid { grid-template-columns: 1fr; } }
@@ -126,7 +120,7 @@
             <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Admin Hub</a>
             <div id="teacherInfoUI">
                 <div class="user-info">
-                    <img id="teacherAvatar" src="" class="user-avatar" alt="avatar">
+                    <img id="teacherAvatar" src="https://ui-avatars.com/api/?name=TC&background=3b82f6&color=fff" class="user-avatar" alt="avatar">
                     <span id="teacherName" class="user-name">TECHNOLOGY COMPUTER</span>
                     <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
                 </div>
@@ -144,7 +138,7 @@
         <div class="page-content-wrapper">
             <div class="admin-tabs">
                 <button class="tab-btn active" onclick="switchTab('tab-posts')"><i class="fas fa-edit"></i> 1. จัดการบทเรียน</button>
-                <button class="tab-btn" onclick="switchTab('tab-check')"><i class="fas fa-tasks"></i> 2. ตรวจงานแยกห้อง</button>
+                <button class="tab-btn" onclick="switchTab('tab-check')"><i class="fas fa-tasks"></i> 2. ตรวจงาน</button>
                 <button class="tab-btn" onclick="switchTab('tab-import')"><i class="fas fa-file-import"></i> 3. นำเข้านักเรียน</button>
             </div>
 
@@ -155,18 +149,26 @@
                         <input type="hidden" id="edit-id">
 
                         <div class="form-group">
-                            <label>📌 เลือกประเภท (สำคัญ)</label>
+                            <label>📌 เลือกประเภท</label>
                             <div class="type-selector">
                                 <label class="type-option" data-type="content">
-                                    <input type="radio" name="act-type" value="content"> 📖 เนื้อหา (อ่านอย่างเดียว)
+                                    <input type="radio" name="act-type" value="content"> 📖 เนื้อหา
                                 </label>
                                 <label class="type-option" data-type="task">
-                                    <input type="radio" name="act-type" value="task" checked> ⚙️ งาน (มีคะแนน)
+                                    <input type="radio" name="act-type" value="task" checked> ⚙️ งาน
                                 </label>
                                 <label class="type-option" data-type="activity">
-                                    <input type="radio" name="act-type" value="activity"> 💡 กิจกรรม (ส่งผลงาน)
+                                    <input type="radio" name="act-type" value="activity"> 💡 กิจกรรม
                                 </label>
                             </div>
+                        </div>
+
+                        <div class="form-group" style="border: 1px dashed rgba(255,255,255,0.3); padding: 10px; border-radius: 10px;">
+                            <label>👁️ การมองเห็นของนักเรียน</label>
+                            <select id="act-status" style="background: rgba(0,0,0,0.3); border:none; font-weight:bold;">
+                                <option value="open">🟢 เปิดให้นักเรียนเข้าทำได้ทันที</option>
+                                <option value="closed">🔴 ปิดชั่วคราว (นักเรียนเห็นแค่ชื่อแต่กดไม่ได้)</option>
+                            </select>
                         </div>
                         
                         <div class="form-group"><label>ชื่อหัวข้อ</label><input type="text" id="act-title" placeholder="เช่น บทที่ 1, ใบงานที่ 2..."></div>
@@ -215,7 +217,7 @@
 
                     <div class="glass-panel">
                         <div class="panel-title"><i class="fas fa-list"></i> รายการที่โพสต์แล้ว</div>
-                        <div id="activities-list-container" style="max-height: 700px; overflow-y: auto; padding-right:5px;">
+                        <div id="activities-list-container" style="max-height: 800px; overflow-y: auto; padding-right:5px;">
                             <div style="text-align:center; padding: 40px; color: #60a5fa;">
                                 <i class="fas fa-spinner fa-spin fa-2x"></i>
                                 <p style="margin-top: 15px;">กำลังเตรียมข้อมูล...</p>
@@ -315,13 +317,15 @@
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+        // ⚠️ ลิงก์ Apps Script ของคุณครู ⚠️
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
+        
         let studentsList = []; 
         let tempImportList = [];
         let currentGradeEmail = '';
         let currentGradeActId = '';
 
-        // ==================== THEME ====================
+        // ==================== THEME & ANIMATION ====================
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
 
@@ -347,9 +351,6 @@
                 particle.style.fontSize = (Math.random() * 15 + 15) + "px";
                 particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
                 particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
-                
-                particle.style.top = "-10vh";
-                
                 particle.innerHTML = themeData.particleChar;
                 container.appendChild(particle);
                 setTimeout(() => particle.remove(), 12000);
@@ -357,9 +358,9 @@
             for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 200);
             particleInterval = setInterval(createParticle, 600);
         }
+
         document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
 
-        // ==================== SYSTEM & TABS ====================
         function switchTab(id) {
             document.querySelectorAll('.tab-content').forEach(t => t.style.display = 'none');
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -368,29 +369,25 @@
             if(id === 'tab-check') loadMatrixData();
         }
 
-        // ==================== FETCH ACTIVITIES (เพิ่ม Cache Busting) ====================
+        // ==================== FETCH ACTIVITIES ====================
         async function fetchActivitiesFromServer() {
             const container = document.getElementById('activities-list-container');
             container.innerHTML = '<div style="text-align:center; padding: 40px; color: #60a5fa;"><i class="fas fa-spinner fa-spin fa-2x"></i><p style="margin-top: 15px;">กำลังเชื่อมต่อฐานข้อมูล...</p></div>';
             try {
                 if(GOOGLE_SCRIPT_URL) {
-                    // เพิ่มรหัสเวลาต่อท้าย URL หลอกให้เบราว์เซอร์คิดว่าเป็นลิงก์ใหม่เสมอ
                     const cacheBuster = new Date().getTime();
                     const response = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
                     const text = await response.text();
                     const parsedData = JSON.parse(text);
-                    
                     if(parsedData && parsedData.type === 'activities' && Array.isArray(parsedData.data)) {
                         let localActs = JSON.parse(localStorage.getItem('global_activities') || '[]');
                         let serverActs = parsedData.data;
-                        
                         if (serverActs.length === 0 && localActs.length > 0) {
                             syncActivities();
                         } else {
                             localStorage.setItem('global_activities', JSON.stringify(serverActs));
                         }
-                    } else if (parsedData && parsedData.type === 'activities' && (!parsedData.data || parsedData.data.length === 0)) {
-                        // ถ้าระบบบอกว่าไม่มีข้อมูลเลย (ครูลบหมด) ให้ล้างเครื่องทันที
+                    } else if (parsedData && (!parsedData.data || parsedData.data.length === 0)) {
                         localStorage.setItem('global_activities', '[]');
                     }
                 }
@@ -420,13 +417,15 @@
                 else if(a.type === 'task') { tColor = '#f59e0b'; tIcon = '⚙️'; tName = 'งาน'; }
                 else if(a.type === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
 
+                let openStatusBadge = (!a.status || a.status === 'open') ? `<span style="color:#10b981; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye"></i> 🟢 เปิดอยู่</span>` : `<span style="color:#ef4444; font-size:0.8rem; font-weight:600;"><i class="fas fa-eye-slash"></i> 🔴 ปิดชั่วคราว</span>`;
+
                 return `
                 <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:12px; margin-bottom:10px; display:flex; justify-content:space-between; align-items:center; border-left: 5px solid ${tColor};">
                     <div>
                         <div style="font-weight:600; color:${tColor}; font-size:1.1rem; margin-bottom:5px;">${tIcon} ${a.title}</div>
                         <div style="font-size:0.8rem; opacity:0.8;">
                             <span style="background:${tColor}33; color:${tColor}; padding:2px 8px; border-radius:10px; margin-right:5px; font-weight:600;">${tName}</span> 
-                            ห้อง: ${a.targetRoom || 'ทุกห้อง'} | ${tScore}
+                            ห้อง: ${a.targetRoom || 'ทุกห้อง'} | ${tScore} | ${openStatusBadge}
                         </div>
                     </div>
                     <div>
@@ -442,6 +441,7 @@
             const title = document.getElementById('act-title').value;
             const typeNode = document.querySelector('input[name="act-type"]:checked');
             const type = typeNode ? typeNode.value : 'task'; 
+            const status = document.getElementById('act-status').value; // บันทึกค่าเปิด/ปิด
             
             const date = document.getElementById('act-date').value;
             if(!title) return alert("⚠️ กรุณากรอกชื่อเรื่อง");
@@ -454,6 +454,7 @@
             const actData = {
                 id: document.getElementById('edit-id').value || Date.now().toString(),
                 type: type,
+                status: status, // เก็บสถานะการมองเห็น
                 title: title, 
                 desc: document.getElementById('act-desc').value,
                 date: date, 
@@ -473,6 +474,7 @@
             syncActivities();
             alert("✅ บันทึกโพสต์สำเร็จ!");
             resetForm(); loadActivities();
+            loadMatrixData();
         }
 
         function editAct(id) {
@@ -481,11 +483,13 @@
             if(!act) return;
 
             document.getElementById('edit-id').value = act.id;
+            
             const actType = act.type || 'task';
             document.querySelectorAll('input[name="act-type"]').forEach(r => {
                 if(r.value === actType) r.checked = true;
             });
-
+            
+            document.getElementById('act-status').value = act.status || 'open'; // โหลดสถานะเปิดปิด
             document.getElementById('act-title').value = act.title;
             document.getElementById('act-desc').value = act.desc || '';
             document.getElementById('act-date').value = act.date || '';
@@ -519,13 +523,14 @@
                 localStorage.setItem('global_activities', JSON.stringify(acts));
                 syncActivities();
                 loadActivities();
-                loadMatrixData(); // สั่งให้อัปเดตในแท็บตรวจงานด้วย
+                loadMatrixData();
             }
         }
 
         function resetForm() {
             document.getElementById('edit-id').value = '';
             document.querySelector('input[name="act-type"][value="task"]').checked = true;
+            document.getElementById('act-status').value = 'open'; // รีเซ็ตสถานะเป็นเปิดเสมอ
             document.getElementById('act-title').value = '';
             document.getElementById('act-desc').value = '';
             document.getElementById('act-date').value = '';
@@ -545,7 +550,7 @@
             fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveActivities", activities: JSON.parse(acts) }) });
         }
 
-        // ==================== MATRIX ตรวจงาน (เพิ่ม Cache Busting) ====================
+        // ==================== MATRIX ตรวจงาน ====================
         async function loadMatrixData() {
             const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
             const gradableActs = acts.filter(a => a.type !== 'content');
@@ -554,7 +559,6 @@
             document.getElementById('matrix-tbody').innerHTML = '<tr><td colspan="7" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</td></tr>';
             
             try {
-                // เพิ่มรหัสเวลาต่อท้าย URL หลอกให้เบราว์เซอร์คิดว่าเป็นลิงก์ใหม่เสมอ
                 const cacheBuster = new Date().getTime();
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
                 studentsList = await res.json();
@@ -655,7 +659,6 @@
             }
         }
 
-        // ==================== EXCEL IMPORT ====================
         function processExcel(e) {
             const file = e.target.files[0];
             const reader = new FileReader();
