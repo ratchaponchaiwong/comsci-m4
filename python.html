@@ -166,164 +166,52 @@ print("Hello, PROT Smart Workspace!")
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
+    // โค้ดป้องกันและเตะนักเรียนออกเมื่อหมดเวลาทำงาน (ฝังในหน้าทำกิจกรรม)
+    function checkDeadlineAndKickOut() {
+        // 1. อ่านรหัสกิจกรรมจาก URL (เช่น python.html?actid=1712345)
         const urlParams = new URLSearchParams(window.location.search);
         const actId = urlParams.get('actid');
-
-        // ==================== THEME ====================
-        const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
-        let particleInterval = null;
-
-        function applyTheme(themeKey) {
-            document.body.setAttribute("data-theme", themeKey);
-            localStorage.setItem('smart_theme', themeKey);
-            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
-            const btn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
-            if(btn) btn.classList.add("active");
-            startThemeParticles(themeKey);
-        }
-
-        function startThemeParticles(theme) {
-            const container = document.getElementById("particleContainer");
-            if(particleInterval) clearInterval(particleInterval);
-            container.innerHTML = "";
-            const themeData = themes[theme];
-            function createParticle() {
-                const particle = document.createElement("div");
-                particle.className = "theme-particle";
-                particle.style.position = "absolute";
-                particle.style.left = Math.random() * 100 + "%";
-                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
-                particle.style.opacity = Math.random() * 0.6 + 0.3;
-                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
-                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
-                particle.innerHTML = themeData.particleChar;
-                container.appendChild(particle);
-                setTimeout(() => particle.remove(), 10000);
-            }
-            for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 150);
-            particleInterval = setInterval(createParticle, 800);
-        }
-        document.querySelectorAll(".theme-btn").forEach(btn => { btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))); });
-
-        // ==================== SYSTEM & LAYOUT ====================
-        function loadLoginInfo() {
-            const email = localStorage.getItem('student_email');
-            if(!email) { window.location.href = "index.html"; return; }
-            document.getElementById('header-user-name').innerText = `👤 ${(localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name')).split(' ')[0]}`;
-        }
-
-        function setLayout(type) {
-            const wrapper = document.getElementById('mainWrapper');
-            if(type === 'single') { wrapper.classList.replace('split-view', 'single-view'); document.getElementById('btn-single').classList.add('active'); document.getElementById('btn-split').classList.remove('active'); } 
-            else { wrapper.classList.replace('single-view', 'split-view'); document.getElementById('btn-split').classList.add('active'); document.getElementById('btn-single').classList.remove('active'); }
-        }
-
-        function loadActivityData() {
-            const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const act = activities.find(a => a.id == actId);
-            if (!act) { document.getElementById('act-title-header').innerText = "ไม่พบกิจกรรม"; return; }
-
-            document.getElementById('act-title-header').innerHTML = act.title;
-
-            // ตรวจสอบเวลาหมดเขต
-            let isPastDeadline = false;
-            if (act.date) {
-                const deadline = new Date(act.date + 'T' + (act.time || '23:59:00'));
-                isPastDeadline = new Date() > deadline;
-            }
-
-            // ถ้าหมดเวลา ให้ซ่อนช่องส่งงาน
-            if(isPastDeadline) {
-                document.getElementById('act-desc-body').innerHTML = act.desc + '<br><br><span style="color:#ef4444; font-weight:bold; background:rgba(239,68,68,0.1); padding:8px 12px; border-radius:8px; display:inline-block;"><i class="fas fa-lock"></i> กิจกรรมนี้หมดเวลาส่งแล้ว ระบบได้ปิดรับการส่งงาน</span>';
-                const submitBox = document.querySelector('.submit-box');
-                if(submitBox) submitBox.style.display = 'none'; 
-            } else {
-                document.getElementById('act-desc-body').innerText = act.desc;
-            }
-
-            const tabs = document.getElementById('mediaTabs');
-            let hasMedia = false;
-            if (act.yt) { addTab("yt-tab", "<i class='fab fa-youtube'></i> YouTube", () => showMedia(formatYT(act.yt))); hasMedia = true; }
-            if (act.doc) { addTab("doc-tab", "<i class='fas fa-file-pdf'></i> ไฟล์เอกสาร", () => showMedia(formatDocs(act.doc))); hasMedia = true; }
-            if (hasMedia) tabs.children[0].click();
-
-            const savedCode = localStorage.getItem(localStorage.getItem('student_email') + '_act_' + actId + '_work_code');
-            if (savedCode && !isPastDeadline) { document.getElementById('code-editor').value = savedCode; }
-        }
-
-        function addTab(className, label, callback) {
-            const btn = document.createElement('button'); btn.className = `media-tab ${className}`; btn.innerHTML = label;
-            btn.onclick = () => { document.querySelectorAll('.media-tab').forEach(t => t.classList.remove('active')); btn.classList.add('active'); callback(); };
-            document.getElementById('mediaTabs').appendChild(btn);
-        }
-        function showMedia(url) { document.getElementById('mediaBox').style.display = 'block'; document.getElementById('mediaBox').innerHTML = `<iframe src="${url}" allowfullscreen></iframe>`; }
-        function formatYT(url) { if (!url) return ""; let id = url.includes('v=') ? url.split('v=')[1].split('&')[0] : url.split('/').pop().split('?')[0]; return `https://www.youtube.com/embed/${id}`; }
-        function formatDocs(url) { if (!url) return ""; if (url.includes('docs.google.com/document/d/') || url.includes('docs.google.com/presentation/d/')) return url.split('/edit')[0] + '/preview'; return url; }
-
-        function changeLanguage() {
-            const lang = document.getElementById('lang-select').value;
-            const editor = document.getElementById('code-editor');
-            if(lang === 'python') {
-                editor.value = '# 🐍 ฝึกเขียน Python\nprint("Hello, PROT Smart Workspace!")';
-            } else {
-                editor.value = '// ⚙️ ฝึกเขียน C++ (Arduino)\nvoid setup() {\n  Serial.begin(9600);\n}\n\nvoid loop() {\n  Serial.println("Hello, PROT!");\n  delay(1000);\n}';
-            }
-            document.getElementById('btn-submit').style.display = 'none';
-            document.getElementById('warning-msg').style.display = 'block';
-            document.getElementById('code-output').innerHTML = ">_ ผลลัพธ์จะแสดงที่นี่...";
-        }
-
-        function outf(text) { document.getElementById("output-area").innerHTML += text; }
-        function builtinRead(x) { if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'"; return Sk.builtinFiles["files"][x]; }
         
-        function runAndCheckCode() {
-            const lang = document.getElementById('lang-select').value;
-            const code = document.getElementById('code-editor').value;
-            const output = document.getElementById('code-output');
-            const btnSubmit = document.getElementById('btn-submit');
-            const warningMsg = document.getElementById('warning-msg');
+        // ถ้าไม่ได้เข้าผ่านระบบล็อก (ไม่มีรหัส) ก็ข้ามไป
+        if (!actId) return;
 
-            output.innerHTML = 'กำลังตรวจสอบและรันโค้ด...\n--------------------\n';
+        // 2. ดึงข้อมูลกิจกรรมจากที่ระบบจำไว้
+        const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+        const currentAct = activities.find(a => String(a.id) === String(actId));
 
-            if (lang === 'python') {
-                Sk.pre = "code-output";
-                Sk.configure({ output: function(text) { output.innerHTML += text; }, read: builtinRead });
-                var myPromise = Sk.misceval.asyncToPromise(function() { return Sk.importMainWithBody("<stdin>", false, code, true); });
-                myPromise.then(function(mod) { 
-                    output.innerHTML += '\n\n✅ โปรแกรมทำงานสำเร็จ (Pass!)'; 
-                    btnSubmit.style.display = 'block'; warningMsg.style.display = 'none'; 
-                }, function(err) { 
-                    output.innerHTML += '\n\n❌ พบข้อผิดพลาด: ' + err.toString(); 
-                    btnSubmit.style.display = 'none'; warningMsg.style.display = 'block'; 
-                });
-            } else {
-                if(code.includes('setup()') && code.includes('loop()')) {
-                    setTimeout(() => { output.innerHTML += 'Compiling C++ Code...\n\n✅ Build Successful\n>_ Hello, PROT!'; btnSubmit.style.display = 'block'; warningMsg.style.display = 'none'; }, 800);
-                } else {
-                    setTimeout(() => { output.innerHTML += 'Compiling C++ Code...\n\n❌ Error: ไม่พบฟังก์ชัน setup() หรือ loop()'; btnSubmit.style.display = 'none'; warningMsg.style.display = 'block'; }, 500);
+        if (currentAct) {
+            // เช็ก 1: ครูสั่งปิดระบบ Manual หรือไม่?
+            if (currentAct.status === 'closed') {
+                alert("⚠️ คุณครูได้ปิดระบบการส่งงาน/กิจกรรมนี้แล้ว!\nระบบจะพากลับไปยังหน้าหลักครับ");
+                window.location.href = "student.html";
+                return;
+            }
+
+            // เช็ก 2: เวลาหมดเขตหรือยัง? (เช็กเฉพาะงานและกิจกรรม ไม่เช็กเนื้อหา)
+            if (currentAct.date && currentAct.type !== 'content') {
+                try {
+                    let timeStr = currentAct.time ? currentAct.time : '23:59';
+                    if (timeStr.split(':').length === 2) { timeStr += ':00'; }
+                    
+                    const deadlineTime = new Date(`${currentAct.date}T${timeStr}`).getTime();
+                    const nowTime = new Date().getTime();
+
+                    if (nowTime > deadlineTime) {
+                        alert("⏳ หมดเวลาทำงานแล้วครับ!\nระบบกำลังพาคุณกลับไปยังหน้าหลัก");
+                        window.location.href = "student.html"; // เตะกลับหน้าหลักทันที
+                    }
+                } catch(e) {
+                    console.log("เกิดข้อผิดพลาดในการอ่านวันที่", e);
                 }
             }
         }
+    }
 
-        async function submitWork() {
-            const email = localStorage.getItem('student_email');
-            const code = document.getElementById('code-editor').value;
-            if(!email) return alert("⚠️ กรุณาล็อกอินก่อนส่งงาน");
-            
-            localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
-            localStorage.setItem(email + '_act_' + actId + '_work_code', code);
-            document.getElementById('btn-submit').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...';
-            
-            let worksObj = {}; worksObj[actId] = code;
-            try {
-                await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ email: email, works: worksObj }) });
-                alert("🎉 ระบบได้รับผลงานโค้ดของคุณเรียบร้อยแล้ว!");
-                window.location.href = "student.html"; 
-            } catch(e) { alert("⚠️ ส่งงานเข้าเครื่องแล้ว แต่เชื่อมเน็ตไม่ได้"); window.location.href = "student.html"; }
-        }
+    // สั่งให้เช็กทันทีที่โหลดหน้าเสร็จ
+    checkDeadlineAndKickOut();
 
-        window.onload = () => { applyTheme(localStorage.getItem('smart_theme') || "default"); loadLoginInfo(); loadActivityData(); };
-    </script>
+    // ตั้งเวลาให้เช็กซ้ำทุกๆ 5 วินาที (เผื่อเด็กแอบเปิดหน้าจอค้างไว้ พอเวลาหมดปุ๊บก็เด้งออกปั๊บ)
+    setInterval(checkDeadlineAndKickOut, 5000);
+</script>
 </body>
 </html>
