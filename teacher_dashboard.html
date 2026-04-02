@@ -615,8 +615,23 @@
                 if(fRoom !== 'all' && !s.room.endsWith("/" + fRoom)) return false;
                 return true;
             }).sort((a,b) => a.number - b.number).forEach(s => {
-                const hasWork = (s.works && s.works[actId]) ? true : false;
-                const score = (s.scores && s.scores[actId] !== undefined && s.scores[actId] !== "") ? s.scores[actId] : '-';
+                
+                // อัปเกรดการเช็กงาน ป้องกันการสับสนระหว่าง String กับ Number
+                const actIdStr = String(actId);
+                let workContent = null;
+                let scoreData = '-';
+
+                if (s.works) {
+                    if (s.works[actIdStr] !== undefined) workContent = s.works[actIdStr];
+                    else if (s.works[Number(actId)] !== undefined) workContent = s.works[Number(actId)];
+                }
+                
+                if (s.scores) {
+                    if (s.scores[actIdStr] !== undefined && s.scores[actIdStr] !== "") scoreData = s.scores[actIdStr];
+                    else if (s.scores[Number(actId)] !== undefined && s.scores[Number(actId)] !== "") scoreData = s.scores[Number(actId)];
+                }
+
+                const hasWork = (workContent !== null && workContent !== undefined && workContent !== "") ? true : false;
                 
                 filteredHTML += `<tr>
                     <td>${s.studentId || '-'}</td>
@@ -624,8 +639,8 @@
                     <td>${s.name}</td>
                     <td>${s.room}</td>
                     <td><span class="status-badge ${hasWork ? 'status-done' : 'status-none'}">${hasWork ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
-                    <td>${score} / ${maxPoints}</td>
-                    <td><button onclick="openGradeModal('${s.email}', '${actId}', '${s.name}', '${maxPoints}')" class="btn-action" style="padding:5px 10px; font-size:0.7rem;"><i class="fas fa-search"></i> ตรวจ</button></td>
+                    <td>${scoreData} / ${maxPoints}</td>
+                    <td><button onclick="openGradeModal('${s.email}', '${actIdStr}', '${s.name}', '${maxPoints}')" class="btn-action" style="padding:5px 10px; font-size:0.7rem;"><i class="fas fa-search"></i> ตรวจ</button></td>
                 </tr>`;
             });
             tbody.innerHTML = filteredHTML || '<tr><td colspan="7" style="text-align:center;">ไม่พบนักเรียนในห้องที่เลือก</td></tr>';
