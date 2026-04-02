@@ -402,7 +402,6 @@
                         localStorage.setItem(email + '_room', room !== '-' ? room : '');
                         localStorage.setItem(email + '_number', number !== '-' ? number : '');
 
-                        // 🌟 ระบบซิงค์สถานะงาน: จะยึดฐานข้อมูล Google Sheets เป็นหลัก 100% 🌟
                         const allActs = JSON.parse(localStorage.getItem('global_activities') || '[]');
                         allActs.forEach(a => {
                             let dbHasWork = (myData.works && myData.works[a.id] !== undefined && myData.works[a.id] !== "");
@@ -415,7 +414,6 @@
                                 localStorage.setItem(email + '_act_' + a.id + '_status', 'submitted');
                                 localStorage.removeItem(email + '_act_' + a.id + '_score');
                             } else {
-                                // ถ้าในฐานข้อมูลไม่มีงาน ให้ล้างสถานะหลอกในเครื่องทิ้ง! (แก้ปัญหา Ghost Data)
                                 localStorage.removeItem(email + '_act_' + a.id + '_status');
                                 localStorage.removeItem(email + '_act_' + a.id + '_score');
                             }
@@ -609,12 +607,21 @@
             document.getElementById('saving-status').style.display = 'block';
             document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูลไปยังฐานข้อมูล...';
 
+            // 🌟 สำคัญ: บันทึกลงเครื่องทันที กันข้อมูลหายวับไปกับตา! 🌟
+            localStorage.setItem(email + '_studentid', studentId);
+            localStorage.setItem(email + '_custom_name', name);
+            localStorage.setItem(email + '_room', room);
+            localStorage.setItem(email + '_number', number);
+            localStorage.setItem('student_name', name);
+
             let enrolledArray = [];
             try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
 
+            // 🌟 สำคัญ: ส่งออกแบบไม่โดนบล็อก (ลบ Header json ออก) 🌟
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                headers: { 'Content-Type': 'application/json' },
+                method: 'POST', 
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                 body: JSON.stringify({ email: email, studentId: studentId, name: name, room: room, number: number, enrolledSubjects: enrolledArray.join(", ") })
             }).then(() => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ! กำลังรีเฟรช...';
