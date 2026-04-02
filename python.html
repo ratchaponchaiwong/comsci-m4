@@ -2,216 +2,104 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Coding Lab | PROT Smart Workspace</title>
-    
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
+    <title>ห้อง Lab ทำงาน | PROT Smart Workspace</title>
     <style>
-        /* ==================== CSS โครงสร้างหลักและธีม ==================== */
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
-        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
-        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
-        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
-        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
-        
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
-        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
-        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
-        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
-        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-        
-        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
-        .logo { font-size: 1.4rem; font-weight: 800; color: #60a5fa; text-decoration: none; display: flex; align-items: center; gap: 10px; }
-        body[data-theme="snow"] .logo { color: #2563eb; }
-        
-        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
-        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
-        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-
-        .layout-toggle { display: flex; justify-content: flex-end; gap: 10px; padding: 0 20px; margin-top: 10px;}
-        .toggle-btn { background: rgba(0,0,0,0.5); color: white; border: 1px solid rgba(255,255,255,0.2); padding: 8px 15px; border-radius: 8px; cursor: pointer; font-size: 0.85rem; font-family: 'Prompt'; transition: 0.2s;}
-        .toggle-btn.active, .toggle-btn:hover { background: #3b82f6; border-color: #3b82f6; }
-        body[data-theme="snow"] .toggle-btn { background: rgba(255,255,255,0.8); color: #1e293b; border-color: rgba(0,0,0,0.2); }
-        body[data-theme="snow"] .toggle-btn.active { background: #3b82f6; color: white; }
-
-        /* ==================== Layout Styles ==================== */
-        .page-content-wrapper { padding: 20px; max-width: 1600px; margin: 0 auto; width: 100%; transition: 0.3s; flex-grow: 1;}
-        
-        /* แบบ 2 หน้าจอ (Split View) */
-        .split-view { display: grid; grid-template-columns: 450px 1fr; gap: 20px; align-items: start; }
-        
-        /* แบบ 1 หน้าจอ (Single View) */
-        .single-view { display: flex; flex-direction: column; gap: 25px; max-width: 1200px; }
-
-        .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; width: 100%; display: flex; flex-direction: column;}
-        body[data-theme="snow"] .glass-panel { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); color: #1e293b; }
-
-        /* Media */
-        .media-container { margin-bottom: 20px; border-radius: 12px; overflow: hidden; background: #000; position: relative; aspect-ratio: 16 / 9; display: none; width: 100%;}
-        .single-view .media-container { aspect-ratio: 21 / 9; }
-        .media-container iframe { width: 100%; height: 100%; border: none; position: absolute; top:0; left:0;}
-        
-        .media-tabs { display: flex; gap: 10px; margin-bottom: 15px; overflow-x: auto; padding-bottom: 5px; }
-        .media-tab { padding: 8px 15px; border-radius: 10px; font-size: 0.85rem; cursor: pointer; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.1); transition: 0.2s; white-space: nowrap; color: inherit; font-family: 'Prompt';}
-        .media-tab.active { background: #ef4444; color: white; border-color: #ef4444; }
-        .media-tab.doc-tab.active { background: #3b82f6; border-color: #3b82f6;}
-
-        /* Code Editor Area */
-        .editor-container { display: flex; flex-direction: column; gap: 10px; height: 700px; }
-        .single-view .editor-container { height: 800px; }
-
-        .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .lang-select { padding: 8px 15px; border-radius: 10px; border: 1px solid #3b82f6; background: rgba(59,130,246,0.1); color: inherit; font-family: 'Prompt'; outline: none; cursor: pointer; font-weight: 600;}
-        
-        textarea#code-editor { flex: 2; width: 100%; background: #1e1e1e; color: #d4d4d4; font-family: 'Consolas', monospace; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); resize: none; font-size: 1rem; outline: none; }
-        
-        .btn-run { background: #3b82f6; color: white; border: none; padding: 10px 25px; border-radius: 10px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px; }
-        .btn-run:hover { background: #2563eb; }
-
-        pre#code-output { flex: 1; background: #000; color: #4ade80; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.1); overflow-y: auto; font-family: 'Consolas', monospace; margin: 0; font-size: 0.9rem;}
-        body[data-theme="snow"] pre#code-output { background: #f1f5f9; color: #1e293b; border-color: rgba(0,0,0,0.1); }
-
-        /* Submission Box */
-        .submit-box { border-top: 1px solid rgba(255,255,255,0.1); padding-top: 20px; margin-top: 15px; text-align: center; }
-        body[data-theme="snow"] .submit-box { border-top-color: rgba(0,0,0,0.1); }
-        
-        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; border-radius: 10px; width: 100%; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.2s; display: none; }
-        .btn-submit:hover { background: #059669; transform: translateY(-2px); }
-        
-        .warning-text { font-size: 0.85rem; color: #f59e0b; margin-top: 5px; display: block; }
-        body[data-theme="snow"] .warning-text { color: #d97706; }
-
-        @media (max-width: 1000px) { .page-content-wrapper.split-view { grid-template-columns: 1fr; } .editor-container { height: auto; min-height: 500px;} textarea#code-editor { min-height: 300px;} }
+        body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; padding: 20px; }
+        .lab-container { max-width: 800px; margin: 0 auto; background: rgba(255,255,255,0.1); padding: 30px; border-radius: 20px; }
+        textarea { width: 100%; height: 200px; padding: 15px; border-radius: 10px; border: 1px solid #3b82f6; background: #1e293b; color: white; font-family: monospace; font-size: 1rem; margin-bottom: 20px;}
+        .btn-submit { background: #10b981; color: white; border: none; padding: 12px 30px; border-radius: 10px; font-size: 1rem; font-weight: bold; cursor: pointer; transition: 0.3s; width: 100%;}
+        .btn-submit:hover { background: #059669; }
     </style>
 </head>
-<body data-theme="default">
-    <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
-    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+<body>
 
-    <div class="content-layer">
-        <header>
-            <a href="student.html" class="logo"><i class="fas fa-chevron-left"></i> <span id="act-title-header">กำลังโหลดกิจกรรม...</span></a>
-            <div style="font-weight: 500; font-size: 0.9rem;" id="loginArea">
-                <span class="user-name" id="header-user-name">กำลังตรวจสอบ...</span>
-            </div>
-        </header>
+    <div class="lab-container">
+        <h2 style="color: #60a5fa;">📝 พื้นที่ส่งงาน / ทำแบบฝึกหัด</h2>
+        <p>พิมพ์คำตอบ, โค้ดโปรแกรม หรือวางลิงก์ผลงานของคุณลงในช่องด้านล่าง</p>
 
-        <div class="theme-switcher">
-            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
-            <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
-            <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
-            <button class="theme-btn" data-theme="halloween">🎃 ฮัลโลวีน</button>
-            <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
-        </div>
+        <textarea id="student-answer" placeholder="พิมพ์คำตอบของคุณที่นี่..."></textarea>
 
-        <div class="layout-toggle">
-            <button class="toggle-btn" id="btn-single" onclick="setLayout('single')"><i class="fas fa-square"></i> 1 หน้าจอ (บน-ล่าง)</button>
-            <button class="toggle-btn active" id="btn-split" onclick="setLayout('split')"><i class="fas fa-columns"></i> 2 หน้าจอ (ซ้าย-ขวา)</button>
-        </div>
-
-        <div class="page-content-wrapper split-view" id="mainWrapper">
-            
-            <div class="glass-panel" id="leftPanel">
-                <div id="media-section">
-                    <div class="media-tabs" id="mediaTabs"></div>
-                    <div class="media-container" id="mediaBox"></div>
-                </div>
-
-                <h3 style="margin-bottom: 10px; color: #60a5fa;"><i class="fas fa-info-circle"></i> คำชี้แจงกิจกรรม</h3>
-                <div id="act-desc-body" style="font-size: 0.95rem; opacity: 0.9; margin-bottom: 20px; overflow-y: auto; max-height: 200px; padding-right: 5px;">กรุณารอข้อมูลสักครู่...</div>
-
-                <div class="submit-box">
-                    <h4 style="margin-bottom: 10px;"><i class="fas fa-tasks"></i> ส่งผลงาน</h4>
-                    <span id="warning-msg" class="warning-text"><i class="fas fa-lock"></i> กรุณาเขียนโค้ดและกด "Run / ตรวจโค้ด" ฝั่งขวามือให้ผ่านก่อน ปุ่มส่งงานถึงจะปรากฏครับ</span>
-                    
-                    <button id="btn-submit" class="btn-submit" onclick="submitWork()">
-                        <i class="fas fa-paper-plane"></i> ยืนยันการส่งโค้ด
-                    </button>
-                </div>
-            </div>
-
-            <div class="glass-panel" style="padding: 15px;">
-                <div class="editor-container">
-                    <div class="editor-header">
-                        <select id="lang-select" class="lang-select" onchange="changeLanguage()">
-                            <option value="python">🐍 Python (ไพทอน)</option>
-                            <option value="cpp">⚙️ C++ (Arduino)</option>
-                        </select>
-                        <button class="btn-run" onclick="runAndCheckCode()"><i class="fas fa-play"></i> Run / ตรวจโค้ด</button>
-                    </div>
-                    
-                    <textarea id="code-editor" spellcheck="false"># 🐍 ฝึกเขียน Python
-print("Hello, PROT Smart Workspace!")
-</textarea>
-                    
-                    <pre id="code-output">>_ ผลลัพธ์จะแสดงที่นี่...</pre>
-                </div>
-            </div>
-        </div>
+        <button class="btn-submit" onclick="prepareToSubmit()" id="submitBtn">
+            <i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน
+        </button>
     </div>
 
     <script>
-    // โค้ดป้องกันและเตะนักเรียนออกเมื่อหมดเวลาทำงาน (ฝังในหน้าทำกิจกรรม)
-    function checkDeadlineAndKickOut() {
-        // 1. อ่านรหัสกิจกรรมจาก URL (เช่น python.html?actid=1712345)
-        const urlParams = new URLSearchParams(window.location.search);
-        const actId = urlParams.get('actid');
-        
-        // ถ้าไม่ได้เข้าผ่านระบบล็อก (ไม่มีรหัส) ก็ข้ามไป
-        if (!actId) return;
+        // ⚠️ 1. เอาลิงก์ Web App URL ตัวล่าสุดของครูมาใส่ตรงนี้ ⚠️
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
 
-        // 2. ดึงข้อมูลกิจกรรมจากที่ระบบจำไว้
-        const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
-        const currentAct = activities.find(a => String(a.id) === String(actId));
+        // ==========================================
+        // ฟังก์ชันที่ 1: ดึงข้อความจากกล่อง แล้วสั่งส่งงาน
+        // ==========================================
+        function prepareToSubmit() {
+            // ดึงข้อความที่นักเรียนพิมพ์ใน <textarea>
+            const answerText = document.getElementById('student-answer').value.trim();
 
-        if (currentAct) {
-            // เช็ก 1: ครูสั่งปิดระบบ Manual หรือไม่?
-            if (currentAct.status === 'closed') {
-                alert("⚠️ คุณครูได้ปิดระบบการส่งงาน/กิจกรรมนี้แล้ว!\nระบบจะพากลับไปยังหน้าหลักครับ");
-                window.location.href = "student.html";
+            // เช็กว่านักเรียนพิมพ์อะไรมาหรือยัง
+            if (answerText === "") {
+                alert("⚠️ กรุณาพิมพ์คำตอบก่อนกดส่งงานครับ!");
                 return;
             }
 
-            // เช็ก 2: เวลาหมดเขตหรือยัง? (เช็กเฉพาะงานและกิจกรรม ไม่เช็กเนื้อหา)
-            if (currentAct.date && currentAct.type !== 'content') {
-                try {
-                    let timeStr = currentAct.time ? currentAct.time : '23:59';
-                    if (timeStr.split(':').length === 2) { timeStr += ':00'; }
-                    
-                    const deadlineTime = new Date(`${currentAct.date}T${timeStr}`).getTime();
-                    const nowTime = new Date().getTime();
+            // ถ้านักเรียนพิมพ์แล้ว ให้ส่งข้อความนั้นเข้าฟังก์ชันหลัก
+            submitWork(answerText);
+        }
 
-                    if (nowTime > deadlineTime) {
-                        alert("⏳ หมดเวลาทำงานแล้วครับ!\nระบบกำลังพาคุณกลับไปยังหน้าหลัก");
-                        window.location.href = "student.html"; // เตะกลับหน้าหลักทันที
-                    }
-                } catch(e) {
-                    console.log("เกิดข้อผิดพลาดในการอ่านวันที่", e);
-                }
+        // ==========================================
+        // ฟังก์ชันที่ 2: ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (Google Sheets)
+        // ==========================================
+        async function submitWork(workContent) {
+            const email = localStorage.getItem('student_email');
+            
+            // อ่าน ID ของงานจาก URL (เช่น python.html?actid=1712345678)
+            const urlParams = new URLSearchParams(window.location.search);
+            const actId = urlParams.get('actid'); 
+
+            if(!email) {
+                alert('⚠️ ไม่พบข้อมูลการล็อกอิน กรุณากลับไปหน้าหลักแล้วล็อกอินใหม่');
+                window.location.href = 'student.html';
+                return;
+            }
+
+            if(!actId) {
+                alert('⚠️ ไม่พบรหัสกิจกรรม (actid) ใน URL กรุณาเข้าผ่านหน้าแดชบอร์ดนักเรียน');
+                return;
+            }
+
+            // เปลี่ยนปุ่มเป็นกำลังส่ง
+            const btn = document.getElementById('submitBtn');
+            btn.innerHTML = '⏳ กำลังบันทึกข้อมูล...';
+            btn.style.background = '#f59e0b';
+            btn.disabled = true;
+
+            // จัดโครงสร้างข้อมูลให้ตรงกับฐานข้อมูล
+            let worksObj = {};
+            worksObj[actId] = workContent; 
+
+            try {
+                // ส่งข้อมูลไปที่ Google Sheets
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({
+                        email: email,
+                        works: worksObj
+                    })
+                });
+                
+                // ให้เครื่องจำสถานะไว้ด้วยหน้าเว็บจะได้ขึ้น "รอตรวจ" ทันที
+                localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
+                
+                alert('✅ ส่งงานสำเร็จเรียบร้อยแล้ว!');
+                window.location.href = 'student.html'; // เตะกลับหน้าหลักอัตโนมัติ
+                
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาดในการส่งงาน กรุณาลองใหม่อีกครั้ง');
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน';
+                btn.style.background = '#10b981';
+                btn.disabled = false;
             }
         }
-    }
-
-    // สั่งให้เช็กทันทีที่โหลดหน้าเสร็จ
-    checkDeadlineAndKickOut();
-
-    // ตั้งเวลาให้เช็กซ้ำทุกๆ 5 วินาที (เผื่อเด็กแอบเปิดหน้าจอค้างไว้ พอเวลาหมดปุ๊บก็เด้งออกปั๊บ)
-    setInterval(checkDeadlineAndKickOut, 5000);
-</script>
+    </script>
 </body>
 </html>
