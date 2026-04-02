@@ -48,7 +48,11 @@
         // ==========================================
         // ฟังก์ชันที่ 2: ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (Google Sheets)
         // ==========================================
+        // ฟังก์ชันหลักสำหรับส่งข้อมูลเข้าฐานข้อมูล (Google Sheets)
         async function submitWork(workContent) {
+            // ⚠️ เอาลิงก์ Web App URL ตัวล่าสุดของครูมาใส่ตรงนี้ ⚠️
+            const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby0F6UMkCluhQvYjheG_zmXECMKsSe0zEXP4f_9t68b8NXEPLMHueEGIBt_kbDfvvcj/exec";
+            
             const email = localStorage.getItem('student_email');
             
             // อ่าน ID ของงานจาก URL (เช่น python.html?actid=1712345678)
@@ -66,12 +70,6 @@
                 return;
             }
 
-            // เปลี่ยนปุ่มเป็นกำลังส่ง
-            const btn = document.getElementById('submitBtn');
-            btn.innerHTML = '⏳ กำลังบันทึกข้อมูล...';
-            btn.style.background = '#f59e0b';
-            btn.disabled = true;
-
             // จัดโครงสร้างข้อมูลให้ตรงกับฐานข้อมูล
             let worksObj = {};
             worksObj[actId] = workContent; 
@@ -81,6 +79,9 @@
                 await fetch(GOOGLE_SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'text/plain;charset=utf-8' // 🌟 ต้องมีบรรทัดนี้ ข้อมูลถึงจะเข้า Sheets!
+                    },
                     body: JSON.stringify({
                         email: email,
                         works: worksObj
@@ -95,9 +96,6 @@
                 
             } catch(e) {
                 alert('❌ เกิดข้อผิดพลาดในการส่งงาน กรุณาลองใหม่อีกครั้ง');
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน';
-                btn.style.background = '#10b981';
-                btn.disabled = false;
             }
         }
     </script>
