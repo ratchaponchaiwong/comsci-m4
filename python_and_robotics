@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Smart Workspace | PROT Smart Workspace</title>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/skulpt@1.2.0/dist/skulpt-stdlib.js"></script>
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* ==================== CSS โครงสร้างหลักจาก Template ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s, color 0.3s;}
+        body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; position: relative; cursor: default; }
+        
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
+        
+        .content-layer { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; }
+        
+        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 8px 15px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 15px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; backdrop-filter: blur(4px); font-size: 0.8rem; }
+        .theme-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.4); }
+        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
+        
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; transition: background 0.3s; }
+        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
+        body[data-theme="forest"] header { background: rgba(30, 60, 30, 0.8); border-bottom-color: rgba(100,200,100,0.3); }
+        body[data-theme="halloween"] header { background: rgba(40, 20, 40, 0.8); border-bottom-color: rgba(255,100,0,0.3); }
+        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
+        
+        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; display: flex; align-items: center; gap: 10px; text-decoration: none; }
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; background-clip: text; }
+        body[data-theme="forest"] .logo { background: linear-gradient(135deg, #90ee90, #6b8e23); -webkit-background-clip: text; background-clip: text; }
+        body[data-theme="halloween"] .logo { background: linear-gradient(135deg, #ff8c00, #ff4500); -webkit-background-clip: text; background-clip: text; }
+        
+        .nav-links { display: flex; gap: 20px; list-style: none; flex-wrap: wrap; margin: 0; padding: 0; align-items: center; }
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 6px 12px; border-radius: 30px; font-size: 0.9rem;}
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        body[data-theme="forest"] .nav-links a { color: #d4ffd4; }
+        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
+        
+        .login-area { display: flex; align-items: center; gap: 15px; }
+        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Prompt'; font-size: 0.85rem; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
+        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
+        .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 4px 12px 4px 8px; border-radius: 50px; backdrop-filter: blur(4px); }
+        .user-avatar { width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
+        .user-name { font-size: 0.85rem; font-weight: 500; color: white; }
+        body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
+        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 4px 10px; border-radius: 30px; color: inherit; cursor: pointer; font-size: 0.75rem; transition: 0.2s; }
+        
+        /* Modal Template */
+        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
+        .login-modal.active { visibility: visible; opacity: 1; }
+        .login-modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
+        .login-modal-content h3 { font-size: 1.8rem; margin-bottom: 16px; color: white; }
+        .login-modal-content p { color: #94a3b8; margin-bottom: 28px; }
+        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: white; background: none; border: none; }
+        .theme-particle { position: absolute; pointer-events: none; animation: floatParticle linear forwards; z-index: 1; }
+        @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
+
+        /* ==================== CSS พิเศษสำหรับ Workspace (ปรับให้เข้ากับธีม Template) ==================== */
+        :root {
+            --panel-bg: rgba(30, 41, 59, 0.6); --border-workspace: rgba(255,255,255,0.1); --editor-bg: rgba(15, 23, 42, 0.8);
+            --output-bg: rgba(0, 0, 0, 0.5); --accent: #3b82f6; --btn-success: #10b981; --btn-success-h: #059669;
+        }
+        body[data-theme="snow"] {
+            --panel-bg: rgba(255, 255, 255, 0.85); --border-workspace: rgba(0,0,0,0.1); --editor-bg: #ffffff;
+            --output-bg: #f8fafc; --accent: #ff6b6b; 
+        }
+        body[data-theme="forest"] {
+            --panel-bg: rgba(30, 60, 30, 0.6); --accent: #10b981; --editor-bg: rgba(10, 30, 10, 0.8);
+        }
+        body[data-theme="halloween"] {
+            --panel-bg: rgba(40, 20, 40, 0.6); --accent: #f59e0b; --editor-bg: rgba(20, 10, 20, 0.8);
+        }
+        body[data-theme="love"] {
+            --panel-bg: rgba(255, 255, 255, 0.85); --border-workspace: rgba(255,105,180,0.3); --editor-bg: #fff0f5;
+            --output-bg: #ffffff; --accent: #ec4899; 
+        }
+
+        .page-content-wrapper { flex: 1; display: flex; width: 100%; max-width: 100%; padding: 0 20px 20px 20px; z-index: 10; position: relative; gap: 20px; overflow: hidden;}
+        
+        #sidebar { width: 320px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 24px; padding: 24px; border: 1px solid var(--border-workspace); display: flex; flex-direction: column; gap: 20px; overflow-y: auto;}
+        
+        .mission-card { background: rgba(0,0,0,0.2); border-radius: 16px; padding: 18px; border: 1px solid var(--border-workspace); }
+        body[data-theme="snow"] .mission-card, body[data-theme="love"] .mission-card { background: rgba(0,0,0,0.05); }
+        .mission-card h4 { font-weight: 700; margin-bottom: 12px; color: var(--accent); display: flex; align-items: center; gap: 8px; font-size: 1.05rem;}
+        .mission-list { list-style: none; padding-left: 0; }
+        .mission-list li { margin: 10px 0; display: flex; align-items: center; gap: 10px; font-size: 0.85rem; font-weight: 500;}
+        .mission-list i { width: 20px; color: var(--accent); text-align: center;}
+
+        .upload-section { background: rgba(16, 185, 129, 0.1); border-radius: 16px; padding: 18px; border: 1px solid var(--btn-success); }
+        .upload-section input { width: 100%; margin-top: 10px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--border-workspace); background: var(--editor-bg); color: inherit; font-family: 'Prompt', monospace; font-size: 0.85rem;}
+        body[data-theme="snow"] .upload-section input, body[data-theme="love"] .upload-section input { border-color: #cbd5e1; }
+        
+        .btn-submit { background: var(--btn-success); color: white; font-weight: 600; border: none; cursor: pointer; transition: 0.2s; width: 100%; margin-top: 15px; padding: 12px; border-radius: 12px; font-family: 'Prompt'; font-size: 0.95rem; display: flex; align-items: center; justify-content: center; gap: 8px;}
+        .btn-submit:hover:not(:disabled) { background: var(--btn-success-h); transform: translateY(-2px); box-shadow: 0 4px 12px rgba(16,185,129,0.3);}
+        .btn-submit:disabled { opacity: 0.6; cursor: not-allowed;}
+
+        #workspace { flex: 1; display: flex; flex-direction: column; gap: 15px; min-width: 0; }
+        
+        .workspace-toolbar { background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 12px 20px; display: flex; flex-wrap: wrap; align-items: center; gap: 15px; border: 1px solid var(--border-workspace); }
+        .workspace-toolbar label { font-weight: 600; font-size: 0.85rem; opacity: 0.9;}
+        select.tool-select { background: var(--editor-bg); border: 1px solid var(--border-workspace); padding: 6px 12px; border-radius: 30px; font-weight: 500; color: inherit; cursor: pointer; font-family: 'Prompt'; font-size: 0.85rem;}
+        body[data-theme="snow"] select.tool-select, body[data-theme="love"] select.tool-select { border-color: #cbd5e1; }
+        .divider { width: 1px; height: 24px; background: var(--border-workspace); margin: 0 5px;}
+
+        #main-grid { flex: 1; display: grid; gap: 15px; min-height: 0; }
+        .grid-single { grid-template-columns: 1fr; }
+        .grid-split { grid-template-columns: 1fr 1fr; }
+
+        .tool-panel { background: var(--panel-bg); border-radius: 20px; overflow: hidden; display: flex; flex-direction: column; border: 1px solid var(--border-workspace); backdrop-filter: blur(12px); transition: 0.3s ease;}
+        .tool-hidden { display: none !important; }
+        .tool-panel iframe { width: 100%; height: 100%; border: none; background: white; }
+
+        .python-container { padding: 20px; display: flex; flex-direction: column; height: 100%; gap: 12px; }
+        .python-container h4 { color: var(--accent); font-weight: 700; display: flex; align-items: center; gap: 8px; font-size: 1rem;}
+        textarea.py-editor { background: var(--editor-bg); color: inherit; font-family: 'JetBrains Mono', 'Consolas', monospace; border: 1px solid var(--border-workspace); border-radius: 16px; padding: 16px; font-size: 13px; resize: none; flex: 1; line-height: 1.5; }
+        body[data-theme="snow"] textarea.py-editor, body[data-theme="love"] textarea.py-editor { border-color: #cbd5e1; }
+        
+        .btn-run { background: var(--accent); color: white; padding: 10px; border: none; border-radius: 30px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; font-size: 0.9rem;}
+        .btn-run:hover { filter: brightness(1.1); transform: translateY(-1px);}
+        
+        .output-box { background: var(--output-bg); color: #86efac; padding: 12px 15px; height: 120px; overflow-y: auto; border-radius: 12px; font-family: monospace; font-size: 12px; border: 1px solid var(--border-workspace); }
+        body[data-theme="snow"] .output-box, body[data-theme="love"] .output-box { color: #15803d; border-color: #cbd5e1;}
+
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: var(--accent); border-radius: 10px; }
+
+        @media (max-width: 900px) { .grid-split { grid-template-columns: 1fr; } .page-content-wrapper { flex-direction: column; overflow-y: auto;} #sidebar { width: 100%; } #workspace { min-height: 800px; } body { overflow-y: auto; } }
+    </style>
+</head>
+<body data-theme="default">
+    <div class="bg-animation">
+        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
+    </div>
+    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+
+    <div class="content-layer">
+        <header>
+            <a href="index.html" class="logo">
+                <i class="fas fa-robot"></i>
+                <span>PROT Smart Workspace</span>
+            </a>
+            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
+                <ul class="nav-links">
+                    <li><a href="index.html">หน้าหลัก</a></li>
+                    <li><a href="student.html">ห้องเรียนของฉัน</a></li>
+                    <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
+                    <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
+                    <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
+                </ul>
+                <div class="login-area" id="loginArea">
+                    <button class="login-btn" id="showLoginBtn">
+                        <i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <div class="theme-switcher">
+            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
+            <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
+            <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
+            <button class="theme-btn" data-theme="halloween">🎃 ฮัลโลวีน</button>
+            <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
+        </div>
+
+        <div class="page-content-wrapper">
+            <div id="sidebar">
+                <div class="mission-card">
+                    <h4><i class="fas fa-tasks"></i> ภารกิจเรียนรู้วันนี้</h4>
+                    <ul class="mission-list">
+                        <li><i class="fas fa-play-circle"></i> ชมวิดีโอแนะนำบทเรียน</li>
+                        <li><i class="fas fa-book-open"></i> อ่านใบความรู้ PDF ประกอบ</li>
+                        <li><i class="fas fa-question-circle"></i> ทำแบบทดสอบ</li>
+                        <li><i class="fas fa-microchip"></i> ทดลอง Arduino บน Wokwi</li>
+                        <li><i class="fab fa-python"></i> ฝึกเขียนโค้ด Python</li>
+                    </ul>
+                </div>
+                <div class="upload-section">
+                    <h4 style="color: var(--btn-success); margin-bottom: 8px;"><i class="fas fa-paper-plane"></i> พื้นที่ส่งงาน</h4>
+                    <p style="font-size: 12px; opacity: 0.8; margin-bottom:5px;"><i class="fas fa-link"></i> วางลิงก์โปรเจค Wokwi (ถ้ามี)</p>
+                    <input type="text" id="wokwi-link" placeholder="https://wokwi.com/projects/...">
+                    
+                    <p style="font-size: 12px; opacity: 0.8; margin-top: 15px;"><i class="fas fa-code"></i> หรือระบบจะส่งโค้ดจากช่อง Python ให้โดยอัตโนมัติเมื่อกดส่งงาน</p>
+                    
+                    <button class="btn-submit" id="submitBtnLab" onclick="prepareToSubmit()">
+                        <i class="fas fa-check-circle"></i> ยืนยันการส่งงาน
+                    </button>
+                </div>
+            </div>
+
+            <div id="workspace">
+                <div class="workspace-toolbar">
+                    <i class="fas fa-th-large" style="color: var(--accent);"></i>
+                    <label>รูปแบบจอ:</label>
+                    <select id="layout-select" class="tool-select" onchange="updateLayout()">
+                        <option value="single">🖥️ จอเดียว</option>
+                        <option value="split" selected>🔄 แบ่ง 2 จอ</option>
+                    </select>
+                    <div class="divider"></div>
+                    <label>📌 ฝั่งซ้าย:</label>
+                    <select id="content-left" class="tool-select" onchange="updateLayout()">
+                        <option value="video">🎥 วิดีโอสอน</option>
+                        <option value="pdf">📄 ใบความรู้</option>
+                        <option value="quiz">📝 แบบทดสอบ</option>
+                        <option value="wokwi">🤖 Arduino Wokwi</option>
+                        <option value="python" selected>🐍 Python Lab</option>
+                    </select>
+                    <label id="label-right">📌 ฝั่งขวา:</label>
+                    <select id="content-right" class="tool-select" onchange="updateLayout()">
+                        <option value="wokwi" selected>🤖 Arduino Wokwi</option>
+                        <option value="python">🐍 Python Lab</option>
+                        <option value="quiz">📝 แบบทดสอบ</option>
+                        <option value="video">🎥 วิดีโอสอน</option>
+                        <option value="pdf">📄 ใบความรู้</option>
+                    </select>
+                </div>
+
+                <div id="main-grid" class="grid-split">
+                    <div id="tool-video" class="tool-panel tool-hidden"><iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ?autoplay=0" allowfullscreen></iframe></div>
+                    <div id="tool-pdf" class="tool-panel tool-hidden"><iframe src="https://docs.google.com/viewer?url=https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf&embedded=true"></iframe></div>
+                    <div id="tool-quiz" class="tool-panel tool-hidden"><iframe src="https://docs.google.com/forms/d/e/1FAIpQLSeE4pWksL-c-4T-tE_uJ8hP6fQj-hL-_F_EwM-1-wBv-1Q41g/viewform?embedded=true"></iframe></div>
+                    <div id="tool-wokwi" class="tool-panel"><iframe src="https://wokwi.com/projects/new/arduino-uno" title="Arduino Simulator"></iframe></div>
+                    <div id="tool-python" class="tool-panel">
+                        <div class="python-container">
+                            <h4><i class="fab fa-python"></i> โค้ดฝึกเขียน Python</h4>
+                            <textarea id="python-code" class="py-editor"># 🚀 เขียนโค้ด Python ของคุณได้เลย!
+# ระบบจะดึงโค้ดตรงนี้ไปส่งให้อัตโนมัติเมื่อกดปุ่มส่งงาน
+
+print("🎉 สวัสดี Smart Learner!")
+name = input("กรุณาพิมพ์ชื่อของคุณ: ")
+print(f"ยินดีต้อนรับ {name} สู่โลกการเขียนโปรแกรม")</textarea>
+                            <button class="btn-run" onclick="runPython()"><i class="fas fa-play"></i> รันโค้ดเลย!</button>
+                            <div class="output-box" id="output">⚡ รอผลลัพธ์...</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="loginModal" class="login-modal">
+        <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+        <div class="login-modal-content">
+            <h3><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
+            <p>กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
+            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
+        </div>
+    </div>
+
+    <script>
+        // 🌟 1. ลิงก์ Web App URL ตัวล่าสุดของครู 🌟
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+
+        // ==================== THEME & PARTICLE SYSTEM (จาก Template) ====================
+        const themes = {
+            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
+            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
+            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
+            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
+            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
+        };
+        let particleInterval = null;
+        
+        function applyTheme(themeKey) {
+            document.body.setAttribute("data-theme", themeKey);
+            localStorage.setItem('smart_theme', themeKey);
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
+            if(activeBtn) activeBtn.classList.add("active");
+            startThemeParticles(themeKey);
+        }
+        
+        function startThemeParticles(theme) {
+            const container = document.getElementById("particleContainer");
+            if(particleInterval) clearInterval(particleInterval);
+            container.innerHTML = "";
+            const themeData = themes[theme];
+            function createParticle() {
+                const particle = document.createElement("div");
+                particle.className = "theme-particle";
+                particle.style.left = Math.random() * 100 + "%";
+                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
+                particle.style.opacity = Math.random() * 0.6 + 0.3;
+                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
+                particle.style.animationDelay = Math.random() * 5 + "s";
+                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                particle.innerHTML = themeData.particleChar;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 10000);
+            }
+            for(let i = 0; i < 15; i++) setTimeout(() => createParticle(), i * 150);
+            particleInterval = setInterval(() => createParticle(), 800);
+        }
+
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+        });
+
+        // ==================== LOGIN SYSTEM (จาก Template) ====================
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) {
+                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
+            }).join('')));
+        }
+        
+        function handleCredentialResponse(response) {
+            const userData = decodeJwtResponse(response.credential);
+            if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userData.email);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                closeLoginModal();
+                updateLoginUI(userData.name, userData.picture);
+            } else {
+                alert('อีเมลนี้ไม่ได้รับอนุญาต');
+            }
+        }
+        
+        function updateLoginUI(userName, userPic) {
+            const loginArea = document.getElementById('loginArea');
+            loginArea.innerHTML = `
+                <div class="user-info">
+                    <img src="${userPic}" class="user-avatar" alt="avatar">
+                    <span class="user-name">${userName.split(' ')[0]}</span>
+                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
+                </div>
+            `;
+        }
+        
+        function logout() {
+            localStorage.removeItem('is_logged_in');
+            location.href = 'index.html';
+        }
+        
+        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+
+        // ==================== ระบบรักษาความปลอดภัย & เวลา ====================
+        function checkUserAndDeadline() {
+            const email = localStorage.getItem('student_email');
+            if (!email) {
+                alert("⚠️ กรุณาเข้าสู่ระบบผ่านหน้า 'ห้องเรียนของฉัน' ก่อนเข้าใช้งานห้อง Lab ครับ");
+                window.location.href = "student.html";
+                return;
+            }
+            
+            const urlParams = new URLSearchParams(window.location.search);
+            const actId = urlParams.get('actid');
+            if (!actId) return;
+
+            const activities = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const currentAct = activities.find(a => String(a.id) === String(actId));
+
+            if (currentAct) {
+                if (currentAct.status === 'closed') {
+                    alert("⚠️ คุณครูได้ปิดระบบการส่งงาน/กิจกรรมนี้แล้ว!\nระบบจะพากลับไปยังหน้าหลักครับ");
+                    window.location.href = "student.html";
+                    return;
+                }
+
+                if (currentAct.date && currentAct.type !== 'content') {
+                    try {
+                        let timeStr = currentAct.time ? currentAct.time : '23:59';
+                        if (timeStr.split(':').length === 2) { timeStr += ':00'; }
+                        const deadlineTime = new Date(`${currentAct.date}T${timeStr}`).getTime();
+                        const nowTime = new Date().getTime();
+                        if (nowTime > deadlineTime) {
+                            alert("⏳ หมดเวลาทำงานแล้วครับ!\nระบบกำลังพาคุณกลับไปยังหน้าหลัก");
+                            window.location.href = "student.html"; 
+                        }
+                    } catch(e) {}
+                }
+            }
+        }
+        
+        setInterval(checkUserAndDeadline, 5000);
+
+        // ==================== WORKSPACE LAYOUT & PYTHON ====================
+        function updateLayout() {
+            const layout = document.getElementById('layout-select').value;
+            const leftTool = document.getElementById('content-left').value;
+            const rightTool = document.getElementById('content-right').value;
+
+            if (layout === 'split' && leftTool === rightTool) {
+                alert("⚠️ กรุณาเลือกเนื้อหาฝั่งซ้ายและขวาให้ต่างกันครับ");
+                return;
+            }
+
+            ['video', 'pdf', 'quiz', 'wokwi', 'python'].forEach(tool => {
+                const el = document.getElementById('tool-' + tool);
+                if (el) el.classList.add('tool-hidden');
+            });
+
+            const grid = document.getElementById('main-grid');
+            if (layout === 'single') {
+                grid.className = 'grid-single';
+                document.getElementById('label-right').style.display = 'none';
+                document.getElementById('content-right').style.display = 'none';
+                const leftPanel = document.getElementById('tool-' + leftTool);
+                if (leftPanel) leftPanel.classList.remove('tool-hidden');
+            } else {
+                grid.className = 'grid-split';
+                document.getElementById('label-right').style.display = 'inline';
+                document.getElementById('content-right').style.display = 'inline-block';
+                const leftElem = document.getElementById('tool-' + leftTool);
+                const rightElem = document.getElementById('tool-' + rightTool);
+                if (leftElem) leftElem.classList.remove('tool-hidden');
+                if (rightElem) rightElem.classList.remove('tool-hidden');
+            }
+        }
+
+        let outputContent = "";
+        function outf(text) {
+            outputContent += text;
+            const outputDiv = document.getElementById("output");
+            if (outputDiv) outputDiv.innerHTML = outputContent.replace(/\n/g, '<br>');
+        }
+        function builtinRead(x) {
+            if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'";
+            return Sk.builtinFiles["files"][x];
+        }
+        function runPython() {
+            const code = document.getElementById("python-code").value;
+            const outputDiv = document.getElementById("output");
+            outputDiv.innerHTML = "";
+            outputContent = "";
+            Sk.pre = "output";
+            Sk.configure({ output: outf, read: builtinRead });
+            const myPromise = Sk.misceval.asyncToPromise(function() {
+                return Sk.importMainWithBody("<stdin>", false, code, true);
+            });
+            myPromise.then(function() {
+                if(outputContent === "") outputDiv.innerHTML = "✅ โค้ดทำงานสำเร็จ (ไม่มี output)";
+            }, function(err) {
+                outputDiv.innerHTML = `<span style="color: #f87171;">❌ ข้อผิดพลาด: ${err.toString()}</span>`;
+            });
+        }
+
+        // ==================== ระบบส่งงานของจริง ====================
+        function prepareToSubmit() {
+            const wokwiLink = document.getElementById('wokwi-link').value.trim();
+            const pythonCode = document.getElementById('python-code').value.trim();
+            
+            let finalAnswer = "";
+            
+            if (wokwiLink) finalAnswer += "📌 ลิงก์ Wokwi:\n" + wokwiLink + "\n\n";
+            if (pythonCode && !pythonCode.includes("ระบบจะดึงโค้ดตรงนี้ไปส่งให้อัตโนมัติ")) {
+                finalAnswer += "💻 โค้ด Python:\n" + pythonCode;
+            }
+
+            if (finalAnswer.trim() === "") {
+                alert("⚠️ กรุณาใส่ลิงก์ Wokwi หรือ พิมพ์โค้ด Python ก่อนกดส่งงานครับ!");
+                return;
+            }
+
+            if(!confirm("⚠️ ยืนยันการส่งงานใช่หรือไม่?")) return;
+            submitWork(finalAnswer.trim());
+        }
+
+        async function submitWork(workContent) {
+            const email = localStorage.getItem('student_email');
+            const urlParams = new URLSearchParams(window.location.search);
+            const actId = urlParams.get('actid'); 
+
+            if(!actId) {
+                alert('⚠️ ไม่พบรหัสกิจกรรมใน URL กรุณากลับไปกดเข้าทำกิจกรรมจากหน้าห้องเรียนของฉัน');
+                return;
+            }
+
+            const btn = document.getElementById('submitBtnLab');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...';
+            btn.disabled = true;
+
+            let worksObj = {};
+            worksObj[actId] = workContent; 
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    body: JSON.stringify({ email: email, works: worksObj })
+                });
+                
+                localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
+                alert('✅ ส่งงานสำเร็จเรียบร้อยแล้ว!\nระบบจะพากลับไปยังห้องเรียนของคุณ');
+                window.location.href = 'student.html'; 
+                
+            } catch(e) {
+                alert('❌ เกิดข้อผิดพลาดในการส่งงาน กรุณาลองใหม่อีกครั้ง');
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> ยืนยันการส่งงาน';
+                btn.disabled = false;
+            }
+        }
+
+        // Initialize
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('smart_theme') || "default";
+            applyTheme(savedTheme);
+            
+            if (localStorage.getItem('is_logged_in') === 'true') {
+                updateLoginUI(localStorage.getItem('student_name'), localStorage.getItem('student_pic'));
+                checkUserAndDeadline();
+            } else {
+                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
+            }
+            updateLayout();
+        };
+        window.addEventListener('resize', updateLayout);
+    </script>
+</body>
+</html>
