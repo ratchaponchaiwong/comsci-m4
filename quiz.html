@@ -51,7 +51,8 @@
                 <div id="uId" style="color:#60a5fa;">🆔 รหัสประจำตัว: -</div>
             </div>
             <button class="btn-main" onclick="startExam()" id="btnBegin">เริ่มการสอบ</button>
-            <div id="countdown" style="display:none; color: #ff6600; margin-top: 15px; font-weight:bold;">กรุณารอระบบ Fullscreen เข้าที่... 10</div>
+            <div id="countdown" style="display:none; color: #ff6600; margin-top: 15px; font-weight:bold;">กรุณารอระบบเข้าที่... 5</div>
+            <p style="margin-top: 15px; font-size: 0.85rem; color: #f87171;" id="ios-warning">⚠️ หากเปิดด้วย LINE กรุณากดปุ่ม 3 จุดมุมขวาบน แล้วเลือก "เปิดในเบราว์เซอร์ (Safari)"</p>
         </div>
 
         <div id="screenExam" style="display:none; padding-bottom: 80px;">
@@ -70,10 +71,13 @@
 
     <script>
         // 🌟 ใส่ URL ของครูตรงนี้ 🌟
-        const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
+        const VALIDATOR_URL = "ใhttps://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
         const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         let examStarted = false, canBan = false, userIP = "unknown", drawn = [], ans = [], timerHandle, timeLeft = 2400;
+        
+        // เช็คว่าเป็นมือถือหรือไอแพดหรือไม่
+        const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
 
         // คลังข้อสอบ 100 ข้อ
         const bank = [
@@ -180,16 +184,19 @@
         ];
 
         function startExam() {
-            if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามกดออกจากแอป ห้ามย่อหน้าต่าง ห้ามกดปุ่มย้อนกลับกลับ(Back) บนมือถือ\nหากฝ่าฝืนสิทธิ์การสอบจะถูกระงับและหมดสิทธิ์สอบทันที!")) return;
+            if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามสลับแอป ห้ามแบ่งหน้าจอ ห้ามกดปุ่มย้อนกลับกลับ(Back)\nหากฝ่าฝืนสิทธิ์การสอบจะถูกระงับทันที!")) return;
             
+            // ขยายหน้าจอบน PC (บนไอแพดหรือมือถือบางรุ่นจะไม่ทำงาน ซึ่งไม่เป็นไร)
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(()=>{});
             }
             
             document.getElementById('btnBegin').style.display = 'none';
+            document.getElementById('ios-warning').style.display = 'none';
+            
             const cd = document.getElementById('countdown'); 
             cd.style.display = 'block';
-            let c = 10;
+            let c = 5; // ลดเวลารอเหลือ 5 วิ
             
             const t = setInterval(() => {
                 c--; 
@@ -201,7 +208,9 @@
                     document.getElementById('screenExam').style.display = 'block';
                     document.getElementById('dotsArea').style.display = 'flex';
                     examStarted = true; 
-                    setTimeout(() => { canBan = true; }, 1000); 
+                    
+                    // ป้องกันการแบนมั่วตอนโหลด
+                    setTimeout(() => { canBan = true; }, 1500); 
                     
                     timerHandle = setInterval(() => {
                         timeLeft--;
@@ -254,6 +263,7 @@
             examStarted = false; 
             clearInterval(timerHandle);
             
+            // ล็อกประวัติในเครื่องทันที
             localStorage.setItem('is_banned', 'true');
             
             const sid = localStorage.getItem(localStorage.getItem('student_email') + '_studentid');
@@ -262,14 +272,20 @@
                 body: JSON.stringify({action:"reportViolation", student_id:sid, ip:userIP, name:localStorage.getItem('student_name'), reason:reason})
             });
             
-            alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์และหมดสิทธิ์สอบแล้ว!");
+            alert("🚨 ยุติการสอบ: " + reason + "\nสิทธิ์การสอบถูกระงับและหมดสิทธิ์สอบทันที!");
             window.location.href = "student.html";
         }
 
         // ระบบจับโกง สลับจอ/แบ่งจอ
-        window.onblur = () => { if(canBan) ban("สลับหน้าจอหรือเปิดแอปอื่น"); };
+        window.onblur = () => { if(canBan) ban("แอบสลับหน้าจอหรือเปิดแอปอื่น"); };
         window.onfocus = () => { document.body.classList.remove('lost-focus'); };
-        window.onresize = () => { if(canBan && window.innerHeight < screen.height * 0.75) ban("แบ่งหน้าจอหรือย่อหน้าต่าง"); };
+        
+        // 🌟 ป้องกันการแบนผิดพลาดจาก แถบ URL บนมือถือ/ไอแพด
+        window.onresize = () => { 
+            if(canBan && !isMobileDevice && window.innerHeight < screen.height * 0.70) {
+                ban("แบ่งหน้าจอหรือย่อหน้าต่าง");
+            } 
+        };
 
         // 🛡️ ระบบล็อกปุ่ม ย้อนกลับ (Back Button)
         window.history.pushState(null, null, window.location.href);
@@ -278,7 +294,7 @@
             if (examStarted) alert("🚨 ระบบไม่อนุญาตให้กดย้อนกลับระหว่างการสอบ!");
         });
 
-        // 🛡️ ป้องกันดูข้อสอบย้อนหลังจากแคช (Cache)
+        // 🛡️ ป้องกันการดูข้อสอบย้อนหลังผ่านแคชบนมือถือ
         window.addEventListener('pageshow', function(event) {
             if (event.persisted || localStorage.getItem('is_banned') === 'true') {
                 if (localStorage.getItem('is_banned') === 'true') {
@@ -305,13 +321,13 @@
             const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
             
             try {
-                // 1. ตรวจคำตอบ
+                // 1. ตรวจคำตอบ (40 -> 20)
                 const res = await fetch(VALIDATOR_URL, {
                     method: 'POST', 
                     body: JSON.stringify({action: "evaluate", answers: data})
                 }).then(r => r.json());
                 
-                // 2. เตรียมข้อมูล (รวมชื่อนักเรียนด้วย)
+                // 2. ดึงข้อมูล
                 const email = localStorage.getItem('student_email');
                 const sid = localStorage.getItem(email + '_studentid');
                 const sname = localStorage.getItem('student_name'); // 🌟 ดึงชื่อนักเรียนมาด้วย
@@ -319,12 +335,11 @@
                 const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
                 const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
                 
-                // 3. ส่งข้อมูล + ชื่อนักเรียน ไปบันทึกลง Sheet
+                // 3. ส่งข้อมูลกลับเข้าชีตหลัก พร้อมชื่อนักเรียน 🌟
                 await fetch(MAIN_URL, {
-                    method:'POST', 
-                    mode:'no-cors', 
+                    method:'POST', mode:'no-cors', 
                     body:JSON.stringify({
-                        action:"submitWork", 
+                        action: "submitWork", 
                         student_id: sid, 
                         student_name: sname, 
                         activity_id: actId, 
@@ -333,10 +348,9 @@
                 });
                 
                 await fetch(MAIN_URL, {
-                    method:'POST', 
-                    mode:'no-cors', 
+                    method:'POST', mode:'no-cors', 
                     body:JSON.stringify({
-                        action:"saveScore", 
+                        action: "saveScore", 
                         student_id: sid, 
                         student_name: sname, 
                         activity_id: actId, 
@@ -344,7 +358,7 @@
                     })
                 });
                 
-                // 4. แสดงผล
+                // 4. แสดงผลลัพธ์
                 document.getElementById('screenExam').style.display = 'none';
                 document.getElementById('dotsArea').style.display = 'none';
                 document.getElementById('screenResult').style.display = 'block';
@@ -356,17 +370,16 @@
             }
         }
 
-        window.onload = async () => {
+        window.onload = () => {
             const theme = localStorage.getItem('smart_theme') || "default";
             document.body.setAttribute("data-theme", theme);
-            
-            try { const ip = await fetch('https://api64.ipify.org?format=json').then(r=>r.json()); userIP = ip.ip; } catch(e) {}
             
             const email = localStorage.getItem('student_email');
             const sid = localStorage.getItem(email + '_studentid');
             
-            if(!sid || sid === '-') { 
-                alert("ไม่มีรหัสประจำตัว กรุณากลับไปแก้ไขข้อมูลส่วนตัวก่อนครับ!"); 
+            // ดักจับคนไม่เข้าระบบหรือเปิดผ่านเบราว์เซอร์ในแอป
+            if(!email || !sid || sid === '-') { 
+                alert("⚠️ ไม่พบข้อมูลรหัสประจำตัว!\n\nหากคุณเปิดผ่านแอป LINE กรุณากดปุ่ม 3 จุดมุมบน แล้วเลือก 'เปิดในเบราว์เซอร์' หรือ Safari ครับ"); 
                 window.location.href = "student.html"; 
                 return; 
             }
@@ -374,6 +387,7 @@
             document.getElementById('uName').innerText = "👤 ผู้สอบ: " + localStorage.getItem('student_name');
             document.getElementById('uId').innerText = "🆔 รหัสประจำตัว: " + sid;
             
+            // วาดลายน้ำ
             const wm = document.getElementById('watermark');
             const txt = localStorage.getItem('student_name') + " (" + sid + ")";
             for(let i=0; i<15; i++) {
@@ -383,19 +397,26 @@
                 wm.appendChild(div);
             }
             
-            try {
-                const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}`).then(r=>r.json());
-                if(res.banned) {
-                    localStorage.setItem('is_banned', 'true');
-                    document.body.innerHTML = `
-                    <div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'>
-                        <i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i>
-                        <h1 style='color:red; font-family:Prompt;'>คุณถูกระงับสิทธิ์การสอบ!</h1>
-                        <p style='font-family:Prompt; color:#333;'>${res.reason}</p>
-                        <button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;">กลับหน้าหลัก</button>
-                    </div>`;
-                }
-            } catch(e) {}
+            // 🌟 ดึง IP แบบไม่บล็อกหน้าจอ (แก้ปัญหาไอแพดค้างตอนดึงข้อมูล) 🌟
+            fetch('https://api64.ipify.org?format=json')
+                .then(r => r.json())
+                .then(ipData => { userIP = ipData.ip; })
+                .catch(e => { userIP = "unknown"; })
+                .finally(async () => {
+                    try {
+                        const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}`).then(r=>r.json());
+                        if(res.banned) {
+                            localStorage.setItem('is_banned', 'true');
+                            document.body.innerHTML = `
+                            <div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'>
+                                <i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i>
+                                <h1 style='color:red; font-family:Prompt;'>คุณถูกระงับสิทธิ์การสอบ!</h1>
+                                <p style='font-family:Prompt; color:#333;'>${res.reason}</p>
+                                <button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;">กลับหน้าหลัก</button>
+                            </div>`;
+                        }
+                    } catch(e) {}
+                });
         };
     </script>
 </body>
