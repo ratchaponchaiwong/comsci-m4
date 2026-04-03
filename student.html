@@ -9,12 +9,12 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; display: flex; flex-direction: column;}
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; display: flex; flex-direction: column; }
         
-        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #1e293b 100%); color: white; }
-        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #f0f8ff 100%); color: #1e293b; }
-        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #3e7a3e 100%); color: white; }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff85a0 100%); color: #1e293b; }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
@@ -25,13 +25,9 @@
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
         
-        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-        .theme-particle { position: absolute; top: -10vh; pointer-events: none; animation: fallDown linear forwards; z-index: 1; }
-        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } }
-        
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; flex: 1; }
         
-        /* Header */
+        /* ==================== Header ==================== */
         header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 15px;}
         body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
         .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px;}
@@ -44,34 +40,29 @@
         .login-area { display: flex; align-items: center; gap: 15px; }
         .login-btn { background: #3b82f6; border: none; padding: 10px 25px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; font-family: 'Prompt'; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); transition: 0.3s;}
         .login-btn:hover { transform: translateY(-2px); background: #2563eb; }
-        .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.1); padding: 5px 15px 5px 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); }
+        
+        .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); }
         body[data-theme="snow"] .user-info, body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
         .user-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; background: white; }
         .user-name { font-size: 0.9rem; font-weight: 500; color: inherit; }
         .logout-btn { background: rgba(239, 68, 68, 0.2); border: none; padding: 6px 12px; border-radius: 30px; cursor: pointer; color: #ef4444; font-size: 0.8rem; transition: 0.2s;}
         .logout-btn:hover { background: #ef4444; color: white; }
 
-        /* Theme Switcher */
         .theme-switcher { background: rgba(0,0,0,0.3); backdrop-filter: blur(12px); padding: 10px 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; position: sticky; top: 75px; z-index: 99; border-radius: 50px; width: fit-content; margin: 15px auto; border: 1px solid rgba(255,255,255,0.1); }
         body[data-theme="snow"] .theme-switcher, body[data-theme="love"] .theme-switcher { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
         .theme-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 40px; color: inherit; font-weight: 500; cursor: pointer; transition: 0.3s; font-family: 'Prompt'; font-size: 0.85rem; }
         body[data-theme="snow"] .theme-btn, body[data-theme="love"] .theme-btn { border-color: rgba(0,0,0,0.1); }
         .theme-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
 
-        /* ==================== 🌟 ปรับขนาดโครงสร้างให้สมส่วน (950px) 🌟 ==================== */
-        .page-content-wrapper { padding: 30px 20px; max-width: 950px; margin: 0 auto; width: 100%; flex: 1;}
+        /* ==================== 🌟 ปรับขนาดให้สมส่วนพอดีสายตา (1050px) 🌟 ==================== */
+        .page-content-wrapper { padding: 30px 20px; max-width: 1050px; margin: 0 auto; width: 100%; flex: 1;}
         .dashboard-container { display: grid; grid-template-columns: 280px 1fr; gap: 25px; }
+        @media (max-width: 768px) { .dashboard-container { grid-template-columns: 1fr; } }
         
-        @media (max-width: 768px) {
-            .dashboard-container { grid-template-columns: 1fr; }
-        }
-        
-        /* 🌟 ปรับการ์ดให้โปร่งแสงแบบกระจกเหมือนหน้าข้อสอบ 🌟 */
-        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: inherit; height: fit-content;}
-        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: inherit; height: fit-content; transition: 0.3s;}
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
         .profile-pic-large { width: 100px; height: 100px; border-radius: 50%; margin: 0 auto 15px auto; border: 3px solid #3b82f6; object-fit: cover; display: none; background: white;}
-        
         .student-details, .tracking-box, .score-box { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 0.9rem; text-align: left; }
         body[data-theme="snow"] .student-details, body[data-theme="love"] .student-details,
         body[data-theme="snow"] .tracking-box, body[data-theme="love"] .tracking-box,
@@ -91,7 +82,7 @@
         .content-area { display: flex; flex-direction: column; gap: 20px; }
         .section-header { font-size: 1.2rem; font-weight: 700; display: flex; align-items: center; gap: 10px; color: inherit;}
         
-        /* 🌟 ปรับสไตล์ Card รายวิชาให้ดูคลีนขึ้น 🌟 */
+        /* 🌟 Card กิจกรรมที่สวยขึ้น 🌟 */
         .task-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); border-radius: 16px; padding: 20px; border: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; transition: 0.3s; }
         body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
         .task-card:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,0.15); border-color: rgba(255,255,255,0.2); }
@@ -102,6 +93,7 @@
         .badge.pending { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
         .badge.submitted { background: rgba(59, 130, 246, 0.15); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.3); }
         .badge.done { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+        .badge.late { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
         .badge.banned { background: rgba(239, 68, 68, 0.15); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.3); }
 
         .btn-action { background: #3b82f6; color: white; padding: 8px 18px; border-radius: 20px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; border: none; cursor: pointer; font-family: 'Prompt'; }
@@ -113,6 +105,7 @@
         .btn-refresh i.spin { animation: fa-spin 1s infinite linear; }
 
         footer { text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; font-size: 0.85rem; opacity: 0.8; }
+        body[data-theme="snow"] footer, body[data-theme="love"] footer { border-top-color: rgba(0,0,0,0.1); }
 
         /* Modal */
         .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
@@ -124,19 +117,18 @@
         .form-group-edit label { display: block; font-size: 0.85rem; margin-bottom: 5px; opacity: 0.9; }
         .form-group-edit input, .form-group-edit select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
         body[data-theme="snow"] .form-group-edit input, body[data-theme="snow"] .form-group-edit select { background: white; border-color: #cbd5e1; color: #1e293b; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.5rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7; transition: 0.2s;}
+        .close-modal:hover { opacity: 1; color: #ef4444; }
         
         #loadingOverlay { position: fixed; inset:0; background: rgba(0,0,0,0.85); z-index: 10000; display: none; align-items: center; justify-content: center; flex-direction: column; color: white; backdrop-filter: blur(5px); }
     </style>
 </head>
 <body data-theme="default">
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
-    <div id="particleContainer"></div>
 
     <div id="loadingOverlay">
         <i class="fas fa-spinner fa-spin fa-4x" style="color: #3b82f6; margin-bottom: 20px;"></i>
-        <h2>กำลังตรวจสอบสิทธิ์การสอบ...</h2>
-        <p>กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้</p>
+        <h2>กำลังตรวจสอบสิทธิ์...</h2>
     </div>
 
     <div class="content-layer">
@@ -156,7 +148,7 @@
         </header>
 
         <div class="theme-switcher">
-            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
+            <button class="theme-btn active" data-theme="default">🤖 เริ่มต้น</button>
             <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
             <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
             <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
@@ -237,6 +229,9 @@
                     <select id="edit-room-num">
                         <option value="1">ห้อง 1</option><option value="2">ห้อง 2</option><option value="3">ห้อง 3</option>
                         <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option>
+                        <option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option>
+                        <option value="10">ห้อง 10</option><option value="11">ห้อง 11</option><option value="12">ห้อง 12</option>
+                        <option value="13">ห้อง 13</option><option value="14">ห้อง 14</option><option value="15">ห้อง 15</option>
                     </select>
                 </div>
             </div>
@@ -274,51 +269,17 @@
             return undefined;
         }
 
-        // --- ระบบ Theme ---
-        const themes = {
-            default: { char: "✨", color: "rgba(59,130,246,0.6)" }, snow: { char: "❄️", color: "rgba(255,255,255,0.7)" },
-            forest: { char: "🍃", color: "rgba(144,238,144,0.6)" }, halloween: { char: "🎃", color: "rgba(255,69,0,0.5)" },
-            love: { char: "🌸", color: "rgba(255,105,180,0.6)" }
-        };
-        let particleInterval = null;
-
         function applyTheme(themeKey) {
             document.body.setAttribute("data-theme", themeKey);
             localStorage.setItem('smart_theme', themeKey);
             document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
             const btn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
             if(btn) btn.classList.add("active");
-
-            startThemeParticles(themeKey);
         }
-
-        function startThemeParticles(theme) {
-            const container = document.getElementById("particleContainer");
-            if(particleInterval) clearInterval(particleInterval);
-            container.innerHTML = "";
-            const themeData = themes[theme];
-            
-            function createParticle() {
-                const particle = document.createElement("div");
-                particle.className = "theme-particle";
-                particle.style.left = Math.random() * 100 + "%";
-                particle.style.fontSize = (Math.random() * 15 + 10) + "px";
-                particle.style.opacity = Math.random() * 0.5 + 0.2;
-                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
-                particle.style.textShadow = `0 0 5px ${themeData.color}`;
-                particle.innerHTML = themeData.char;
-                container.appendChild(particle);
-                setTimeout(() => particle.remove(), 10000);
-            }
-            for(let i = 0; i < 10; i++) setTimeout(createParticle, i * 200);
-            particleInterval = setInterval(createParticle, 1000);
-        }
-
         document.querySelectorAll(".theme-btn").forEach(btn => {
             btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
         });
 
-        // --- ระบบ Login Google ---
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -348,7 +309,6 @@
 
         let db = { activities: [], students: [], submissions: [] };
         
-        // --- 🌟 ดึงข้อมูลสด และ ตรวจการแบน 🌟 ---
         async function fetchRealtimeData() {
             const email = localStorage.getItem('student_email');
             if (!email) return;
@@ -398,7 +358,6 @@
             }
         }
 
-        // --- 🌟 ระบบคลิกปุ่มเริ่มสอบ 🌟 ---
         async function handleExamClick(examUrl) {
             const email = localStorage.getItem('student_email');
             const sid = localStorage.getItem(email + '_studentid');
@@ -439,7 +398,6 @@
             }
         }
 
-        // --- 🌟 วาดหน้า Dashboard 🌟 ---
         function renderDashboard(email, myData) {
             const studentId = getVal(myData, 'student_id', 'รหัส', 'id') || '-';
             const room = getVal(myData, 'room', 'ห้อง', 'ชั้น') || '-';
@@ -588,7 +546,6 @@
             }
         }
 
-        // --- ฟังก์ชันแก้ไขโปรไฟล์ ---
         function openEditProfileModal() {
             const email = localStorage.getItem('student_email');
             const myData = db.students.find(s => getVal(s, 'email') === email) || {};
@@ -618,11 +575,10 @@
             if (!name || !number || !studentId) return alert('⚠️ กรุณากรอกรหัสนักเรียน, ชื่อ และเลขที่ให้ครบถ้วน');
             
             document.getElementById('saving-status').style.display = 'block';
-            document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปเดตข้อมูลไปที่ฐานข้อมูล...';
+            document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปเดตข้อมูล...';
 
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
+                method: 'POST', mode: 'no-cors',
                 body: JSON.stringify({ action: "updateProfile", email: email, student_id: studentId, name: name, room: room, number: number })
             }).then(() => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
