@@ -14,7 +14,6 @@
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); }
-        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
 
         .sidebar { width: 280px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px 0; z-index: 100; transition: 0.3s; height: 100vh; overflow-y: auto;}
@@ -66,6 +65,9 @@
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
         .badge-red { background: rgba(239,68,68,0.2); color: #ef4444; }
         .badge-green { background: rgba(16,185,129,0.2); color: #10b981; }
+
+        /* ตัวโหลดข้อมูล (Loading State) */
+        .empty-state { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; }
     </style>
 </head>
 <body data-theme="default">
@@ -99,37 +101,41 @@
             
             <div id="tab-activities" class="tab-content active">
                 <div class="glass-card">
-                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> สร้างโพสต์กิจกรรม (13 คอลัมน์)</h3>
+                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> สร้างโพสต์กิจกรรม</h3>
                     <div class="form-grid">
-                        <div class="form-group"><label>ประเภท</label><select id="act-type"><option value="task">งานปฎิบัติ</option><option value="activity">กิจกรรม</option></select></div>
-                        <div class="form-group"><label>สถานะ</label><select id="act-status"><option value="open">🟢 เปิด</option><option value="closed">🔴 ปิด</option></select></div>
+                        <div class="form-group"><label>ประเภท</label><select id="act-type"><option value="task">งานปฎิบัติ (มีคะแนน)</option><option value="activity">กิจกรรม (ไม่มีคะแนน)</option></select></div>
+                        <div class="form-group"><label>สถานะ</label><select id="act-status"><option value="open">🟢 เปิดรับงาน</option><option value="closed">🔴 ปิดรับงาน</option></select></div>
                         <div class="form-group full"><label>ชื่อหัวข้องาน</label><input type="text" id="act-title"></div>
                         <div class="form-group full"><label>คำสั่ง / รายละเอียด</label><textarea id="act-desc" rows="2"></textarea></div>
                         <div class="form-group"><label>วันที่กำหนดส่ง</label><input type="date" id="act-date"></div>
-                        <div class="form-group"><label>เวลา</label><input type="time" id="act-time" value="23:59"></div>
-                        <div class="form-group"><label>ห้องเรียน</label><select id="act-room"><option value="ทุกห้อง">ทุกห้อง</option></select></div>
-                        <div class="form-group"><label>คะแนนเต็ม</label><input type="number" id="act-points" value="10"></div>
-                        <div class="form-group full"><label>ลิงก์ปลายทาง Lab</label><input type="text" id="act-link" value="#"></div>
-                        <div class="form-group"><label>YouTube URL</label><input type="text" id="act-yt"></div>
-                        <div class="form-group"><label>PDF/Docs URL</label><input type="text" id="act-doc"></div>
+                        <div class="form-group"><label>เวลา</label><input type="time" id="act-time"></div>
+                        <div class="form-group"><label>ห้องเรียน</label>
+                            <select id="act-room"></select>
+                        </div>
+                        <div class="form-group"><label>คะแนนเต็ม</label>
+                            <input type="number" id="act-points" placeholder="ระบุคะแนนเต็ม">
+                        </div>
+                        <div class="form-group full"><label>ลิงก์ปลายทาง Lab</label><input type="text" id="act-link" placeholder="ถ้าไม่มีให้เว้นว่างไว้"></div>
+                        <div class="form-group"><label>YouTube URL</label><input type="text" id="act-yt" placeholder="https://youtube.com/..."></div>
+                        <div class="form-group"><label>PDF/Docs URL</label><input type="text" id="act-doc" placeholder="https://drive.google.com/..."></div>
                     </div>
                     <button class="btn-action" onclick="saveActivity()"><i class="fas fa-paper-plane"></i> โพสต์กิจกรรม</button>
                 </div>
                 <div class="glass-card">
-                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-list"></i> กิจกรรมที่สั่งไปแล้ว</h3>
-                    <div id="activities-list">กำลังโหลดข้อมูล...</div>
+                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-list"></i> กิจกรรมที่สั่งไปแล้ว (ดึงจากฐานข้อมูล)</h3>
+                    <div id="activities-list"><div class="empty-state">รอโหลดข้อมูล...</div></div>
                 </div>
             </div>
 
             <div id="tab-matrix" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-clipboard-check"></i> ตารางตรวจงาน</h3>
+                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-clipboard-check"></i> ตารางตรวจงาน (ข้อมูลจริง)</h3>
                     <div class="form-grid">
                         <div class="form-group"><label>เลือกงาน</label><select id="matrix-act" onchange="renderMatrix()"></select></div>
-                        <div class="form-group"><label>เลือกห้อง</label><select id="matrix-room" onchange="renderMatrix()"><option value="all">ดูทุกห้อง</option></select></div>
+                        <div class="form-group"><label>เลือกห้อง</label><select id="matrix-room" onchange="renderMatrix()"></select></div>
                     </div>
                     <table style="display:block; overflow-x:auto;">
-                        <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ</th><th>ห้อง</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr></thead>
+                        <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ</th><th>ห้อง</th><th>สถานะ</th><th>คะแนนที่ได้</th><th>จัดการ</th></tr></thead>
                         <tbody id="matrix-body"></tbody>
                     </table>
                 </div>
@@ -137,28 +143,28 @@
 
             <div id="tab-cms" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="color: #f59e0b; margin-bottom: 20px;"><i class="fas fa-trophy"></i> เพิ่มผลงานนักเรียน/กิจกรรม (Portfolio)</h3>
+                    <h3 style="color: #f59e0b; margin-bottom: 20px;"><i class="fas fa-trophy"></i> อัปโหลดผลงานสู่หน้าเว็บ (Portfolio)</h3>
                     <div class="form-grid">
-                        <div class="form-group full"><label>ชื่อผลงาน/กิจกรรม</label><input type="text" id="cms-p-title" placeholder="เช่น การสอบคัดเลือก..."></div>
-                        <div class="form-group full"><label>ลิงก์รูปภาพ (URL)</label><input type="text" id="cms-p-img" placeholder="https://..."></div>
+                        <div class="form-group full"><label>ชื่อผลงาน/กิจกรรม</label><input type="text" id="cms-p-title"></div>
+                        <div class="form-group full"><label>ลิงก์รูปภาพ (URL)</label><input type="text" id="cms-p-img"></div>
                         <div class="form-group full"><label>คำอธิบายสั้นๆ</label><textarea id="cms-p-desc" rows="3"></textarea></div>
                     </div>
-                    <button class="btn-action btn-warning" onclick="saveCMSPortfolio()" id="btn-save-port"><i class="fas fa-plus"></i> อัปโหลดผลงานขึ้นเว็บ</button>
+                    <button class="btn-action btn-warning" onclick="saveCMSPortfolio()" id="btn-save-port"><i class="fas fa-plus"></i> อัปโหลดผลงาน</button>
                 </div>
                 <div class="glass-card">
-                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-images"></i> ผลงานที่โชว์บนหน้าเว็บนักเรียน</h3>
-                    <div id="cms-portfolio-list">กำลังโหลด...</div>
+                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-images"></i> ผลงานในฐานข้อมูล (ดึงจากชีต Portfolios)</h3>
+                    <div id="cms-portfolio-list"><div class="empty-state">รอโหลดข้อมูล...</div></div>
                 </div>
             </div>
 
             <div id="tab-classview" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="color: #3b82f6; margin-bottom: 20px;"><i class="fas fa-users-class"></i> ข้อมูลเชิงลึกรายห้องเรียน</h3>
+                    <h3 style="color: #3b82f6; margin-bottom: 20px;"><i class="fas fa-users-class"></i> ข้อมูลสถิติเชิงลึกรายบุคคล (Real-time)</h3>
                     <div class="form-group" style="max-width: 300px;">
-                        <select id="view-class-room" onchange="renderClassViewTable()"><option value="all">แสดงนักเรียนทั้งหมด</option></select>
+                        <select id="view-class-room" onchange="renderClassViewTable()"></select>
                     </div>
                     <table style="display:block; overflow-x:auto;">
-                        <thead><tr><th>เลขที่/ชื่อ</th><th>ใช้งานล่าสุด</th><th>ส่งแล้ว</th><th>ค้างส่ง</th><th>คะแนนรวม</th></tr></thead>
+                        <thead><tr><th>เลขที่/ชื่อ</th><th>การเข้าใช้งานล่าสุด</th><th>ส่งงานแล้ว</th><th>ค้างส่ง</th><th>คะแนนรวมสะสม</th></tr></thead>
                         <tbody id="class-view-body"></tbody>
                     </table>
                 </div>
@@ -170,23 +176,23 @@
     <div id="gradeModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="document.getElementById('gradeModal').classList.remove('active')">×</button>
-            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">ชื่อนักเรียน</h3>
+            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">-</h3>
             <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <label>เนื้อหางานที่ส่ง:</label>
-                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all;"></div>
+                <label>เนื้อหางานที่นักเรียนส่งมา:</label>
+                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all; color: #f59e0b;">-</div>
             </div>
-            <div class="form-group"><label>ให้คะแนน</label><input type="number" id="grade-input-score"></div>
-            <button class="btn-action btn-success" style="width: 100%; justify-content: center;" onclick="saveScore()">บันทึกคะแนน</button>
+            <div class="form-group"><label>ให้คะแนน (เต็ม <span id="grade-max-points" style="color:#10b981; font-weight:bold;">-</span>)</label><input type="number" id="grade-input-score"></div>
+            <button class="btn-action btn-success" style="width: 100%; justify-content: center;" onclick="saveScore()">บันทึกคะแนนเข้าระบบ</button>
         </div>
     </div>
 
     <script>
-        // 🌟 1. เปลี่ยน URL ตรงนี้เป็น URL ของครู 🌟
+        // 🌟 1. เปลี่ยน URL ให้ตรงกับ Google Apps Script ของครู 🌟
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         let db = { activities: [], students: [], submissions: [], portfolios: [] };
 
-        // 🌟 Tab Switching & Theme
+        // 🌟 Tab & Theme Logic
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
@@ -203,14 +209,16 @@
             localStorage.setItem('admin_theme', theme);
         }
 
-        // 🌟 Fetch Data
+        // 🌟 ดึงข้อมูลจากฐานข้อมูล 100%
         async function loadAllData() {
             const btn = document.querySelector('button[onclick="loadAllData()"]');
-            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังอัปเดต...';
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังเชื่อมต่อฐานข้อมูล...';
+            
             try {
                 const resp = await fetch(`${SCRIPT_URL}?action=readAll`);
                 db = await resp.json();
                 
+                // ถ่ายทอดข้อมูลจริงลง UI
                 updateRoomSelectors();
                 renderActivitiesList();
                 renderMatrix();
@@ -219,29 +227,41 @@
                 
                 btn.innerHTML = '<i class="fas fa-check-circle"></i> ข้อมูลล่าสุดแล้ว';
             } catch (e) {
-                btn.innerHTML = '<i class="fas fa-times"></i> ผิดพลาด';
+                console.error(e);
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ดึงข้อมูลล้มเหลว';
+                
+                // แจ้งเตือนเมื่อระบบล่ม เพื่อไม่ให้มีของปลอมค้าง
+                document.getElementById('activities-list').innerHTML = '<div class="empty-state">ไม่สามารถเชื่อมต่อ Google Sheets ได้</div>';
+                document.getElementById('matrix-body').innerHTML = '<tr><td colspan="7" class="empty-state">ดึงข้อมูลล้มเหลว</td></tr>';
             }
         }
 
+        // 🌟 อัปเดต Dropdown ให้มีเฉพาะข้อมูลที่มีอยู่จริง
         function updateRoomSelectors() {
+            // ค้นหาว่ามีห้องอะไรบ้างในชีต Students จริงๆ เท่านั้น
             const rooms = [...new Set(db.students.map(s => s.room))].filter(Boolean).sort();
-            const selects = ['act-room', 'matrix-room', 'view-class-room'];
             
-            selects.forEach(id => {
-                const el = document.getElementById(id);
-                if(el) {
-                    const current = el.value;
-                    el.innerHTML = (id === 'act-room') ? '<option value="ทุกห้อง">ทุกห้อง</option>' : '<option value="all">ดูทุกห้อง</option>';
-                    rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
-                    el.value = current;
-                }
-            });
+            // อัปเดต Dropdown ห้องเรียน
+            const actRoom = document.getElementById('act-room');
+            const matrixRoom = document.getElementById('matrix-room');
+            const viewRoom = document.getElementById('view-class-room');
 
+            if(actRoom) actRoom.innerHTML = '<option value="ทุกห้อง">เลือกส่งทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+            if(matrixRoom) matrixRoom.innerHTML = '<option value="all">ดูผลรวมทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+            if(viewRoom) viewRoom.innerHTML = '<option value="all">ดูสถิติรวมทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+
+            // อัปเดต Dropdown กิจกรรมในหน้า Matrix ให้ดึงเฉพาะงานที่มีอยู่จริง
             const matrixAct = document.getElementById('matrix-act');
-            if(matrixAct) matrixAct.innerHTML = db.activities.map(a => `<option value="${a.ID}">${a.Title}</option>`).join('');
+            if(matrixAct) {
+                if(db.activities.length === 0) {
+                    matrixAct.innerHTML = '<option value="">ไม่มีงานในระบบ</option>';
+                } else {
+                    matrixAct.innerHTML = db.activities.map(a => `<option value="${a.ID}">${a.Title} (เต็ม ${a.Points})</option>`).join('');
+                }
+            }
         }
 
-        // 🌟 TAB 1: Activities
+        // 🌟 บันทึกกิจกรรม
         async function saveActivity() {
             const data = {
                 action: "saveActivity",
@@ -253,7 +273,7 @@
                 time: document.getElementById('act-time').value,
                 target: "all",
                 room: document.getElementById('act-room').value,
-                points: document.getElementById('act-points').value,
+                points: document.getElementById('act-points').value || "0", // ถ้าไม่ใส่ ให้เป็น 0 ไปเลย ไม่ปลอมแปลงเป็น 10
                 link: document.getElementById('act-link').value,
                 doc_link: document.getElementById('act-doc').value,
                 yt_link: document.getElementById('act-yt').value
@@ -261,50 +281,82 @@
             if(!data.title) return alert("กรุณาใส่ชื่อหัวข้องาน");
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("โพสต์กิจกรรมเรียบร้อย!");
+                alert("โพสต์ข้อมูลลง Google Sheets เรียบร้อย!");
+                // ล้างค่าฟอร์ม
+                document.getElementById('act-title').value = '';
+                document.getElementById('act-desc').value = '';
                 loadAllData();
             } catch (e) { alert("บันทึกไม่สำเร็จ!"); }
         }
 
+        // 🌟 แสดงรายการกิจกรรม (ข้อมูลจริง)
         function renderActivitiesList() {
             const list = document.getElementById('activities-list');
-            if (!db.activities || db.activities.length === 0) return list.innerHTML = "ยังไม่มีงาน";
+            if (!db.activities || db.activities.length === 0) {
+                list.innerHTML = '<div class="empty-state">ยังไม่มีกิจกรรมในฐานข้อมูล Google Sheets</div>';
+                return;
+            }
             list.innerHTML = db.activities.map(act => `
                 <div class="list-item">
                     <div>
-                        <strong>${act.Title}</strong> <span class="badge ${act.Status === 'open' ? 'badge-green' : 'badge-red'}">${act.Status}</span>
-                        <br><small>ห้อง: ${act.Room} | คะแนน: ${act.Points} | ส่ง: ${act.Date}</small>
+                        <strong style="font-size: 1.1rem;">${act.Title}</strong> 
+                        <span class="badge ${act.Status === 'open' ? 'badge-green' : 'badge-red'}">${act.Status === 'open' ? 'เปิด' : 'ปิด'}</span>
+                        <br><small style="color:#cbd5e1;">กำหนดส่ง: ${act.Date || '-'} | ห้องเป้าหมาย: ${act.Room} | คะแนนเต็ม: ${act.Points}</small>
                     </div>
                 </div>
             `).join('');
         }
 
-        // 🌟 TAB 2: Matrix & Grading
+        // 🌟 ตาราง Matrix ตรวจงาน (ข้อมูลจริง)
         function renderMatrix() {
             const actId = document.getElementById('matrix-act').value;
             const room = document.getElementById('matrix-room').value;
             const body = document.getElementById('matrix-body');
             
+            if (!actId) {
+                body.innerHTML = '<tr><td colspan="7" class="empty-state">กรุณาเลือกงานที่ต้องการตรวจ</td></tr>';
+                return;
+            }
+
             let filtered = db.students;
             if (room !== 'all') filtered = db.students.filter(s => s.room == room);
 
+            if(filtered.length === 0) {
+                body.innerHTML = '<tr><td colspan="7" class="empty-state">ไม่พบข้อมูลนักเรียนในห้องที่เลือก</td></tr>';
+                return;
+            }
+
             body.innerHTML = filtered.map(s => {
+                // ค้นหาการส่งงานที่ตรงกับ รหัสเด็ก และ ID งาน จริงๆ
                 const sub = db.submissions.find(item => item.student_id == s.student_id && item.activity_id == actId);
                 return `<tr>
-                    <td>${s.student_id}</td><td>${s.number}</td><td>${s.name}</td><td>${s.room}</td>
-                    <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
-                    <td>${sub ? (sub.score || 0) : '-'}</td>
-                    <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')">ตรวจ</button></td>
+                    <td>${s.student_id}</td>
+                    <td>${s.number}</td>
+                    <td>${s.name}</td>
+                    <td>${s.room}</td>
+                    <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ค้างส่ง'}</span></td>
+                    <td style="font-weight: bold; color: ${sub ? '#f59e0b' : 'inherit'};">${sub ? (sub.score || '0') : '-'}</td>
+                    <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')"><i class="fas fa-edit"></i> ให้คะแนน</button></td>
                 </tr>`;
             }).join('');
         }
 
+        // 🌟 Modal ให้คะแนน (ดึงข้อมูล Activity มาโชว์คะแนนเต็มจริงๆ)
         function openGrade(stdId, actId) {
             const std = db.students.find(s => s.student_id == stdId);
+            const act = db.activities.find(a => a.ID == actId);
             const sub = db.submissions.find(item => item.student_id == stdId && item.activity_id == actId);
             
-            document.getElementById('grade-student-name').innerText = "ตรวจงาน: " + (std ? std.name : stdId);
-            document.getElementById('grade-work-content').innerText = sub ? sub.work_content : "ยังไม่มีการส่งงาน";
+            // วางข้อมูลจริงลง Modal
+            document.getElementById('grade-student-name').innerText = "ตรวจงานของ: " + (std ? std.name : stdId);
+            document.getElementById('grade-work-content').innerText = sub ? (sub.work_content || "ส่งงานเปล่า") : "นักเรียนยังไม่ได้ส่งงานนี้เข้าระบบ";
+            
+            // กำหนดคะแนนเต็ม ตามที่ดึงมาจากฐานข้อมูล (ไม่ใช่เลข 10 ลอยๆ)
+            const maxPoints = act ? act.Points : 0;
+            document.getElementById('grade-max-points').innerText = maxPoints;
+            document.getElementById('grade-input-score').max = maxPoints;
+            document.getElementById('grade-input-score').value = sub ? sub.score : ''; // ถ้าเคยให้แล้วดึงมาโชว์
+            
             document.getElementById('gradeModal').classList.add('active');
             window.currentGrading = { stdId, actId };
         }
@@ -317,43 +369,45 @@
                 score: document.getElementById('grade-input-score').value
             };
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-            alert("บันทึกคะแนนแล้ว!");
+            alert("อัปเดตคะแนนลงฐานข้อมูลแล้ว!");
             document.getElementById('gradeModal').classList.remove('active');
             loadAllData();
         }
 
-        // 🌟 TAB 3: CMS (Portfolio)
+        // 🌟 CMS Portfolio
         async function saveCMSPortfolio() {
             const title = document.getElementById('cms-p-title').value;
             const imgLink = document.getElementById('cms-p-img').value;
             const desc = document.getElementById('cms-p-desc').value;
 
-            if (!title || !imgLink) return alert("กรุณาใส่ชื่อและลิงก์รูปภาพครับ");
+            if (!title || !imgLink) return alert("กรุณาใส่ชื่อและลิงก์รูปภาพให้ครบครับ");
 
             const btn = document.getElementById('btn-save-port');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูล...';
 
             try {
                 await fetch(SCRIPT_URL, { 
                     method: 'POST', 
                     body: JSON.stringify({ action: "savePortfolio", title: title, image_link: imgLink, desc: desc }) 
                 });
-                alert("อัปโหลดผลงานสำเร็จ!");
+                alert("บันทึกลงฐานข้อมูลสำเร็จ!");
                 document.getElementById('cms-p-title').value = '';
                 document.getElementById('cms-p-img').value = '';
                 document.getElementById('cms-p-desc').value = '';
                 loadAllData();
-            } catch (e) { alert("บันทึกไม่สำเร็จ"); }
-            finally { btn.innerHTML = '<i class="fas fa-plus"></i> อัปโหลดผลงานขึ้นเว็บ'; }
+            } catch (e) { alert("ล้มเหลว"); }
+            finally { btn.innerHTML = '<i class="fas fa-plus"></i> อัปโหลดผลงาน'; }
         }
 
         function renderPortfoliosList() {
             const list = document.getElementById('cms-portfolio-list');
-            if (!db.portfolios || db.portfolios.length === 0) return list.innerHTML = "ยังไม่มีผลงาน";
-            
+            if (!db.portfolios || db.portfolios.length === 0) {
+                list.innerHTML = '<div class="empty-state">ยังไม่มีผลงานในชีต Portfolios</div>';
+                return;
+            }
             list.innerHTML = db.portfolios.reverse().map(p => `
                 <div class="list-item" style="align-items: flex-start;">
-                    <img src="${p.ImageLink}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                    <img src="${p.ImageLink}" onerror="this.src='https://via.placeholder.com/80'" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
                     <div style="flex: 1;">
                         <strong>${p.Title}</strong><br>
                         <small style="color: #94a3b8;">อัปโหลดเมื่อ: ${p.Date}</small>
@@ -363,21 +417,29 @@
             `).join('');
         }
 
-        // 🌟 TAB 4: Class View
+        // 🌟 Class View (สถิติ)
         function renderClassViewTable() {
             const room = document.getElementById('view-class-room').value;
             const body = document.getElementById('class-view-body');
-            let filtered = (room === 'all') ? db.students : db.students.filter(s => s.room == room);
+            
+            let filtered = db.students;
+            if (room !== 'all') filtered = db.students.filter(s => s.room == room);
+
+            if(filtered.length === 0) {
+                body.innerHTML = '<tr><td colspan="5" class="empty-state">ไม่พบรายชื่อนักเรียนในฐานข้อมูล</td></tr>';
+                return;
+            }
 
             body.innerHTML = filtered.map(s => `<tr>
-                <td><strong>${s.number}. ${s.name}</strong><br><small>รหัส: ${s.student_id}</small></td>
-                <td><small>${s.last_login || '-'}</small></td>
+                <td><strong>${s.number}. ${s.name}</strong><br><small style="opacity:0.6;">รหัส: ${s.student_id}</small></td>
+                <td><small>${s.last_login || 'ไม่ระบุ/ไม่เคยเข้า'}</small></td>
                 <td><span class="badge badge-green">${s.sent_count || 0}</span></td>
                 <td><span class="badge badge-red">${s.pending_count || 0}</span></td>
                 <td style="font-weight:bold; color:#60a5fa;">${s.total_score || 0}</td>
             </tr>`).join('');
         }
 
+        // ตอนเปิดหน้า ให้โหลดข้อมูลทันที
         window.onload = () => {
             applyTheme(localStorage.getItem('admin_theme') || 'default');
             loadAllData();
