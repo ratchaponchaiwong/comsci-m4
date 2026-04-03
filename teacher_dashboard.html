@@ -2,334 +2,538 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Admin Hub | PROT Smart Workspace</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ครูผู้สอน | PROT Smart Workspace</title>
+    
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* ==================== ธีมหลัก ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; background: #0f172a; color: #f1f5f9; display: flex; height: 100vh; overflow: hidden; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; min-height: 100vh; }
         
-        /* Sidebar */
-        .sidebar { width: 280px; background: #1e293b; border-right: 1px solid #334155; display: flex; flex-direction: column; padding: 20px 0; }
-        .sidebar-brand { font-size: 1.4rem; font-weight: 800; color: #60a5fa; padding: 0 20px 20px 20px; border-bottom: 1px solid #334155; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 5px; padding: 0 15px; }
-        .nav-menu li { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; color: #cbd5e1; }
-        .nav-menu li:hover { background: rgba(59, 130, 246, 0.1); color: #60a5fa; }
-        .nav-menu li.active { background: #3b82f6; color: white; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
-        .teacher-profile { margin-top: auto; padding: 20px; border-top: 1px solid #334155; display: flex; align-items: center; gap: 12px; }
-        .teacher-profile img { width: 40px; height: 40px; border-radius: 50%; border: 2px solid #60a5fa; }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
-        /* Main Content */
-        .main-content { flex: 1; display: flex; flex-direction: column; background: #0a0f2a; overflow-y: auto; }
-        .header-bar { background: #1e293b; padding: 20px 30px; border-bottom: 1px solid #334155; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 10; }
-        .content-body { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; }
+        /* BG Animation */
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
+        .bg-animation .circle { position: absolute; border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="default"] .circle { background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); }
+        body[data-theme="snow"] .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="love"] .circle { background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
+        .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
         
-        .tab-content { display: none; animation: fadeIn 0.3s ease; }
+        /* Header */
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #60a5fa; text-decoration: none; display: flex; align-items: center; gap: 10px;}
+        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { color: #e11d48; }
+
+        /* Theme Switcher */
+        .theme-switcher { background: rgba(0,0,0,0.5); padding: 10px 20px; display: flex; justify-content: center; gap: 10px; margin: 15px auto; border-radius: 50px; width: fit-content; }
+        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 6px 16px; border-radius: 20px; color: white; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; font-size: 0.85rem;}
+        .theme-btn.active { background: #3b82f6; }
+
+        /* Container & Tabs */
+        .container { max-width: 1100px; margin: 0 auto; padding: 20px; }
+        .admin-tabs { display: flex; gap: 10px; margin-bottom: 20px; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 10px;}
+        body[data-theme="snow"] .admin-tabs, body[data-theme="love"] .admin-tabs { border-bottom-color: rgba(0,0,0,0.1); }
+        .tab-btn { background: transparent; border: none; color: inherit; padding: 10px 20px; font-size: 1.1rem; font-weight: 600; cursor: pointer; opacity: 0.6; transition: 0.3s; font-family: 'Prompt';}
+        .tab-btn.active { opacity: 1; color: #60a5fa; border-bottom: 3px solid #60a5fa; }
+        body[data-theme="snow"] .tab-btn.active { color: #2563eb; border-color: #2563eb; }
+        body[data-theme="love"] .tab-btn.active { color: #e11d48; border-color: #e11d48; }
+        .tab-content { display: none; animation: fadeIn 0.3s; }
         .tab-content.active { display: block; }
-        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { from { opacity:0; } to { opacity:1; } }
 
         /* Cards & Forms */
-        .card { background: #1e293b; border-radius: 20px; padding: 25px; border: 1px solid #334155; margin-bottom: 20px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 1px dashed #334155; padding-bottom: 15px; }
-        .card-title { font-size: 1.2rem; font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 10px; }
+        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 20px; color: inherit;}
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255,255,255,0.9); border-color: rgba(0,0,0,0.1); color: #1e293b;}
         
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; }
-        .form-group label { display: block; margin-bottom: 8px; font-size: 0.9rem; color: #94a3b8; }
-        .form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid #475569; background: #0f172a; color: white; font-family: 'Prompt'; font-size: 0.95rem; }
-        .form-group input:focus, .form-group select:focus { border-color: #3b82f6; outline: none; }
+        .form-group.full { grid-column: span 2; }
+        label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 500; opacity: 0.9; }
+        input, select, textarea { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; font-size: 0.95rem; }
+        body[data-theme="snow"] input, body[data-theme="snow"] select, body[data-theme="snow"] textarea, body[data-theme="love"] input, body[data-theme="love"] select, body[data-theme="love"] textarea { background: white; border-color: #cbd5e1; color: black; }
         
         /* Buttons */
-        .btn { padding: 10px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; border: none; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
-        .btn-primary { background: #3b82f6; color: white; }
-        .btn-primary:hover { background: #2563eb; }
-        .btn-success { background: #10b981; color: white; }
-        .btn-success:hover { background: #059669; }
-        .btn-danger { background: #ef4444; color: white; }
-        .btn-warning { background: #f59e0b; color: white; }
-
-        /* Tables */
-        table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-        th, td { padding: 12px 15px; text-align: left; border-bottom: 1px solid #334155; font-size: 0.9rem; }
-        th { background: #0f172a; color: #94a3b8; font-weight: 600; }
-        tr:hover { background: rgba(255,255,255,0.02); }
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-        .badge-red { background: rgba(239,68,68,0.2); color: #ef4444; }
-        .badge-green { background: rgba(16,185,129,0.2); color: #10b981; }
-
-        /* Search Box */
-        .search-box { display: flex; gap: 10px; margin-bottom: 20px; }
-        .search-box input { flex: 1; padding: 12px 20px; border-radius: 30px; border: 1px solid #3b82f6; background: rgba(59,130,246,0.1); color: white; font-size: 1rem; }
-
-        .student-profile-card { display: flex; gap: 20px; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; margin-top: 20px; border: 1px dashed #475569; }
-        .student-profile-card img { width: 80px; height: 80px; border-radius: 50%; border: 3px solid #3b82f6; }
-        .student-details h3 { color: #60a5fa; margin-bottom: 5px; }
-        .student-details p { color: #cbd5e1; font-size: 0.9rem; margin-bottom: 5px; }
+        .btn-action { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; font-size: 0.95rem;}
+        body[data-theme="love"] .btn-action { background: #e11d48; }
+        .btn-action:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-danger { background: #ef4444; }
+        .btn-warning { background: #f59e0b; }
+        
+        /* Activity List */
+        .activity-item { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
+        body[data-theme="snow"] .activity-item, body[data-theme="love"] .activity-item { background: rgba(0,0,0,0.05); }
+        
+        /* Table */
+        .table-responsive { overflow-x: auto; }
+        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
+        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        body[data-theme="snow"] th, body[data-theme="snow"] td, body[data-theme="love"] th, body[data-theme="love"] td { border-bottom-color: rgba(0,0,0,0.1); }
+        th { font-weight: 600; color: #60a5fa; }
+        body[data-theme="love"] th { color: #e11d48; }
+        
+        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
+        .modal.active { visibility: visible; opacity: 1; }
+        .modal-content { background: #1e293b; padding: 30px; border-radius: 15px; width: 90%; max-width: 500px; color: white; position: relative;}
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: white; color: black; }
+        
+        @media (max-width: 768px) { .form-grid { grid-template-columns: 1fr; } .form-group.full { grid-column: span 1; } .activity-item { flex-direction: column; gap: 15px; align-items: flex-start; } }
     </style>
 </head>
-<body>
+<body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
 
-    <div class="sidebar">
-        <div class="sidebar-brand">
-            <i class="fas fa-user-shield"></i> Admin Hub
-        </div>
-        <ul class="nav-menu">
-            <li class="active" onclick="switchTab('tab-activities', this)"><i class="fas fa-tasks"></i> จัดการกิจกรรม/สั่งงาน</li>
-            <li onclick="switchTab('tab-student-db', this)"><i class="fas fa-user-edit"></i> ฐานข้อมูลนักเรียน (รายบุคคล)</li>
-            <li onclick="switchTab('tab-overview', this)"><i class="fas fa-chart-bar"></i> ภาพรวมระดับชั้น</li>
-            <li onclick="switchTab('tab-cms', this)"><i class="fas fa-pager"></i> จัดการหน้าเว็บ (CMS)</li>
-            <li><a href="index.html" style="color: inherit; text-decoration: none; display: flex; gap: 12px; width: 100%;"><i class="fas fa-home"></i> ดูหน้าเว็บนักเรียน</a></li>
-        </ul>
-        <div class="teacher-profile">
-            <img src="https://ui-avatars.com/api/?name=TC&background=3b82f6&color=fff" id="teacherAvatar">
-            <div>
-                <div style="font-weight: 600; font-size: 0.9rem;" id="teacherName">ครูผู้สอน</div>
-                <div style="font-size: 0.75rem; color: #94a3b8; cursor: pointer;" onclick="logout()">ออกจากระบบ</div>
-            </div>
-        </div>
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-chalkboard-teacher"></i> ระบบจัดการครูผู้สอน</a>
+        <div style="font-size: 0.9rem; opacity: 0.8;">ยินดีต้อนรับ ครูผู้สอน</div>
+    </header>
+
+    <div class="theme-switcher">
+        <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
+        <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
+        <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
+        <button class="theme-btn" data-theme="halloween">🎃 ฮัลโลวีน</button>
+        <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
     </div>
 
-    <div class="main-content">
-        <div class="header-bar">
-            <h2><i class="fas fa-cogs" style="color: #60a5fa;"></i> ระบบบริหารจัดการห้องเรียน</h2>
-            <button class="btn btn-primary" onclick="loadAllDataFromGoogle()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
+    <div class="container">
+        <div class="admin-tabs">
+            <button class="tab-btn active" onclick="switchTab('tab1', this)"><i class="fas fa-edit"></i> 1. จัดการกิจกรรม/สั่งงาน</button>
+            <button class="tab-btn" onclick="switchTab('tab2', this)"><i class="fas fa-tasks"></i> 2. ตรวจงาน (Matrix)</button>
+            <button class="tab-btn" onclick="switchTab('tab3', this)"><i class="fas fa-file-csv"></i> 3. นำเข้ารายชื่อ CSV</button>
         </div>
 
-        <div class="content-body">
-            
-            <div id="tab-activities" class="tab-content active">
-                <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="fas fa-plus-circle"></i> สร้าง/แก้ไข งานและกิจกรรม</div></div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
-                        <div class="form-group"><label>ประเภท</label><select id="act-type"><option value="content">📖 เนื้อหา (ไม่มีคะแนน)</option><option value="task">⚙️ งานปฎิบัติ</option><option value="activity">💡 กิจกรรมกลุ่ม</option></select></div>
-                        <div class="form-group"><label>หัวข้องาน</label><input type="text" id="act-title" placeholder="เช่น แบบฝึกหัดที่ 1"></div>
-                        <div class="form-group" style="grid-column: span 2;"><label>รายละเอียด/คำสั่ง</label><textarea id="act-desc" rows="2" placeholder="อธิบายคำสั่งงาน..."></textarea></div>
-                        <div class="form-group"><label>กำหนดส่ง (วันที่)</label><input type="date" id="act-date"></div>
-                        <div class="form-group"><label>เวลา</label><input type="time" id="act-time" value="23:59"></div>
-                        <div class="form-group"><label>คะแนนเต็ม</label><input type="number" id="act-points" value="10"></div>
-                        <div class="form-group"><label>เป้าหมาย</label><select id="act-room"><option value="ทุกห้อง">ทุกห้อง</option><option value="ม.4/1">ม.4/1</option><option value="ม.4/2">ม.4/2</option></select></div>
-                        <div class="form-group" style="grid-column: span 2;"><label>ลิงก์ปลายทาง (ห้อง Lab)</label><select id="act-link"><option value="#">ไม่มีลิงก์ (ปิดปุ่ม)</option><option value="content.html">📖 หน้าเนื้อหา</option><option value="python.html">🐍 ห้อง Lab: Python</option><option value="robotics.html">🤖 ห้อง Lab: Wokwi</option></select></div>
+        <div id="tab1" class="tab-content active">
+            <div class="glass-card">
+                <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> ฟอร์มสร้าง/แก้ไข โพสต์กิจกรรม</h3>
+                <input type="hidden" id="edit-id">
+                
+                <div class="form-grid">
+                    <div class="form-group">
+                        <label>ประเภทเนื้อหา</label>
+                        <select id="act-type">
+                            <option value="task">⚙️ งานปฎิบัติ (มีคะแนน)</option>
+                            <option value="activity">💡 กิจกรรม (มีคะแนน)</option>
+                            <option value="content">📖 เนื้อหาความรู้ (ไม่มีคะแนน)</option>
+                        </select>
                     </div>
-                    <button class="btn btn-success" onclick="addActivity()"><i class="fas fa-save"></i> บันทึกกิจกรรม</button>
-                </div>
-            </div>
-
-            <div id="tab-student-db" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title"><i class="fas fa-search"></i> ค้นหาและจัดการข้อมูลนักเรียน</div>
-                        <button class="btn btn-success"><i class="fas fa-user-plus"></i> เพิ่มนักเรียนใหม่</button>
+                    <div class="form-group">
+                        <label>สถานะ</label>
+                        <select id="act-status">
+                            <option value="open">🟢 เปิดให้นักเรียนเข้าทำได้</option>
+                            <option value="closed">🔴 ปิดชั่วคราว (เห็นชื่อแต่กดไม่ได้)</option>
+                        </select>
                     </div>
+                    <div class="form-group full"><label>ชื่อหัวข้องาน</label><input type="text" id="act-title" placeholder="เช่น ใบงานที่ 1..."></div>
+                    <div class="form-group full"><label>คำสั่ง / รายละเอียด</label><textarea id="act-desc" rows="2" placeholder="อธิบายงานให้นักเรียนเข้าใจ..."></textarea></div>
+                    <div class="form-group"><label>วันที่กำหนดส่ง</label><input type="date" id="act-date"></div>
+                    <div class="form-group"><label>เวลา</label><input type="time" id="act-time" value="23:59"></div>
+                    <div class="form-group"><label>คะแนนเต็ม</label><input type="number" id="act-points" value="10"></div>
                     
-                    <div class="search-box">
-                        <input type="text" id="search-student-id" placeholder="พิมพ์รหัสนักเรียน (เช่น 65001) หรือ อีเมล เพื่อค้นหา...">
-                        <button class="btn btn-primary" onclick="searchStudent()"><i class="fas fa-search"></i> ค้นหา</button>
+                    <div class="form-group">
+                        <label>มอบหมายให้ห้องเรียน</label>
+                        <select id="act-room">
+                            <option value="ทุกห้อง">✅ ทุกห้อง</option>
+                            <option value="ม.1/1">ม.1/1</option><option value="ม.2/1">ม.2/1</option>
+                            <option value="ม.3/1">ม.3/1</option><option value="ม.4/1">ม.4/1</option>
+                            <option value="ม.5/1">ม.5/1</option><option value="ม.6/1">ม.6/1</option>
+                        </select>
                     </div>
 
-                    <div id="student-search-result" style="display: none;">
-                        <div class="student-profile-card">
-                            <img src="" id="res-pic" alt="Student">
-                            <div class="student-details" style="flex: 1;">
-                                <h3 id="res-name">ชื่อนักเรียน</h3>
-                                <p><i class="fas fa-id-badge"></i> รหัส: <span id="res-id"></span> | ห้อง: <span id="res-room"></span> | เลขที่: <span id="res-number"></span></p>
-                                <p><i class="fas fa-envelope"></i> อีเมล: <span id="res-email"></span></p>
-                                <p><i class="fas fa-chart-line"></i> คะแนนรวม: <span id="res-score" style="color:#10b981; font-weight:bold;">0</span></p>
-                                <div style="margin-top: 15px; padding: 10px; background: rgba(239,68,68,0.1); border-left: 3px solid #ef4444; border-radius: 5px;">
-                                    <strong style="color:#ef4444;"><i class="fas fa-exclamation-circle"></i> งานที่ค้างส่ง:</strong>
-                                    <div id="res-missing" style="font-size: 0.85rem; margin-top: 5px;">ไม่มีงานค้าง</div>
-                                </div>
-                            </div>
-                            <div style="display: flex; flex-direction: column; gap: 10px;">
-                                <button class="btn btn-warning"><i class="fas fa-edit"></i> แก้ไขข้อมูล</button>
-                                <button class="btn btn-danger"><i class="fas fa-trash-alt"></i> ลบนักเรียน</button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div id="tab-overview" class="tab-content">
-                <div class="card">
-                    <div class="card-header">
-                        <div class="card-title"><i class="fas fa-chart-bar"></i> ภาพรวมระดับชั้น / สรุปคะแนน</div>
-                        <select id="filter-room" onchange="renderClassOverview()" style="width: 200px; padding: 8px; border-radius: 8px; background: #0f172a; color: white; border: 1px solid #475569;">
-                            <option value="all">ดูทุกห้องเรียน</option>
-                            <option value="ม.4/1">ม.4/1</option>
-                            <option value="ม.4/2">ม.4/2</option>
+                    <div class="form-group full">
+                        <label>ลิงก์ปลายทาง (ห้อง Lab/เรียน)</label>
+                        <select id="act-link">
+                            <option value="#">-- ไม่มีลิงก์ปลายทาง --</option>
+                            <option value="content.html">📖 เข้าหน้าเนื้อหา (ไม่มีปุ่มส่งงาน)</option>
+                            <option value="python.html">🐍 เข้าห้อง Lab: เขียน Python</option>
+                            <option value="robotics.html">🤖 เข้าห้อง Lab: ต่อวงจร Wokwi</option>
                         </select>
                     </div>
                     
-                    <div style="overflow-x: auto;">
-                        <table id="class-overview-table">
-                            <thead>
-                                <tr>
-                                    <th>รหัส</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th>เลขที่</th><th>คะแนนรวม</th><th>สถานะงานค้าง</th><th>จัดการ</th>
-                                </tr>
-                            </thead>
-                            <tbody id="class-overview-body">
-                                </tbody>
-                        </table>
+                    <div class="form-group"><label><i class="fab fa-youtube" style="color:#ef4444;"></i> ลิงก์คลิป YouTube (ถ้ามี)</label><input type="text" id="act-yt" placeholder="https://youtube.com/..."></div>
+                    <div class="form-group"><label><i class="fas fa-file-pdf" style="color:#3b82f6;"></i> ลิงก์เอกสาร Docs/PDF (ถ้ามี)</label><input type="text" id="act-doc" placeholder="https://drive.google.com/..."></div>
+                </div>
+
+                <div style="margin-top: 15px; display: flex; gap: 10px;">
+                    <button class="btn-action" onclick="saveActivity()" id="btn-save-main"><i class="fas fa-paper-plane"></i> โพสต์กิจกรรม</button>
+                    <button class="btn-action btn-danger" onclick="resetForm()" id="btn-cancel" style="display:none;">ยกเลิกแก้ไข</button>
+                    <span id="sync-status" style="margin-left:10px; font-size:0.9rem; color:#10b981; display:none;"><i class="fas fa-spinner fa-spin"></i> กำลังอัปเดตระบบ...</span>
+                </div>
+            </div>
+
+            <div class="glass-card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                    <h3 style="color: #60a5fa;"><i class="fas fa-list"></i> รายการโพสต์กิจกรรมที่สั่งไปแล้ว</h3>
+                    <button class="btn-action" style="padding: 5px 15px; font-size: 0.8rem;" onclick="syncFromDatabase()"><i class="fas fa-sync"></i> โหลดข้อมูลล่าสุด</button>
+                </div>
+                <div id="activities-list">
+                    </div>
+            </div>
+        </div>
+
+        <div id="tab2" class="tab-content">
+            <div class="glass-card">
+                <h3 style="color: #60a5fa; margin-bottom: 15px;"><i class="fas fa-search"></i> ตารางตรวจงานนักเรียน</h3>
+                <div class="form-grid" style="margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px;">
+                    <div class="form-group">
+                        <label>เลือกงานที่จะตรวจ</label>
+                        <select id="matrix-act" onchange="renderMatrix()"></select>
+                    </div>
+                    <div class="form-group">
+                        <label>เลือกห้อง</label>
+                        <select id="matrix-room" onchange="renderMatrix()">
+                            <option value="all">ดูทุกห้อง</option>
+                            <option value="ม.4/1">ม.4/1</option>
+                        </select>
                     </div>
                 </div>
-            </div>
 
-            <div id="tab-cms" class="tab-content">
+                <div class="table-responsive">
+                    <table>
+                        <thead>
+                            <tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th>สถานะส่งงาน</th><th>คะแนน</th><th>จัดการ</th></tr>
+                        </thead>
+                        <tbody id="matrix-body">
+                            <tr><td colspan="7" style="text-align:center;">กำลังโหลดข้อมูลนักเรียน...</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab3" class="tab-content">
+            <div class="glass-card">
+                <h3 style="color: #10b981; margin-bottom: 15px;"><i class="fas fa-file-csv"></i> นำเข้ารายชื่อจากไฟล์ CSV</h3>
+                <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px;">ไฟล์ CSV ต้องมีหัวคอลัมน์ (บรรทัดแรก) เรียงตามนี้: <b>email, student_id, name, room, number</b></p>
                 
-                <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="fas fa-chalkboard-teacher"></i> แก้ไขข้อมูลผู้สอน (Teacher Profile)</div></div>
-                    <div class="form-group"><label>ลิงก์รูปภาพครู (Image URL)</label><input type="text" placeholder="https://..."></div>
-                    <div class="form-group"><label>ประวัติ/คำแนะนำ</label><textarea rows="3" placeholder="สวัสดีนักเรียนทุกคน..."></textarea></div>
-                    <div class="form-group"><label>ลิงก์ YouTube (วิดีโอแนะนำรายวิชา)</label><input type="text" placeholder="https://youtube.com/..."></div>
-                    <button class="btn btn-primary"><i class="fas fa-save"></i> บันทึกข้อมูลครู</button>
-                </div>
-
-                <div class="card">
-                    <div class="card-header"><div class="card-title"><i class="fas fa-trophy"></i> จัดการผลงานนักเรียน (Student Portfolio)</div></div>
-                    <div class="form-group"><label>ชื่อผลงาน</label><input type="text" placeholder="เช่น โครงงานหุ่นยนต์รดน้ำต้นไม้"></div>
-                    <div class="form-group"><label>ลิงก์รูปภาพผลงาน</label><input type="text" placeholder="https://..."></div>
-                    <div class="form-group"><label>คำอธิบาย</label><textarea rows="2" placeholder="ผลงานชิ้นนี้สร้างขึ้นโดย..."></textarea></div>
-                    <button class="btn btn-success"><i class="fas fa-plus"></i> เพิ่มเข้าโชว์รูม</button>
-                </div>
-
+                <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 15px;">
+                <br>
+                <button class="btn-action" style="background: #10b981;" onclick="processCSV()"><i class="fas fa-upload"></i> อัปโหลดข้อมูลลงระบบ</button>
+                <div id="csv-status" style="margin-top: 15px; color: #f59e0b; display:none;"><i class="fas fa-spinner fa-spin"></i> กำลังประมวลผล...</div>
             </div>
-
         </div>
     </div>
 
-    <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+    <div id="gradeModal" class="modal">
+        <div class="modal-content">
+            <button class="close-modal" onclick="document.getElementById('gradeModal').classList.remove('active')">×</button>
+            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">ชื่อนักเรียน</h3>
+            
+            <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.1);">
+                <label>ผลงานที่นักเรียนส่งมา:</label>
+                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; font-size: 0.95rem; word-break: break-all;"></div>
+            </div>
+            
+            <div class="form-group">
+                <label>ให้คะแนน (เต็ม <span id="grade-max-points">10</span>)</label>
+                <input type="number" id="grade-input-score">
+            </div>
+            
+            <button class="btn-action" style="width: 100%; background: #10b981;" onclick="saveScore()"><i class="fas fa-save"></i> บันทึกคะแนน</button>
+            <div id="grading-status" style="text-align:center; margin-top:10px; color:#10b981; display:none;"><i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...</div>
+        </div>
+    </div>
 
     <script>
-        // 🌟 ลิงก์ Google Script ตัวเดิมของคุณครู 🌟
+        // 🌟 ใส่ลิงก์ Google Script ตัวล่าสุดของคุณครูตรงนี้ครับ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+        
+        let allStudents = [];
+        let currentGradeEmail = '';
+        let currentGradeActId = '';
 
-        let allStudentsData = [];
-        let allActivitiesData = [];
-
-        // ฟังก์ชันสลับแท็บ
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            
-            document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-            element.classList.add('active');
-
-            if(tabId === 'tab-overview') renderClassOverview();
-        }
-
-        // ดึงข้อมูลทั้งหมดจาก Database
-        async function loadAllDataFromGoogle() {
-            try {
-                const cacheBuster = new Date().getTime(); 
-                // ดึงข้อมูลนักเรียน
-                const stdRes = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
-                allStudentsData = await stdRes.json();
-                
-                // ดึงข้อมูลกิจกรรม
-                const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
-                const actData = await actRes.json();
-                allActivitiesData = actData.data || [];
-
-                alert("✅ ดึงข้อมูลล่าสุดจากฐานข้อมูลสำเร็จ!");
-                renderClassOverview(); // อัปเดตตาราง
-            } catch(e) {
-                alert("⚠️ เกิดข้อผิดพลาดในการดึงข้อมูล");
-            }
-        }
-
-        // ระบบค้นหานักเรียนรายบุคคล (TAB 2)
-        function searchStudent() {
-            const query = document.getElementById('search-student-id').value.trim().toLowerCase();
-            if(!query) return alert("กรุณาพิมพ์รหัสหรืออีเมลครับ");
-
-            const student = allStudentsData.find(s => 
-                (s.studentId && s.studentId.toString().toLowerCase() === query) || 
-                (s.email && s.email.toLowerCase() === query)
-            );
-
-            if (student) {
-                document.getElementById('res-name').innerText = student.name || "ไม่มีชื่อ";
-                document.getElementById('res-id').innerText = student.studentId || "-";
-                document.getElementById('res-room').innerText = student.room || "-";
-                document.getElementById('res-number').innerText = student.number || "-";
-                document.getElementById('res-email').innerText = student.email;
-                document.getElementById('res-pic').src = "https://ui-avatars.com/api/?name=" + (student.name || "S") + "&background=3b82f6&color=fff";
-
-                // คำนวณคะแนนและงานค้าง
-                let totalScore = 0;
-                let missing = [];
-                allActivitiesData.forEach(act => {
-                    if(act.type !== 'content') {
-                        let hasWork = student.works && student.works[act.id];
-                        let hasScore = student.scores && student.scores[act.id];
-                        
-                        if(hasScore) totalScore += parseInt(student.scores[act.id]);
-                        if(!hasWork && !hasScore) missing.push(act.title);
-                    }
-                });
-
-                document.getElementById('res-score').innerText = totalScore;
-                document.getElementById('res-missing').innerHTML = missing.length > 0 ? missing.join("<br>• ") : "<span style='color:#10b981;'>ไม่มีงานค้าง 🎉</span>";
-                
-                document.getElementById('student-search-result').style.display = 'block';
-            } else {
-                alert("❌ ไม่พบข้อมูลนักเรียนรหัสนี้ครับ");
-                document.getElementById('student-search-result').style.display = 'none';
-            }
-        }
-
-        // ระบบแสดงภาพรวมระดับชั้น (TAB 3)
-        function renderClassOverview() {
-            const tbody = document.getElementById('class-overview-body');
-            const filterRoom = document.getElementById('filter-room').value;
-            tbody.innerHTML = "";
-
-            let filteredStudents = allStudentsData.filter(s => s.room && s.room !== '-');
-            if (filterRoom !== 'all') {
-                filteredStudents = filteredStudents.filter(s => s.room === filterRoom);
-            }
-
-            // เรียงตามเลขที่
-            filteredStudents.sort((a, b) => parseInt(a.number || 999) - parseInt(b.number || 999));
-
-            filteredStudents.forEach(student => {
-                let totalScore = 0;
-                let missingCount = 0;
-
-                allActivitiesData.forEach(act => {
-                    if(act.type !== 'content') {
-                        let hasWork = student.works && student.works[act.id];
-                        let hasScore = student.scores && student.scores[act.id];
-                        if(hasScore) totalScore += parseInt(student.scores[act.id]);
-                        if(!hasWork && !hasScore) missingCount++;
-                    }
-                });
-
-                let statusBadge = missingCount > 0 
-                    ? `<span class="badge badge-red">ค้าง ${missingCount} งาน</span>` 
-                    : `<span class="badge badge-green">ครบถ้วน</span>`;
-
-                tbody.innerHTML += `
-                    <tr>
-                        <td>${student.studentId || '-'}</td>
-                        <td style="font-weight:500;">${student.name || '-'}</td>
-                        <td>${student.room || '-'}</td>
-                        <td>${student.number || '-'}</td>
-                        <td style="color:#60a5fa; font-weight:bold;">${totalScore}</td>
-                        <td>${statusBadge}</td>
-                        <td><button class="btn btn-primary" style="padding: 5px 10px; font-size:0.8rem;" onclick="document.getElementById('search-student-id').value='${student.studentId}'; switchTab('tab-student-db', document.querySelectorAll('.nav-menu li')[1]); searchStudent();">ดูข้อมูล</button></td>
-                    </tr>
-                `;
+        // Theme Switcher
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => {
+                document.body.setAttribute("data-theme", btn.getAttribute("data-theme"));
+                document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
             });
+        });
 
-            if(filteredStudents.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align:center; padding: 20px; opacity:0.6;">ยังไม่มีข้อมูลนักเรียนในห้องนี้</td></tr>`;
+        // Tab Switcher
+        function switchTab(tabId, btn) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            btn.classList.add('active');
+            if(tabId === 'tab2') loadMatrixData();
+        }
+
+        // ==================== ระบบจัดการกิจกรรม (แบบคลาสสิก) ====================
+        function loadActivitiesUI() {
+            const listDiv = document.getElementById('activities-list');
+            let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            
+            if(acts.length === 0) {
+                listDiv.innerHTML = '<p style="text-align:center; opacity:0.6; padding: 20px;">ยังไม่มีการสั่งงาน</p>';
+                return;
+            }
+
+            listDiv.innerHTML = acts.map(a => {
+                let color = a.type === 'content' ? '#a855f7' : (a.type === 'task' ? '#f59e0b' : '#10b981');
+                let icon = a.type === 'content' ? '📖' : '⚙️';
+                let statusText = a.status === 'closed' ? '<span style="color:#ef4444;">🔴 ปิดชั่วคราว</span>' : '<span style="color:#10b981;">🟢 เปิดอยู่</span>';
+                
+                return `
+                <div class="activity-item" style="border-left-color: ${color};">
+                    <div>
+                        <h4 style="color:${color}; margin-bottom:5px;">${icon} ${a.title}</h4>
+                        <div style="font-size:0.85rem; opacity:0.8;">
+                            กำหนดส่ง: ${a.date || '-'} | ห้อง: ${a.targetRoom} | สถานะ: ${statusText}
+                        </div>
+                    </div>
+                    <div style="display:flex; gap:10px;">
+                        <button class="btn-action btn-warning" onclick="editAct('${a.id}')"><i class="fas fa-edit"></i> แก้ไข</button>
+                        <button class="btn-action btn-danger" onclick="deleteAct('${a.id}')"><i class="fas fa-trash"></i></button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function saveActivity() {
+            const title = document.getElementById('act-title').value;
+            if(!title) return alert("กรุณาใส่ชื่อหัวข้องาน");
+
+            const actData = {
+                id: document.getElementById('edit-id').value || Date.now().toString(),
+                type: document.getElementById('act-type').value,
+                status: document.getElementById('act-status').value,
+                title: title,
+                desc: document.getElementById('act-desc').value,
+                date: document.getElementById('act-date').value,
+                time: document.getElementById('act-time').value,
+                points: document.getElementById('act-points').value,
+                targetRoom: document.getElementById('act-room').value,
+                link: document.getElementById('act-link').value,
+                yt: document.getElementById('act-yt').value,
+                doc: document.getElementById('act-doc').value
+            };
+
+            let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const idx = acts.findIndex(a => String(a.id) === String(actData.id));
+            if(idx > -1) acts[idx] = actData; else acts.push(actData);
+
+            localStorage.setItem('global_activities', JSON.stringify(acts));
+            loadActivitiesUI();
+            resetForm();
+            pushToDatabase(acts);
+        }
+
+        function editAct(id) {
+            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const act = acts.find(a => String(a.id) === String(id));
+            if(!act) return;
+
+            document.getElementById('edit-id').value = act.id;
+            document.getElementById('act-type').value = act.type || 'task';
+            document.getElementById('act-status').value = act.status || 'open';
+            document.getElementById('act-title').value = act.title;
+            document.getElementById('act-desc').value = act.desc || '';
+            document.getElementById('act-date').value = act.date || '';
+            document.getElementById('act-time').value = act.time || '23:59';
+            document.getElementById('act-points').value = act.points || '10';
+            document.getElementById('act-room').value = act.targetRoom || 'ทุกห้อง';
+            document.getElementById('act-link').value = act.link || '#';
+            document.getElementById('act-yt').value = act.yt || '';
+            document.getElementById('act-doc').value = act.doc || '';
+
+            document.getElementById('btn-save-main').innerHTML = '<i class="fas fa-save"></i> บันทึกการแก้ไข';
+            document.getElementById('btn-cancel').style.display = 'inline-block';
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function deleteAct(id) {
+            if(!confirm("ต้องการลบงานนี้ใช่หรือไม่?")) return;
+            let acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            acts = acts.filter(a => String(a.id) !== String(id));
+            localStorage.setItem('global_activities', JSON.stringify(acts));
+            loadActivitiesUI();
+            pushToDatabase(acts);
+        }
+
+        function resetForm() {
+            document.getElementById('edit-id').value = '';
+            document.getElementById('act-title').value = '';
+            document.getElementById('act-desc').value = '';
+            document.getElementById('btn-save-main').innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
+            document.getElementById('btn-cancel').style.display = 'none';
+        }
+
+        // ==================== ระบบฐานข้อมูล ====================
+        function pushToDatabase(actsArray) {
+            document.getElementById('sync-status').style.display = 'inline-block';
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ action: "saveActivities", activities: actsArray })
+            }).then(() => {
+                setTimeout(() => document.getElementById('sync-status').style.display = 'none', 1000);
+            });
+        }
+
+        async function syncFromDatabase() {
+            document.getElementById('activities-list').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังดึงข้อมูล...';
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + Date.now());
+                const data = await res.json();
+                if(data && data.type === 'activities') {
+                    localStorage.setItem('global_activities', JSON.stringify(data.data || []));
+                    loadActivitiesUI();
+                }
+            } catch(e) {
+                alert("โหลดข้อมูลไม่สำเร็จ กรุณาลองใหม่");
+                loadActivitiesUI();
             }
         }
 
+        // ==================== ระบบตรวจงาน (Matrix) ====================
+        async function loadMatrixData() {
+            document.getElementById('matrix-body').innerHTML = '<tr><td colspan="7" style="text-align:center;"><i class="fas fa-spinner fa-spin"></i> ดึงข้อมูลนักเรียนจาก Database...</td></tr>';
+            
+            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const tasks = acts.filter(a => a.type !== 'content');
+            document.getElementById('matrix-act').innerHTML = tasks.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
+
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?t=" + Date.now());
+                allStudents = await res.json();
+                renderMatrix();
+            } catch(e) {
+                document.getElementById('matrix-body').innerHTML = '<tr><td colspan="7" style="text-align:center; color:#ef4444;">โหลดไม่สำเร็จ</td></tr>';
+            }
+        }
+
+        function renderMatrix() {
+            const tbody = document.getElementById('matrix-body');
+            const actId = document.getElementById('matrix-act').value;
+            const roomFilter = document.getElementById('matrix-room').value;
+
+            if(!allStudents || allStudents.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">ยังไม่มีนักเรียนในระบบ</td></tr>';
+                return;
+            }
+
+            let filtered = allStudents;
+            if(roomFilter !== 'all') filtered = filtered.filter(s => s.room === roomFilter);
+            
+            filtered.sort((a,b) => parseInt(a.number||99) - parseInt(b.number||99));
+
+            let html = '';
+            filtered.forEach(s => {
+                let work = null, score = '-';
+                if(s.works && s.works[actId] !== undefined) work = s.works[actId];
+                if(s.scores && s.scores[actId] !== undefined && s.scores[actId] !== "") score = s.scores[actId];
+                
+                let hasWork = (work !== null && work !== "");
+                let statusHtml = hasWork ? `<span style="color:#10b981; font-weight:bold;">ส่งแล้ว</span>` : `<span style="color:#ef4444;">ยังไม่ส่ง</span>`;
+
+                html += `
+                <tr>
+                    <td>${s.studentId || '-'}</td>
+                    <td>${s.number || '-'}</td>
+                    <td>${s.name || '-'}</td>
+                    <td>${s.room || '-'}</td>
+                    <td>${statusHtml}</td>
+                    <td style="color:#60a5fa; font-weight:bold;">${score}</td>
+                    <td><button class="btn-action" style="padding: 5px 10px; font-size:0.8rem;" onclick="openGradeModal('${s.email}','${actId}','${s.name}')">ตรวจงาน</button></td>
+                </tr>`;
+            });
+            tbody.innerHTML = html || '<tr><td colspan="7" style="text-align:center;">ไม่พบข้อมูล</td></tr>';
+        }
+
+        function openGradeModal(email, actId, name) {
+            currentGradeEmail = email;
+            currentGradeActId = actId;
+            const student = allStudents.find(s => s.email === email);
+            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
+            const actData = acts.find(a => String(a.id) === String(actId));
+            
+            document.getElementById('grade-student-name').innerText = name;
+            document.getElementById('grade-max-points').innerText = actData ? actData.points : 10;
+            
+            let workDisplay = 'ไม่พบผลงาน';
+            if(student.works && student.works[actId]) {
+                let w = student.works[actId];
+                if(String(w).startsWith('http')) {
+                    workDisplay = `<a href="${w}" target="_blank" style="color:#60a5fa;">เปิดดูลิงก์ผลงาน <i class="fas fa-external-link-alt"></i></a>`;
+                } else {
+                    workDisplay = `<pre style="white-space:pre-wrap;">${w}</pre>`;
+                }
+            }
+            document.getElementById('grade-work-content').innerHTML = workDisplay;
+            document.getElementById('grade-input-score').value = (student.scores && student.scores[actId]) ? student.scores[actId] : '';
+            document.getElementById('gradeModal').classList.add('active');
+        }
+
+        function saveScore() {
+            const score = document.getElementById('grade-input-score').value;
+            if(score === '') return alert('กรุณาใส่คะแนน');
+            document.getElementById('grading-status').style.display = 'block';
+
+            let scoresObj = {}; scoresObj[currentGradeActId] = score;
+            
+            fetch(GOOGLE_SCRIPT_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({ email: currentGradeEmail, scores: scoresObj })
+            }).then(() => {
+                document.getElementById('gradeModal').classList.remove('active');
+                document.getElementById('grading-status').style.display = 'none';
+                loadMatrixData(); // รีเฟรชตาราง
+            });
+        }
+
+        // ==================== ระบบนำเข้า CSV (คลาสสิก) ====================
+        function processCSV() {
+            const fileInput = document.getElementById('csvFileInput');
+            if(!fileInput.files.length) return alert('กรุณาเลือกไฟล์ CSV');
+            
+            document.getElementById('csv-status').style.display = 'block';
+            const reader = new FileReader();
+            reader.onload = async function(e) {
+                const text = e.target.result;
+                const rows = text.split('\n');
+                let count = 0;
+
+                for(let i = 1; i < rows.length; i++) { // ข้ามหัวตาราง
+                    const cols = rows[i].split(',');
+                    if(cols.length >= 5) {
+                        let email = cols[0].trim();
+                        let stdId = cols[1].trim();
+                        let name = cols[2].trim();
+                        let room = cols[3].trim();
+                        let num = cols[4].trim();
+                        
+                        if(email && name) {
+                            await fetch(GOOGLE_SCRIPT_URL, {
+                                method: 'POST', mode: 'no-cors',
+                                body: JSON.stringify({ email: email, studentId: stdId, name: name, room: room, number: num })
+                            });
+                            count++;
+                        }
+                    }
+                }
+                document.getElementById('csv-status').innerHTML = `✅ นำเข้าสำเร็จ ${count} คน`;
+            };
+            reader.readAsText(fileInput.files[0]);
+        }
+
+        // เริ่มต้นทำงาน
         window.onload = () => {
-            loadAllDataFromGoogle(); // โหลดข้อมูลอัตโนมัติเมื่อเปิดหน้าเว็บครู
+            const savedTheme = localStorage.getItem('smart_theme') || "default";
+            applyTheme(savedTheme);
+            loadActivitiesUI();
         };
     </script>
 </body>
