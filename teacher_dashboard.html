@@ -21,6 +21,7 @@
         .sidebar-brand { font-size: 1.3rem; font-weight: 800; color: #60a5fa; padding: 0 20px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 5px; padding: 0 15px; }
         .nav-menu li { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; opacity: 0.8; }
+        .nav-menu li:hover { background: rgba(59, 130, 246, 0.2); opacity: 1; color: #60a5fa; }
         .nav-menu li.active { background: #3b82f6; color: white; opacity: 1; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
 
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; position: relative; z-index: 10; }
@@ -44,9 +45,11 @@
         body[data-theme="snow"] input, body[data-theme="snow"] select, body[data-theme="snow"] textarea, body[data-theme="love"] input, body[data-theme="love"] select, body[data-theme="love"] textarea { background: white; border-color: #cbd5e1; }
         
         .btn-action { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; display: inline-flex; align-items: center; gap: 8px;}
-        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
+        .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
+        .btn-action:disabled { opacity: 0.7; cursor: not-allowed; }
         .btn-danger { background: #ef4444 !important; }
         .btn-success { background: #10b981 !important; }
+        .btn-warning { background: #f59e0b !important; }
 
         .list-item { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
         
@@ -57,6 +60,7 @@
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
         .modal-content { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px; color: white; position: relative; max-height: 90vh; overflow-y: auto;}
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: #ffffff; color: #1e293b; }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
         
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
@@ -177,10 +181,33 @@
             </div>
             
             <div id="tab-cms" class="tab-content">
-                <div class="glass-card"><h3>จัดการผลงานนักเรียน</h3><div id="cms-portfolio-list"></div></div>
+                <div class="glass-card">
+                    <h3 style="color: #f59e0b; margin-bottom: 20px;"><i class="fas fa-trophy"></i> อัปโหลดผลงานสู่หน้าเว็บ (Portfolio)</h3>
+                    <div class="form-grid">
+                        <div class="form-group full"><label>ชื่อผลงาน/กิจกรรม</label><input type="text" id="cms-p-title" placeholder="พิมพ์ชื่อผลงาน..."></div>
+                        <div class="form-group full"><label>ลิงก์รูปภาพ (URL)</label><input type="text" id="cms-p-img" placeholder="เช่น https://imgur.com/... หรือ Google Drive Link"></div>
+                        <div class="form-group full"><label>คำอธิบายสั้นๆ</label><textarea id="cms-p-desc" rows="3" placeholder="อธิบายเกี่ยวกับผลงานชิ้นนี้..."></textarea></div>
+                    </div>
+                    <button class="btn-action btn-warning" onclick="saveCMSPortfolio()" id="btn-save-port"><i class="fas fa-upload"></i> เผยแพร่ผลงาน</button>
+                </div>
+                <div class="glass-card">
+                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-images"></i> ผลงานในฐานข้อมูล</h3>
+                    <div id="cms-portfolio-list"><div class="empty-state">กำลังโหลดข้อมูล...</div></div>
+                </div>
             </div>
+
             <div id="tab-classview" class="tab-content">
-                <div class="glass-card"><h3>ข้อมูลรายห้องเรียน</h3><div id="class-view-body"></div></div>
+                <div class="glass-card">
+                    <h3 style="color: #3b82f6; margin-bottom: 20px;"><i class="fas fa-users-class"></i> ข้อมูลและสถิติรายบุคคล</h3>
+                    <div class="form-group" style="max-width: 300px;">
+                        <label>เลือกห้องเรียนเพื่อดูสถิติ</label>
+                        <select id="view-class-room" onchange="renderClassViewTable()"></select>
+                    </div>
+                    <table style="display:block; overflow-x:auto;">
+                        <thead><tr><th>รหัส</th><th>เลขที่/ชื่อ</th><th>การเข้าใช้งานล่าสุด</th><th>ส่งงานแล้ว</th><th>ค้างส่ง</th><th>คะแนนรวมสะสม</th></tr></thead>
+                        <tbody id="class-view-body"></tbody>
+                    </table>
+                </div>
             </div>
 
         </div>
@@ -191,27 +218,38 @@
             <button class="close-modal" onclick="document.getElementById('gradeModal').classList.remove('active')">×</button>
             <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">ตรวจงาน</h3>
             <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <label>สิ่งที่นักเรียนส่งมา:</label>
-                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all; color: #f59e0b; white-space: pre-wrap;"></div>
+                <label>ผลงานที่นักเรียนส่งมา:</label>
+                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all; color: #f59e0b; line-height: 1.5;"></div>
             </div>
-            <div class="form-group"><label>ระบุคะแนน (เต็ม <span id="grade-max-points">-</span>)</label><input type="number" id="grade-input-score"></div>
-            <button class="btn-action btn-success" style="width: 100%; justify-content: center;" onclick="saveScore()"><i class="fas fa-save"></i> บันทึกคะแนน</button>
+            <div class="form-group">
+                <label>ระบุคะแนน (เต็ม <span id="grade-max-points" style="color: #10b981; font-weight: bold;">-</span>)</label>
+                <input type="number" id="grade-input-score" placeholder="กรอกคะแนนที่นี่...">
+            </div>
+            <button class="btn-action btn-success" id="btn-save-score" style="width: 100%; justify-content: center;" onclick="saveScore()">
+                <i class="fas fa-save"></i> บันทึกคะแนน
+            </button>
         </div>
     </div>
 
     <script>
+        // 🌟 ใส่ลิงก์ Google Script ของครูตรงนี้ให้ตรงกันนะครับ 🌟
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         let db = { activities: [], students: [], submissions: [], portfolios: [] };
 
+        // ฟังก์ชันสลับหน้าต่าง Tabs 
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
             document.getElementById(tabId).classList.add('active');
             el.classList.add('active');
+            
             if(tabId === 'tab-matrix') renderMatrix();
+            if(tabId === 'tab-classview') renderClassViewTable();
+            if(tabId === 'tab-cms') renderPortfoliosList();
         }
 
+        // ดึงข้อมูลทั้งหมด
         async function loadAllData() {
             const btn = document.querySelector('button[onclick="loadAllData()"]');
             btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังอัปเดต...';
@@ -221,25 +259,34 @@
                 updateRoomSelectors();
                 renderActivitiesList();
                 renderMatrix();
+                renderClassViewTable();
+                renderPortfoliosList();
                 btn.innerHTML = '<i class="fas fa-check-circle"></i> ข้อมูลล่าสุดแล้ว';
             } catch (e) {
                 btn.innerHTML = '<i class="fas fa-times"></i> ผิดพลาด';
             }
         }
 
+        // อัปเดต Dropdown ห้องเรียนในหน้าต่างๆ
         function updateRoomSelectors() {
-            const rooms = [...new Set(db.students.map(s => s.room))].filter(Boolean).sort();
+            const rooms = [...new Set((db.students || []).map(s => s.room))].filter(Boolean).sort();
             const matrixRoom = document.getElementById('matrix-room');
-            if(matrixRoom) matrixRoom.innerHTML = '<option value="all">แสดงทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+            const viewRoom = document.getElementById('view-class-room');
+            
+            const roomOptions = '<option value="all">แสดงทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+            
+            if(matrixRoom) matrixRoom.innerHTML = roomOptions;
+            if(viewRoom) viewRoom.innerHTML = roomOptions;
 
             const matrixAct = document.getElementById('matrix-act');
-            if(matrixAct) matrixAct.innerHTML = db.activities.map(a => {
+            if(matrixAct) matrixAct.innerHTML = (db.activities || []).map(a => {
                 let actId = a.ID || a.id;
                 let actTitle = a.Title || a.title;
                 return `<option value="${actId}">${actTitle}</option>`;
             }).join('');
         }
 
+        // ===================== ระบบกิจกรรม =====================
         async function saveActivity() {
             const grade = document.getElementById('act-grade').value;
             const roomNum = document.getElementById('act-room-num').value;
@@ -264,12 +311,20 @@
 
             if(!data.title) return alert("กรุณาใส่ชื่อหัวข้องาน");
             
+            const btn = document.getElementById('btn-save-act');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูล...';
+            btn.disabled = true;
+
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
                 alert("✅ บันทึกและส่งข้อมูลสำเร็จ");
                 resetForm();
                 loadAllData();
-            } catch (e) { alert("❌ บันทึกไม่สำเร็จ"); }
+            } catch (e) { 
+                alert("❌ บันทึกไม่สำเร็จ"); 
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
+                btn.disabled = false;
+            }
         }
 
         function renderActivitiesList() {
@@ -279,14 +334,12 @@
                 return;
             }
             list.innerHTML = db.activities.map(act => {
-                // ตัวป้องกัน Header ตัวเล็ก-ใหญ่ ใน Google Sheets
                 let actId = act.ID || act.id;
                 let actTitle = act.Title || act.title;
                 let actStatus = act.Status || act.status;
                 let actRoom = act.Room || act.room;
                 let actPoints = act.Points || act.points;
                 
-                // แปลงวันที่ให้อ่านง่าย
                 let actDate = act.Date || act.date || '-';
                 if(String(actDate).includes('T')) actDate = String(actDate).split('T')[0];
 
@@ -299,7 +352,7 @@
                     <div>
                         <strong>${actTitle}</strong> 
                         <span class="badge ${actStatus === 'open' ? 'badge-green' : 'badge-red'}">${actStatus === 'open' ? 'เปิด' : 'ปิด'}</span>
-                        <br><small>เป้าหมาย: ${actRoom} | กำหนดส่ง: ${actDate} ${actTime} | ${actPoints} คะแนน</small>
+                        <br><small style="color: #94a3b8;">เป้าหมาย: ${actRoom} | กำหนดส่ง: ${actDate} ${actTime} | ${actPoints} คะแนน</small>
                     </div>
                     <div style="display:flex; gap:8px;">
                         <button class="btn-action" onclick="editActivity('${actId}')"><i class="fas fa-edit"></i></button>
@@ -309,12 +362,10 @@
             }).join('');
         }
 
-        // 🌟 ฟังก์ชันดึงข้อมูลมาแก้ไข (ปรับปรุงตัวต้านทาน Google Sheets) 🌟
         function editActivity(actId) {
             const act = db.activities.find(a => (a.ID || a.id) == actId);
             if(!act) return;
 
-            // ตัวช่วยดึงค่า ไม่ว่าคอลัมน์ใน Sheet จะเป็นพิมพ์เล็กหรือใหญ่
             const getVal = (key1, key2) => act[key1] !== undefined ? act[key1] : (act[key2] !== undefined ? act[key2] : '');
 
             document.getElementById('act-edit-id').value = getVal('ID', 'id');
@@ -327,12 +378,10 @@
             document.getElementById('act-doc').value = getVal('Doc', 'doc');
             document.getElementById('act-yt').value = getVal('YouTube', 'yt_link') || getVal('youtube', 'yt_link');
 
-            // 🌟 แก้ปัญหา Date โดนแปลง 🌟
             let rawDate = getVal('Date', 'date');
             if (String(rawDate).includes('T')) rawDate = String(rawDate).split('T')[0]; 
             document.getElementById('act-date').value = rawDate;
 
-            // 🌟 แก้ปัญหา Time โดนแปลง 🌟
             let rawTime = getVal('Time', 'time');
             if (String(rawTime).includes('T')) {
                 rawTime = String(rawTime).split('T')[1].substring(0, 5); 
@@ -341,7 +390,6 @@
             }
             document.getElementById('act-time').value = rawTime;
 
-            // 🌟 แยกชั้นกับห้องกลับไปที่ Dropdown 🌟
             const roomVal = getVal('Room', 'room') || "ทุกห้อง";
             if(roomVal.includes('/')) {
                 const parts = roomVal.split('/');
@@ -367,22 +415,33 @@
             document.getElementById('act-edit-id').value = '';
             document.getElementById('act-title').value = '';
             document.getElementById('act-desc').value = '';
-            document.getElementById('btn-save-act').innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
+            const btn = document.getElementById('btn-save-act');
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
+            btn.disabled = false;
             document.getElementById('btn-cancel-edit').style.display = 'none';
         }
 
+        // ===================== ระบบตรวจงาน (Matrix) =====================
         function renderMatrix() {
             const actId = document.getElementById('matrix-act').value;
             const room = document.getElementById('matrix-room').value;
             const body = document.getElementById('matrix-body');
             
-            let filtered = db.students;
-            if (room !== 'all') filtered = db.students.filter(s => s.room == room);
+            let filtered = db.students || [];
+            if (room !== 'all') filtered = filtered.filter(s => s.room == room);
+
+            if(filtered.length === 0) {
+                body.innerHTML = '<tr><td colspan="7" class="empty-state">ไม่พบนักเรียนในห้องที่เลือก</td></tr>';
+                return;
+            }
 
             body.innerHTML = filtered.map(s => {
-                const sub = db.submissions.find(item => item.student_id == s.student_id && item.activity_id == actId);
+                const sub = (db.submissions || []).find(item => item.student_id == s.student_id && item.activity_id == actId);
                 return `<tr>
-                    <td>${s.student_id || '-'}</td><td>${s.number || '-'}</td><td>${s.name || 'นักเรียน'}</td><td>${s.room || '-'}</td>
+                    <td>${s.student_id || '-'}</td>
+                    <td>${s.number || '-'}</td>
+                    <td>${s.name || 'นักเรียน'}</td>
+                    <td>${s.room || '-'}</td>
                     <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ค้างส่ง'}</span></td>
                     <td style="font-weight:bold;">${sub ? (sub.score || '0') : '-'}</td>
                     <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')">ตรวจ</button></td>
@@ -390,38 +449,142 @@
             }).join('');
         }
 
-        function openGrade(stdId, actId) {
-            const std = db.students.find(s => s.student_id == stdId);
-            const act = db.activities.find(a => (a.ID || a.id) == actId);
-            const sub = db.submissions.find(item => item.student_id == stdId && item.activity_id == actId);
+        // 🌟 อัปเกรดระบบตัวแปลงลิงก์อัตโนมัติ (Clickable Links) 🌟
+        function parseWork(content) {
+            if (!content) return "ยังไม่มีการส่งงาน";
+            let text = String(content);
             
-            document.getElementById('grade-student-name').innerText = "นักเรียน: " + (std ? std.name : stdId);
-            document.getElementById('grade-work-content').innerText = sub ? parseWork(sub.work_content) : "ยังไม่ส่งงาน";
-            document.getElementById('grade-max-points').innerText = act ? (act.Points || act.points) : '-';
+            try {
+                // เช็คของเก่าที่เป็นรูปแบบ JSON
+                if (text.trim().startsWith('{')) {
+                    const parsed = JSON.parse(text);
+                    text = Object.values(parsed).join('\n\n');
+                }
+            } catch(e) {}
+
+            // แปลง < และ > เป็น HTML Entity ก่อน เพื่อป้องกันการแทรกโค้ด (XSS)
+            text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+            // ใช้ Regex จับลิงก์ แล้วแปลงเป็นปุ่มกด
+            const urlRegex = /(https?:\/\/[^\s]+)/g;
+            text = text.replace(urlRegex, function(url) {
+                return `<a href="${url}" target="_blank" style="color: #60a5fa; text-decoration: underline; font-weight: 600; display: inline-block; margin-top: 5px; background: rgba(59,130,246,0.1); padding: 5px 10px; border-radius: 8px;"><i class="fas fa-external-link-alt"></i> เปิดดูผลงาน (Link)</a><br><small style="color: #94a3b8; font-size: 0.75rem;">(${url})</small>`;
+            });
+
+            // ขึ้นบรรทัดใหม่
+            return text.replace(/\n/g, '<br>');
+        }
+
+        function openGrade(stdId, actId) {
+            const std = (db.students || []).find(s => s.student_id == stdId);
+            const act = (db.activities || []).find(a => (a.ID || a.id) == actId);
+            const sub = (db.submissions || []).find(item => item.student_id == stdId && item.activity_id == actId);
+            
+            document.getElementById('grade-student-name').innerText = "ตรวจงานของ: " + (std ? std.name : stdId);
+            
+            // ⚠️ ใช้ innerHTML แทน innerText เพื่อให้ปุ่มลิงก์ทำงานได้
+            document.getElementById('grade-work-content').innerHTML = sub ? parseWork(sub.work_content) : "นักเรียนยังไม่ได้ส่งงานนี้เข้าระบบ";
+            
+            const maxPoints = act ? (act.Points || act.points) : '-';
+            document.getElementById('grade-max-points').innerText = maxPoints;
             document.getElementById('grade-input-score').value = sub ? sub.score : '';
+            
             document.getElementById('gradeModal').classList.add('active');
             window.currentGrading = { stdId, actId };
         }
 
-        function parseWork(content) {
-            try {
-                if (typeof content === 'string' && content.trim().startsWith('{')) {
-                    const parsed = JSON.parse(content);
-                    return Object.values(parsed).join('\n\n');
-                }
-            } catch(e) {}
-            return content;
-        }
-
         async function saveScore() {
             const score = document.getElementById('grade-input-score').value;
-            await fetch(SCRIPT_URL, { 
-                method: 'POST', 
-                body: JSON.stringify({ action: "saveScore", student_id: window.currentGrading.stdId, activity_id: window.currentGrading.actId, score: score }) 
-            });
-            alert("บันทึกคะแนนแล้ว");
-            document.getElementById('gradeModal').classList.remove('active');
-            loadAllData();
+            const btn = document.getElementById('btn-save-score');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+            btn.disabled = true;
+
+            try {
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: "saveScore", student_id: window.currentGrading.stdId, activity_id: window.currentGrading.actId, score: score }) 
+                });
+                alert("✅ บันทึกคะแนนเรียบร้อยแล้ว");
+                document.getElementById('gradeModal').classList.remove('active');
+                loadAllData();
+            } catch(e) {
+                alert("❌ ขัดข้อง ไม่สามารถบันทึกคะแนนได้");
+            } finally {
+                btn.innerHTML = '<i class="fas fa-save"></i> บันทึกคะแนน';
+                btn.disabled = false;
+            }
+        }
+
+        // ===================== ระบบ CMS (Portfolio) =====================
+        async function saveCMSPortfolio() {
+            const title = document.getElementById('cms-p-title').value;
+            const imgLink = document.getElementById('cms-p-img').value;
+            const desc = document.getElementById('cms-p-desc').value;
+
+            if (!title || !imgLink) return alert("⚠️ กรุณาใส่ชื่อผลงานและลิงก์รูปภาพให้ครบถ้วน");
+
+            const btn = document.getElementById('btn-save-port');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลด...';
+            btn.disabled = true;
+
+            try {
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: "savePortfolio", title: title, image_link: imgLink, desc: desc }) 
+                });
+                alert("✅ อัปโหลดผลงานสำเร็จ!");
+                document.getElementById('cms-p-title').value = '';
+                document.getElementById('cms-p-img').value = '';
+                document.getElementById('cms-p-desc').value = '';
+                loadAllData();
+            } catch (e) { 
+                alert("❌ เกิดข้อผิดพลาด"); 
+            } finally { 
+                btn.innerHTML = '<i class="fas fa-upload"></i> เผยแพร่ผลงาน'; 
+                btn.disabled = false;
+            }
+        }
+
+        function renderPortfoliosList() {
+            const list = document.getElementById('cms-portfolio-list');
+            if (!db.portfolios || db.portfolios.length === 0) {
+                list.innerHTML = '<div class="empty-state">ยังไม่มีผลงานในระบบ</div>';
+                return;
+            }
+            // แสดงผลลัพธ์ย้อนกลับ (ใหม่สุดขึ้นก่อน)
+            list.innerHTML = [...db.portfolios].reverse().map(p => `
+                <div class="list-item" style="align-items: flex-start; background: rgba(0,0,0,0.1); border-left: 4px solid #f59e0b;">
+                    <img src="${p.ImageLink || p.image_link}" onerror="this.src='https://via.placeholder.com/80'" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px; border: 1px solid rgba(255,255,255,0.2);">
+                    <div style="flex: 1;">
+                        <strong style="color: #f59e0b;">${p.Title || p.title}</strong><br>
+                        <small style="color: #94a3b8;">อัปโหลดเมื่อ: ${p.Date || p.date}</small>
+                        <p style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">${p.Description || p.desc || '-'}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // ===================== ระบบ Class View (สถิติ) =====================
+        function renderClassViewTable() {
+            const room = document.getElementById('view-class-room').value;
+            const body = document.getElementById('class-view-body');
+            
+            let filtered = db.students || [];
+            if (room !== 'all') filtered = filtered.filter(s => s.room == room);
+
+            if(filtered.length === 0) {
+                body.innerHTML = '<tr><td colspan="6" class="empty-state">ไม่พบรายชื่อนักเรียนในห้องที่เลือก</td></tr>';
+                return;
+            }
+
+            body.innerHTML = filtered.map(s => `<tr>
+                <td>${s.student_id || '-'}</td>
+                <td><strong>${s.number || '-'}. ${s.name || 'นักเรียน'}</strong></td>
+                <td><small style="opacity:0.8;">${s.last_login || 'ไม่เคยเข้า'}</small></td>
+                <td><span class="badge badge-green">${s.sent_count || 0} งาน</span></td>
+                <td><span class="badge badge-red">${s.pending_count || 0} งาน</span></td>
+                <td style="font-weight:bold; color:#60a5fa;">${s.total_score || 0}</td>
+            </tr>`).join('');
         }
 
         function applyTheme(theme) { document.body.setAttribute("data-theme", theme); }
