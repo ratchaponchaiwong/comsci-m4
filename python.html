@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>ห้อง Lab Python | PROT Smart Workspace</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* CSS หลักจาก Template */
+        /* CSS หลัก */
         * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s, color 0.3s;}
         body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; cursor: default; }
         
@@ -26,9 +26,6 @@
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
-        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
@@ -36,12 +33,9 @@
         .content-layer { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; }
         
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
         .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
-        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
         
         .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 4px 12px 4px 8px; border-radius: 50px; }
-        body[data-theme="snow"] .user-info, body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3b82f6; }
         .user-name { font-size: 0.85rem; font-weight: 500; color: inherit; }
         
@@ -51,7 +45,7 @@
         body[data-theme="forest"] { --panel-bg: rgba(30, 60, 30, 0.6); --accent: #10b981; --editor-bg: rgba(10, 30, 10, 0.8); }
         body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(255,105,180,0.3); --editor-bg: #fff0f5; --output-bg: #ffffff; --accent: #ec4899; }
 
-        .workspace-wrapper { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
+        .workspace-wrapper { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; transition: 0.3s; }
         
         .sidebar { width: 300px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; transition: 0.3s; }
         .task-title { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; }
@@ -63,19 +57,21 @@
         .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; border-color: #94a3b8; }
         
         .main-panel { flex: 1; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; padding: 20px; transition: 0.3s; }
-        .editor-area { flex: 1; background: var(--editor-bg); color: inherit; font-family: 'JetBrains Mono', monospace; padding: 15px; border-radius: 15px; border: 1px solid var(--border-ws); resize: none; font-size: 14px; margin-bottom: 15px; }
-        body[data-theme="snow"] .editor-area, body[data-theme="love"] .editor-area { border-color: #cbd5e1; }
+        .editor-area { flex: 1; background: var(--editor-bg); color: inherit; font-family: 'JetBrains Mono', monospace; padding: 15px; border-radius: 15px; border: 1px solid var(--border-ws); resize: none; font-size: 16px; margin-bottom: 15px; line-height: 1.5; }
+        body[data-theme="snow"] .editor-area, body[data-theme="love"] .editor-area { border-color: #cbd5e1; color: #1e293b; }
         
-        .output-box { background: var(--output-bg); color: #86efac; padding: 15px; height: 150px; border-radius: 15px; font-family: monospace; border: 1px solid var(--border-ws); overflow-y: auto; }
+        .output-box { background: var(--output-bg); color: #86efac; padding: 15px; height: 150px; border-radius: 15px; font-family: monospace; border: 1px solid var(--border-ws); overflow-y: auto; font-size: 15px;}
         body[data-theme="snow"] .output-box, body[data-theme="love"] .output-box { color: #15803d; }
-        .btn-run { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        
+        .btn-run { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; transition: 0.2s; display: flex; align-items: center; gap: 8px;}
         .btn-run:hover { filter: brightness(1.1); transform: translateY(-2px); }
 
-        /* ==================== 🎯 FOCUS MODE CSS 🎯 ==================== */
+        /* ==================== 🎯 โหมดโฟกัส (สำหรับ iPad แนวนอน) 🎯 ==================== */
         body.focus-mode header { display: none !important; }
         body.focus-mode .workspace-wrapper { padding: 10px; height: 100vh; }
+        body.focus-mode .sidebar { width: 250px; } /* ย่อแถบซ้ายลงนิดนึงตอนอยู่โหมดโฟกัส */
         
-        /* ปุ่มแสดงเมนู (ลอยอยู่มุมขวาบนเมื่ออยู่ในโหมดโฟกัส) */
+        /* ปุ่มแสดงเมนูคืน จะลอยอยู่มุมขวาบนเฉพาะตอนเข้าโหมดโฟกัส */
         #exit-focus-btn {
             display: none;
             position: fixed;
@@ -98,7 +94,7 @@
         #exit-focus-btn:hover { background: #dc2626; transform: scale(1.05); }
         body.focus-mode #exit-focus-btn { display: flex; }
 
-        /* ทำให้ส่วน Main Panel เต็มจอมากขึ้นถ้าใช้มือถือ/แท็บเล็ต */
+        /* ให้หน้าจอเป็นมิตรกับมือถือ/แท็บเล็ตแนวตั้ง */
         @media (max-width: 768px) {
             .workspace-wrapper { flex-direction: column; overflow-y: auto; }
             .sidebar { width: 100%; height: auto; flex-shrink: 0; }
@@ -110,14 +106,14 @@
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
     
     <button id="exit-focus-btn" onclick="toggleFocusMode()">
-        <i class="fas fa-compress-arrows-alt"></i> แสดงเมนูคืน
+        <i class="fas fa-compress-arrows-alt"></i> แสดงเมนูด้านบน
     </button>
 
     <div class="content-layer">
         <header>
             <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <a href="student.html" style="color: inherit; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px;"><i class="fas fa-arrow-left"></i> กลับห้องเรียน</a>
+                <a href="student.html" style="color: inherit; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;"><i class="fas fa-arrow-left"></i> กลับห้องเรียน</a>
                 <div class="user-info" id="loginArea">
                     <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
                 </div>
@@ -139,11 +135,11 @@
             </div>
 
             <div class="main-panel">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                    <button class="btn-run" style="margin-bottom: 0;" onclick="runPython()"><i class="fas fa-play"></i> รันโค้ด Python</button>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; flex-wrap: wrap; gap: 10px;">
+                    <button class="btn-run" onclick="runPython()"><i class="fas fa-play"></i> รันโค้ด Python</button>
                     
-                    <button onclick="toggleFocusMode()" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 8px 18px; border-radius: 30px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 8px;">
-                        <i class="fas fa-expand-arrows-alt"></i> ขยายเต็มหน้าจอ
+                    <button onclick="toggleFocusMode()" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 8px 18px; border-radius: 30px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                        <i class="fas fa-expand-arrows-alt"></i> พื้นที่ทำงานเต็มจอ
                     </button>
                 </div>
 
@@ -156,7 +152,7 @@ print("Hello, PROT Smart Workspace!")
     </div>
 
     <script>
-        // 🌟 1. ใส่ลิงก์ Google Script ที่นี่ 🌟
+        // 🌟 1. ใส่ลิงก์ Google Script ของครู 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         function getVal(obj, ...keys) {
@@ -170,6 +166,7 @@ print("Hello, PROT Smart Workspace!")
 
         let isPastDeadlineGlobal = false;
 
+        // โหลดข้อมูลนักเรียน
         async function loadUserData() {
             const email = localStorage.getItem('student_email');
             if (!email) {
@@ -244,7 +241,7 @@ print("Hello, PROT Smart Workspace!")
             }
         }
 
-        // ระบบรัน Python
+        // 🌟 ระบบรัน Python 🌟
         let outputContent = "";
         function outf(text) {
             outputContent += text;
@@ -254,39 +251,53 @@ print("Hello, PROT Smart Workspace!")
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
         }
+
         function runPython() {
             const code = document.getElementById("python-code").value;
             const outputDiv = document.getElementById("output");
-            outputDiv.innerHTML = ""; outputContent = "";
+            outputDiv.innerHTML = ""; 
+            outputContent = "";
             Sk.pre = "output";
-            Sk.configure({ output: outf, read: builtin অফিসেRead }); // แก้ไขการพิมพ์ผิดให้รันได้ปกติ
+            
+            // 🛑 แก้ไขบั๊กตัวอักษรแปลกปลอมใน Skulpt ตรงนี้ให้เรียบร้อยแล้วครับ 🛑
             Sk.configure({ output: outf, read: builtinRead }); 
+            
             const myPromise = Sk.misceval.asyncToPromise(function() {
                 return Sk.importMainWithBody("<stdin>", false, code, true);
             });
-            myPromise.then(() => { if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ (ไม่มี Output แสดงผล)"; }, 
+            
+            myPromise.then(
+                () => { if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ (ไม่มี Output แสดงผล)"; }, 
                 (err) => { outputDiv.innerHTML = `<span style="color: #ef4444;">❌ ข้อผิดพลาด: ${err.toString()}</span>`; }
             );
         }
 
-        // 🌟 ฟังก์ชันสลับโหมดโฟกัส 🌟
+        // 🌟 ฟังก์ชันสลับโหมดโฟกัส (รองรับทั้งคอมและ iPad) 🌟
         function toggleFocusMode() {
             document.body.classList.toggle('focus-mode');
             
             if (document.body.classList.contains('focus-mode')) {
-                // ขออนุญาตขยายหน้าจอเต็ม (Fullscreen) ถ้าเบราว์เซอร์รองรับ
-                if (document.documentElement.requestFullscreen) {
-                    document.documentElement.requestFullscreen().catch(()=>{});
-                }
+                // พยายามขอ Fullscreen (สำหรับคอม/แอนดรอยด์)
+                try {
+                    if (document.documentElement.requestFullscreen) {
+                        document.documentElement.requestFullscreen().catch(()=>{});
+                    } else if (document.documentElement.webkitRequestFullscreen) {
+                        document.documentElement.webkitRequestFullscreen();
+                    }
+                } catch(e) {}
             } else {
-                // ออกจากหน้าจอเต็ม
-                if (document.exitFullscreen) {
-                    document.exitFullscreen().catch(()=>{});
-                }
+                // ออกจาก Fullscreen
+                try {
+                    if (document.exitFullscreen) {
+                        document.exitFullscreen().catch(()=>{});
+                    } else if (document.webkitExitFullscreen) {
+                        document.webkitExitFullscreen();
+                    }
+                } catch(e) {}
             }
         }
 
-        // ระบบส่งงานแบบใหม่
+        // 🌟 ระบบส่งงาน 🌟
         async function submitWork() {
             if(isPastDeadlineGlobal) return alert("หมดเวลาส่งงานแล้วครับ ไม่สามารถส่งได้");
 
@@ -359,6 +370,7 @@ print("Hello, PROT Smart Workspace!")
                 btn.disabled = false;
             }
         }
+        
         window.onload = loadUserData;
     </script>
 </body>
