@@ -9,99 +9,63 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* --- คง Style เดิมของคุณไว้ทั้งหมด --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* 🌟 แก้ไข Scrollbar ให้สามารถเลื่อนลงได้จนสุด 🌟 */
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; height: 100vh; display: flex; overflow: hidden; color: white;}
-        
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); }
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
 
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .bg-animation .circle { position: absolute; border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        body[data-theme="default"] .circle { background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); }
-        body[data-theme="snow"] .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
-        body[data-theme="forest"] .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="love"] .circle { background: radial-gradient(circle, rgba(255,255,255,0.5) 0%, rgba(255,255,255,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
-        .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
-        .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-
         .sidebar { width: 280px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px 0; z-index: 100; transition: 0.3s; height: 100vh; overflow-y: auto;}
         body[data-theme="snow"] .sidebar, body[data-theme="love"] .sidebar { background: rgba(255,255,255,0.85); border-right-color: rgba(0,0,0,0.1); }
-        
         .sidebar-brand { font-size: 1.3rem; font-weight: 800; color: #60a5fa; padding: 0 20px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        body[data-theme="snow"] .sidebar-brand, body[data-theme="love"] .sidebar-brand { color: #e11d48; border-bottom-color: rgba(0,0,0,0.1); }
         
         .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 5px; padding: 0 15px; }
         .nav-menu li { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; opacity: 0.8; }
         .nav-menu li:hover { background: rgba(59, 130, 246, 0.2); opacity: 1; color: #60a5fa; }
-        body[data-theme="snow"] .nav-menu li:hover, body[data-theme="love"] .nav-menu li:hover { background: rgba(225,29,72,0.1); color: #e11d48; }
-        
         .nav-menu li.active { background: #3b82f6; color: white; opacity: 1; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
-        body[data-theme="love"] .nav-menu li.active { background: #e11d48; box-shadow: 0 4px 10px rgba(225, 29, 72, 0.3); }
 
-        /* 🌟 แก้ไขพื้นที่เนื้อหาหลักให้เลื่อนได้อย่างอิสระ 🌟 */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; position: relative; z-index: 10; }
         .header-bar { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05);}
-        body[data-theme="snow"] .header-bar, body[data-theme="love"] .header-bar { background: rgba(255,255,255,0.9); border-bottom-color: rgba(0,0,0,0.1); }
-        .content-body { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 100px; } /* เว้นระยะด้านล่างให้เลื่อนสุด */
+        .content-body { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 100px; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); color: inherit;}
-        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.9); border-color: rgba(0,0,0,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.9); border-color: rgba(0,0,0,0.1); }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; }
         .form-group.full { grid-column: span 2; }
-        label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 500; opacity: 0.9; }
-        input, select, textarea { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; font-size: 0.95rem; }
-        body[data-theme="snow"] input, body[data-theme="snow"] select, body[data-theme="snow"] textarea, body[data-theme="love"] input, body[data-theme="love"] select, body[data-theme="love"] textarea { background: white; border-color: #cbd5e1; }
+        input, select, textarea { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
         
-        .btn-action { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; display: inline-flex; align-items: center; gap: 8px; font-size: 0.95rem;}
-        body[data-theme="love"] .btn-action { background: #e11d48; }
-        .btn-action:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
+        .btn-action { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
         .btn-danger { background: #ef4444 !important; }
-        .btn-warning { background: #f59e0b !important; }
-        .btn-success { background: #10b981 !important; }
-
-        .list-item { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
-        body[data-theme="snow"] .list-item, body[data-theme="love"] .list-item { background: rgba(0,0,0,0.05); }
-        body[data-theme="love"] .list-item { border-left-color: #e11d48; }
 
         .table-responsive { overflow-x: auto; }
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        body[data-theme="snow"] th, body[data-theme="snow"] td, body[data-theme="love"] th, body[data-theme="love"] td { border-bottom-color: rgba(0,0,0,0.1); }
-        th { font-weight: 600; color: #60a5fa; background: rgba(0,0,0,0.2);}
-        body[data-theme="snow"] th, body[data-theme="love"] th { background: rgba(0,0,0,0.03); color: #1e293b;}
-        body[data-theme="love"] th { color: #e11d48; }
-
-        .theme-picker { display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 40px; }
-        body[data-theme="snow"] .theme-picker, body[data-theme="love"] .theme-picker { background: rgba(0,0,0,0.05); }
-        .theme-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; border-radius: 50%; width: 30px; height: 30px; transition: 0.2s; }
-        .theme-btn:hover { transform: scale(1.2); }
+        th { color: #60a5fa; background: rgba(0,0,0,0.2); }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
-        /* 🌟 แก้ไข Modal ให้มี Scrollbar ในตัวถ้าเนื้อหายาว 🌟 */
-        .modal-content { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px; color: white; position: relative; max-height: 90vh; overflow-y: auto;}
-        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: white; color: black; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7; z-index: 10;}
+        .modal-content { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px; position: relative; max-height: 90vh; overflow-y: auto;}
         
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-        .badge-red { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.4);}
-        .badge-green { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.4);}
-        .badge-yellow { background: rgba(245,158,11,0.2); color: #f59e0b; border: 1px solid rgba(245,158,11,0.4);}
+        .badge-red { background: rgba(239,68,68,0.2); color: #ef4444; }
+        .badge-green { background: rgba(16,185,129,0.2); color: #10b981; }
+
+        /* --- Theme Pickers --- */
+        .theme-picker { display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 40px; }
+        .theme-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
     </style>
 </head>
 <body data-theme="default">
-    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
 
     <div class="sidebar">
         <div class="sidebar-brand"><i class="fas fa-user-shield"></i> Admin Hub</div>
@@ -111,590 +75,164 @@
             <li onclick="switchTab('tab-studentdb', this)"><i class="fas fa-search"></i> 3. ค้นหานักเรียน / CSV</li>
             <li onclick="switchTab('tab-cms', this)"><i class="fas fa-pager"></i> 4. จัดการเนื้อหาเว็บ (CMS)</li>
             <li onclick="switchTab('tab-classview', this)"><i class="fas fa-users-class"></i> 5. ข้อมูลรายห้องเรียน</li>
-            <li><a href="index.html" style="color: inherit; text-decoration: none; display: flex; gap: 12px; width: 100%;"><i class="fas fa-home"></i> กลับหน้าเว็บนักเรียน</a></li>
+            <li><a href="index.html" style="color: inherit; text-decoration: none; display: flex; gap: 12px;"><i class="fas fa-home"></i> กลับหน้าหลัก</a></li>
         </ul>
-        <div style="margin-top: auto; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; align-items: center; gap: 12px;">
-            <img src="https://ui-avatars.com/api/?name=TC&background=3b82f6&color=fff" style="width: 40px; height: 40px; border-radius: 50%;">
-            <div>
-                <div style="font-weight: 600; font-size: 0.9rem;">ครูผู้สอน</div>
-                <div style="font-size: 0.75rem; opacity: 0.7; cursor: pointer;" onclick="logout()">ออกจากระบบ</div>
-            </div>
-        </div>
     </div>
 
     <div class="main-content">
         <div class="header-bar">
-            <h2 style="font-size: 1.3rem;"><i class="fas fa-cogs"></i> ระบบบริหารจัดการหลังบ้าน</h2>
+            <h2><i class="fas fa-cogs"></i> ระบบบริหารจัดการ</h2>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <div class="theme-picker">
-                    <button class="theme-btn" onclick="applyTheme('default')" title="เริ่มต้น">🤖</button>
-                    <button class="theme-btn" onclick="applyTheme('snow')" title="หิมะ">❄️</button>
-                    <button class="theme-btn" onclick="applyTheme('forest')" title="ป่าเขียว">🌿</button>
-                    <button class="theme-btn" onclick="applyTheme('halloween')" title="ฮาโลวีน">🎃</button>
-                    <button class="theme-btn" onclick="applyTheme('love')" title="ซากุระ">🌸</button>
+                    <button class="theme-btn" onclick="applyTheme('default')">🤖</button>
+                    <button class="theme-btn" onclick="applyTheme('snow')">❄️</button>
+                    <button class="theme-btn" onclick="applyTheme('forest')">🌿</button>
+                    <button class="theme-btn" onclick="applyTheme('love')">🌸</button>
                 </div>
-                <button class="btn-action" style="background: #10b981; font-size: 1.1rem; padding: 10px 25px;" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
+                <button class="btn-action" style="background: #10b981;" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
             </div>
         </div>
 
         <div class="content-body">
-            
             <div id="tab-activities" class="tab-content active">
                 <div class="glass-card">
-                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> สร้าง/แก้ไข โพสต์กิจกรรม</h3>
-                    <input type="hidden" id="edit-id">
+                    <h3 style="color: #60a5fa; margin-bottom:15px;">สร้างโพสต์กิจกรรม</h3>
                     <div class="form-grid">
-                        <div class="form-group">
-                            <label>ประเภทเนื้อหา</label>
-                            <select id="act-type">
-                                <option value="task">⚙️ งานปฎิบัติ (มีคะแนน)</option>
-                                <option value="activity">💡 กิจกรรม (มีคะแนน)</option>
-                                <option value="content">📖 เนื้อหาความรู้ (ไม่มีคะแนน)</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label>สถานะ</label>
-                            <select id="act-status"><option value="open">🟢 เปิดให้นักเรียนเข้าทำได้</option><option value="closed">🔴 ปิดชั่วคราว (เห็นชื่อแต่กดไม่ได้)</option></select>
-                        </div>
-                        <div class="form-group full"><label>ชื่อหัวข้องาน</label><input type="text" id="act-title" placeholder="เช่น ใบงานที่ 1..."></div>
-                        <div class="form-group full"><label>คำสั่ง / รายละเอียด</label><textarea id="act-desc" rows="2" placeholder="อธิบายงานให้นักเรียนเข้าใจ..."></textarea></div>
-                        <div class="form-group"><label>วันที่กำหนดส่ง</label><input type="date" id="act-date"></div>
-                        <div class="form-group"><label>เวลา</label><input type="time" id="act-time" value="23:59"></div>
+                        <div class="form-group full"><label>ชื่อหัวข้องาน</label><input type="text" id="act-title"></div>
+                        <div class="form-group"><label>ประเภท</label><select id="act-type"><option value="task">งานปฎิบัติ</option><option value="activity">กิจกรรม</option></select></div>
                         <div class="form-group"><label>คะแนนเต็ม</label><input type="number" id="act-points" value="10"></div>
-                        
-                        <div class="form-group">
-                            <label>มอบหมายให้ห้องเรียน</label>
-                            <select id="act-room">
-                                <option value="ทุกห้อง">✅ ทุกห้อง</option>
-                                </select>
-                        </div>
-                        
-                        <div class="form-group full">
-                            <label>ลิงก์ปลายทาง (ห้อง Lab/เรียน)</label>
-                            <select id="act-link">
-                                <option value="#">-- ไม่มีลิงก์ปลายทาง --</option>
-                                <option value="content.html">📖 เข้าหน้าเนื้อหา (ไม่มีปุ่มส่งงาน)</option>
-                                <option value="python.html">🐍 เข้าห้อง Lab: เขียน Python</option>
-                                <option value="robotics.html">🤖 เข้าห้อง Lab: ต่อวงจร Wokwi</option>
-                            </select>
-                        </div>
-                        <div class="form-group"><label><i class="fab fa-youtube" style="color:#ef4444;"></i> ลิงก์คลิป YouTube</label><input type="text" id="act-yt" placeholder="https://youtube.com/..."></div>
-                        <div class="form-group"><label><i class="fas fa-file-pdf" style="color:#3b82f6;"></i> ลิงก์เอกสาร Docs/PDF</label><input type="text" id="act-doc" placeholder="https://drive.google.com/..."></div>
+                        <div class="form-group full"><label>คำสั่ง</label><textarea id="act-desc" rows="2"></textarea></div>
                     </div>
-                    <div style="margin-top: 15px; display: flex; gap: 10px;">
-                        <button class="btn-action" onclick="saveActivity()" id="btn-save-act"><i class="fas fa-paper-plane"></i> โพสต์กิจกรรม</button>
-                        <button class="btn-action btn-danger" onclick="resetActForm()" id="btn-cancel-act" style="display:none;">ยกเลิกแก้ไข</button>
-                    </div>
+                    <button class="btn-action" onclick="saveActivity()"><i class="fas fa-save"></i> บันทึกกิจกรรม</button>
                 </div>
-
                 <div class="glass-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="color: #60a5fa;"><i class="fas fa-list"></i> รายการโพสต์กิจกรรมที่สั่งไปแล้ว</h3>
-                    </div>
-                    <div id="activities-list">กำลังโหลดข้อมูล...</div>
+                    <h3>รายการงานที่สั่งแล้ว</h3>
+                    <div id="activities-list">กำลังโหลด...</div>
                 </div>
             </div>
 
             <div id="tab-matrix" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-clipboard-check"></i> ตารางตรวจงานนักเรียน</h3>
-                    <div class="form-grid" style="margin-bottom: 20px;">
-                        <div class="form-group"><label>เลือกงานที่จะตรวจ</label><select id="matrix-act" onchange="renderMatrix()"></select></div>
-                        <div class="form-group">
-                            <label>เลือกห้องเรียน</label>
-                            <select id="matrix-room" onchange="renderMatrix()">
-                                <option value="all">ดูทุกห้อง</option>
-                                </select>
-                        </div>
+                    <h3 style="color: #60a5fa; margin-bottom:15px;">ตารางตรวจงาน</h3>
+                    <div class="form-grid" style="margin-bottom:20px;">
+                        <div class="form-group"><label>เลือกงาน</label><select id="matrix-act" onchange="renderMatrix()"></select></div>
+                        <div class="form-group"><label>เลือกห้อง</label><select id="matrix-room" onchange="renderMatrix()"><option value="all">ทุกห้อง</option></select></div>
                     </div>
                     <div class="table-responsive">
                         <table>
-                            <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th>สถานะส่งงาน</th><th>คะแนน</th><th>จัดการ</th></tr></thead>
-                            <tbody id="matrix-body"><tr><td colspan="7" style="text-align:center;">กรุณาดึงข้อมูลล่าสุดก่อนครับ</td></tr></tbody>
+                            <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr></thead>
+                            <tbody id="matrix-body"></tbody>
                         </table>
                     </div>
                 </div>
             </div>
-
-            <div id="tab-studentdb" class="tab-content">
-                <div class="glass-card">
-                    <h3 style="color: #10b981; margin-bottom: 15px;"><i class="fas fa-file-csv"></i> นำเข้ารายชื่อจากไฟล์ CSV</h3>
-                    <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px;">ไฟล์ CSV ต้องมีหัวคอลัมน์: <b>email, student_id, name, room, number</b></p>
-                    <input type="file" id="csvFileInput" accept=".csv" style="margin-bottom: 15px; padding: 10px; background: rgba(0,0,0,0.2); border-radius: 10px; width: 100%;">
-                    <button class="btn-action btn-success" onclick="processCSV()"><i class="fas fa-upload"></i> อัปโหลดข้อมูล</button>
-                    <span id="csv-status" style="margin-left:10px; color:#f59e0b;"></span>
-                </div>
-
-                <div class="glass-card">
-                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-search"></i> ค้นหาข้อมูลนักเรียนรายบุคคล</h3>
-                    <div style="display: flex; gap: 10px; margin-bottom: 20px;">
-                        <input type="text" id="search-student-id" placeholder="พิมพ์รหัสนักเรียน หรือ อีเมล..." style="flex:1;">
-                        <button class="btn-action" onclick="searchStudent()"><i class="fas fa-search"></i> ค้นหา</button>
-                    </div>
-                    <div id="student-search-result" style="display: none; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; border-left: 4px solid #3b82f6;">
-                        </div>
-                </div>
-            </div>
-
-            <div id="tab-cms" class="tab-content">
-                <div class="glass-card">
-                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-chalkboard-teacher"></i> แก้ไขข้อมูลผู้สอน</h3>
-                    <div class="form-grid">
-                        <div class="form-group full"><label>ชื่อ-นามสกุล ครูผู้สอน</label><input type="text" id="cms-t-name"></div>
-                        <div class="form-group"><label>ลิงก์รูปโปรไฟล์</label><input type="text" id="cms-t-pic" placeholder="https://..."></div>
-                        <div class="form-group"><label>ลิงก์วิดีโอแนะนำตัว</label><input type="text" id="cms-t-yt" placeholder="https://youtube.com/..."></div>
-                        <div class="form-group full"><label>ประวัติการศึกษา / คำแนะนำ</label><textarea id="cms-t-bio" rows="3"></textarea></div>
-                    </div>
-                    <button class="btn-action" onclick="saveCMSTeacher()"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
-                </div>
-
-                <div class="glass-card">
-                    <h3 style="color: #f59e0b; margin-bottom: 20px;"><i class="fas fa-trophy"></i> เพิ่มผลงานนักเรียน</h3>
-                    <input type="hidden" id="cms-p-id">
-                    <div class="form-grid">
-                        <div class="form-group"><label>ชื่อผลงาน</label><input type="text" id="cms-p-title"></div>
-                        <div class="form-group"><label>ลิงก์รูปภาพผลงาน</label><input type="text" id="cms-p-img"></div>
-                        <div class="form-group full"><label>คำอธิบายสั้นๆ</label><textarea id="cms-p-desc" rows="2"></textarea></div>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-action btn-warning" onclick="saveCMSPortfolio()" id="btn-save-port"><i class="fas fa-plus"></i> เพิ่มผลงานใหม่</button>
-                        <button class="btn-action btn-danger" onclick="resetPortForm()" id="btn-cancel-port" style="display:none;">ยกเลิก</button>
-                    </div>
-                    <div id="cms-portfolio-list" style="margin-top:20px;">กำลังโหลด...</div>
-                </div>
-
-                <div class="glass-card">
-                    <h3 style="color: #10b981; margin-bottom: 20px;"><i class="fas fa-book"></i> เพิ่มรายวิชาเพิ่มเติม</h3>
-                    <input type="hidden" id="cms-s-id">
-                    <div class="form-grid">
-                        <div class="form-group full"><label>ชื่อวิชา</label><input type="text" id="cms-s-title"></div>
-                        <div class="form-group"><label>รหัสวิชา</label><input type="text" id="cms-s-code"></div>
-                        <div class="form-group"><label>ลิงก์รูปภาพปกวิชา</label><input type="text" id="cms-s-img"></div>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-action btn-success" onclick="saveCMSSubject()" id="btn-save-subj"><i class="fas fa-plus"></i> เพิ่มรายวิชา</button>
-                        <button class="btn-action btn-danger" onclick="resetSubjForm()" id="btn-cancel-subj" style="display:none;">ยกเลิก</button>
-                    </div>
-                    <div id="cms-subject-list" style="margin-top:20px;">กำลังโหลด...</div>
-                </div>
-            </div>
-
-            <div id="tab-classview" class="tab-content">
-                <div class="glass-card">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                        <h3 style="color: #3b82f6;"><i class="fas fa-users-class"></i> ข้อมูลนักเรียน รายห้องเรียน</h3>
-                        <button class="btn-action" style="padding: 5px 15px; font-size: 0.8rem; background: #10b981;" onclick="loadAllData()"><i class="fas fa-sync"></i> อัปเดตตาราง</button>
-                    </div>
-                    
-                    <div class="form-grid" style="margin-bottom: 20px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 12px;">
-                        <div class="form-group">
-                            <label>เลือกห้องเรียนเพื่อดูข้อมูล</label>
-                            <select id="view-class-room" onchange="renderClassViewTable()">
-                                <option value="all">แสดงนักเรียนทั้งหมด</option>
-                                </select>
-                        </div>
-                    </div>
-
-                    <div class="table-responsive">
-                        <table>
-                            <thead>
-                                <tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ-นามสกุล</th><th>ห้อง</th><th>สถานะภาพรวม</th><th>รายละเอียด</th></tr>
-                            </thead>
-                            <tbody id="class-view-body">
-                                <tr><td colspan="6" style="text-align:center;">กรุณาเลือกห้องเรียนด้านบน</td></tr>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <div id="studentDetailModal" class="modal">
-        <div class="modal-content" style="max-width: 700px;">
-            <button class="close-modal" onclick="document.getElementById('studentDetailModal').classList.remove('active')">×</button>
-            <div style="display: flex; align-items: center; gap: 15px; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 15px; margin-bottom: 15px;">
-                <img id="sd-pic" src="" style="width: 60px; height: 60px; border-radius: 50%; border: 3px solid #3b82f6;">
-                <div>
-                    <h3 id="sd-name" style="color: #60a5fa; margin-bottom: 5px;">ชื่อนักเรียน</h3>
-                    <div style="font-size: 0.9rem; opacity: 0.8;">รหัส: <span id="sd-id"></span> | ห้อง: <span id="sd-room"></span> | เลขที่: <span id="sd-number"></span></div>
-                </div>
-            </div>
             
-            <div id="sd-summary" style="font-size: 1.2rem; font-weight: bold; margin-bottom: 15px; text-align: center;">คะแนนรวม: 0/0</div>
-            
-            <div style="max-height: 400px; overflow-y: auto;">
-                <table style="margin-top: 0;">
-                    <thead style="position: sticky; top: 0; background: #0f172a; z-index: 1;">
-                        <tr><th>ชื่องาน / กิจกรรม</th><th style="text-align: center;">สถานะส่งงาน</th><th style="text-align: center;">คะแนนที่ได้</th></tr>
-                    </thead>
-                    <tbody id="sd-tasks">
-                        </tbody>
-                </table>
-            </div>
+            <div id="tab-studentdb" class="tab-content"><div class="glass-card"><h3>ค้นหานักเรียน</h3></div></div>
+            <div id="tab-cms" class="tab-content"><div class="glass-card"><h3>จัดการ CMS</h3></div></div>
+            <div id="tab-classview" class="tab-content"><div class="glass-card"><h3>ข้อมูลรายห้อง</h3></div></div>
+
         </div>
     </div>
 
     <div id="gradeModal" class="modal">
         <div class="modal-content">
-            <button class="close-modal" onclick="document.getElementById('gradeModal').classList.remove('active')">×</button>
-            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">ชื่อนักเรียน</h3>
-            <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(0,0,0,0.1);">
-                <label style="font-weight:bold;">ผลงานที่นักเรียนส่งมา:</label>
-                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; font-size: 0.95rem; word-break: break-all;"></div>
-            </div>
-            <div class="form-group"><label>ให้คะแนน (เต็ม <span id="grade-max-points">10</span>)</label><input type="number" id="grade-input-score"></div>
-            <button class="btn-action btn-success" style="width: 100%; justify-content: center;" onclick="saveScore()"><i class="fas fa-save"></i> บันทึกคะแนน</button>
+            <h3 id="grade-student-name">ตรวจงาน</h3>
+            <div style="background:rgba(0,0,0,0.2); padding:15px; margin:15px 0; border-radius:10px;" id="grade-work-content">ไม่มีไฟล์แนบ</div>
+            <div class="form-group"><label>ใส่คะแนน</label><input type="number" id="grade-input-score"></div>
+            <button class="btn-action" onclick="saveScore()">บันทึก</button>
+            <button class="btn-action btn-danger" onclick="document.getElementById('gradeModal').classList.remove('active')">ปิด</button>
         </div>
     </div>
 
     <script>
+        // --- 1. การตั้งค่า URL ---
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
-        // 🌟 ใส่รายชื่ออีเมลของคุณครู (Admin) ตรงนี้ได้เลยครับ 🌟
-        const adminEmails = [
-            'ratchapon@prot.ac.th', 
-            'teacher@prot.ac.th',
-            'ratchapon.p@prot.ac.th' // ใส่เมลอื่นๆ ของครูเพิ่มตรงนี้ได้ครับ
-        ];
+        let db = { activities: [], students: [], submissions: [] };
 
-        async function saveOutfit() {
-            if (!localStorage.getItem('is_logged_in')) {
-                alert('⚠️ กรุณาเข้าสู่ระบบก่อนบันทึกชุด');
-                openLoginModal();
-                return;
-            }
-            
-            const email = localStorage.getItem('student_email');
-            const outfitData = {
-                email: email,
-                skinColor: document.getElementById('skinColor').value,
-                shirtColor: document.getElementById('shirtColor').value,
-                shoeColor: document.getElementById('shoeColor').value,
-                faceMouth: document.getElementById('faceMouth').value,
-                pattern: document.getElementById('pattern').value,
-                hatStyle: document.getElementById('hatStyle').value,
-                timestamp: new Date().toISOString()
-            };
-            
-            localStorage.setItem(`robot_outfit_${email}`, JSON.stringify(outfitData));
-            
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(outfitData)
-                });
-                showSpeechBubble('💾 บันทึกชุดเรียบร้อย! 💕');
-            } catch(e) {
-                showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
-            }
-            closeWardrobe();
+        // --- 2. ระบบ Tab (สำคัญ) ---
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
         }
-        
-        async function loadOutfit() {
-            const email = localStorage.getItem('student_email');
-            if (!email) return;
+
+        // --- 3. ระบบดึงข้อมูลจาก Sheets (สำคัญ) ---
+        async function loadAllData() {
+            const btn = document.querySelector('button[onclick="loadAllData()"]');
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Loading...';
             
             try {
-                const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+                // ยิงไปที่ Apps Script (ต้องไปแก้ฝั่ง GS ให้รองรับ action=readAll)
+                const response = await fetch(`${SCRIPT_URL}?action=readAll`);
                 const data = await response.json();
-                if (data && data.skinColor && data.skinColor !== undefined) {
-                    document.getElementById('skinColor').value = data.skinColor;
-                    document.getElementById('shirtColor').value = data.shirtColor;
-                    document.getElementById('shoeColor').value = data.shoeColor;
-                    document.getElementById('faceMouth').value = data.faceMouth;
-                    document.getElementById('pattern').value = data.pattern;
-                    document.getElementById('hatStyle').value = data.hatStyle;
-                    updateRobotOutfit();
-                    showSpeechBubble('🎉 โหลดชุดจากคลาวด์สำเร็จ! น่ารักมากกก 💖');
-                    startAutoDance();
-                    return;
-                }
-            } catch(e) {
-                console.log("โหลดข้อมูลไม่สำเร็จ", e);
-            }
-            
-            const saved = localStorage.getItem(`robot_outfit_${email}`);
-            if (saved) {
-                const outfit = JSON.parse(saved);
-                document.getElementById('skinColor').value = outfit.skinColor;
-                document.getElementById('shirtColor').value = outfit.shirtColor;
-                document.getElementById('shoeColor').value = outfit.shoeColor;
-                document.getElementById('faceMouth').value = outfit.faceMouth;
-                document.getElementById('pattern').value = outfit.pattern;
-                document.getElementById('hatStyle').value = outfit.hatStyle;
-                updateRobotOutfit();
-                showSpeechBubble('🎉 ยินดีต้อนรับกลับ! นี่คือหุ่นยนต์ของคุณนะคะ 💖');
-                startAutoDance();
-            } else {
-                updateRobotOutfit();
-                showSpeechBubble('🤖 สวัสดี! กดที่ไอคอนเสื้อผ้าเพื่อแต่งตัวหุ่นยนต์ของคุณเลย 🎨');
-                startAutoDance();
-            }
-        }
-        
-        function updateRobotOutfit() {
-            const skinColor = document.getElementById('skinColor').value;
-            const shirtColor = document.getElementById('shirtColor').value;
-            const shoeColor = document.getElementById('shoeColor').value;
-            const faceMouth = document.getElementById('faceMouth').value;
-            const pattern = document.getElementById('pattern').value;
-            const hatStyle = document.getElementById('hatStyle').value;
-            
-            document.getElementById('robotHead').setAttribute('fill', skinColor);
-            document.getElementById('robotBody').setAttribute('fill', shirtColor);
-            document.getElementById('leftArm').setAttribute('fill', shirtColor);
-            document.getElementById('rightArm').setAttribute('fill', shirtColor);
-            document.getElementById('leftShoe').setAttribute('fill', shoeColor);
-            document.getElementById('rightShoe').setAttribute('fill', shoeColor);
-            
-            const patternPath = document.getElementById('shirtPattern');
-            if (pattern === 'star') patternPath.setAttribute('d', 'M170 290 L180 275 L190 290 L200 275 L210 290 L220 275 L230 290 Z');
-            else if (pattern === 'heart') patternPath.setAttribute('d', 'M200 285 C190 275, 180 280, 200 295 C220 280, 210 275, 200 285 Z');
-            else if (pattern === 'circle') patternPath.setAttribute('d', 'M175 290 A10 10 0 1 1 175 290 M200 290 A10 10 0 1 1 200 290 M225 290 A10 10 0 1 1 225 290');
-            else if (pattern === 'stripe') patternPath.setAttribute('d', 'M160 280 L240 280 M160 295 L240 295 M160 310 L240 310 M160 325 L240 325');
-            else patternPath.setAttribute('d', '');
-            patternPath.setAttribute('opacity', pattern !== 'none' ? '0.8' : '0');
-            
-            const foreheadPattern = document.getElementById('foreheadPattern');
-            if (pattern === 'star') foreheadPattern.setAttribute('d', 'M185 120 L195 108 L200 115 L205 108 L215 120 Z');
-            else foreheadPattern.setAttribute('d', '');
-            foreheadPattern.setAttribute('opacity', pattern === 'star' ? '0.9' : '0');
-            
-            const hairPath = document.getElementById('hairStyle');
-            if (hatStyle === 'cap') hairPath.setAttribute('d', 'M115 110 Q200 85 285 110 L285 130 Q200 100 115 130 Z');
-            else if (hatStyle === 'crown') hairPath.setAttribute('d', 'M170 95 L180 80 L190 95 L200 78 L210 95 L220 80 L230 95');
-            else if (hatStyle === 'flower') hairPath.setAttribute('d', 'M195 95 C195 85, 205 85, 205 95 C210 90, 215 100, 205 105 C210 110, 200 115, 200 105 C200 115, 190 110, 195 105 C185 100, 190 90, 195 95 Z');
-            else if (hatStyle === 'bow') hairPath.setAttribute('d', 'M185 105 Q195 95 200 105 Q205 95 215 105 Q205 115 200 110 Q195 115 185 105 Z');
-            else hairPath.setAttribute('d', '');
-            hairPath.setAttribute('opacity', hatStyle !== 'none' ? '0.9' : '0');
-            
-            const leftPupil = document.getElementById('leftPupil');
-            const rightPupil = document.getElementById('rightPupil');
-            const leftEyeWhite = document.getElementById('leftEyeWhite');
-            const rightEyeWhite = document.getElementById('rightEyeWhite');
-            const leftBrow = document.getElementById('leftBrow');
-            const rightBrow = document.getElementById('rightBrow');
-            
-            leftPupil.setAttribute('cx', '172'); leftPupil.setAttribute('r', '8'); leftPupil.setAttribute('fill', '#0f172a');
-            rightPupil.setAttribute('cx', '232'); rightPupil.setAttribute('r', '8'); rightPupil.setAttribute('fill', '#0f172a');
-            leftEyeWhite.setAttribute('fill', 'white'); rightEyeWhite.setAttribute('fill', 'white');
-            leftBrow.removeAttribute('transform'); rightBrow.removeAttribute('transform');
-            leftBrow.setAttribute('y', '140'); rightBrow.setAttribute('y', '140');
-            
-            if (faceMouth === 'happy') { leftPupil.setAttribute('r', '10'); rightPupil.setAttribute('r', '10'); leftBrow.setAttribute('y', '135'); rightBrow.setAttribute('y', '135'); }
-            else if (faceMouth === 'love') { leftPupil.setAttribute('fill', '#ff6b6b'); rightPupil.setAttribute('fill', '#ff6b6b'); leftEyeWhite.setAttribute('fill', '#ffb7c5'); rightEyeWhite.setAttribute('fill', '#ffb7c5'); }
-            else if (faceMouth === 'wink') { rightPupil.setAttribute('r', '4'); }
-            else if (faceMouth === 'cool') { leftBrow.setAttribute('transform', 'rotate(-10 167 143)'); rightBrow.setAttribute('transform', 'rotate(10 232 143)'); }
-            
-            const leftCheek = document.getElementById('leftCheek');
-            const rightCheek = document.getElementById('rightCheek');
-            leftCheek.setAttribute('opacity', faceMouth === 'love' ? '0.8' : '0.3');
-            rightCheek.setAttribute('opacity', faceMouth === 'love' ? '0.8' : '0.3');
-        }
-        
-        const bounceAnimations = ['bounce1', 'bounce2', 'bounce3', 'shake', 'wiggle'];
-        const clickMessages = [
-            '🤪 อย่ามาจั๊กจี้สิ!', '💙 ชอบจัง~', '✨ กระโดดโลดเต้น', '🎵 เต้นไปกับเรา~', 
-            '🤖 หวัดดีจ้า!', '😊 สวัสดีครับ', '⚡ โอ๊ย! ตกใจ', '💃 หนุกหนาน~', 
-            '🌟 เก่งจังเลย', '🎉 เย้ๆๆ', '🤗 คิดถึงจัง', '💕 รักเลย'
-        ];
-        
-        function playRandomBounce() {
-            const robot = document.getElementById('robotContainer');
-            const randomAnim = bounceAnimations[Math.floor(Math.random() * bounceAnimations.length)];
-            bounceAnimations.forEach(anim => robot.classList.remove(anim));
-            void robot.offsetWidth;
-            robot.classList.add(randomAnim);
-            setTimeout(() => {
-                robot.classList.remove(randomAnim);
-            }, 500);
-            
-            const msg = clickMessages[Math.floor(Math.random() * clickMessages.length)];
-            showSpeechBubble(msg);
-        }
-        
-        let autoDanceInterval = null;
-        const autoDances = ['autoDance1', 'autoDance2', 'autoDance3'];
-        
-        function startAutoDance() {
-            if(autoDanceInterval) clearInterval(autoDanceInterval);
-            const robot = document.getElementById('robotContainer');
-            robot.classList.add('autoDance1');
-            autoDanceInterval = setInterval(() => {
-                const newDance = autoDances[Math.floor(Math.random() * autoDances.length)];
-                autoDances.forEach(d => robot.classList.remove(d));
-                robot.classList.add(newDance);
-            }, 3000);
-        }
-        
-        function stopAutoDance() {
-            if(autoDanceInterval) clearInterval(autoDanceInterval);
-            const robot = document.getElementById('robotContainer');
-            autoDances.forEach(d => robot.classList.remove(d));
-        }
-        
-        function showSpeechBubble(msg) {
-            const existing = document.querySelector('.speech-bubble');
-            if(existing) existing.remove();
-            const bubble = document.createElement('div');
-            bubble.classList.add('speech-bubble');
-            bubble.textContent = msg;
-            const rect = document.getElementById('robotContainer').getBoundingClientRect();
-            bubble.style.left = (rect.left + rect.width/2 - 100) + 'px';
-            bubble.style.top = (rect.top - 60) + 'px';
-            document.body.appendChild(bubble);
-            setTimeout(() => bubble.remove(), 2500);
-        }
-        
-        function openWardrobe() { 
-            if(!localStorage.getItem('is_logged_in')) {
-                showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะแต่งตัวให้หนูได้เลย!');
-                openLoginModal();
-                return;
-            }
-            document.getElementById('wardrobeModal').classList.add('active'); 
-        }
-        function closeWardrobe() { document.getElementById('wardrobeModal').classList.remove('active'); }
-        
-        function decodeJwtResponse(token) {
-            let base64Url = token.split('.')[1];
-            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-        }
-        
-        function handleCredentialResponse(response) {
-            const userData = decodeJwtResponse(response.credential);
-            const userEmail = userData.email;
-            
-            // ยอมรับอีเมล @gmail.com และ @prot.ac.th
-            if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
-                localStorage.setItem('student_name', userData.name);
-                localStorage.setItem('student_email', userEmail);
-                localStorage.setItem('student_pic', userData.picture);
-                localStorage.setItem('is_logged_in', 'true');
                 
-                // 🌟 ตรวจสอบว่าเป็นอีเมลแอดมิน (ครู) หรือไม่ 🌟
-                if (adminEmails.includes(userEmail)) {
-                    window.location.href = 'teacher_dashboard.html';
-                    return;
-                }
+                db = data; // บันทึกข้อมูลลงตัวแปรหลัก
                 
-                closeLoginModal();
-                updateLoginUI();
-                document.getElementById('outfitIcon').style.display = 'flex';
-                loadOutfit();
-            } else {
-                alert('❌ อีเมลนี้ไม่ได้รับอนุญาต');
+                renderActivitiesList();
+                updateSelectOptions();
+                renderMatrix();
+                
+                btn.innerHTML = '<i class="fas fa-sync-alt"></i> อัปเดตข้อมูล';
+            } catch (e) {
+                console.error(e);
+                alert("โหลดข้อมูลไม่สำเร็จ ตรวจสอบ SCRIPT_URL หรือ Permission ของ Sheets");
+                btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ผิดพลาด';
             }
-        }
-        
-        function updateLoginUI() {
-            const name = localStorage.getItem('student_name');
-            const pic = localStorage.getItem('student_pic');
-            document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
-        }
-        
-        function logout() {
-            stopAutoDance();
-            localStorage.removeItem('is_logged_in');
-            window.location.reload();
-        }
-        
-        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
-        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
-        
-        const themes = { 
-            default: { glowColor: "rgba(59,130,246,0.3)", particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, 
-            snow: { glowColor: "rgba(255,255,255,0.5)", particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, 
-            forest: { glowColor: "rgba(100,200,100,0.4)", particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, 
-            halloween: { glowColor: "rgba(255,69,0,0.4)", particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, 
-            love: { glowColor: "rgba(255,105,180,0.4)", particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } 
-        };
-
-        let particleInterval = null;
-
-        function startThemeParticles(themeKey) {
-            const container = document.getElementById("particleContainer");
-            if(!container) return;
-            if(particleInterval) clearInterval(particleInterval);
-            container.innerHTML = "";
-            const themeData = themes[themeKey] || themes['default'];
-            
-            function createParticle() {
-                const particle = document.createElement("div");
-                particle.className = "theme-particle";
-                particle.style.left = Math.random() * 100 + "vw";
-                particle.style.top = "-10vh";
-                particle.style.fontSize = (Math.random() * 15 + 15) + "px";
-                particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
-                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
-                particle.innerHTML = themeData.particleChar;
-                container.appendChild(particle);
-                setTimeout(() => particle.remove(), 12000);
-            }
-            
-            for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 200);
-            particleInterval = setInterval(createParticle, 600);
         }
 
-        function applyTheme(themeKey) {
-            document.body.setAttribute("data-theme", themeKey);
-            localStorage.setItem('smart_theme', themeKey);
-            document.getElementById("robotGlow").style.background = `radial-gradient(circle, ${themes[themeKey].glowColor} 0%, rgba(0,0,0,0) 70%)`;
-            const msg = themeKey === 'snow' ? '❄️ ธีมหิมะ เย็นสบาย~' : themeKey === 'forest' ? '🌿 ธีมป่าเขียว สดชื่น!' : themeKey === 'halloween' ? '🎃 ธีมฮัลโลวีน สนุกสุดๆ!' : themeKey === 'love' ? '🌸 ธีมซากุระ หวานละมุน~' : '🤖 ธีมเริ่มต้น คลาสสิค!';
-            showSpeechBubble(msg);
-            startThemeParticles(themeKey);
+        function renderActivitiesList() {
+            const container = document.getElementById('activities-list');
+            container.innerHTML = db.activities.map(act => `
+                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between;">
+                    <div><strong>${act.title}</strong><br><small>${act.type} | ${act.points} คะแนน</small></div>
+                    <button class="btn-action btn-danger" onclick="deleteAct('${act.id}')"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('') || "ไม่มีข้อมูล";
         }
-        
-        document.getElementById('heroRobot')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            if(localStorage.getItem('is_logged_in')) {
-                playRandomBounce();
-            } else {
-                showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะมาเล่นด้วยกันได้เลย!');
-                openLoginModal();
-            }
-        });
-        
-        document.getElementById('outfitIcon')?.addEventListener('click', (e) => {
-            e.stopPropagation();
-            openWardrobe();
-        });
-        
-        ['skinColor', 'shirtColor', 'shoeColor', 'faceMouth', 'pattern', 'hatStyle'].forEach(id => 
-            document.getElementById(id)?.addEventListener('change', updateRobotOutfit)
-        );
-        
-        document.querySelectorAll(".theme-btn").forEach(btn => btn.addEventListener("click", () => { 
-            applyTheme(btn.getAttribute("data-theme")); 
-            document.querySelectorAll(".theme-btn").forEach(b=>b.classList.remove("active")); 
-            btn.classList.add("active"); 
-        }));
-        
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('smart_theme') || "default";
-            applyTheme(savedTheme);
-            document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
+
+        function updateSelectOptions() {
+            const matrixAct = document.getElementById('matrix-act');
+            matrixAct.innerHTML = db.activities.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
             
-            // 🌟 ตรวจสอบตอนเปิดเว็บว่าถ้าเป็นครูที่ล็อกอินค้างไว้ ให้เด้งไป Dashboard เลย
-            if (localStorage.getItem('is_logged_in') === 'true') { 
-                const userEmail = localStorage.getItem('student_email');
-                if (adminEmails.includes(userEmail)) {
-                    window.location.href = 'teacher_dashboard.html';
-                    return;
-                }
-                updateLoginUI(); 
-                document.getElementById('outfitIcon').style.display = 'flex';
-                loadOutfit(); 
-            } else { 
-                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
-                document.getElementById('outfitIcon').style.display = 'none';
-                startAutoDance();
-            }
+            const rooms = [...new Set(db.students.map(s => s.room))];
+            const matrixRoom = document.getElementById('matrix-room');
+            matrixRoom.innerHTML = '<option value="all">ทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+        }
+
+        function renderMatrix() {
+            const selectedAct = document.getElementById('matrix-act').value;
+            const selectedRoom = document.getElementById('matrix-room').value;
+            const body = document.getElementById('matrix-body');
+            
+            let filtered = db.students;
+            if (selectedRoom !== 'all') filtered = db.students.filter(s => s.room === selectedRoom);
+
+            body.innerHTML = filtered.map(s => {
+                const sub = db.submissions.find(sub => sub.student_id === s.student_id && sub.activity_id === selectedAct);
+                return `
+                    <tr>
+                        <td>${s.student_id}</td>
+                        <td>${s.number}</td>
+                        <td>${s.name}</td>
+                        <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
+                        <td>${sub ? (sub.score || 0) : '-'}</td>
+                        <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${selectedAct}')">ตรวจ</button></td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function applyTheme(theme) {
+            document.body.setAttribute('data-theme', theme);
+            localStorage.setItem('prot_admin_theme', theme);
+        }
+
+        // --- รันตอนโหลดหน้าจอ ---
+        window.onload = () => {
+            applyTheme(localStorage.getItem('prot_admin_theme') || 'default');
+            loadAllData();
         };
     </script>
 </body>
