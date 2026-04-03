@@ -2,13 +2,14 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>แบบทดสอบ | PROT Smart Workspace</title>
     <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', sans-serif; transition: 0.5s; overflow-x: hidden; min-height: 100vh; }
+        body { font-family: 'Prompt', sans-serif; transition: 0.5s; overflow-x: hidden; min-height: 100vh; user-select: none; -webkit-user-select: none; }
+        
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a, #1e293b); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff, #f0f8ff); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a, #3e7a3e); color: white; }
@@ -17,17 +18,24 @@
 
         .watermark-container { position: fixed; inset:0; pointer-events:none; z-index:9999; display:grid; grid-template-columns:repeat(3, 1fr); opacity:0.06; }
         .watermark-item { transform:rotate(-30deg); display:flex; align-items:center; justify-content:center; white-space:nowrap; font-size:1.1rem; font-weight: bold; }
-        body.lost-focus { filter: blur(45px) grayscale(1) !important; }
-        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+        
+        /* 🛡️ สไตล์เมื่อโดนจับได้ว่าสลับจอ */
+        body.lost-focus { filter: blur(30px) grayscale(1) brightness(0.5) !important; transition: 0.1s; }
+        
+        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.98); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+        
         .qcard { margin-top: 20px; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         body[data-theme="snow"] .qcard, body[data-theme="love"] .qcard { background: rgba(255, 255, 255, 0.9); color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        
         .option { padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; cursor: pointer; transition: 0.3s; display:flex; align-items:flex-start; gap:10px; }
         body[data-theme="snow"] .option, body[data-theme="love"] .option { border-color: rgba(0,0,0,0.1); }
         .option:hover { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; }
         .option.selected { background: #3b82f6 !important; color: white !important; border-color: #60a5fa; box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
         .option-label { font-weight: 800; color: #ff6600; width: 25px; }
         body[data-theme="snow"] .option.selected .option-label, body[data-theme="love"] .option.selected .option-label { color: #fff; }
+        
         .btn-main { background: #3b82f6; color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; cursor: pointer; font-weight: bold; font-size:1.1rem; }
+        
         .progress-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; z-index: 1000; }
         .dot { width: 30px; height: 30px; border-radius: 50%; background: #333; color: white; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .dot.active { background: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
@@ -35,7 +43,11 @@
 </head>
 <body data-theme="default">
     <div id="watermark" class="watermark-container"></div>
-    <div id="split-warning"><i class="fas fa-expand fa-4x" style="color:red; margin-bottom:20px;"></i><h2>ตรวจพบการแบ่งหน้าจอ!</h2><p>กรุณาขยายจอให้เต็มและรอระบบเข้าที่สักครู่</p></div>
+    <div id="split-warning">
+        <i class="fas fa-expand fa-4x" style="color:red; margin-bottom:20px;"></i>
+        <h2>ตรวจพบการย่อหรือแบ่งหน้าจอ!</h2>
+        <p>กรุณาขยายจอให้เต็มเพื่อสอบต่อ (ระบบจะจับตาดูคุณอย่างใกล้ชิด)</p>
+    </div>
     
     <header style="background: rgba(0,0,0,0.5); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100;">
         <div style="font-weight: 800; color: #60a5fa; font-size:1.2rem;"><i class="fas fa-robot"></i> PROT EXAM</div>
@@ -52,7 +64,6 @@
             </div>
             <button class="btn-main" onclick="startExam()" id="btnBegin">เริ่มการสอบ</button>
             <div id="countdown" style="display:none; color: #ff6600; margin-top: 15px; font-weight:bold;">กรุณารอระบบเข้าที่... 5</div>
-            <p style="margin-top: 15px; font-size: 0.85rem; color: #f87171;" id="ios-warning">⚠️ หากเปิดด้วย LINE กรุณากดปุ่ม 3 จุดมุมขวาบน แล้วเลือก "เปิดในเบราว์เซอร์ (Safari)"</p>
         </div>
 
         <div id="screenExam" style="display:none; padding-bottom: 80px;">
@@ -70,15 +81,12 @@
     <div class="progress-bar" id="dotsArea" style="display:none;"></div>
 
     <script>
-        // 🌟 ใส่ URL ของครูตรงนี้ 🌟
-        const VALIDATOR_URL = "ใhttps://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
+        // 🌟 ใส่ URL ของครู 🌟
+        const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
         const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         let examStarted = false, canBan = false, userIP = "unknown", drawn = [], ans = [], timerHandle, timeLeft = 2400;
         
-        // เช็คว่าเป็นมือถือหรือไอแพดหรือไม่
-        const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
         // คลังข้อสอบ 100 ข้อ
         const bank = [
             { "id": 1, "question": "ข้อใดอธิบายหน้าที่ของระบบรับรู้ (Perception) ในหุ่นยนต์ได้ถูกต้องที่สุด", "options": ["ทำหน้าที่รับข้อมูลจากสภาพแวดล้อมผ่านเซนเซอร์", "ทำหน้าที่จัดเก็บข้อมูลการทำงาน", "ทำหน้าที่ควบคุมแรงบิดของมอเตอร์", "ทำหน้าที่แปลงโปรแกรมเป็นคำสั่งเครื่อง"] },
@@ -184,19 +192,16 @@
         ];
 
         function startExam() {
-            if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามสลับแอป ห้ามแบ่งหน้าจอ ห้ามกดปุ่มย้อนกลับกลับ(Back)\nหากฝ่าฝืนสิทธิ์การสอบจะถูกระงับทันที!")) return;
+            if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามใช้ 2 จอ ห้ามเปิดแอปซ้อน ห้ามสลับหน้าจอ ห้ามกดปุ่มย้อนกลับ\nระบบจะจับตาดูคุณตลอดเวลา หากฝ่าฝืนจะถูกระงับสิทธิ์ทันที!")) return;
             
-            // ขยายหน้าจอบน PC (บนไอแพดหรือมือถือบางรุ่นจะไม่ทำงาน ซึ่งไม่เป็นไร)
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(()=>{});
             }
             
             document.getElementById('btnBegin').style.display = 'none';
-            document.getElementById('ios-warning').style.display = 'none';
-            
             const cd = document.getElementById('countdown'); 
             cd.style.display = 'block';
-            let c = 5; // ลดเวลารอเหลือ 5 วิ
+            let c = 5; 
             
             const t = setInterval(() => {
                 c--; 
@@ -209,7 +214,7 @@
                     document.getElementById('dotsArea').style.display = 'flex';
                     examStarted = true; 
                     
-                    // ป้องกันการแบนมั่วตอนโหลด
+                    // หน่วง 1.5 วิก่อนเริ่มจับผิด
                     setTimeout(() => { canBan = true; }, 1500); 
                     
                     timerHandle = setInterval(() => {
@@ -263,7 +268,6 @@
             examStarted = false; 
             clearInterval(timerHandle);
             
-            // ล็อกประวัติในเครื่องทันที
             localStorage.setItem('is_banned', 'true');
             
             const sid = localStorage.getItem(localStorage.getItem('student_email') + '_studentid');
@@ -272,22 +276,48 @@
                 body: JSON.stringify({action:"reportViolation", student_id:sid, ip:userIP, name:localStorage.getItem('student_name'), reason:reason})
             });
             
-            alert("🚨 ยุติการสอบ: " + reason + "\nสิทธิ์การสอบถูกระงับและหมดสิทธิ์สอบทันที!");
+            alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์และหมดสิทธิ์สอบแล้ว!");
             window.location.href = "student.html";
         }
 
-        // ระบบจับโกง สลับจอ/แบ่งจอ
-        window.onblur = () => { if(canBan) ban("แอบสลับหน้าจอหรือเปิดแอปอื่น"); };
-        window.onfocus = () => { document.body.classList.remove('lost-focus'); };
+        // ==================================================
+        // 🌟 อัปเกรดระบบจับโกง 2 จอ สำหรับ iPad (Visibility API) 🌟
+        // ==================================================
         
-        // 🌟 ป้องกันการแบนผิดพลาดจาก แถบ URL บนมือถือ/ไอแพด
+        // 1. จับการสลับแอป หรือ หน้าจอหรี่ลง (Focus & Blur)
+        window.addEventListener('blur', () => { 
+            if(canBan) ban("แอบสลับหน้าจอ, หุบหน้าจอ หรือใช้งาน 2 แอปพร้อมกัน"); 
+        });
+        
+        window.addEventListener('focus', () => { 
+            document.body.classList.remove('lost-focus'); 
+        });
+
+        // 2. จับการเปิด Slide Over หรือ Split View (Visibility)
+        document.addEventListener('visibilitychange', () => {
+            if (canBan && document.visibilityState === 'hidden') {
+                ban("ระบบตรวจพบการซ่อนหน้าต่างหรือเปิดแอปซ้อน");
+            }
+        });
+
+        // 3. ป้องกันการลากคลุมข้อความ (ห้ามก๊อปปี้)
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // 4. จับการย่อขนาดหน้าจอ (Resize) (ปิดไว้บนมือถือกันบั๊กแถบ URL แต่เปิดไว้จับ 2 จอบน PC/iPad ขนาดใหญ่)
         window.onresize = () => { 
-            if(canBan && !isMobileDevice && window.innerHeight < screen.height * 0.70) {
-                ban("แบ่งหน้าจอหรือย่อหน้าต่าง");
-            } 
+            const isMobileDevice = /iPhone|Android/i.test(navigator.userAgent);
+            // ถ้าไม่ใช่โทรศัพท์มือถือเล็กๆ และความกว้างจอหายไป แสดงว่าแบ่ง 2 จอ
+            if(canBan && !isMobileDevice && window.innerWidth < screen.width * 0.8) {
+                document.getElementById('split-warning').style.display = 'flex';
+                ban("ย่อหน้าต่างหรือแบ่งหน้าจอ 2 ฝั่ง");
+            } else {
+                document.getElementById('split-warning').style.display = 'none';
+            }
         };
 
+        // ==================================================
         // 🛡️ ระบบล็อกปุ่ม ย้อนกลับ (Back Button)
+        // ==================================================
         window.history.pushState(null, null, window.location.href);
         window.addEventListener('popstate', function(event) {
             window.history.pushState(null, null, window.location.href);
@@ -321,44 +351,32 @@
             const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
             
             try {
-                // 1. ตรวจคำตอบ (40 -> 20)
                 const res = await fetch(VALIDATOR_URL, {
                     method: 'POST', 
                     body: JSON.stringify({action: "evaluate", answers: data})
                 }).then(r => r.json());
                 
-                // 2. ดึงข้อมูล
                 const email = localStorage.getItem('student_email');
                 const sid = localStorage.getItem(email + '_studentid');
-                const sname = localStorage.getItem('student_name'); // 🌟 ดึงชื่อนักเรียนมาด้วย
+                const sname = localStorage.getItem('student_name'); 
                 
                 const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
                 const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
                 
-                // 3. ส่งข้อมูลกลับเข้าชีตหลัก พร้อมชื่อนักเรียน 🌟
                 await fetch(MAIN_URL, {
                     method:'POST', mode:'no-cors', 
                     body:JSON.stringify({
-                        action: "submitWork", 
-                        student_id: sid, 
-                        student_name: sname, 
-                        activity_id: actId, 
-                        work_content: log
+                        action: "submitWork", student_id: sid, student_name: sname, activity_id: actId, work_content: log
                     })
                 });
                 
                 await fetch(MAIN_URL, {
                     method:'POST', mode:'no-cors', 
                     body:JSON.stringify({
-                        action: "saveScore", 
-                        student_id: sid, 
-                        student_name: sname, 
-                        activity_id: actId, 
-                        score: res.finalScore
+                        action: "saveScore", student_id: sid, student_name: sname, activity_id: actId, score: res.finalScore
                     })
                 });
                 
-                // 4. แสดงผลลัพธ์
                 document.getElementById('screenExam').style.display = 'none';
                 document.getElementById('dotsArea').style.display = 'none';
                 document.getElementById('screenResult').style.display = 'block';
@@ -377,9 +395,8 @@
             const email = localStorage.getItem('student_email');
             const sid = localStorage.getItem(email + '_studentid');
             
-            // ดักจับคนไม่เข้าระบบหรือเปิดผ่านเบราว์เซอร์ในแอป
             if(!email || !sid || sid === '-') { 
-                alert("⚠️ ไม่พบข้อมูลรหัสประจำตัว!\n\nหากคุณเปิดผ่านแอป LINE กรุณากดปุ่ม 3 จุดมุมบน แล้วเลือก 'เปิดในเบราว์เซอร์' หรือ Safari ครับ"); 
+                alert("⚠️ ไม่พบข้อมูลรหัสประจำตัว กรุณากลับไปหน้าห้องเรียนเพื่อตั้งค่ารหัสครับ"); 
                 window.location.href = "student.html"; 
                 return; 
             }
@@ -387,7 +404,6 @@
             document.getElementById('uName').innerText = "👤 ผู้สอบ: " + localStorage.getItem('student_name');
             document.getElementById('uId').innerText = "🆔 รหัสประจำตัว: " + sid;
             
-            // วาดลายน้ำ
             const wm = document.getElementById('watermark');
             const txt = localStorage.getItem('student_name') + " (" + sid + ")";
             for(let i=0; i<15; i++) {
@@ -397,7 +413,6 @@
                 wm.appendChild(div);
             }
             
-            // 🌟 ดึง IP แบบไม่บล็อกหน้าจอ (แก้ปัญหาไอแพดค้างตอนดึงข้อมูล) 🌟
             fetch('https://api64.ipify.org?format=json')
                 .then(r => r.json())
                 .then(ipData => { userIP = ipData.ip; })
