@@ -350,408 +350,351 @@
     </div>
 
     <script>
-        // 🌟 ใส่ลิงก์ Google Script ตัวล่าสุดของคุณครูตรงนี้ครับ 🌟
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6LgfZ1EMcKAh8shNWgqHzqHJgF76GFA79jECZbketXpu_r0ghIOUCu1LH0TICLmZj1A/exec";
         
-        let allStudents = [];
-        let allActivities = [];
-        let cmsData = { teacher: {}, portfolio: [], subjects: [] };
+        // 🌟 ใส่รายชื่ออีเมลของคุณครู (Admin) ตรงนี้ได้เลยครับ 🌟
+        const adminEmails = [
+            'ratchapon@prot.ac.th', 
+            'teacher@prot.ac.th',
+            'ratchapon.p@prot.ac.th' // ใส่เมลอื่นๆ ของครูเพิ่มตรงนี้ได้ครับ
+        ];
+
+        async function saveOutfit() {
+            if (!localStorage.getItem('is_logged_in')) {
+                alert('⚠️ กรุณาเข้าสู่ระบบก่อนบันทึกชุด');
+                openLoginModal();
+                return;
+            }
+            
+            const email = localStorage.getItem('student_email');
+            const outfitData = {
+                email: email,
+                skinColor: document.getElementById('skinColor').value,
+                shirtColor: document.getElementById('shirtColor').value,
+                shoeColor: document.getElementById('shoeColor').value,
+                faceMouth: document.getElementById('faceMouth').value,
+                pattern: document.getElementById('pattern').value,
+                hatStyle: document.getElementById('hatStyle').value,
+                timestamp: new Date().toISOString()
+            };
+            
+            localStorage.setItem(`robot_outfit_${email}`, JSON.stringify(outfitData));
+            
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(outfitData)
+                });
+                showSpeechBubble('💾 บันทึกชุดเรียบร้อย! 💕');
+            } catch(e) {
+                showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
+            }
+            closeWardrobe();
+        }
+        
+        async function loadOutfit() {
+            const email = localStorage.getItem('student_email');
+            if (!email) return;
+            
+            try {
+                const response = await fetch(`${SCRIPT_URL}?email=${encodeURIComponent(email)}`);
+                const data = await response.json();
+                if (data && data.skinColor && data.skinColor !== undefined) {
+                    document.getElementById('skinColor').value = data.skinColor;
+                    document.getElementById('shirtColor').value = data.shirtColor;
+                    document.getElementById('shoeColor').value = data.shoeColor;
+                    document.getElementById('faceMouth').value = data.faceMouth;
+                    document.getElementById('pattern').value = data.pattern;
+                    document.getElementById('hatStyle').value = data.hatStyle;
+                    updateRobotOutfit();
+                    showSpeechBubble('🎉 โหลดชุดจากคลาวด์สำเร็จ! น่ารักมากกก 💖');
+                    startAutoDance();
+                    return;
+                }
+            } catch(e) {
+                console.log("โหลดข้อมูลไม่สำเร็จ", e);
+            }
+            
+            const saved = localStorage.getItem(`robot_outfit_${email}`);
+            if (saved) {
+                const outfit = JSON.parse(saved);
+                document.getElementById('skinColor').value = outfit.skinColor;
+                document.getElementById('shirtColor').value = outfit.shirtColor;
+                document.getElementById('shoeColor').value = outfit.shoeColor;
+                document.getElementById('faceMouth').value = outfit.faceMouth;
+                document.getElementById('pattern').value = outfit.pattern;
+                document.getElementById('hatStyle').value = outfit.hatStyle;
+                updateRobotOutfit();
+                showSpeechBubble('🎉 ยินดีต้อนรับกลับ! นี่คือหุ่นยนต์ของคุณนะคะ 💖');
+                startAutoDance();
+            } else {
+                updateRobotOutfit();
+                showSpeechBubble('🤖 สวัสดี! กดที่ไอคอนเสื้อผ้าเพื่อแต่งตัวหุ่นยนต์ของคุณเลย 🎨');
+                startAutoDance();
+            }
+        }
+        
+        function updateRobotOutfit() {
+            const skinColor = document.getElementById('skinColor').value;
+            const shirtColor = document.getElementById('shirtColor').value;
+            const shoeColor = document.getElementById('shoeColor').value;
+            const faceMouth = document.getElementById('faceMouth').value;
+            const pattern = document.getElementById('pattern').value;
+            const hatStyle = document.getElementById('hatStyle').value;
+            
+            document.getElementById('robotHead').setAttribute('fill', skinColor);
+            document.getElementById('robotBody').setAttribute('fill', shirtColor);
+            document.getElementById('leftArm').setAttribute('fill', shirtColor);
+            document.getElementById('rightArm').setAttribute('fill', shirtColor);
+            document.getElementById('leftShoe').setAttribute('fill', shoeColor);
+            document.getElementById('rightShoe').setAttribute('fill', shoeColor);
+            
+            const patternPath = document.getElementById('shirtPattern');
+            if (pattern === 'star') patternPath.setAttribute('d', 'M170 290 L180 275 L190 290 L200 275 L210 290 L220 275 L230 290 Z');
+            else if (pattern === 'heart') patternPath.setAttribute('d', 'M200 285 C190 275, 180 280, 200 295 C220 280, 210 275, 200 285 Z');
+            else if (pattern === 'circle') patternPath.setAttribute('d', 'M175 290 A10 10 0 1 1 175 290 M200 290 A10 10 0 1 1 200 290 M225 290 A10 10 0 1 1 225 290');
+            else if (pattern === 'stripe') patternPath.setAttribute('d', 'M160 280 L240 280 M160 295 L240 295 M160 310 L240 310 M160 325 L240 325');
+            else patternPath.setAttribute('d', '');
+            patternPath.setAttribute('opacity', pattern !== 'none' ? '0.8' : '0');
+            
+            const foreheadPattern = document.getElementById('foreheadPattern');
+            if (pattern === 'star') foreheadPattern.setAttribute('d', 'M185 120 L195 108 L200 115 L205 108 L215 120 Z');
+            else foreheadPattern.setAttribute('d', '');
+            foreheadPattern.setAttribute('opacity', pattern === 'star' ? '0.9' : '0');
+            
+            const hairPath = document.getElementById('hairStyle');
+            if (hatStyle === 'cap') hairPath.setAttribute('d', 'M115 110 Q200 85 285 110 L285 130 Q200 100 115 130 Z');
+            else if (hatStyle === 'crown') hairPath.setAttribute('d', 'M170 95 L180 80 L190 95 L200 78 L210 95 L220 80 L230 95');
+            else if (hatStyle === 'flower') hairPath.setAttribute('d', 'M195 95 C195 85, 205 85, 205 95 C210 90, 215 100, 205 105 C210 110, 200 115, 200 105 C200 115, 190 110, 195 105 C185 100, 190 90, 195 95 Z');
+            else if (hatStyle === 'bow') hairPath.setAttribute('d', 'M185 105 Q195 95 200 105 Q205 95 215 105 Q205 115 200 110 Q195 115 185 105 Z');
+            else hairPath.setAttribute('d', '');
+            hairPath.setAttribute('opacity', hatStyle !== 'none' ? '0.9' : '0');
+            
+            const leftPupil = document.getElementById('leftPupil');
+            const rightPupil = document.getElementById('rightPupil');
+            const leftEyeWhite = document.getElementById('leftEyeWhite');
+            const rightEyeWhite = document.getElementById('rightEyeWhite');
+            const leftBrow = document.getElementById('leftBrow');
+            const rightBrow = document.getElementById('rightBrow');
+            
+            leftPupil.setAttribute('cx', '172'); leftPupil.setAttribute('r', '8'); leftPupil.setAttribute('fill', '#0f172a');
+            rightPupil.setAttribute('cx', '232'); rightPupil.setAttribute('r', '8'); rightPupil.setAttribute('fill', '#0f172a');
+            leftEyeWhite.setAttribute('fill', 'white'); rightEyeWhite.setAttribute('fill', 'white');
+            leftBrow.removeAttribute('transform'); rightBrow.removeAttribute('transform');
+            leftBrow.setAttribute('y', '140'); rightBrow.setAttribute('y', '140');
+            
+            if (faceMouth === 'happy') { leftPupil.setAttribute('r', '10'); rightPupil.setAttribute('r', '10'); leftBrow.setAttribute('y', '135'); rightBrow.setAttribute('y', '135'); }
+            else if (faceMouth === 'love') { leftPupil.setAttribute('fill', '#ff6b6b'); rightPupil.setAttribute('fill', '#ff6b6b'); leftEyeWhite.setAttribute('fill', '#ffb7c5'); rightEyeWhite.setAttribute('fill', '#ffb7c5'); }
+            else if (faceMouth === 'wink') { rightPupil.setAttribute('r', '4'); }
+            else if (faceMouth === 'cool') { leftBrow.setAttribute('transform', 'rotate(-10 167 143)'); rightBrow.setAttribute('transform', 'rotate(10 232 143)'); }
+            
+            const leftCheek = document.getElementById('leftCheek');
+            const rightCheek = document.getElementById('rightCheek');
+            leftCheek.setAttribute('opacity', faceMouth === 'love' ? '0.8' : '0.3');
+            rightCheek.setAttribute('opacity', faceMouth === 'love' ? '0.8' : '0.3');
+        }
+        
+        const bounceAnimations = ['bounce1', 'bounce2', 'bounce3', 'shake', 'wiggle'];
+        const clickMessages = [
+            '🤪 อย่ามาจั๊กจี้สิ!', '💙 ชอบจัง~', '✨ กระโดดโลดเต้น', '🎵 เต้นไปกับเรา~', 
+            '🤖 หวัดดีจ้า!', '😊 สวัสดีครับ', '⚡ โอ๊ย! ตกใจ', '💃 หนุกหนาน~', 
+            '🌟 เก่งจังเลย', '🎉 เย้ๆๆ', '🤗 คิดถึงจัง', '💕 รักเลย'
+        ];
+        
+        function playRandomBounce() {
+            const robot = document.getElementById('robotContainer');
+            const randomAnim = bounceAnimations[Math.floor(Math.random() * bounceAnimations.length)];
+            bounceAnimations.forEach(anim => robot.classList.remove(anim));
+            void robot.offsetWidth;
+            robot.classList.add(randomAnim);
+            setTimeout(() => {
+                robot.classList.remove(randomAnim);
+            }, 500);
+            
+            const msg = clickMessages[Math.floor(Math.random() * clickMessages.length)];
+            showSpeechBubble(msg);
+        }
+        
+        let autoDanceInterval = null;
+        const autoDances = ['autoDance1', 'autoDance2', 'autoDance3'];
+        
+        function startAutoDance() {
+            if(autoDanceInterval) clearInterval(autoDanceInterval);
+            const robot = document.getElementById('robotContainer');
+            robot.classList.add('autoDance1');
+            autoDanceInterval = setInterval(() => {
+                const newDance = autoDances[Math.floor(Math.random() * autoDances.length)];
+                autoDances.forEach(d => robot.classList.remove(d));
+                robot.classList.add(newDance);
+            }, 3000);
+        }
+        
+        function stopAutoDance() {
+            if(autoDanceInterval) clearInterval(autoDanceInterval);
+            const robot = document.getElementById('robotContainer');
+            autoDances.forEach(d => robot.classList.remove(d));
+        }
+        
+        function showSpeechBubble(msg) {
+            const existing = document.querySelector('.speech-bubble');
+            if(existing) existing.remove();
+            const bubble = document.createElement('div');
+            bubble.classList.add('speech-bubble');
+            bubble.textContent = msg;
+            const rect = document.getElementById('robotContainer').getBoundingClientRect();
+            bubble.style.left = (rect.left + rect.width/2 - 100) + 'px';
+            bubble.style.top = (rect.top - 60) + 'px';
+            document.body.appendChild(bubble);
+            setTimeout(() => bubble.remove(), 2500);
+        }
+        
+        function openWardrobe() { 
+            if(!localStorage.getItem('is_logged_in')) {
+                showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะแต่งตัวให้หนูได้เลย!');
+                openLoginModal();
+                return;
+            }
+            document.getElementById('wardrobeModal').classList.add('active'); 
+        }
+        function closeWardrobe() { document.getElementById('wardrobeModal').classList.remove('active'); }
+        
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
+        }
+        
+        function handleCredentialResponse(response) {
+            const userData = decodeJwtResponse(response.credential);
+            const userEmail = userData.email;
+            
+            // ยอมรับอีเมล @gmail.com และ @prot.ac.th
+            if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userEmail);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                
+                // 🌟 ตรวจสอบว่าเป็นอีเมลแอดมิน (ครู) หรือไม่ 🌟
+                if (adminEmails.includes(userEmail)) {
+                    window.location.href = 'teacher_dashboard.html';
+                    return;
+                }
+                
+                closeLoginModal();
+                updateLoginUI();
+                document.getElementById('outfitIcon').style.display = 'flex';
+                loadOutfit();
+            } else {
+                alert('❌ อีเมลนี้ไม่ได้รับอนุญาต');
+            }
+        }
+        
+        function updateLoginUI() {
+            const name = localStorage.getItem('student_name');
+            const pic = localStorage.getItem('student_pic');
+            document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
+        }
+        
+        function logout() {
+            stopAutoDance();
+            localStorage.removeItem('is_logged_in');
+            window.location.reload();
+        }
+        
+        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+        
+        const themes = { 
+            default: { glowColor: "rgba(59,130,246,0.3)", particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, 
+            snow: { glowColor: "rgba(255,255,255,0.5)", particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, 
+            forest: { glowColor: "rgba(100,200,100,0.4)", particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, 
+            halloween: { glowColor: "rgba(255,69,0,0.4)", particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, 
+            love: { glowColor: "rgba(255,105,180,0.4)", particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } 
+        };
+
+        let particleInterval = null;
+
+        function startThemeParticles(themeKey) {
+            const container = document.getElementById("particleContainer");
+            if(!container) return;
+            if(particleInterval) clearInterval(particleInterval);
+            container.innerHTML = "";
+            const themeData = themes[themeKey] || themes['default'];
+            
+            function createParticle() {
+                const particle = document.createElement("div");
+                particle.className = "theme-particle";
+                particle.style.left = Math.random() * 100 + "vw";
+                particle.style.top = "-10vh";
+                particle.style.fontSize = (Math.random() * 15 + 15) + "px";
+                particle.style.animationDuration = (Math.random() * 5 + 5) + "s";
+                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
+                particle.innerHTML = themeData.particleChar;
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 12000);
+            }
+            
+            for(let i = 0; i < 15; i++) setTimeout(createParticle, i * 200);
+            particleInterval = setInterval(createParticle, 600);
+        }
 
         function applyTheme(themeKey) {
             document.body.setAttribute("data-theme", themeKey);
             localStorage.setItem('smart_theme', themeKey);
+            document.getElementById("robotGlow").style.background = `radial-gradient(circle, ${themes[themeKey].glowColor} 0%, rgba(0,0,0,0) 70%)`;
+            const msg = themeKey === 'snow' ? '❄️ ธีมหิมะ เย็นสบาย~' : themeKey === 'forest' ? '🌿 ธีมป่าเขียว สดชื่น!' : themeKey === 'halloween' ? '🎃 ธีมฮัลโลวีน สนุกสุดๆ!' : themeKey === 'love' ? '🌸 ธีมซากุระ หวานละมุน~' : '🤖 ธีมเริ่มต้น คลาสสิค!';
+            showSpeechBubble(msg);
+            startThemeParticles(themeKey);
         }
-
-        function switchTab(tabId, element) {
-            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-            element.classList.add('active');
-            if(tabId === 'tab-matrix') renderMatrix();
-            if(tabId === 'tab-classview') renderClassViewTable();
-        }
-
-        // 🌟 ฟังก์ชันสร้างตัวเลือกห้องเรียน ม.1/1 ถึง ม.6/15 อัตโนมัติ 🌟
-        function populateRoomDropdowns() {
-            let optionsHtml = '';
-            for (let m = 1; m <= 6; m++) {
-                for (let r = 1; r <= 15; r++) {
-                    optionsHtml += `<option value="ม.${m}/${r}">ม.${m}/${r}</option>`;
+        
+        document.getElementById('heroRobot')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            if(localStorage.getItem('is_logged_in')) {
+                playRandomBounce();
+            } else {
+                showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะมาเล่นด้วยกันได้เลย!');
+                openLoginModal();
+            }
+        });
+        
+        document.getElementById('outfitIcon')?.addEventListener('click', (e) => {
+            e.stopPropagation();
+            openWardrobe();
+        });
+        
+        ['skinColor', 'shirtColor', 'shoeColor', 'faceMouth', 'pattern', 'hatStyle'].forEach(id => 
+            document.getElementById(id)?.addEventListener('change', updateRobotOutfit)
+        );
+        
+        document.querySelectorAll(".theme-btn").forEach(btn => btn.addEventListener("click", () => { 
+            applyTheme(btn.getAttribute("data-theme")); 
+            document.querySelectorAll(".theme-btn").forEach(b=>b.classList.remove("active")); 
+            btn.classList.add("active"); 
+        }));
+        
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('smart_theme') || "default";
+            applyTheme(savedTheme);
+            document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
+            
+            // 🌟 ตรวจสอบตอนเปิดเว็บว่าถ้าเป็นครูที่ล็อกอินค้างไว้ ให้เด้งไป Dashboard เลย
+            if (localStorage.getItem('is_logged_in') === 'true') { 
+                const userEmail = localStorage.getItem('student_email');
+                if (adminEmails.includes(userEmail)) {
+                    window.location.href = 'teacher_dashboard.html';
+                    return;
                 }
-            }
-            // แทรกใส่ Select ทุกจุด
-            document.getElementById('act-room').insertAdjacentHTML('beforeend', optionsHtml);
-            document.getElementById('matrix-room').insertAdjacentHTML('beforeend', optionsHtml);
-            document.getElementById('view-class-room').insertAdjacentHTML('beforeend', optionsHtml);
-        }
-
-        // ==================== โหลดข้อมูลทั้งหมดจาก Database ====================
-        async function loadAllData() {
-            try {
-                const cacheBuster = Date.now();
-                const resAct = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
-                const dataAct = await resAct.json();
-                allActivities = dataAct.data || [];
-                renderActivitiesList();
-
-                const resStd = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
-                allStudents = await resStd.json();
-                
-                const resCms = await fetch(GOOGLE_SCRIPT_URL + "?action=getCMS&t=" + cacheBuster);
-                cmsData = await resCms.json();
-                
-                renderCMSUI();
-                populateMatrixDropdowns();
-                renderMatrix();
-                renderClassViewTable();
-                
-            } catch(e) {
-                alert("⚠️ โหลดข้อมูลไม่สำเร็จ กรุณาตรวจสอบอินเทอร์เน็ต");
-            }
-        }
-
-        // ==================== จัดการกิจกรรม (Tab 1) ====================
-        function renderActivitiesList() {
-            const listDiv = document.getElementById('activities-list');
-            if(allActivities.length === 0) { listDiv.innerHTML = '<p>ยังไม่มีการสั่งงาน</p>'; return; }
-
-            listDiv.innerHTML = allActivities.map(a => {
-                let color = a.type === 'content' ? '#a855f7' : (a.type === 'task' ? '#f59e0b' : '#10b981');
-                return `
-                <div class="list-item" style="border-left-color: ${color};">
-                    <div>
-                        <h4 style="color:${color}; margin-bottom:5px;">${a.title}</h4>
-                        <div style="font-size:0.85rem; opacity:0.8;">ส่ง: ${a.date||'-'} | เป้าหมาย: ${a.targetRoom} | ไฟล์: ${a.link === '#' ? 'ไม่มี' : a.link}</div>
-                    </div>
-                    <div style="display:flex; gap:10px;">
-                        <button class="btn-action btn-warning" style="padding: 5px 12px; font-size:0.85rem;" onclick="editAct('${a.id}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-danger" style="padding: 5px 12px; font-size:0.85rem;" onclick="deleteAct('${a.id}')"><i class="fas fa-trash"></i></button>
-                    </div>
-                </div>`;
-            }).join('');
-        }
-
-        function saveActivity() {
-            const title = document.getElementById('act-title').value;
-            if(!title) return alert("กรุณาใส่ชื่อหัวข้องาน");
-            const actData = {
-                id: document.getElementById('edit-id').value || Date.now().toString(),
-                type: document.getElementById('act-type').value, status: document.getElementById('act-status').value,
-                title: title, desc: document.getElementById('act-desc').value,
-                date: document.getElementById('act-date').value, time: document.getElementById('act-time').value,
-                points: document.getElementById('act-points').value, targetRoom: document.getElementById('act-room').value,
-                link: document.getElementById('act-link').value, yt: document.getElementById('act-yt').value, doc: document.getElementById('act-doc').value
-            };
-            const idx = allActivities.findIndex(a => String(a.id) === String(actData.id));
-            if(idx > -1) allActivities[idx] = actData; else allActivities.push(actData);
-            
-            renderActivitiesList(); resetActForm(); pushActivitiesToDB();
-        }
-
-        function editAct(id) {
-            const act = allActivities.find(a => String(a.id) === String(id));
-            if(!act) return;
-            document.getElementById('edit-id').value = act.id; document.getElementById('act-type').value = act.type || 'task';
-            document.getElementById('act-status').value = act.status || 'open'; document.getElementById('act-title').value = act.title;
-            document.getElementById('act-desc').value = act.desc || ''; document.getElementById('act-date').value = act.date || '';
-            document.getElementById('act-time').value = act.time || '23:59'; document.getElementById('act-points').value = act.points || '10';
-            document.getElementById('act-room').value = act.targetRoom || 'ทุกห้อง'; document.getElementById('act-link').value = act.link || '#';
-            document.getElementById('act-yt').value = act.yt || ''; document.getElementById('act-doc').value = act.doc || '';
-            
-            document.getElementById('btn-save-act').innerHTML = '<i class="fas fa-save"></i> บันทึกการแก้ไข';
-            document.getElementById('btn-cancel-act').style.display = 'inline-flex';
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        function deleteAct(id) {
-            if(!confirm("ต้องการลบงานนี้ใช่หรือไม่?")) return;
-            allActivities = allActivities.filter(a => String(a.id) !== String(id));
-            renderActivitiesList(); pushActivitiesToDB();
-        }
-
-        function resetActForm() {
-            document.getElementById('edit-id').value = ''; document.getElementById('act-title').value = ''; document.getElementById('act-desc').value = '';
-            document.getElementById('btn-save-act').innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
-            document.getElementById('btn-cancel-act').style.display = 'none';
-        }
-
-        function pushActivitiesToDB() {
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveActivities", activities: allActivities }) });
-        }
-
-        // ==================== ตรวจงาน Matrix (Tab 2) ====================
-        function populateMatrixDropdowns() {
-            const tasks = allActivities.filter(a => a.type !== 'content');
-            document.getElementById('matrix-act').innerHTML = tasks.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
-        }
-
-        function renderMatrix() {
-            const tbody = document.getElementById('matrix-body');
-            const actId = document.getElementById('matrix-act').value;
-            const roomFilter = document.getElementById('matrix-room').value;
-            if(!allStudents || allStudents.length === 0) { tbody.innerHTML = '<tr><td colspan="7">ไม่มีข้อมูลนักเรียน</td></tr>'; return; }
-
-            let filtered = allStudents;
-            if(roomFilter !== 'all') filtered = filtered.filter(s => s.room === roomFilter);
-            filtered.sort((a,b) => parseInt(a.number||99) - parseInt(b.number||99));
-
-            tbody.innerHTML = filtered.map(s => {
-                let work = (s.works && s.works[actId] !== undefined) ? s.works[actId] : null;
-                let score = (s.scores && s.scores[actId] !== undefined && s.scores[actId] !== "") ? s.scores[actId] : '-';
-                let statusHtml = (work !== null && work !== "") ? `<span class="badge badge-green">ส่งแล้ว</span>` : `<span class="badge badge-red">ยังไม่ส่ง</span>`;
-                return `<tr><td>${s.studentId||'-'}</td><td>${s.number||'-'}</td><td>${s.name||'-'}</td><td>${s.room||'-'}</td><td>${statusHtml}</td><td style="color:#60a5fa; font-weight:bold;">${score}</td>
-                <td><button class="btn-action" style="padding: 5px 10px; font-size:0.8rem;" onclick="openGradeModal('${s.email}','${actId}','${s.name}')">ตรวจงาน</button></td></tr>`;
-            }).join('');
-        }
-
-        let currentGradeEmail = '', currentGradeActId = '';
-        function openGradeModal(email, actId, name) {
-            currentGradeEmail = email; currentGradeActId = actId;
-            const student = allStudents.find(s => s.email === email);
-            const actData = allActivities.find(a => String(a.id) === String(actId));
-            document.getElementById('grade-student-name').innerText = name;
-            document.getElementById('grade-max-points').innerText = actData ? actData.points : 10;
-            
-            let workDisplay = 'ไม่พบผลงาน';
-            if(student.works && student.works[actId]) {
-                let w = student.works[actId];
-                workDisplay = String(w).startsWith('http') ? `<a href="${w}" target="_blank" style="color:#60a5fa;">เปิดดูลิงก์ผลงาน</a>` : `<pre style="white-space:pre-wrap;">${w}</pre>`;
-            }
-            document.getElementById('grade-work-content').innerHTML = workDisplay;
-            document.getElementById('grade-input-score').value = (student.scores && student.scores[actId]) ? student.scores[actId] : '';
-            document.getElementById('gradeModal').classList.add('active');
-        }
-
-        function saveScore() {
-            const score = document.getElementById('grade-input-score').value;
-            if(score === '') return alert('กรุณาใส่คะแนน');
-            let scoresObj = {}; scoresObj[currentGradeActId] = score;
-            fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ email: currentGradeEmail, scores: scoresObj }) }).then(() => {
-                document.getElementById('gradeModal').classList.remove('active');
-                const s = allStudents.find(st => st.email === currentGradeEmail);
-                if(s) { if(!s.scores) s.scores={}; s.scores[currentGradeActId] = score; }
-                renderMatrix(); 
-            });
-        }
-
-        // ==================== 🌟 ข้อมูลรายห้องเรียน (Tab 5 ใหม่อลังการ) 🌟 ====================
-        function renderClassViewTable() {
-            const tbody = document.getElementById('class-view-body');
-            const roomFilter = document.getElementById('view-class-room').value;
-            
-            if(!allStudents || allStudents.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">ยังไม่มีนักเรียนในระบบ</td></tr>';
-                return;
-            }
-
-            let filtered = allStudents.filter(s => s.room && s.room !== '-');
-            if(roomFilter !== 'all') filtered = filtered.filter(s => s.room === roomFilter);
-            filtered.sort((a,b) => parseInt(a.number||99) - parseInt(b.number||99));
-
-            const tasks = allActivities.filter(a => a.type !== 'content');
-
-            tbody.innerHTML = filtered.map(s => {
-                let missingCount = 0;
-                tasks.forEach(act => {
-                    let hasWork = s.works && s.works[act.id];
-                    let hasScore = s.scores && s.scores[act.id];
-                    if(!hasWork && !hasScore) missingCount++;
-                });
-
-                let statusBadge = missingCount > 0 
-                    ? `<span class="badge badge-red">ค้าง ${missingCount} งาน</span>` 
-                    : `<span class="badge badge-green">ครบถ้วน</span>`;
-
-                return `
-                <tr>
-                    <td>${s.studentId||'-'}</td>
-                    <td>${s.number||'-'}</td>
-                    <td style="font-weight:bold;">${s.name||'-'}</td>
-                    <td>${s.room||'-'}</td>
-                    <td>${statusBadge}</td>
-                    <td><button class="btn-action" style="padding: 5px 15px; font-size:0.8rem; background: #f59e0b;" onclick="openStudentDetailModal('${s.email}')"><i class="fas fa-search-plus"></i> ดูรายละเอียด</button></td>
-                </tr>`;
-            }).join('');
-            
-            if(filtered.length === 0) tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; opacity:0.6;">ไม่มีนักเรียนในห้องนี้</td></tr>';
-        }
-
-        function openStudentDetailModal(email) {
-            const student = allStudents.find(s => s.email === email);
-            if(!student) return;
-            
-            document.getElementById('sd-name').innerText = student.name || 'ไม่มีชื่อ';
-            document.getElementById('sd-id').innerText = student.studentId || '-';
-            document.getElementById('sd-room').innerText = student.room || '-';
-            document.getElementById('sd-number').innerText = student.number || '-';
-            document.getElementById('sd-pic').src = `https://ui-avatars.com/api/?name=${student.name||'S'}&background=3b82f6&color=fff`;
-            
-            let totalScore = 0; let maxScore = 0;
-            let tbodyHtml = '';
-            
-            const tasks = allActivities.filter(a => a.type !== 'content');
-            tasks.forEach(act => {
-                let points = parseInt(act.points || 0);
-                maxScore += points;
-                
-                let work = (student.works && student.works[act.id]) ? student.works[act.id] : null;
-                let score = (student.scores && student.scores[act.id] !== undefined && student.scores[act.id] !== "") ? parseInt(student.scores[act.id]) : null;
-                
-                let statusBadge = '';
-                let scoreText = '-';
-                
-                if(score !== null) {
-                    totalScore += score;
-                    statusBadge = '<span class="badge badge-green">ตรวจแล้ว</span>';
-                    scoreText = `<span style="color:#10b981; font-weight:bold;">${score}/${points}</span>`;
-                } else if (work) {
-                    statusBadge = '<span class="badge badge-yellow">รอตรวจ</span>';
-                    scoreText = `<span style="color:#f59e0b;">(รอลงคะแนนเต็ม ${points})</span>`;
-                } else {
-                    statusBadge = '<span class="badge badge-red">ค้างส่ง</span>';
-                    scoreText = `<span style="color:#ef4444; font-weight:bold;">0/${points}</span>`;
-                }
-                
-                tbodyHtml += `<tr>
-                    <td>${act.title}</td>
-                    <td style="text-align:center;">${statusBadge}</td>
-                    <td style="text-align:center;">${scoreText}</td>
-                </tr>`;
-            });
-
-            document.getElementById('sd-summary').innerHTML = `คะแนนรวม: <span style="color:#10b981;">${totalScore}/${maxScore}</span>`;
-            document.getElementById('sd-tasks').innerHTML = tbodyHtml || '<tr><td colspan="3" style="text-align:center;">ยังไม่มีงานในระบบ</td></tr>';
-            
-            document.getElementById('studentDetailModal').classList.add('active');
-        }
-
-        // ==================== ค้นหา และ CSV (Tab 3) ====================
-        function searchStudent() {
-            const query = document.getElementById('search-student-id').value.trim().toLowerCase();
-            if(!query) return;
-            const student = allStudents.find(s => (s.studentId && s.studentId.toString().toLowerCase() === query) || (s.email && s.email.toLowerCase() === query));
-            if (student) {
-                openStudentDetailModal(student.email); // 🌟 ใช้ Modal ตัวใหม่แสดงผลได้เลย สวยกว่า 🌟
+                updateLoginUI(); 
+                document.getElementById('outfitIcon').style.display = 'flex';
+                loadOutfit(); 
             } else { 
-                alert("❌ ไม่พบข้อมูล"); 
+                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
+                document.getElementById('outfitIcon').style.display = 'none';
+                startAutoDance();
             }
-        }
-
-        function processCSV() {
-            const fileInput = document.getElementById('csvFileInput');
-            if(!fileInput.files.length) return alert('กรุณาเลือกไฟล์ CSV');
-            document.getElementById('csv-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลด...';
-            const reader = new FileReader();
-            reader.onload = async function(e) {
-                const rows = e.target.result.split('\n'); let count = 0;
-                for(let i = 1; i < rows.length; i++) { 
-                    const cols = rows[i].split(',');
-                    if(cols.length >= 5 && cols[0].trim() && cols[2].trim()) {
-                        await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ email: cols[0].trim(), studentId: cols[1].trim(), name: cols[2].trim(), room: cols[3].trim(), number: cols[4].trim() }) });
-                        count++;
-                    }
-                }
-                document.getElementById('csv-status').innerHTML = `✅ นำเข้าสำเร็จ ${count} คน`;
-                loadAllData(); 
-            };
-            reader.readAsText(fileInput.files[0]);
-        }
-
-        // ==================== CMS (Tab 4) ====================
-        function renderCMSUI() {
-            if(cmsData.teacher) {
-                document.getElementById('cms-t-name').value = cmsData.teacher.name || '';
-                document.getElementById('cms-t-pic').value = cmsData.teacher.img || '';
-                document.getElementById('cms-t-yt').value = cmsData.teacher.yt || '';
-                document.getElementById('cms-t-bio').value = cmsData.teacher.bio || '';
-            }
-            const portList = document.getElementById('cms-portfolio-list');
-            if(!cmsData.portfolio || cmsData.portfolio.length === 0) { portList.innerHTML = '<p style="opacity:0.6;">ยังไม่มีผลงาน</p>'; } 
-            else {
-                portList.innerHTML = cmsData.portfolio.map((p, i) => `
-                    <div class="list-item" style="border-left-color: #f59e0b;">
-                        <div><h4 style="color:#f59e0b;">${p.title}</h4><div style="font-size:0.8rem;">${p.desc}</div></div>
-                        <div>
-                            <button class="btn-action btn-warning" style="padding: 5px 12px; font-size:0.85rem;" onclick="editPortfolio(${i})"><i class="fas fa-edit"></i></button>
-                            <button class="btn-action btn-danger" style="padding: 5px 12px; font-size:0.85rem;" onclick="deletePortfolio(${i})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`).join('');
-            }
-            const subjList = document.getElementById('cms-subject-list');
-            if(!cmsData.subjects || cmsData.subjects.length === 0) { subjList.innerHTML = '<p style="opacity:0.6;">ยังไม่มีวิชาเพิ่มเติม</p>'; } 
-            else {
-                subjList.innerHTML = cmsData.subjects.map((s, i) => `
-                    <div class="list-item" style="border-left-color: #10b981;">
-                        <div><h4 style="color:#10b981;">${s.title}</h4><div style="font-size:0.8rem;">รหัส: ${s.code}</div></div>
-                        <div>
-                            <button class="btn-action btn-warning" style="padding: 5px 12px; font-size:0.85rem;" onclick="editSubject(${i})"><i class="fas fa-edit"></i></button>
-                            <button class="btn-action btn-danger" style="padding: 5px 12px; font-size:0.85rem;" onclick="deleteSubject(${i})"><i class="fas fa-trash"></i></button>
-                        </div>
-                    </div>`).join('');
-            }
-        }
-
-        function saveCMSDataToDB() {
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action: "saveCMS", teacher: cmsData.teacher, portfolio: cmsData.portfolio, subjects: cmsData.subjects })
-            });
-        }
-
-        function saveCMSTeacher() {
-            cmsData.teacher = { name: document.getElementById('cms-t-name').value, img: document.getElementById('cms-t-pic').value, yt: document.getElementById('cms-t-yt').value, bio: document.getElementById('cms-t-bio').value };
-            saveCMSDataToDB(); alert("บันทึกข้อมูลครูสำเร็จ!");
-        }
-
-        function saveCMSPortfolio() {
-            const title = document.getElementById('cms-p-title').value;
-            if(!title) return alert("กรุณาใส่ชื่อผลงาน");
-            const p = { title: title, img: document.getElementById('cms-p-img').value, desc: document.getElementById('cms-p-desc').value };
-            const id = document.getElementById('cms-p-id').value;
-            if(id !== "") cmsData.portfolio[id] = p; else cmsData.portfolio.push(p);
-            saveCMSDataToDB(); renderCMSUI(); resetPortForm();
-        }
-        function editPortfolio(idx) {
-            document.getElementById('cms-p-id').value = idx; document.getElementById('cms-p-title').value = cmsData.portfolio[idx].title;
-            document.getElementById('cms-p-img').value = cmsData.portfolio[idx].img; document.getElementById('cms-p-desc').value = cmsData.portfolio[idx].desc;
-            document.getElementById('btn-save-port').innerHTML = '<i class="fas fa-save"></i> บันทึกการแก้ไข'; document.getElementById('btn-cancel-port').style.display = 'inline-flex';
-        }
-        function deletePortfolio(idx) {
-            if(!confirm("ลบผลงานนี้?")) return;
-            cmsData.portfolio.splice(idx, 1); saveCMSDataToDB(); renderCMSUI();
-        }
-        function resetPortForm() {
-            document.getElementById('cms-p-id').value = ""; document.getElementById('cms-p-title').value = ""; document.getElementById('cms-p-img').value = ""; document.getElementById('cms-p-desc').value = "";
-            document.getElementById('btn-save-port').innerHTML = '<i class="fas fa-plus"></i> เพิ่มผลงานใหม่'; document.getElementById('btn-cancel-port').style.display = 'none';
-        }
-
-        function saveCMSSubject() {
-            const title = document.getElementById('cms-s-title').value;
-            if(!title) return alert("กรุณาใส่ชื่อวิชา");
-            const s = { title: title, code: document.getElementById('cms-s-code').value, img: document.getElementById('cms-s-img').value };
-            const id = document.getElementById('cms-s-id').value;
-            if(id !== "") cmsData.subjects[id] = s; else cmsData.subjects.push(s);
-            saveCMSDataToDB(); renderCMSUI(); resetSubjForm();
-        }
-        function editSubject(idx) {
-            document.getElementById('cms-s-id').value = idx; document.getElementById('cms-s-title').value = cmsData.subjects[idx].title;
-            document.getElementById('cms-s-code').value = cmsData.subjects[idx].code; document.getElementById('cms-s-img').value = cmsData.subjects[idx].img;
-            document.getElementById('btn-save-subj').innerHTML = '<i class="fas fa-save"></i> บันทึกการแก้ไข'; document.getElementById('btn-cancel-subj').style.display = 'inline-flex';
-        }
-        function deleteSubject(idx) {
-            if(!confirm("ลบวิชานี้?")) return;
-            cmsData.subjects.splice(idx, 1); saveCMSDataToDB(); renderCMSUI();
-        }
-        function resetSubjForm() {
-            document.getElementById('cms-s-id').value = ""; document.getElementById('cms-s-title').value = ""; document.getElementById('cms-s-code').value = ""; document.getElementById('cms-s-img').value = "";
-            document.getElementById('btn-save-subj').innerHTML = '<i class="fas fa-plus"></i> เพิ่มรายวิชา'; document.getElementById('btn-cancel-subj').style.display = 'none';
-        }
-
-        // เริ่มต้นการทำงาน
-        window.onload = () => {
-            applyTheme(localStorage.getItem('smart_theme') || "default");
-            populateRoomDropdowns(); // สร้างตัวเลือกห้องอัตโนมัติ
-            loadAllData();
         };
     </script>
 </body>
