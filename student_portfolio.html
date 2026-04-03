@@ -3,75 +3,238 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ผลงานนักเรียน | PROT Smart Workspace</title>
+    <title>ผลงานและกิจกรรมโรงเรียน | PROT Smart Workspace</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
+        /* 🌟 โครงสร้างพื้นฐาน 🌟 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; min-height: 100vh; color: white; background: #0f172a; }
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        .logo { font-size: 1.5rem; font-weight: 700; color: #60a5fa; text-decoration: none; display: flex; align-items: center; gap: 10px;}
-        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
-        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; }
-        .nav-links a:hover, .nav-links a.active { color: #f59e0b; background: rgba(245,158,11,0.1); }
+        body { 
+            font-family: 'Prompt', 'Inter', sans-serif; 
+            background-color: #f8fafc; /* พื้นหลังสีเทาอ่อน สบายตา */
+            color: #1e293b; 
+            padding-bottom: 60px;
+        }
         
-        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
-        .header-title { text-align: center; margin-bottom: 40px; color: #f59e0b; font-size: 2.2rem; }
-        
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
-        .port-card { background: rgba(30, 41, 59, 0.7); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; display: flex; flex-direction: column; }
-        .port-card:hover { transform: translateY(-10px); box-shadow: 0 15px 30px rgba(245,158,11,0.2); border-color: #f59e0b; }
-        .port-img { width: 100%; height: 220px; object-fit: cover; background: #1e293b; border-bottom: 3px solid #f59e0b; }
-        .port-info { padding: 20px; flex: 1; display: flex; flex-direction: column; }
-        .port-title { font-size: 1.2rem; font-weight: 700; color: white; margin-bottom: 10px; }
-        .port-desc { font-size: 0.9rem; color: #cbd5e1; line-height: 1.6; }
+        /* 🌟 ส่วนหัว (Header) 🌟 */
+        .header { 
+            background: #0f172a; 
+            padding: 20px 40px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            position: sticky; 
+            top: 0; 
+            z-index: 100;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        .header h1 { 
+            font-size: 1.5rem; 
+            color: #60a5fa; 
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .back-btn { 
+            color: white; 
+            text-decoration: none; 
+            padding: 8px 20px; 
+            background: rgba(255,255,255,0.1); 
+            border-radius: 30px; 
+            transition: 0.3s;
+            font-size: 0.95rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .back-btn:hover { 
+            background: #3b82f6; 
+            transform: translateY(-2px);
+        }
+
+        /* 🌟 พื้นที่แสดงผลงาน 🌟 */
+        .container { 
+            max-width: 1200px; 
+            margin: 40px auto; 
+            padding: 0 20px; 
+        }
+        .section-title { 
+            font-size: 1.8rem; 
+            font-weight: 600; 
+            margin-bottom: 30px; 
+            color: #1e40af; 
+            border-left: 5px solid #3b82f6; 
+            padding-left: 15px; 
+        }
+
+        /* 🌟 Grid กล่องผลงาน (Card Layout) 🌟 */
+        .portfolio-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* เรียงกล่องอัตโนมัติตามขนาดจอ */
+            gap: 30px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            overflow: hidden; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            flex-direction: column;
+            cursor: pointer;
+        }
+
+        .card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+            border-color: #93c5fd;
+        }
+
+        /* บังคับรูปภาพให้ขนาดเท่ากันเป๊ะ และไม่เบี้ยว */
+        .card-img {
+            width: 100%;
+            height: 200px; 
+            object-fit: cover; 
+            border-bottom: 1px solid #e2e8f0;
+            transition: transform 0.5s ease;
+        }
+        .card:hover .card-img {
+            transform: scale(1.05);
+        }
+        .img-container {
+            overflow: hidden;
+        }
+
+        .card-body {
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            flex: 1; 
+        }
+
+        .card-title {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #0f172a;
+            margin-bottom: 10px;
+            line-height: 1.4;
+        }
+
+        .card-desc {
+            font-size: 0.9rem;
+            color: #64748b;
+            margin-bottom: 20px;
+            line-height: 1.6;
+            /* ตัดคำถ้ายาวเกิน 3 บรรทัด */
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .card-footer {
+            margin-top: auto; 
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.85rem;
+            border-top: 1px dashed #e2e8f0;
+            padding-top: 15px;
+        }
+
+        .read-more { 
+            color: #3b82f6; 
+            text-decoration: none; 
+            font-weight: 500; 
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .read-more:hover { color: #2563eb; }
+        .post-date { color: #94a3b8; font-size: 0.8rem;}
+
+        .loader { 
+            text-align: center; 
+            padding: 50px; 
+            font-size: 1.2rem; 
+            color: #64748b; 
+        }
     </style>
 </head>
 <body>
-    <header>
-        <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
-        <ul class="nav-links">
-            <li><a href="index.html">หน้าหลัก</a></li>
-            <li><a href="student.html">ห้องเรียนของฉัน</a></li>
-            <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
-            <li><a href="student_portfolio.html" class="active">ผลงานนักเรียน</a></li>
-        </ul>
-    </header>
+
+    <div class="header">
+        <h1><i class="fas fa-images"></i> ข่าวสารและผลงานนักเรียน</h1>
+        <a href="index.html" class="back-btn"><i class="fas fa-home"></i> กลับหน้าหลัก</a>
+    </div>
 
     <div class="container">
-        <h2 class="header-title"><i class="fas fa-trophy"></i> แกลเลอรีผลงานนักเรียน</h2>
-        <div id="loading" style="text-align: center; font-size: 1.2rem; color: #f59e0b;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดผลงาน...</div>
-        <div class="grid" id="portfolio-grid"></div>
+        <h2 class="section-title">อัปเดตล่าสุด</h2>
+        
+        <div id="loading" class="loader">
+            <i class="fas fa-circle-notch fa-spin"></i> กำลังดึงข้อมูลจากฐานข้อมูล...
+        </div>
+        
+        <div class="portfolio-grid" id="portfolioContainer"></div>
     </div>
 
     <script>
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
-        
-        window.onload = async () => {
+        // 🌟 1. เปลี่ยน URL ตรงนี้ให้เป็น URL ของ Google Apps Script ของครู 🌟
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+
+        async function loadPortfolios() {
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getCMS&t=" + Date.now());
-                const data = await res.json();
-                const ports = data.portfolio || [];
-                const grid = document.getElementById('portfolio-grid');
+                // ดึงข้อมูลจากฐานข้อมูล
+                const response = await fetch(`${SCRIPT_URL}?action=readAll`);
+                const data = await response.json();
                 
-                if(ports.length === 0) {
-                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#94a3b8; font-size:1.1rem;">ยังไม่มีการอัปโหลดผลงานในขณะนี้</div>';
-                } else {
-                    grid.innerHTML = ports.map(p => `
-                        <div class="port-card">
-                            <img src="${p.img || 'https://via.placeholder.com/400x250?text=No+Image'}" class="port-img" onerror="this.src='https://via.placeholder.com/400x250?text=Image+Error'">
-                            <div class="port-info">
-                                <div class="port-title">${p.title}</div>
-                                <div class="port-desc">${p.desc}</div>
+                const container = document.getElementById('portfolioContainer');
+                document.getElementById('loading').style.display = 'none';
+
+                // กรณีที่ยังไม่มีข้อมูลในระบบ
+                if (!data.portfolios || data.portfolios.length === 0) {
+                    container.innerHTML = `
+                        <div style="grid-column: 1/-1; text-align:center; padding: 50px; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
+                            <i class="fas fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                            <h3 style="color: #64748b;">ยังไม่มีข้อมูลผลงาน/กิจกรรม</h3>
+                            <p style="color: #94a3b8; font-size: 0.9rem;">รอคุณครูอัปเดตข้อมูลสักครู่นะครับ</p>
+                        </div>`;
+                    return;
+                }
+
+                // สลับข้อมูลให้รายการใหม่ล่าสุดขึ้นก่อน (.reverse()) และสร้างเป็น HTML Card
+                container.innerHTML = data.portfolios.reverse().map(item => `
+                    <div class="card" onclick="alert('อ่านรายละเอียดเพิ่มเติม: ${item.Title}')">
+                        <div class="img-container">
+                            <img src="${item.ImageLink}" alt="รูปภาพกิจกรรม" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop'">
+                        </div>
+                        <div class="card-body">
+                            <h3 class="card-title">${item.Title}</h3>
+                            <p class="card-desc">${item.Description || 'ไม่มีคำอธิบายเพิ่มเติม'}</p>
+                            <div class="card-footer">
+                                <span class="read-more">อ่านเพิ่ม <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i></span>
+                                <span class="post-date"><i class="far fa-calendar-alt"></i> ${item.Date || ''}</span>
                             </div>
                         </div>
-                    `).join('');
-                }
-                document.getElementById('loading').style.display = 'none';
-            } catch(e) {
-                document.getElementById('loading').innerHTML = '<span style="color:#ef4444;">⚠️ ไม่สามารถดึงข้อมูลได้ในขณะนี้</span>';
+                    </div>
+                `).join('');
+
+            } catch (error) {
+                console.error("Error fetching portfolios:", error);
+                document.getElementById('loading').innerHTML = `
+                    <span style='color:#ef4444;'>
+                        <i class="fas fa-exclamation-triangle"></i> ดึงข้อมูลไม่สำเร็จ โปรดลองรีเฟรชหน้าเว็บใหม่
+                    </span>`;
             }
-        };
+        }
+
+        // เริ่มโหลดข้อมูลทันทีที่เปิดหน้าเว็บ
+        window.onload = loadPortfolios;
     </script>
+
 </body>
 </html>
