@@ -8,7 +8,6 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
-        /* สไตล์พื้นฐาน คงเดิม */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
         
@@ -25,6 +24,10 @@
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        
+        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .theme-particle { position: absolute; top: -10vh; pointer-events: none; animation: fallDown linear forwards; z-index: 1; }
+        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } }
         
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
         header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px;}
@@ -108,6 +111,8 @@
     </style>
 </head>
 <body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
+    <div id="particleContainer"></div>
 
     <div class="content-layer">
         <header>
@@ -227,6 +232,13 @@
         // 🌟 1. ใส่ URL Google Apps Script ของครูตรงนี้ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
 
+        // --- ฟังก์ชันอัจฉริยะ ป้องกันปัญหาพิมพ์เล็ก-ใหญ่ ใน Google Sheets ---
+        function getVal(obj, key) {
+            if (!obj) return undefined;
+            const realKey = Object.keys(obj).find(k => k.toLowerCase() === key.toLowerCase());
+            return realKey ? obj[realKey] : undefined;
+        }
+
         // --- ระบบ Theme ---
         function applyTheme(themeKey) {
             document.body.setAttribute("data-theme", themeKey);
@@ -267,7 +279,6 @@
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
-        // --- 🌟 ดึงข้อมูลสด 100% จาก Google Sheets (หัวใจสำคัญ) 🌟 ---
         let db = { activities: [], students: [], submissions: [] };
         
         async function fetchRealtimeData() {
@@ -281,38 +292,35 @@
             container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
             
             try {
-                // 1. ดึงฐานข้อมูลใหม่ทุกครั้ง ไม่พึ่งของเก่าในเครื่อง
+                // ดึงฐานข้อมูลใหม่ทุกครั้ง
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
                 db = await res.json();
                 
-                // 2. ส่ง PING เวลาเข้าใช้งาน
-                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "updateTimestamp", type: "last_login", email: email }) });
+                // ส่ง PING เวลาเข้าใช้งาน
+                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateTimestamp", type: "last_login", email: email }) });
 
-                // 3. ปรับปรุง UI ให้ตรงกับฐานข้อมูล
                 renderDashboard(email);
                 
                 if(btnSync) btnSync.innerHTML = '<i class="fas fa-check"></i> อัปเดตแล้ว';
                 document.getElementById('status-msg').style.display = 'none';
 
             } catch(e) { 
-                console.error("Fetch Error:", e);
                 container.innerHTML = '<div style="text-align:center; color:#ef4444;">เชื่อมต่อฐานข้อมูลล้มเหลว โปรดลองอัปเดตอีกครั้ง</div>';
                 if(btnSync) btnSync.innerHTML = '<i class="fas fa-sync-alt"></i> ลองใหม่';
             }
         }
 
-        // --- 🌟 นำข้อมูลจริงมาแสดงที่หน้าจอ 🌟 ---
         function renderDashboard(email) {
-            // 1. หาประวัตินักเรียนจาก DB
-            const myData = db.students.find(s => s.email === email) || {};
-            const studentId = myData.student_id || '-';
-            const room = myData.room || '-';
-            const number = myData.number || '-';
-            const name = myData.name || localStorage.getItem('student_name') || 'นักเรียน';
+            // ดึงประวัตินักเรียนโดยใช้ getVal เพื่อแก้ปัญหาตัวเล็กตัวใหญ่
+            const myData = db.students.find(s => getVal(s, 'email') === email) || {};
+            
+            const studentId = getVal(myData, 'student_id') || '-';
+            const room = getVal(myData, 'room') || '-';
+            const number = getVal(myData, 'number') || '-';
+            const name = getVal(myData, 'name') || localStorage.getItem('student_name') || 'นักเรียน';
+            const editDate = getVal(myData, 'last_update') || '-';
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
-            const editDate = myData.last_update || '-';
 
-            // วางข้อมูลประวัติลงหน้าจอ
             document.getElementById('profile-name').innerText = name;
             document.getElementById('profile-email').innerText = email;
             document.getElementById('profile-pic-img').src = pic;
@@ -327,7 +335,6 @@
             document.getElementById('editProfileBtn').style.display = 'inline-block';
             document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
 
-            // 2. ถ้านักเรียนยังไม่ได้ระบุห้อง ให้แจ้งเตือนแล้วหยุด
             const container = document.getElementById('dynamic-modules-container');
             if (room === '-' || room === '') {
                 container.innerHTML = `<div class="task-card" style="justify-content:center; border-left:4px solid #f59e0b; flex-direction:column; text-align:center;">
@@ -338,9 +345,8 @@
                 return;
             }
 
-            // 3. กรองเฉพาะกิจกรรมที่สั่งมาที่ห้องนี้
             const myActivities = db.activities.filter(act => {
-                const targetRoom = act.Room || act.room || 'ทุกห้อง';
+                const targetRoom = getVal(act, 'room') || 'ทุกห้อง';
                 return targetRoom === 'ทุกห้อง' || targetRoom === room;
             });
 
@@ -349,21 +355,20 @@
                 return;
             }
 
-            // 4. วนลูปวาดกล่องกิจกรรม และเช็คสถานะการส่งงาน *สดๆ จากชีต Submissions*
             container.innerHTML = '';
             let totalMaxPoints = 0, totalEarned = 0, submittedCount = 0;
-            let gradableCount = myActivities.filter(a => (a.Type || a.type) !== 'content').length;
+            let gradableCount = myActivities.filter(a => getVal(a, 'type') !== 'content').length;
             let missingTasks = [];
 
             myActivities.forEach(act => {
-                const actId = act.ID || act.id;
-                const actType = act.Type || act.type;
-                const actTitle = act.Title || act.title;
-                const actPoints = parseInt(act.Points || act.points || 0);
-                const actStatusStr = act.Status || act.status; // open/closed
+                const actId = getVal(act, 'id');
+                const actType = getVal(act, 'type');
+                const actTitle = getVal(act, 'title');
+                const actPoints = parseInt(getVal(act, 'points') || 0);
+                const actStatusStr = getVal(act, 'status'); 
                 
-                // 🌟 หัวใจสำคัญ: ตรวจการส่งงานจากฐานข้อมูล (ไม่ง้อของในเครื่อง) 🌟
-                const submission = db.submissions.find(sub => sub.student_id == studentId && sub.activity_id == actId);
+                // ค้นหาว่าเด็กคนนี้ส่งงานรหัสนี้หรือยัง
+                const submission = db.submissions.find(sub => getVal(sub, 'student_id') == studentId && getVal(sub, 'activity_id') == actId);
                 
                 let isContent = (actType === 'content');
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'งาน';
@@ -372,7 +377,7 @@
 
                 let badgeHtml = '', btnHtml = '', scoreHtml = '';
                 let isClosed = (actStatusStr === 'closed');
-                let linkPath = act.Link || act.link || '#';
+                let linkPath = getVal(act, 'link') || '#';
                 if(linkPath !== '#') linkPath += `?actid=${actId}`;
 
                 const btnLocked = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดระบบ</button>`;
@@ -383,23 +388,20 @@
                 } else {
                     totalMaxPoints += actPoints;
                     
-                    // วิเคราะห์สถานะจากชีต Submissions
                     if (submission) {
                         submittedCount++;
-                        // ถ้าครูให้คะแนนแล้ว (มีตัวเลข)
-                        if (submission.score !== undefined && submission.score !== "") {
-                            totalEarned += parseInt(submission.score);
+                        let subScore = getVal(submission, 'score');
+                        if (subScore !== undefined && subScore !== "") {
+                            totalEarned += parseInt(subScore);
                             badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
-                            scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">คะแนน: ${submission.score} / ${actPoints}</div>`;
+                            scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">คะแนน: ${subScore} / ${actPoints}</div>`;
                             btnHtml = `<button class="btn-action btn-locked" disabled>ให้คะแนนแล้ว</button>`;
                         } else {
-                            // ถ้าส่งแล้ว แต่ครูยังไม่ตรวจ
                             badgeHtml = `<span class="badge submitted">✅ รอตรวจ</span>`;
-                            scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">รอการให้คะแนน (เต็ม ${actPoints})</div>`;
+                            scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${actPoints})</div>`;
                             btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:#f59e0b;"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
                         }
                     } else {
-                        // ถ้าไม่เจอข้อมูลการส่งงาน
                         missingTasks.push(actTitle);
                         badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
                         scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${actPoints}</div>`;
@@ -407,18 +409,22 @@
                     }
                 }
 
+                let deadlineDate = getVal(act, 'date') || '-';
+                let deadlineTime = getVal(act, 'time') || '-';
+                if(String(deadlineDate).includes('T')) deadlineDate = String(deadlineDate).split('T')[0];
+                if(String(deadlineTime).includes('T')) deadlineTime = String(deadlineTime).split('T')[1].substring(0,5);
+
                 container.innerHTML += `
                     <div class="task-card" style="border-left: 5px solid ${isClosed ? '#ef4444' : tColor};">
                         <div class="task-info">
                             <h4 style="color:${isClosed ? '#ef4444' : tColor};">${tIcon} ${actTitle}</h4>
-                            <p style="font-size:0.85rem; opacity:0.8;">${act.Description || act.desc || ''}</p>
-                            <small style="color:${tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.Date || act.date || '-'} | ${act.Time || act.time || '-'}</small>
+                            <p style="font-size:0.85rem; opacity:0.8;">${getVal(act, 'desc') || getVal(act, 'description') || ''}</p>
+                            <small style="color:${tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${deadlineDate} | ${deadlineTime}</small>
                         </div>
                         <div class="task-meta">${badgeHtml}${scoreHtml}<div style="margin-top:8px;">${btnHtml}</div></div>
                     </div>`;
             });
 
-            // 5. อัปเดตสถิติทั้งหมดบนหน้าจอ
             let progressPercent = gradableCount > 0 ? Math.round((submittedCount / gradableCount) * 100) : 0;
             document.getElementById('total-score').innerHTML = `${totalEarned} <span style="font-size: 1rem;">/ ${totalMaxPoints}</span>`;
             document.getElementById('progress-fill').style.width = progressPercent + '%';
@@ -433,16 +439,15 @@
             }
         }
 
-        // --- 🌟 ฟังก์ชันจัดการแก้ไขประวัติ 🌟 ---
         function openEditProfileModal() {
             const email = localStorage.getItem('student_email');
-            const myData = db.students.find(s => s.email === email) || {};
+            const myData = db.students.find(s => getVal(s, 'email') === email) || {};
             
-            document.getElementById('edit-studentid').value = myData.student_id || '';
-            document.getElementById('edit-name').value = myData.name || localStorage.getItem('student_name') || "";
-            document.getElementById('edit-number').value = myData.number || '';
+            document.getElementById('edit-studentid').value = getVal(myData, 'student_id') || '';
+            document.getElementById('edit-name').value = getVal(myData, 'name') || localStorage.getItem('student_name') || "";
+            document.getElementById('edit-number').value = getVal(myData, 'number') || '';
             
-            const storedRoom = myData.room || 'ม.4/1';
+            const storedRoom = getVal(myData, 'room') || 'ม.4/1';
             if(storedRoom.includes('/')) {
                 const parts = storedRoom.split('/');
                 document.getElementById('edit-grade').value = parts[0];
@@ -467,17 +472,15 @@
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
+                mode: 'no-cors', // 🌟 ป้องกัน CORS Block
                 body: JSON.stringify({ action: "updateProfile", email: email, student_id: studentId, name: name, room: room, number: number })
             }).then(() => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
                 setTimeout(() => {
                     closeEditProfileModal(); 
                     document.getElementById('saving-status').style.display = 'none';
-                    fetchRealtimeData(); // รีเฟรชดึงข้อมูลใหม่ทันทีหลังแก้เสร็จ
+                    fetchRealtimeData(); 
                 }, 1000);
-            }).catch(e => {
-                alert("⚠️ ข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
-                document.getElementById('saving-status').style.display = 'none';
             });
         }
 
