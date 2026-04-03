@@ -2,7 +2,7 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>Lab: Python + หุ่นยนต์ | PROT Smart Workspace</title>
     
     <script src="https://accounts.google.com/gsi/client" async defer></script>
@@ -15,12 +15,13 @@
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s, color 0.3s;}
-        body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column;}
+        body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; height: 100vh; display: flex; flex-direction: column; cursor: default;}
         
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
@@ -33,9 +34,9 @@
         
         .content-layer { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; }
         
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 20px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
-        .logo { font-size: 1.2rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
+        header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
         body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
         
         .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 4px 12px 4px 8px; border-radius: 50px; }
@@ -43,52 +44,76 @@
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3b82f6; }
         .user-name { font-size: 0.85rem; font-weight: 500; color: inherit; }
 
-        :root { --panel-bg: rgba(30, 41, 59, 0.6); --border-ws: rgba(255,255,255,0.1); --editor-bg: rgba(15, 23, 42, 0.8); --output-bg: rgba(0, 0, 0, 0.5); --accent: #3b82f6; }
-        body[data-theme="snow"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(0,0,0,0.1); --editor-bg: #ffffff; --output-bg: #f8fafc; --accent: #ff6b6b; }
-        body[data-theme="forest"] { --panel-bg: rgba(30, 60, 30, 0.6); --accent: #10b981; --editor-bg: rgba(10, 30, 10, 0.8); }
-        body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(255,105,180,0.3); --editor-bg: #fff0f5; --output-bg: #ffffff; --accent: #ec4899; }
+        :root { --panel-bg: rgba(255,255,255,0.05); --border-ws: rgba(255,255,255,0.1); --editor-bg: rgba(15, 23, 42, 0.6); --output-bg: rgba(0, 0, 0, 0.5); --accent: #3b82f6; }
+        body[data-theme="snow"] { --panel-bg: rgba(255, 255, 255, 0.8); --border-ws: rgba(0,0,0,0.1); --editor-bg: #ffffff; --output-bg: #f8fafc; --accent: #ff6b6b; }
+        body[data-theme="forest"] { --panel-bg: rgba(255,255,255,0.05); --accent: #10b981; --editor-bg: rgba(10, 30, 10, 0.6); }
+        body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.8); --border-ws: rgba(255,105,180,0.3); --editor-bg: #fff0f5; --output-bg: #ffffff; --accent: #ec4899; }
 
-        .workspace-wrapper { display: flex; flex: 1; padding: 10px; gap: 10px; overflow: hidden; flex-direction: column; }
+        .workspace-wrapper { display: flex; flex: 1; padding: 15px; gap: 15px; overflow: hidden; flex-direction: column; transition: 0.3s; max-width: 1600px; margin: 0 auto; width: 100%;}
         @media (min-width: 900px) { .workspace-wrapper { flex-direction: row; } }
         
-        .control-panel { background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 15px; padding: 15px; border: 1px solid var(--border-ws); display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap;}
+        .control-panel { background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.15);}
+        body[data-theme="snow"] .control-panel, body[data-theme="love"] .control-panel { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         .task-info { flex: 1; min-width: 250px; }
-        .task-title { color: var(--accent); font-weight: 700; font-size: 1rem; margin-bottom: 5px; }
-        .task-desc { font-size: 0.85rem; opacity: 0.8; }
+        .task-title { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 5px; }
+        .task-desc { font-size: 0.9rem; opacity: 0.8; }
         
-        .submit-zone { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: rgba(16, 185, 129, 0.1); padding: 10px; border-radius: 12px; border: 1px solid #10b981; }
-        .submit-zone input { padding: 8px 12px; border-radius: 8px; border: 1px solid var(--border-ws); background: var(--editor-bg); color: inherit; font-family: 'Prompt'; font-size: 0.85rem; min-width: 200px;}
+        .submit-zone { display: flex; gap: 10px; align-items: center; flex-wrap: wrap; background: rgba(16, 185, 129, 0.1); padding: 12px; border-radius: 15px; border: 1px solid #10b981; }
+        .submit-zone input { padding: 10px 15px; border-radius: 10px; border: 1px solid var(--border-ws); background: var(--editor-bg); color: inherit; font-family: 'Prompt'; font-size: 0.85rem; min-width: 220px;}
         body[data-theme="snow"] .submit-zone input, body[data-theme="love"] .submit-zone input { border-color: #cbd5e1; }
-        .btn-submit { background: #10b981; color: white; border: none; padding: 8px 20px; border-radius: 8px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .submit-zone input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+        .btn-submit { background: #10b981; color: white; border: none; padding: 10px 20px; border-radius: 10px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; transition: 0.2s;}
         .btn-submit:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
         .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; border-color: #94a3b8; }
 
-        .split-container { display: flex; flex: 1; gap: 10px; overflow: hidden; flex-direction: column;}
+        .split-container { display: flex; flex: 1; gap: 15px; overflow: hidden; flex-direction: column;}
         @media (min-width: 900px) { .split-container { flex-direction: row; } }
 
-        .editor-section { flex: 1; display: flex; flex-direction: column; gap: 10px; background: var(--panel-bg); border-radius: 15px; padding: 15px; border: 1px solid var(--border-ws); }
+        .editor-section { flex: 1; display: flex; flex-direction: column; gap: 10px; background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); box-shadow: 0 10px 30px rgba(0,0,0,0.15);}
+        body[data-theme="snow"] .editor-section, body[data-theme="love"] .editor-section { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
         .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
-        .btn-run { background: var(--accent); color: white; border: none; padding: 6px 15px; border-radius: 20px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: 0.2s;}
-        .btn-run:hover { filter: brightness(1.1); transform: translateY(-2px); }
+        .btn-run { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: 0.2s;}
+        .btn-run:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.3); }
         
-        .editor-area { flex: 1; background: var(--editor-bg); color: inherit; font-family: 'JetBrains Mono', monospace; padding: 15px; border-radius: 10px; border: 1px solid var(--border-ws); resize: none; font-size: 14px; }
+        .editor-area { flex: 1; background: var(--editor-bg); color: inherit; font-family: 'JetBrains Mono', monospace; padding: 15px; border-radius: 12px; border: 1px solid var(--border-ws); resize: none; font-size: 15px; line-height: 1.5;}
         body[data-theme="snow"] .editor-area, body[data-theme="love"] .editor-area { border-color: #cbd5e1; }
+        .editor-area:focus { outline: none; border-color: var(--accent); }
         
-        .output-box { background: var(--output-bg); color: #86efac; padding: 10px; height: 120px; border-radius: 10px; font-family: monospace; border: 1px solid var(--border-ws); overflow-y: auto; font-size: 0.85rem;}
+        .output-box { background: var(--output-bg); color: #86efac; padding: 15px; height: 130px; border-radius: 12px; font-family: monospace; border: 1px solid var(--border-ws); overflow-y: auto; font-size: 0.9rem;}
         body[data-theme="snow"] .output-box, body[data-theme="love"] .output-box { color: #15803d; }
         
-        .wokwi-section { flex: 1; background: var(--panel-bg); border-radius: 15px; border: 1px solid var(--border-ws); overflow: hidden; display: flex; flex-direction: column;}
+        .wokwi-section { flex: 1; background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--border-ws); overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
+        body[data-theme="snow"] .wokwi-section, body[data-theme="love"] .wokwi-section { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
         .wokwi-section iframe { flex: 1; width: 100%; border: none; background: white; }
+
+        /* 🎯 โหมดโฟกัส 🎯 */
+        body.focus-mode header { display: none !important; }
+        body.focus-mode .workspace-wrapper { padding: 10px; max-width: 100%; height: 100vh; }
+        
+        #exit-focus-btn { display: none; position: fixed; top: 15px; right: 15px; z-index: 10000; background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transition: 0.3s; align-items: center; gap: 8px; }
+        #exit-focus-btn:hover { background: #dc2626; transform: scale(1.05); }
+        body.focus-mode #exit-focus-btn { display: flex; }
+
+        @media (max-width: 768px) {
+            .workspace-wrapper { overflow-y: auto; }
+            .editor-section { min-height: 50vh; }
+            .wokwi-section { min-height: 60vh; }
+        }
     </style>
 </head>
 <body data-theme="default">
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
     
+    <button id="exit-focus-btn" onclick="toggleFocusMode()"><i class="fas fa-compress-arrows-alt"></i> ย่อเมนูคืน</button>
+
     <div class="content-layer">
         <header>
             <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
-            <div class="user-info" id="loginArea">
-                <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <a href="student.html" style="color: inherit; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;"><i class="fas fa-arrow-left"></i> กลับห้องเรียน</a>
+                <div class="user-info" id="loginArea"><i class="fas fa-spinner fa-spin"></i></div>
             </div>
         </header>
 
@@ -103,17 +128,18 @@
                 <div class="submit-zone" id="submit-zone">
                     <i class="fas fa-link" style="color: #10b981;"></i>
                     <input type="text" id="wokwi-link" placeholder="วางลิงก์ Wokwi ที่นี่...">
-                    <button class="btn-submit" id="submitBtnLab" onclick="submitWork()">
-                        <i class="fas fa-paper-plane"></i> ส่งโค้ดและลิงก์
-                    </button>
+                    <button class="btn-submit" id="submitBtnLab" onclick="submitWork()"><i class="fas fa-paper-plane"></i> ส่งโค้ดและลิงก์</button>
                 </div>
             </div>
 
             <div class="split-container">
                 <div class="editor-section">
                     <div class="editor-header">
-                        <strong style="color: var(--accent);"><i class="fab fa-python"></i> Python Editor</strong>
-                        <button class="btn-run" onclick="runPython()"><i class="fas fa-play"></i> รันโค้ด</button>
+                        <strong style="color: var(--accent); font-size: 1.1rem;"><i class="fab fa-python"></i> Python Editor</strong>
+                        <div style="display: flex; gap: 10px;">
+                            <button class="btn-run" onclick="runPython()"><i class="fas fa-play"></i> รันโค้ด</button>
+                            <button onclick="toggleFocusMode()" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 6px 15px; border-radius: 20px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; display: flex; align-items: center; gap: 8px; font-size: 0.85rem;"><i class="fas fa-expand-arrows-alt"></i> เต็มจอ</button>
+                        </div>
                     </div>
                     <textarea id="python-code" class="editor-area"># พิมพ์โค้ด Python ของคุณที่นี่
 print("Hello, Python & Robotics!")
@@ -129,7 +155,6 @@ print("Hello, Python & Robotics!")
     </div>
 
     <script>
-        // 🌟 1. ใส่ลิงก์ Google Script ที่นี่ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         function getVal(obj, ...keys) {
@@ -145,23 +170,15 @@ print("Hello, Python & Robotics!")
 
         async function loadUserData() {
             const email = localStorage.getItem('student_email');
-            if (!email) {
-                alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
-                window.location.href = "student.html"; return;
-            }
-            const name = localStorage.getItem('student_name') || "นักเรียน";
-            const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S";
-            document.getElementById('loginArea').innerHTML = `<img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span>`;
-            
-            const theme = localStorage.getItem('smart_theme') || "default";
-            document.body.setAttribute('data-theme', theme);
+            if (!email) { window.location.href = "student.html"; return; }
+            document.getElementById('loginArea').innerHTML = `<img src="${localStorage.getItem('student_pic')}" class="user-avatar"><span class="user-name">${localStorage.getItem('student_name').split(' ')[0]}</span>`;
+            document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
 
             const urlParams = new URLSearchParams(window.location.search);
             const actId = urlParams.get('actid');
             
             if(actId) {
                 try {
-                    // ดึงเวลาสากลตอนโหลดหน้า
                     let currentRealTime = new Date().getTime();
                     try {
                         const timeRes = await fetch('https://worldtimeapi.org/api/timezone/Asia/Bangkok');
@@ -178,7 +195,6 @@ print("Hello, Python & Robotics!")
                         document.getElementById('task-title').innerHTML = `<i class="fas fa-laptop-code"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
                         document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด');
 
-                        // เช็คเวลาหมดเขต
                         let rawDate = getVal(currentAct, 'date', 'วันที่');
                         let rawTime = getVal(currentAct, 'time', 'เวลา');
                         if (rawDate) {
@@ -207,9 +223,7 @@ print("Hello, Python & Robotics!")
                         document.getElementById('task-title').innerHTML = `<i class="fas fa-laptop-code"></i> ห้องปฏิบัติการรวม`;
                         document.getElementById('task-desc').innerText = `ไม่พบข้อมูลงานในระบบ กรุณากลับไปหน้าหลัก`;
                     }
-                } catch(e) {
-                    console.log("Error loading task", e);
-                }
+                } catch(e) {}
             } else {
                 document.getElementById('task-title').innerHTML = `<i class="fas fa-laptop-code"></i> ห้องปฏิบัติการรวม (โหมดอิสระ)`;
                 document.getElementById('task-desc').innerText = `เขียนโค้ดและต่อวงจรได้อย่างอิสระ (ไม่มีการส่งงาน)`;
@@ -217,7 +231,6 @@ print("Hello, Python & Robotics!")
             }
         }
 
-        // ระบบรัน Python
         let outputContent = "";
         function outf(text) {
             outputContent += text;
@@ -233,18 +246,21 @@ print("Hello, Python & Robotics!")
             outputDiv.innerHTML = ""; outputContent = "";
             Sk.pre = "output";
             Sk.configure({ output: outf, read: builtinRead });
-            const myPromise = Sk.misceval.asyncToPromise(function() {
-                return Sk.importMainWithBody("<stdin>", false, code, true);
-            });
-            myPromise.then(() => { if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ"; }, 
-                (err) => { outputDiv.innerHTML = `<span style="color: #ef4444;">❌ ข้อผิดพลาด: ${err.toString()}</span>`; }
-            );
+            const myPromise = Sk.misceval.asyncToPromise(function() { return Sk.importMainWithBody("<stdin>", false, code, true); });
+            myPromise.then(() => { if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ"; }, (err) => { outputDiv.innerHTML = `<span style="color: #ef4444;">❌ ข้อผิดพลาด: ${err.toString()}</span>`; });
         }
 
-        // 🌟 ระบบส่งงานและเช็คเวลาซ้ำซ้อน (Double Check) 🌟
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+            if (document.body.classList.contains('focus-mode')) {
+                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+            }
+        }
+
         async function submitWork() {
             if(isPastDeadlineGlobal) return alert("หมดเวลาส่งงานแล้วครับ ไม่สามารถส่งได้");
-
             const code = document.getElementById('python-code').value.trim();
             const link = document.getElementById('wokwi-link').value.trim();
             
@@ -257,66 +273,24 @@ print("Hello, Python & Robotics!")
             const email = localStorage.getItem('student_email');
             const studentId = localStorage.getItem(email + '_studentid');
 
-            if (!actId) {
-                alert("❌ ไม่พบรหัสกิจกรรม! กรุณากลับไปเข้าผ่านหน้า 'ห้องเรียนของฉัน'");
-                window.location.href = "student.html"; return;
-            }
-            if (!studentId || studentId === '-' || studentId === '') {
-                alert("❌ ไม่พบรหัสประจำตัวนักเรียน!\nกรุณากลับไปแก้ไขข้อมูลส่วนตัวก่อนครับ");
-                window.location.href = "student.html"; return;
-            }
+            if (!actId) { alert("❌ ไม่พบรหัสกิจกรรม!"); window.location.href = "student.html"; return; }
+            if (!studentId || studentId === '-' || studentId === '') { alert("❌ ไม่พบรหัสประจำตัวนักเรียน!\nกรุณากลับไปแก้ไขข้อมูลส่วนตัวก่อนครับ"); window.location.href = "student.html"; return; }
 
             const btn = document.getElementById('submitBtnLab');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบเวลาและส่งงาน...'; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...'; 
             btn.disabled = true;
 
-            // 🌟 เช็คเวลาสากลวินาทีที่กดส่ง (ป้องกันการเปิดหน้าทิ้งไว้) 🌟
-            try {
-                const timeRes = await fetch('https://worldtimeapi.org/api/timezone/Asia/Bangkok');
-                const timeData = await timeRes.json();
-                const nowCheck = new Date(timeData.datetime).getTime();
-                
-                const cacheBuster = new Date().getTime();
-                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + cacheBuster);
-                const db = await res.json();
-                const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน', 'ID') == actId);
-                
-                if (currentAct && getVal(currentAct, 'date', 'วันที่')) {
-                    let rawDate = getVal(currentAct, 'date', 'วันที่');
-                    let rawTime = getVal(currentAct, 'time', 'เวลา') || '23:59';
-                    if (String(rawDate).includes('T')) rawDate = String(rawDate).split('T')[0];
-                    if (String(rawTime).includes('T')) rawTime = String(rawTime).split('T')[1].substring(0,5);
-                    if (rawTime.split(':').length === 2) rawTime += ':00';
-                    
-                    if (nowCheck > new Date(`${rawDate}T${rawTime}`).getTime()) {
-                        alert("หมดเวลาส่งงานพอดีครับ ระบบไม่สามารถบันทึกข้อมูลได้");
-                        window.location.href = "student.html";
-                        return;
-                    }
-                }
-            } catch(e) {} // ถ้า API เช็คเวลาล่ม ก็อนุโลมให้ผ่านไปเซฟข้อมูล
-
-            // มัดรวมข้อความ
             const finalWorkContent = `💻 โค้ด Python:\n${code}\n\n📌 ลิงก์ Wokwi:\n${link}`;
 
             try {
                 await fetch(GOOGLE_SCRIPT_URL, { 
-                    method: 'POST', 
-                    mode: 'no-cors', 
-                    body: JSON.stringify({ 
-                        action: "submitWork",
-                        student_id: studentId,
-                        activity_id: actId,
-                        work_content: finalWorkContent
-                    }) 
+                    method: 'POST', mode: 'no-cors', 
+                    body: JSON.stringify({ action: "submitWork", student_id: studentId, activity_id: actId, work_content: finalWorkContent }) 
                 });
-                
-                alert('✅ ส่งงานสำเร็จ! ระบบจะพากลับไปหน้าห้องเรียน'); 
-                window.location.href = 'student.html'; 
+                alert('✅ ส่งงานสำเร็จ!'); window.location.href = 'student.html'; 
             } catch(e) {
                 alert('❌ ขัดข้องในการเชื่อมต่อ กรุณาลองใหม่'); 
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> ส่งโค้ดและลิงก์'; 
-                btn.disabled = false;
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> ส่งโค้ดและลิงก์'; btn.disabled = false;
             }
         }
         
