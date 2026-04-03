@@ -83,8 +83,8 @@
 
         <div class="workspace-wrapper">
             <div class="sidebar">
-                <div class="task-title" id="task-title"><i class="fab fa-python"></i> ห้องปฏิบัติการ Python</div>
-                <div class="task-desc" id="task-desc">เขียนโค้ดและทดสอบผลลัพธ์ เมื่อทำงานเสร็จแล้วให้กดปุ่มยืนยันด้านล่าง</div>
+                <div class="task-title" id="task-title"><i class="fab fa-python"></i> กำลังโหลดข้อมูลงาน...</div>
+                <div class="task-desc" id="task-desc">กรุณารอสักครู่ ระบบกำลังเชื่อมต่อฐานข้อมูล</div>
                 
                 <div class="upload-section">
                     <p style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-info-circle"></i> ระบบจะดึงโค้ดที่คุณเขียนไปส่งให้อัตโนมัติ</p>
@@ -108,7 +108,17 @@ print("Hello, PROT Smart Workspace!")
         // 🌟 ใส่ลิงก์ Google Script ที่นี่ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
-        function loadUserData() {
+        // ตัวช่วยเรื่องการพิมพ์เล็ก-ใหญ่ ของ Header Sheet
+        function getVal(obj, ...keys) {
+            if (!obj) return undefined;
+            for (let key of keys) {
+                const realKey = Object.keys(obj).find(k => String(k).trim().toLowerCase() === String(key).trim().toLowerCase());
+                if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) return obj[realKey];
+            }
+            return undefined;
+        }
+
+        async function loadUserData() {
             const email = localStorage.getItem('student_email');
             if (!email) {
                 alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
@@ -121,13 +131,31 @@ print("Hello, PROT Smart Workspace!")
             const theme = localStorage.getItem('smart_theme') || "default";
             document.body.setAttribute('data-theme', theme);
 
+            // ดึงข้อมูลชื่อกิจกรรมสดๆ จากฐานข้อมูล
             const urlParams = new URLSearchParams(window.location.search);
             const actId = urlParams.get('actid');
-            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const currentAct = acts.find(a => String(a.id) === String(actId));
-            if(currentAct) {
-                document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ${currentAct.title}`;
-                document.getElementById('task-desc').innerText = currentAct.desc;
+            
+            if(actId) {
+                try {
+                    const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
+                    const db = await res.json();
+                    const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน') == actId);
+                    
+                    if(currentAct) {
+                        document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
+                        document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด');
+                    } else {
+                        document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ห้องปฏิบัติการ Python`;
+                        document.getElementById('task-desc').innerText = `เขียนโค้ดและทดสอบผลลัพธ์ เมื่อทำงานเสร็จแล้วให้กดปุ่มยืนยัน`;
+                    }
+                } catch(e) {
+                    document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ห้องปฏิบัติการ Python`;
+                    document.getElementById('task-desc').innerText = `เขียนโค้ดและทดสอบผลลัพธ์ เมื่อทำงานเสร็จแล้วให้กดปุ่มยืนยัน`;
+                }
+            } else {
+                document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ห้องปฏิบัติการ Python (โหมดอิสระ)`;
+                document.getElementById('task-desc').innerText = `เขียนโค้ดฝึกซ้อมได้อย่างอิสระ (ไม่มีการส่งงาน)`;
+                document.getElementById('submitBtnLab').style.display = 'none';
             }
         }
 
@@ -150,29 +178,57 @@ print("Hello, PROT Smart Workspace!")
             const myPromise = Sk.misceval.asyncToPromise(function() {
                 return Sk.importMainWithBody("<stdin>", false, code, true);
             });
-            myPromise.then(() => { if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ"; }, 
-                (err) => { outputDiv.innerHTML = `<span style="color: #ef4444;">❌ ${err.toString()}</span>`; }
+            myPromise.then(() => { if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ (ไม่มี Output แสดงผล)"; }, 
+                (err) => { outputDiv.innerHTML = `<span style="color: #ef4444;">❌ ข้อผิดพลาด: ${err.toString()}</span>`; }
             );
         }
 
-        // ระบบส่งงาน
+        // 🌟 ระบบส่งงานแบบใหม่ (เชื่อมโยงฐานข้อมูลตรง 100%) 🌟
         async function submitWork() {
             const code = document.getElementById('python-code').value.trim();
             if (code === "" || code.includes("พิมพ์โค้ด Python ของคุณที่นี่")) return alert("กรุณาเขียนโค้ดก่อนส่งครับ!");
             if(!confirm("ยืนยันการส่งโค้ดนี้ใช่หรือไม่?")) return;
 
-            const actId = new URLSearchParams(window.location.search).get('actid'); 
+            const urlParams = new URLSearchParams(window.location.search);
+            const actId = urlParams.get('actid'); 
             const email = localStorage.getItem('student_email');
-            const btn = document.getElementById('submitBtnLab');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...'; btn.disabled = true;
+            const studentId = localStorage.getItem(email + '_studentid');
 
-            let worksObj = {}; worksObj[actId] = "💻 โค้ด Python:\n" + code;
+            if (!actId) {
+                alert("❌ ไม่พบรหัสกิจกรรม! กรุณากลับไปเข้าผ่านหน้า 'ห้องเรียนของฉัน'");
+                window.location.href = "student.html";
+                return;
+            }
+            if (!studentId || studentId === '-' || studentId === '') {
+                alert("❌ ไม่พบรหัสประจำตัวนักเรียน!\\nกรุณากลับไปหน้า 'ห้องเรียนของฉัน' แล้วกด 'แก้ไขข้อมูลส่วนตัว' ก่อนส่งงานครับ");
+                window.location.href = "student.html";
+                return;
+            }
+
+            const btn = document.getElementById('submitBtnLab');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...'; 
+            btn.disabled = true;
+
+            const finalWorkContent = "💻 โค้ด Python:\n" + code;
+
             try {
-                await fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ email: email, works: worksObj }) });
-                localStorage.setItem(email + '_act_' + actId + '_status', 'submitted');
-                alert('✅ ส่งงานสำเร็จ!'); window.location.href = 'student.html'; 
+                await fetch(GOOGLE_SCRIPT_URL, { 
+                    method: 'POST', 
+                    mode: 'no-cors', 
+                    body: JSON.stringify({ 
+                        action: "submitWork",
+                        student_id: studentId,
+                        activity_id: actId,
+                        work_content: finalWorkContent
+                    }) 
+                });
+                
+                alert('✅ ส่งงานสำเร็จ! ระบบจะพากลับไปหน้าห้องเรียน'); 
+                window.location.href = 'student.html'; 
             } catch(e) {
-                alert('❌ ขัดข้อง กรุณาลองใหม่'); btn.innerHTML = '<i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน'; btn.disabled = false;
+                alert('❌ ขัดข้องในการเชื่อมต่อ กรุณาลองใหม่'); 
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน'; 
+                btn.disabled = false;
             }
         }
         window.onload = loadUserData;
