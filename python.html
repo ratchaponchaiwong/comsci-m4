@@ -58,8 +58,9 @@
         .task-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; }
         
         .upload-section { background: rgba(16, 185, 129, 0.1); border-radius: 16px; padding: 15px; border: 1px solid #10b981; margin-top: auto; }
-        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; margin-top: 10px; }
-        .btn-submit:hover:not(:disabled) { background: #059669; }
+        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; margin-top: 10px; transition: 0.2s;}
+        .btn-submit:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; border-color: #94a3b8; }
         
         .main-panel { flex: 1; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; padding: 20px; }
         .editor-area { flex: 1; background: var(--editor-bg); color: inherit; font-family: 'JetBrains Mono', monospace; padding: 15px; border-radius: 15px; border: 1px solid var(--border-ws); resize: none; font-size: 14px; margin-bottom: 15px; }
@@ -67,7 +68,8 @@
         
         .output-box { background: var(--output-bg); color: #86efac; padding: 15px; height: 150px; border-radius: 15px; font-family: monospace; border: 1px solid var(--border-ws); overflow-y: auto; }
         body[data-theme="snow"] .output-box, body[data-theme="love"] .output-box { color: #15803d; }
-        .btn-run { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; align-self: flex-start; margin-bottom: 15px; }
+        .btn-run { background: var(--accent); color: white; border: none; padding: 10px 20px; border-radius: 30px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; align-self: flex-start; margin-bottom: 15px; transition: 0.2s;}
+        .btn-run:hover { filter: brightness(1.1); transform: translateY(-2px); }
     </style>
 </head>
 <body data-theme="default">
@@ -85,6 +87,7 @@
             <div class="sidebar">
                 <div class="task-title" id="task-title"><i class="fab fa-python"></i> กำลังโหลดข้อมูลงาน...</div>
                 <div class="task-desc" id="task-desc">กรุณารอสักครู่ ระบบกำลังเชื่อมต่อฐานข้อมูล</div>
+                <div id="task-deadline" style="font-size: 0.8rem; color: #ef4444; margin-bottom: 15px; font-weight: 600;"></div>
                 
                 <div class="upload-section">
                     <p style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-info-circle"></i> ระบบจะดึงโค้ดที่คุณเขียนไปส่งให้อัตโนมัติ</p>
@@ -105,7 +108,7 @@ print("Hello, PROT Smart Workspace!")
     </div>
 
     <script>
-        // 🌟 ใส่ลิงก์ Google Script ที่นี่ 🌟
+        // 🌟 1. ใส่ลิงก์ Google Script ที่นี่ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         // ตัวช่วยเรื่องการพิมพ์เล็ก-ใหญ่ ของ Header Sheet
@@ -117,6 +120,8 @@ print("Hello, PROT Smart Workspace!")
             }
             return undefined;
         }
+
+        let isPastDeadlineGlobal = false;
 
         async function loadUserData() {
             const email = localStorage.getItem('student_email');
@@ -131,31 +136,67 @@ print("Hello, PROT Smart Workspace!")
             const theme = localStorage.getItem('smart_theme') || "default";
             document.body.setAttribute('data-theme', theme);
 
-            // ดึงข้อมูลชื่อกิจกรรมสดๆ จากฐานข้อมูล
             const urlParams = new URLSearchParams(window.location.search);
             const actId = urlParams.get('actid');
             
             if(actId) {
                 try {
-                    const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
+                    // ดึงเวลาสากล
+                    let currentRealTime = new Date().getTime();
+                    try {
+                        const timeRes = await fetch('https://worldtimeapi.org/api/timezone/Asia/Bangkok');
+                        const timeData = await timeRes.json();
+                        currentRealTime = new Date(timeData.datetime).getTime();
+                    } catch(e) {}
+
+                    // ดึงข้อมูลกิจกรรม
+                    const cacheBuster = new Date().getTime();
+                    const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + cacheBuster);
                     const db = await res.json();
-                    const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน') == actId);
+                    const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน', 'ID') == actId);
                     
                     if(currentAct) {
                         document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
                         document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด');
+
+                        // เช็คเวลาหมดเขต
+                        let rawDate = getVal(currentAct, 'date', 'วันที่');
+                        let rawTime = getVal(currentAct, 'time', 'เวลา');
+                        if (rawDate) {
+                            if (String(rawDate).includes('T')) rawDate = String(rawDate).split('T')[0];
+                            if (String(rawTime).includes('T')) rawTime = String(rawTime).split('T')[1].substring(0,5);
+                            else if (String(rawTime).length >= 5) rawTime = String(rawTime).substring(0,5);
+
+                            let timeObj = (rawTime !== '-' && rawTime) ? rawTime : '23:59';
+                            if (timeObj.split(':').length === 2) timeObj += ':00';
+                            
+                            let deadlineTime = new Date(`${rawDate}T${timeObj}`).getTime();
+                            if (currentRealTime > deadlineTime) {
+                                isPastDeadlineGlobal = true;
+                                document.getElementById('task-deadline').innerHTML = `<i class="fas fa-ban"></i> หมดเวลาส่งงานแล้ว (${rawDate} | ${rawTime})`;
+                                const btn = document.getElementById('submitBtnLab');
+                                btn.disabled = true;
+                                btn.innerHTML = '<i class="fas fa-lock"></i> หมดเวลาส่งงาน';
+                                btn.style.background = '#ef4444';
+                                btn.style.borderColor = '#ef4444';
+                            } else {
+                                document.getElementById('task-deadline').innerHTML = `<i class="far fa-clock"></i> กำหนดส่ง: ${rawDate} | ${rawTime}`;
+                                document.getElementById('task-deadline').style.color = '#10b981';
+                            }
+                        }
                     } else {
                         document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ห้องปฏิบัติการ Python`;
-                        document.getElementById('task-desc').innerText = `เขียนโค้ดและทดสอบผลลัพธ์ เมื่อทำงานเสร็จแล้วให้กดปุ่มยืนยัน`;
+                        document.getElementById('task-desc').innerText = `ไม่พบข้อมูลงานในระบบ กรุณากลับไปหน้าหลัก`;
                     }
                 } catch(e) {
                     document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ห้องปฏิบัติการ Python`;
-                    document.getElementById('task-desc').innerText = `เขียนโค้ดและทดสอบผลลัพธ์ เมื่อทำงานเสร็จแล้วให้กดปุ่มยืนยัน`;
+                    document.getElementById('task-desc').innerText = `เกิดข้อผิดพลาดในการดึงข้อมูล`;
                 }
             } else {
                 document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ห้องปฏิบัติการ Python (โหมดอิสระ)`;
                 document.getElementById('task-desc').innerText = `เขียนโค้ดฝึกซ้อมได้อย่างอิสระ (ไม่มีการส่งงาน)`;
                 document.getElementById('submitBtnLab').style.display = 'none';
+                document.querySelector('.upload-section').style.display = 'none';
             }
         }
 
@@ -185,6 +226,8 @@ print("Hello, PROT Smart Workspace!")
 
         // 🌟 ระบบส่งงานแบบใหม่ (เชื่อมโยงฐานข้อมูลตรง 100%) 🌟
         async function submitWork() {
+            if(isPastDeadlineGlobal) return alert("หมดเวลาส่งงานแล้วครับ ไม่สามารถส่งได้");
+
             const code = document.getElementById('python-code').value.trim();
             if (code === "" || code.includes("พิมพ์โค้ด Python ของคุณที่นี่")) return alert("กรุณาเขียนโค้ดก่อนส่งครับ!");
             if(!confirm("ยืนยันการส่งโค้ดนี้ใช่หรือไม่?")) return;
@@ -196,18 +239,42 @@ print("Hello, PROT Smart Workspace!")
 
             if (!actId) {
                 alert("❌ ไม่พบรหัสกิจกรรม! กรุณากลับไปเข้าผ่านหน้า 'ห้องเรียนของฉัน'");
-                window.location.href = "student.html";
-                return;
+                window.location.href = "student.html"; return;
             }
             if (!studentId || studentId === '-' || studentId === '') {
-                alert("❌ ไม่พบรหัสประจำตัวนักเรียน!\\nกรุณากลับไปหน้า 'ห้องเรียนของฉัน' แล้วกด 'แก้ไขข้อมูลส่วนตัว' ก่อนส่งงานครับ");
-                window.location.href = "student.html";
-                return;
+                alert("❌ ไม่พบรหัสประจำตัวนักเรียน!\nกรุณากลับไปหน้า 'ห้องเรียนของฉัน' แล้วกด 'แก้ไขข้อมูลส่วนตัว' ก่อนส่งงานครับ");
+                window.location.href = "student.html"; return;
             }
 
             const btn = document.getElementById('submitBtnLab');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งงาน...'; 
             btn.disabled = true;
+
+            // 🌟 เช็คเวลาสากลอีกรอบก่อนส่ง (กันเหนียว) 🌟
+            try {
+                const timeRes = await fetch('https://worldtimeapi.org/api/timezone/Asia/Bangkok');
+                const timeData = await timeRes.json();
+                const nowCheck = new Date(timeData.datetime).getTime();
+                
+                const cacheBuster = new Date().getTime();
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + cacheBuster);
+                const db = await res.json();
+                const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน', 'ID') == actId);
+                
+                if (currentAct && getVal(currentAct, 'date', 'วันที่')) {
+                    let rawDate = getVal(currentAct, 'date', 'วันที่');
+                    let rawTime = getVal(currentAct, 'time', 'เวลา') || '23:59';
+                    if (String(rawDate).includes('T')) rawDate = String(rawDate).split('T')[0];
+                    if (String(rawTime).includes('T')) rawTime = String(rawTime).split('T')[1].substring(0,5);
+                    if (rawTime.split(':').length === 2) rawTime += ':00';
+                    
+                    if (nowCheck > new Date(`${rawDate}T${rawTime}`).getTime()) {
+                        alert("หมดเวลาส่งงานพอดีครับ ไม่สามารถบันทึกข้อมูลได้");
+                        window.location.href = "student.html";
+                        return;
+                    }
+                }
+            } catch(e) {} // ถ้า API ล่มก็ปล่อยผ่านไปบันทึกเลย
 
             const finalWorkContent = "💻 โค้ด Python:\n" + code;
 
