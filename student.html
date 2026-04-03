@@ -232,12 +232,10 @@
     </div>
 
     <script>
-        // 🌟 1. ตั้งค่าลิงก์เชื่อมต่อ 🌟
+        // 🌟 ตั้งค่า URL 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
-        
-        // ⚠️ สำคัญมาก: ใส่ลิงก์ Validator (ตัวตรวจข้อสอบ) ตรงนี้ เพื่อใช้เช็คประวัติคนโกง
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
-        
+
         let userIP = "unknown";
         let isStudentBanned = false;
         let banReasonStr = "";
@@ -259,7 +257,9 @@
             const btn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
             if(btn) btn.classList.add("active");
         }
-        document.querySelectorAll(".theme-btn").forEach(btn => btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))));
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+        });
 
         // --- ระบบ Login Google ---
         function decodeJwtResponse(token) {
@@ -276,7 +276,9 @@
                 localStorage.setItem('is_logged_in', 'true');
                 closeLoginModal();
                 fetchRealtimeData(); 
-            } else { alert('ไม่อนุญาตให้อีเมลนี้เข้าสู่ระบบ'); }
+            } else {
+                alert('ไม่อนุญาตให้อีเมลนี้เข้าสู่ระบบ');
+            }
         }
         function logout() {
             if(confirm('⚠️ ต้องการออกจากระบบ?')) {
@@ -289,7 +291,7 @@
 
         let db = { activities: [], students: [], submissions: [] };
         
-        // --- 🌟 ดึงข้อมูลและเช็คสถานะโกง 🌟 ---
+        // --- 🌟 ดึงข้อมูลสด และ ตรวจการแบน 🌟 ---
         async function fetchRealtimeData() {
             const email = localStorage.getItem('student_email');
             if (!email) return;
@@ -301,10 +303,11 @@
             container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
             
             try {
+                // 1. ดึงข้อมูลนักเรียนและกิจกรรมจากชีตหลัก
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
                 db = await res.json();
                 
-                // 🛡️ ดึง IP และ เช็ค Blacklist จากเซิร์ฟเวอร์
+                // 2. ดึง IP Address
                 try {
                     const ipRes = await fetch('https://api64.ipify.org?format=json');
                     const ipData = await ipRes.json();
@@ -318,12 +321,19 @@
                 
                 const studentId = getVal(myData, 'student_id', 'รหัส', 'id') || '-';
 
-                if(studentId !== '-') {
+                // 3. ตรวจสอบสถานะการทุจริตจาก Validator Script
+                if(studentId !== '-' && studentId !== '') {
                     try {
                         const banRes = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}`);
                         const banData = await banRes.json();
                         isStudentBanned = banData.banned;
                         banReasonStr = banData.reason || "ทุจริตการสอบ";
+                        
+                        if(isStudentBanned) {
+                            localStorage.setItem('is_banned', 'true');
+                        } else {
+                            localStorage.removeItem('is_banned'); // ปลดแบนถ้าครูลบชื่อในชีตแล้ว
+                        }
                     } catch(e) { console.log("Ban check skipped"); }
                 }
 
@@ -340,7 +350,7 @@
             }
         }
 
-        // --- 🌟 วาดหน้าจอ 🌟 ---
+        // --- 🌟 วาดหน้า Dashboard 🌟 ---
         function renderDashboard(email, myData) {
             const studentId = getVal(myData, 'student_id', 'รหัส', 'id') || '-';
             const room = getVal(myData, 'room', 'ห้อง', 'ชั้น') || '-';
@@ -400,7 +410,7 @@
                 const submission = db.submissions.find(sub => getVal(sub, 'student_id', 'รหัส') == studentId && getVal(sub, 'activity_id', 'รหัสงาน') == actId);
                 
                 let isContent = (actType === 'content');
-                let isExam = (actType === 'exam' || String(linkPath).includes('quiz.html')); // 🛡️ ตรวจว่าเป็นข้อสอบไหม
+                let isExam = (actType === 'exam' || String(linkPath).includes('quiz.html')); 
                 
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'งาน';
                 if(isContent) { tColor = '#a855f7'; tIcon = '📖'; tName = 'เนื้อหา'; }
@@ -419,14 +429,14 @@
                 } else {
                     totalMaxPoints += actPoints;
                     
-                    // 🛡️ หากเป็นข้อสอบ และ พบว่านักเรียนโดนแบน 🛡️
+                    // 🛡️ หากเป็นข้อสอบ และ พบว่าโดนแบน (ดึงค่าจาก API)
                     if (isExam && isStudentBanned) {
                         missingTasks.push(actTitle);
                         badgeHtml = `<span class="badge banned">❌ ระงับสิทธิ์</span>`;
                         scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; color:#ef4444; font-weight:bold;">เหตุผล: ${banReasonStr}</div>`;
                         btnHtml = `<button class="btn-action" style="background:#ef4444; cursor:not-allowed;" onclick="alert('🚨 ยุติการสอบ: ตรวจพบพฤติกรรมการทุจริต (${banReasonStr}) กรุณาติดต่อครูผู้สอนเพื่อขอสอบใหม่ครับ')">❌ หมดสิทธิ์สอบ</button>`;
                     }
-                    // ถ้าส่งงานแล้ว
+                    // ถ้าทำไปแล้ว ส่งงานแล้ว
                     else if (submission) {
                         submittedCount++;
                         let subScore = getVal(submission, 'score', 'คะแนน');
@@ -434,14 +444,15 @@
                             totalEarned += parseInt(subScore);
                             badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
                             scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">คะแนน: ${subScore} / ${actPoints}</div>`;
-                            btnHtml = `<button class="btn-action btn-locked" disabled>ให้คะแนนแล้ว</button>`;
+                            // 🌟 ปุ่มสีเขียวสำหรับงานที่ทำแล้ว 🌟
+                            btnHtml = `<button class="btn-action btn-locked" style="background:#10b981; cursor:not-allowed; opacity: 0.9;" disabled><i class="fas fa-check"></i> ส่งแล้ว</button>`;
                         } else {
                             badgeHtml = `<span class="badge submitted">✅ รอตรวจ</span>`;
                             scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${actPoints})</div>`;
                             btnHtml = isClosed ? btnLocked : (targetUrl !== '#' ? `<a href="${targetUrl}" class="btn-action" style="background:#f59e0b;"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
                         }
                     } 
-                    // ถ้ายังไม่ส่ง
+                    // ถ้ายังไม่ทำและยังไม่หมดเวลา
                     else {
                         missingTasks.push(actTitle);
                         badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
