@@ -72,7 +72,6 @@
         body[data-theme="snow"] .student-details div, body[data-theme="love"] .student-details div { border-bottom-color: rgba(0,0,0,0.1); }
         .student-details div:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0;}
         
-        /* 🌟 สไตล์กล่องแจ้งเตือนข้อมูลใหม่ 🌟 */
         .tracking-box { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 0.85rem; text-align: left; border: 1px solid rgba(59, 130, 246, 0.3); }
         body[data-theme="snow"] .tracking-box, body[data-theme="love"] .tracking-box { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); }
         .tracking-box div { margin-bottom: 6px; }
@@ -209,7 +208,7 @@
 
                     <div id="dynamic-modules-container">
                         <div style="text-align: center; padding: 20px; opacity: 0.6;">
-                            <i class="fas fa-spinner fa-spin"></i> กำลังโหลดบทเรียน...
+                            <i class="fas fa-spinner fa-spin"></i> กรุณาเข้าสู่ระบบ...
                         </div>
                     </div>
                     
@@ -226,7 +225,7 @@
         <div class="modal-content">
             <button class="close-modal" onclick="closeEditProfileModal()">×</button>
             <h3 style="color: inherit; margin-bottom: 20px;"><i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว</h3>
-            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px;">ข้อมูลจะถูกส่งไปบันทึกที่ Google Sheets ของครู</p>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px;">ข้อมูลจะถูกอัปเดตไปที่ Google Sheets ของครูทันที</p>
             
             <div class="form-group-edit"><label>รหัสนักเรียน (ID)</label><input type="text" id="edit-studentid" placeholder="เช่น 65001"></div>
             <div class="form-group-edit"><label>ชื่อ-นามสกุล</label><input type="text" id="edit-name"></div>
@@ -243,7 +242,6 @@
                         <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option>
                         <option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option>
                         <option value="10">ห้อง 10</option><option value="11">ห้อง 11</option><option value="12">ห้อง 12</option>
-                        <option value="13">ห้อง 13</option><option value="14">ห้อง 14</option><option value="15">ห้อง 15</option>
                     </select>
                 </div>
             </div>
@@ -263,10 +261,13 @@
     </div>
 
     <script>
+        // 🌟 ใส่ URL ของครูตรงนี้ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
 
         const themes = { default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" }, snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" }, forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" }, halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" }, love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" } };
         let particleInterval = null;
+        let db = { activities: [], students: [], submissions: [] }; // เก็บข้อมูลชั่วคราว
+        let isFetching = false;
 
         function applyTheme(themeKey) {
             document.body.setAttribute("data-theme", themeKey);
@@ -309,12 +310,6 @@
             btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
         });
 
-        function getUserData(keyName, defaultValue = null) {
-            const email = localStorage.getItem('student_email');
-            const key = email ? email + '_' + keyName : null;
-            try { return key && localStorage.getItem(key) ? localStorage.getItem(key) : defaultValue; } catch(e) { return defaultValue; }
-        }
-
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -350,17 +345,12 @@
             const email = localStorage.getItem('student_email');
             if (!email) { document.getElementById('showLoginBtn').style.display = 'flex'; return; }
 
-            // 🌟 จัดการระบบเวลาลงทะเบียน และ เข้าใช้งาน 🌟
+            // บันทึกเวลาสมัครใช้งานและล็อกอินล่าสุด
             let nowTime = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
-            if (!localStorage.getItem(email + '_regdate')) {
-                localStorage.setItem(email + '_regdate', nowTime);
-            }
+            if (!localStorage.getItem(email + '_regdate')) localStorage.setItem(email + '_regdate', nowTime);
             localStorage.setItem(email + '_lastactive', nowTime);
 
-            const name = getUserData('custom_name') || localStorage.getItem('student_name') || "นักเรียน";
-            const studentId = getUserData('studentid') || '-';
-            const room = getUserData('room') || '-';
-            const number = getUserData('number') || '-';
+            const name = localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name') || "นักเรียน";
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
 
             document.getElementById('profile-name').innerText = name;
@@ -368,31 +358,26 @@
             document.getElementById('profile-pic-img').src = pic;
             document.getElementById('profile-pic-img').style.display = 'block';
             
-            document.getElementById('display-studentid').innerText = studentId;
-            document.getElementById('display-room').innerText = room;
-            document.getElementById('display-number').innerText = number;
             document.getElementById('student-details-box').style.display = 'block';
             document.getElementById('editProfileBtn').style.display = 'inline-block';
             document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
 
-            // 🌟 แสดงผลเวลาที่กล่อง Tracking 🌟
             document.getElementById('display-regdate').innerText = localStorage.getItem(email + '_regdate');
-            document.getElementById('display-lastactive').innerText = localStorage.getItem(email + '_lastactive');
+            document.getElementById('display-lastactive').innerText = nowTime;
             document.getElementById('display-editdate').innerText = localStorage.getItem(email + '_editdate') || "ยังไม่เคยแก้ไข";
             document.getElementById('tracking-box').style.display = 'block';
 
-            // 🌟 ส่ง PING อัตโนมัติตอนเปิดเว็บ! 🌟
+            // ส่งข้อมูลบันทึกเวลาเข้าฐานข้อมูล
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ email: email, action: "ping" })
-            });
+                method: 'POST',
+                body: JSON.stringify({ action: "updateTimestamp", type: "last_login", email: email })
+            }).catch(e => console.log(e));
 
             fetchDataFromServer(false);
             loadEnrolledSubjects(email);
         }
 
-        let isFetching = false;
-        
+        // 🌟 ดึงข้อมูลทั้งหมดจาก Google Sheets (โครงสร้างใหม่ readAll)
         async function fetchDataFromServer(isSilent = true) {
             const email = localStorage.getItem('student_email');
             if (!email || isFetching) return;
@@ -402,98 +387,60 @@
             const syncBtn = document.getElementById('btn-sync');
             
             if(syncBtn) syncBtn.innerHTML = '<i class="fas fa-sync-alt spin"></i> กำลังอัปเดต...';
-            if(!isSilent) {
-                container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังดึงข้อมูลล่าสุดจากฐานข้อมูล...</div>';
+            if(!isSilent) container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังดึงข้อมูลล่าสุดจากฐานข้อมูล...</div>';
+            
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
+                db = await res.json();
+                
+                // ดึงข้อมูลโปรไฟล์นักเรียนจากฐานข้อมูลมาทับ Local
+                const myData = db.students.find(s => s.email === email);
+                if(myData) {
+                    const dbStudentId = myData.student_id || '-';
+                    const dbFullName = myData.name || 'นักเรียน';
+                    const dbRoom = myData.room || '-';
+                    const dbNumber = myData.number || '-';
+
+                    document.getElementById('display-studentid').innerText = dbStudentId;
+                    document.getElementById('profile-name').innerText = dbFullName;
+                    document.getElementById('display-room').innerText = dbRoom;
+                    document.getElementById('display-number').innerText = dbNumber;
+                    document.querySelector('.user-name').innerText = dbFullName.split(' ')[0];
+                    
+                    localStorage.setItem(email + '_studentid', dbStudentId !== '-' ? dbStudentId : '');
+                    localStorage.setItem(email + '_custom_name', dbFullName !== 'นักเรียน' ? dbFullName : '');
+                    localStorage.setItem(email + '_room', dbRoom !== '-' ? dbRoom : '');
+                    localStorage.setItem(email + '_number', dbNumber !== '-' ? dbNumber : '');
+                }
+                document.getElementById('status-msg').style.display = 'none';
+            } catch(e) { 
+                console.error("Fetch Error:", e);
+                document.getElementById('status-msg').style.display = 'block';
+                document.getElementById('status-msg').innerHTML = '⚠️ ขัดข้องในการดึงข้อมูลจากฐานข้อมูล ระบบจะแสดงผลข้อมูลล่าสุดที่มีในเครื่อง';
             }
             
-            if(GOOGLE_SCRIPT_URL) {
-                try {
-                    const cacheBuster = new Date().getTime(); 
-                    
-                    const actRes = await fetch(GOOGLE_SCRIPT_URL + "?action=getActivities&t=" + cacheBuster);
-                    const actText = await actRes.text();
-                    const actData = JSON.parse(actText);
-                    
-                    if(actData && actData.type === 'activities' && Array.isArray(actData.data)) {
-                        localStorage.setItem('global_activities', JSON.stringify(actData.data));
-                    }
-
-                    const stdRes = await fetch(GOOGLE_SCRIPT_URL + "?t=" + cacheBuster);
-                    const stdText = await stdRes.text();
-                    const allStudents = JSON.parse(stdText);
-                    
-                    const myData = allStudents.find(s => s.email === email);
-                    
-                    if(myData) {
-                        const dbStudentId = (myData.studentId && myData.studentId !== "") ? myData.studentId : localStorage.getItem(email + '_studentid') || '-';
-                        const dbFullName = (myData.name && myData.name !== "") ? myData.name : localStorage.getItem(email + '_custom_name') || localStorage.getItem('student_name') || 'นักเรียน';
-                        const dbRoom = (myData.room && myData.room !== "") ? myData.room : localStorage.getItem(email + '_room') || '-';
-                        const dbNumber = (myData.number && myData.number !== "") ? myData.number : localStorage.getItem(email + '_number') || '-';
-
-                        document.getElementById('display-studentid').innerText = dbStudentId;
-                        document.getElementById('profile-name').innerText = dbFullName;
-                        document.getElementById('display-room').innerText = dbRoom;
-                        document.getElementById('display-number').innerText = dbNumber;
-                        
-                        localStorage.setItem(email + '_studentid', dbStudentId !== '-' ? dbStudentId : '');
-                        localStorage.setItem(email + '_custom_name', dbFullName !== 'นักเรียน' ? dbFullName : '');
-                        localStorage.setItem(email + '_room', dbRoom !== '-' ? dbRoom : '');
-                        localStorage.setItem(email + '_number', dbNumber !== '-' ? dbNumber : '');
-
-                        const allActs = JSON.parse(localStorage.getItem('global_activities') || '[]');
-                        allActs.forEach(a => {
-                            let dbHasWork = (myData.works && myData.works[a.id] !== undefined && myData.works[a.id] !== "");
-                            let dbHasScore = (myData.scores && myData.scores[a.id] !== undefined && myData.scores[a.id] !== "");
-
-                            if (dbHasScore) {
-                                localStorage.setItem(email + '_act_' + a.id + '_status', 'graded');
-                                localStorage.setItem(email + '_act_' + a.id + '_score', myData.scores[a.id]);
-                            } else if (dbHasWork) {
-                                localStorage.setItem(email + '_act_' + a.id + '_status', 'submitted');
-                                localStorage.removeItem(email + '_act_' + a.id + '_score');
-                            } else {
-                                localStorage.removeItem(email + '_act_' + a.id + '_status');
-                                localStorage.removeItem(email + '_act_' + a.id + '_score');
-                            }
-                        });
-
-                        document.getElementById('status-msg').style.display = 'none';
-                    } 
-                } catch(e) { 
-                    console.error("Fetch Error:", e);
-                    document.getElementById('status-msg').style.display = 'block';
-                    document.getElementById('status-msg').innerHTML = '⚠️ ขัดข้องในการดึงข้อมูลจากฐานข้อมูล ระบบจะแสดงผลข้อมูลล่าสุดที่มีในเครื่อง';
-                }
-            }
             renderModules(email);
             if(syncBtn) syncBtn.innerHTML = '<i class="fas fa-sync-alt"></i> อัปเดตข้อมูล';
             isFetching = false;
         }
 
-        setInterval(() => {
-            if (localStorage.getItem('is_logged_in') === 'true') {
-                fetchDataFromServer(true); 
-            }
-        }, 60000);
-
+        // 🌟 แสดงรายการงาน/กิจกรรม
         function renderModules(email) {
             const container = document.getElementById('dynamic-modules-container');
-            let allActivities = [];
-            try { allActivities = JSON.parse(localStorage.getItem('global_activities')) || []; } catch(e) { }
-            
             const studentRoom = localStorage.getItem(email + '_room') || "";
+            const studentId = localStorage.getItem(email + '_studentid') || "";
             
             if (studentRoom === "" || studentRoom === "-") {
                 container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.8; border-left:4px solid #f59e0b; flex-direction: column; text-align: center;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b; margin-bottom: 10px;"></i>
                     <h3 style="color: #f59e0b; margin-bottom: 5px;">ยังไม่ได้ตั้งค่าห้องเรียน</h3>
-                    <p>กรุณากดปุ่ม <b>"แก้ไขข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุห้องเรียนของคุณ ระบบจึงจะแสดงบทเรียนให้ครับ</p>
+                    <p>กรุณากดปุ่ม <b>"แก้ไขข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุห้องเรียนของคุณ</p>
                 </div>`;
                 return;
             }
 
-            const activities = allActivities.filter(act => {
-                const target = act.targetRoom || 'ทุกห้อง';
+            const activities = (db.activities || []).filter(act => {
+                const target = act.Room || act.targetRoom || 'ทุกห้อง';
                 return target === 'ทุกห้อง' || target === studentRoom;
             });
             
@@ -504,51 +451,60 @@
 
             container.innerHTML = '';
             let totalMaxPoints = 0, totalEarned = 0, submittedCount = 0;
-            let gradableCount = activities.filter(a => a.type !== 'content').length;
-            let missingTasks = []; // 🌟 เก็บรายชื่องานที่ค้างส่ง
+            let gradableCount = activities.filter(a => a.Type !== 'content').length;
+            let missingTasks = [];
 
             activities.forEach(act => {
-                const status = localStorage.getItem(email + '_act_' + act.id + '_status');
-                const score = parseInt(localStorage.getItem(email + '_act_' + act.id + '_score') || 0);
+                // หารายการส่งงานจากฐานข้อมูล (db.submissions)
+                const sub = db.submissions.find(s => s.student_id == studentId && s.activity_id == act.ID);
+                let status = 'pending';
+                let score = 0;
+
+                if (sub) {
+                    if (sub.score !== undefined && sub.score !== "") {
+                        status = 'graded';
+                        score = parseInt(sub.score);
+                    } else {
+                        status = 'submitted';
+                    }
+                }
 
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'ทั่วไป';
                 let isContent = false;
                 
-                if(act.type === 'content') { tColor = '#a855f7'; tIcon = '📖'; tName = 'เนื้อหา'; isContent = true; }
-                else if(act.type === 'task') { tColor = '#f59e0b'; tIcon = '⚙️'; tName = 'งาน'; }
-                else if(act.type === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
+                if(act.Type === 'content') { tColor = '#a855f7'; tIcon = '📖'; tName = 'เนื้อหา'; isContent = true; }
+                else if(act.Type === 'task') { tColor = '#f59e0b'; tIcon = '⚙️'; tName = 'งาน'; }
+                else if(act.Type === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
 
                 if (!isContent) {
-                    totalMaxPoints += parseInt(act.points || 15);
+                    totalMaxPoints += parseInt(act.Points || 0);
                     if (status === 'submitted' || status === 'graded') {
                         submittedCount++;
                     } else {
-                        missingTasks.push(act.title); // 🌟 ถ้างดค้าง ให้เก็บชื่อไว้โชว์
+                        missingTasks.push(act.Title);
                     }
                     if (status === 'graded') totalEarned += score;
                 }
 
                 let isPastDeadline = false;
-                if (act.date && !isContent) { 
+                if (act.Date && !isContent) { 
                     try {
-                        let timeStr = act.time ? act.time : '23:59';
+                        let timeStr = act.Time ? act.Time : '23:59';
                         if (timeStr.split(':').length === 2) { timeStr += ':00'; }
-                        const deadlineTime = new Date(`${act.date}T${timeStr}`).getTime();
+                        const deadlineTime = new Date(`${act.Date}T${timeStr}`).getTime();
                         const nowTime = new Date().getTime();
                         if (nowTime > deadlineTime) { isPastDeadline = true; }
                     } catch(e) {}
                 }
 
                 let badgeHtml = '', btnHtml = '', scoreHtml = '', deadlineText = '';
-                let linkPath = act.link && act.link !== '#' ? `${act.link}?actid=${act.id}` : '#';
-
-                const isClosedByTeacher = (act.status === 'closed');
+                let linkPath = act.Link && act.Link !== '#' ? `${act.Link}?actid=${act.ID}` : '#';
+                const isClosedByTeacher = (act.Status === 'closed');
                 const lockedBtnStyle = `background: #64748b; color: white; opacity: 0.8; pointer-events: none; cursor: not-allowed; text-decoration: none; display: inline-flex; align-items: center; gap: 8px; padding: 8px 20px; border-radius: 30px; font-size: 0.85rem; font-weight: 600; font-family: 'Prompt'; border: none;`;
 
                 if (isContent) {
                     badgeHtml = `<span class="badge" style="background:${tColor}33; color:${tColor}; border:1px solid ${tColor}80;">${tIcon} ${tName}</span>`;
                     scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ไม่มีการเก็บคะแนน</div>`;
-                    
                     if (isClosedByTeacher) {
                         btnHtml = `<button style="${lockedBtnStyle}" disabled><i class="fas fa-lock"></i> ปิดเข้าชมชั่วคราว</button>`;
                         deadlineText = `<small style="color:#ef4444; display:block; margin-top:5px;"><i class="fas fa-eye-slash"></i> ยังไม่เปิดให้อ่านเนื้อหา</small>`;
@@ -558,22 +514,20 @@
                     }
                 } 
                 else {
-                    deadlineText = `<small style="color:${isPastDeadline ? '#ef4444' : tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.date || '-'} | ${act.time || '-'}</small>`;
-                    
+                    deadlineText = `<small style="color:${isPastDeadline ? '#ef4444' : tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${act.Date || '-'} | ${act.Time || '-'}</small>`;
                     if (isClosedByTeacher) {
                         badgeHtml = `<span class="badge" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.5);">🔒 ปิดระบบ</span>`;
-                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.points}</div>`;
+                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.Points}</div>`;
                         btnHtml = `<button style="${lockedBtnStyle}" disabled><i class="fas fa-lock"></i> ยังไม่เปิดให้ทำ</button>`;
                     }
                     else if (status === 'graded') {
                         badgeHtml = `<span class="badge done" style="background:#10b98133; color:#10b981; border:1px solid #10b981;">⭐ ตรวจแล้ว</span>`;
-                        scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">ได้คะแนน: ${score} / ${act.points}</div>`;
+                        scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">ได้คะแนน: ${score} / ${act.Points}</div>`;
                         btnHtml = `<button style="${lockedBtnStyle}" disabled><i class="fas fa-lock"></i> ปิดการแก้ไขแล้ว</button>`;
                     } 
                     else if (status === 'submitted') {
                         badgeHtml = `<span class="badge submitted" style="background:#3b82f633; color:#60a5fa; border:1px solid #3b82f6;">✅ รอตรวจ</span>`;
-                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${act.points})</div>`;
-                        
+                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${act.Points})</div>`;
                         if (isPastDeadline) {
                             btnHtml = `<button style="${lockedBtnStyle}" disabled><i class="fas fa-lock"></i> หมดเวลาแก้ไขงาน</button>`;
                         } else {
@@ -581,7 +535,7 @@
                         }
                     } 
                     else { 
-                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.points}</div>`;
+                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${act.Points}</div>`;
                         if (isPastDeadline) {
                             badgeHtml = `<span class="badge late" style="background:rgba(239, 68, 68, 0.2); color:#ef4444; border:1px solid rgba(239, 68, 68, 0.5);">❌ หมดเวลา</span>`;
                             btnHtml = `<button style="${lockedBtnStyle}" disabled><i class="fas fa-lock"></i> หมดเวลาส่งงานแล้ว</button>`;
@@ -595,15 +549,15 @@
                 container.innerHTML += `
                     <div class="task-card" style="border-left: 5px solid ${isClosedByTeacher ? '#ef4444' : (isPastDeadline && !isContent ? '#ef4444' : tColor)};">
                         <div class="task-info">
-                            <h4 style="color:${isClosedByTeacher ? '#ef4444' : (isPastDeadline && !isContent ? '#ef4444' : tColor)};">${tIcon} ${act.title}</h4>
-                            <p style="font-size:0.85rem; opacity:0.8;">${act.desc}</p>
+                            <h4 style="color:${isClosedByTeacher ? '#ef4444' : (isPastDeadline && !isContent ? '#ef4444' : tColor)};">${tIcon} ${act.Title}</h4>
+                            <p style="font-size:0.85rem; opacity:0.8;">${act.Description}</p>
                             ${deadlineText}
                         </div>
                         <div class="task-meta">${badgeHtml}${scoreHtml}<div style="margin-top:8px;">${btnHtml}</div></div>
                     </div>`;
             });
 
-            // 🌟 คำนวณสรุปแสดงที่กล่องซ้ายมือ 🌟
+            // อัปเดตสถิติ
             let progressPercent = gradableCount > 0 ? Math.round((submittedCount / gradableCount) * 100) : 0;
             document.getElementById('total-score').innerHTML = `${totalEarned} <span style="font-size: 1rem;">/ ${totalMaxPoints}</span>`;
             document.getElementById('progress-fill').style.width = progressPercent + '%';
@@ -644,6 +598,7 @@
         }
         function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('active'); }
 
+        // 🌟 บันทึกและอัปเดตประวัตินักเรียนไปที่ Google Sheets 🌟
         function saveProfileData() {
             const studentId = document.getElementById('edit-studentid').value.trim();
             const name = document.getElementById('edit-name').value.trim();
@@ -656,7 +611,6 @@
             document.getElementById('saving-status').style.display = 'block';
             document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อมูลไปยังฐานข้อมูล...';
 
-            // 🌟 บันทึกเวลาที่ทำการแก้ไขล่าสุด 🌟
             let editTime = new Date().toLocaleString('th-TH', { timeZone: 'Asia/Bangkok', day:'2-digit', month:'2-digit', year:'numeric', hour:'2-digit', minute:'2-digit', second:'2-digit' });
             localStorage.setItem(email + '_editdate', editTime);
             document.getElementById('display-editdate').innerText = editTime;
@@ -665,30 +619,27 @@
             localStorage.setItem(email + '_custom_name', name);
             localStorage.setItem(email + '_room', room);
             localStorage.setItem(email + '_number', number);
-            localStorage.setItem('student_name', name);
 
-            document.getElementById('display-studentid').innerText = studentId;
-            document.getElementById('profile-name').innerText = name;
-            document.getElementById('display-room').innerText = room;
-            document.getElementById('display-number').innerText = number;
-            document.querySelector('.user-name').innerText = name.split(' ')[0];
-
-            let enrolledArray = [];
-            try { enrolledArray = JSON.parse(localStorage.getItem(email + '_enrolled_subjects')) || []; } catch(e){}
-
+            // ยิงข้อมูลไปให้ Code.gs (action: "updateProfile")
             fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST', 
-                mode: 'no-cors',
-                body: JSON.stringify({ email: email, studentId: studentId, name: name, room: room, number: number, enrolledSubjects: enrolledArray.join(", ") })
-            }).then(() => {
+                method: 'POST',
+                body: JSON.stringify({ 
+                    action: "updateProfile", 
+                    email: email, 
+                    student_id: studentId, 
+                    name: name, 
+                    room: room, 
+                    number: number 
+                })
+            }).then(response => response.json()).then(data => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
                 setTimeout(() => {
                     closeEditProfileModal(); 
                     document.getElementById('saving-status').style.display = 'none';
-                    renderModules(email); 
+                    fetchDataFromServer(true); // รีเฟรชหน้าให้ข้อมูลอัปเดตใหม่
                 }, 1000);
             }).catch(e => {
-                alert("⚠️ บันทึกในเครื่องแล้ว แต่ส่งเข้าส่วนกลางไม่สำเร็จ");
+                alert("⚠️ เซิร์ฟเวอร์ไม่ตอบสนอง แต่ข้อมูลในเครื่องบันทึกแล้ว");
                 document.getElementById('saving-status').style.display = 'none';
                 closeEditProfileModal();
             });
