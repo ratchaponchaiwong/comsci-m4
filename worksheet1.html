@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>ใบงานกิจกรรม | PROT Smart Workspace</title>
+    
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        /* ==================== โครงสร้างหลักและพื้นหลัง ==================== */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #3e7a3e 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff85a0 100%); color: #1e293b; }
+        
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        
+        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .theme-particle { position: absolute; top: -10vh; pointer-events: none; animation: fallDown linear forwards; z-index: 1; }
+        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } }
+
+        /* ==================== แถบเมนูด้านบน (Header) ==================== */
+        header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 15px; }
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        
+        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; flex-wrap: wrap; }
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; font-size: 0.95rem; }
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        .nav-links a:hover, .nav-links a.active { color: #fff; background: #3b82f6; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+
+        .theme-switcher { background: rgba(0,0,0,0.3); backdrop-filter: blur(12px); padding: 10px 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 15px auto; border-radius: 50px; width: fit-content; border: 1px solid rgba(255,255,255,0.1); }
+        body[data-theme="snow"] .theme-switcher, body[data-theme="love"] .theme-switcher { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
+        .theme-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 40px; color: inherit; font-weight: 500; cursor: pointer; transition: 0.3s; font-family: 'Prompt'; font-size: 0.85rem; }
+        body[data-theme="snow"] .theme-btn, body[data-theme="love"] .theme-btn { border-color: rgba(0,0,0,0.1); }
+        .theme-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+
+        /* ==================== พื้นที่กิจกรรม ==================== */
+        .page-content-wrapper { padding: 20px; max-width: 1000px; margin: 0 auto; width: 100%; z-index: 10; position: relative; flex: 1; transition: 0.3s; }
+        
+        .glass-card { 
+            background: rgba(255,255,255,0.05); 
+            backdrop-filter: blur(15px); 
+            border-radius: 24px; 
+            padding: 30px; 
+            border: 1px solid rgba(255,255,255,0.1); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15); 
+            color: inherit; 
+            margin-bottom: 20px;
+            transition: 0.3s;
+        }
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { 
+            background: rgba(255, 255, 255, 0.8); 
+            border-color: rgba(0,0,0,0.1); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+        }
+
+        .activity-header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid rgba(255,255,255,0.1); padding-bottom: 15px; margin-bottom: 20px; flex-wrap: wrap; gap: 15px; }
+        body[data-theme="snow"] .activity-header, body[data-theme="love"] .activity-header { border-bottom-color: rgba(0,0,0,0.1); }
+        
+        .activity-title { font-size: 1.5rem; font-weight: 700; color: #60a5fa; display: flex; align-items: center; gap: 10px; }
+        
+        /* ปุ่มสลับโหมดโฟกัส */
+        .btn-focus { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 8px 18px; border-radius: 30px; cursor: pointer; font-family: 'Prompt'; font-weight: 600; transition: 0.3s; display: flex; align-items: center; gap: 8px; }
+        .btn-focus:hover { background: #3b82f6; color: white; }
+
+        /* พื้นที่สำหรับแทรก Liveworksheet หรือ Google Form */
+        .activity-workspace { width: 100%; min-height: 60vh; background: rgba(0,0,0,0.2); border-radius: 15px; border: 1px dashed rgba(255,255,255,0.2); display: flex; align-items: center; justify-content: center; overflow: hidden;}
+        body[data-theme="snow"] .activity-workspace, body[data-theme="love"] .activity-workspace { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+        
+        .activity-workspace iframe { width: 100%; height: 100%; border: none; min-height: 60vh; }
+
+        footer { text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; font-size: 0.85rem; opacity: 0.8; }
+
+        /* ==================== 🎯 FOCUS MODE CSS 🎯 ==================== */
+        body.focus-mode header { display: none !important; }
+        body.focus-mode .theme-switcher { display: none !important; }
+        body.focus-mode footer { display: none !important; }
+        body.focus-mode .page-content-wrapper { padding: 10px; max-width: 100%; }
+        body.focus-mode .glass-card { border-radius: 15px; padding: 15px; }
+        body.focus-mode .activity-workspace { min-height: 85vh; }
+        body.focus-mode .activity-workspace iframe { min-height: 85vh; }
+        
+        /* ปุ่มแสดงเมนู (ลอยอยู่มุมขวาบนเมื่ออยู่ในโหมดโฟกัส) */
+        #exit-focus-btn {
+            display: none;
+            position: fixed;
+            top: 15px;
+            right: 15px;
+            z-index: 10000;
+            background: #ef4444;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 30px;
+            cursor: pointer;
+            font-family: 'Prompt';
+            font-weight: bold;
+            box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4);
+            transition: 0.3s;
+            align-items: center;
+            gap: 8px;
+        }
+        #exit-focus-btn:hover { background: #dc2626; transform: scale(1.05); }
+        body.focus-mode #exit-focus-btn { display: flex; }
+    </style>
+</head>
+<body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
+    <div id="particleContainer"></div>
+
+    <button id="exit-focus-btn" onclick="toggleFocusMode()">
+        <i class="fas fa-compress-arrows-alt"></i> แสดงเมนูคืน
+    </button>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-robot"></i><span>PROT Smart Workspace</span></a>
+        <div style="display: flex; align-items: center; gap: 20px; flex-wrap: wrap;">
+            <ul class="nav-links">
+                <li><a href="student.html"><i class="fas fa-arrow-left"></i> กลับห้องเรียน</a></li>
+            </ul>
+        </div>
+    </header>
+
+    <div class="theme-switcher">
+        <button class="theme-btn active" data-theme="default">🤖 เริ่มต้น</button>
+        <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
+        <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
+        <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
+    </div>
+
+    <div class="page-content-wrapper">
+        <div class="glass-card">
+            
+            <div class="activity-header">
+                <div class="activity-title">
+                    <i class="fas fa-pencil-ruler"></i> ใบงานที่ 1: ส่วนประกอบหุ่นยนต์
+                </div>
+                
+                <button class="btn-focus" onclick="toggleFocusMode()" id="enter-focus-btn">
+                    <i class="fas fa-expand-arrows-alt"></i> โหมดเต็มจอ (ซ่อนเมนู)
+                </button>
+            </div>
+
+            <div class="activity-workspace">
+                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" allowfullscreen></iframe>
+            </div>
+
+        </div>
+    </div>
+
+    <footer>
+        <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | วิทยาการคำนวณเพื่ออนาคต</p>
+    </footer>
+
+    <script>
+        // ระบบ Theme & Particles
+        const themes = {
+            default: { char: "✨", color: "rgba(59,130,246,0.6)" }, snow: { char: "❄️", color: "rgba(255,255,255,0.7)" },
+            forest: { char: "🍃", color: "rgba(144,238,144,0.6)" }, love: { char: "🌸", color: "rgba(255,105,180,0.6)" }
+        };
+        let particleInterval = null;
+        
+        function applyTheme(themeKey) {
+            document.body.setAttribute("data-theme", themeKey);
+            localStorage.setItem('smart_theme', themeKey);
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
+            if(activeBtn) activeBtn.classList.add("active");
+            startThemeParticles(themeKey);
+        }
+        
+        function startThemeParticles(theme) {
+            const container = document.getElementById("particleContainer");
+            if(particleInterval) clearInterval(particleInterval);
+            container.innerHTML = "";
+            const themeData = themes[theme];
+            
+            function createParticle() {
+                const p = document.createElement("div");
+                p.className = "theme-particle";
+                p.style.left = Math.random() * 100 + "%";
+                p.style.fontSize = (Math.random() * 15 + 10) + "px";
+                p.style.opacity = Math.random() * 0.5 + 0.2;
+                p.style.animationDuration = Math.random() * 8 + 5 + "s";
+                p.style.textShadow = `0 0 5px ${themeData.color}`;
+                p.innerHTML = themeData.char;
+                container.appendChild(p);
+                setTimeout(() => p.remove(), 10000);
+            }
+            for(let i = 0; i < 10; i++) setTimeout(createParticle, i * 200);
+            particleInterval = setInterval(createParticle, 1000);
+        }
+
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+        });
+
+        // 🎯 ฟังก์ชันสลับโหมดโฟกัส (ซ่อน/แสดง เมนู)
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+            
+            // ขยายหน้าจอของตัวเบราว์เซอร์ด้วยถ้าทำได้ (สำหรับ PC/Android)
+            if (document.body.classList.contains('focus-mode')) {
+                if (document.documentElement.requestFullscreen) {
+                    document.documentElement.requestFullscreen().catch(()=>{});
+                }
+            } else {
+                if (document.exitFullscreen) {
+                    document.exitFullscreen().catch(()=>{});
+                }
+            }
+        }
+
+        window.onload = function() {
+            const savedTheme = localStorage.getItem('smart_theme') || "default";
+            applyTheme(savedTheme);
+        };
+    </script>
+</body>
+</html>
