@@ -101,7 +101,10 @@
             
             <div id="tab-activities" class="tab-content active">
                 <div class="glass-card">
-                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> สร้างโพสต์กิจกรรม</h3>
+                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> สร้าง/แก้ไข โพสต์กิจกรรม</h3>
+                    
+                    <input type="hidden" id="act-edit-id" value="">
+                    
                     <div class="form-grid">
                         <div class="form-group"><label>ประเภท</label><select id="act-type"><option value="task">งานปฎิบัติ (มีคะแนน)</option><option value="activity">กิจกรรม (ไม่มีคะแนน)</option></select></div>
                         <div class="form-group"><label>สถานะ</label><select id="act-status"><option value="open">🟢 เปิดรับงาน</option><option value="closed">🔴 ปิดรับงาน</option></select></div>
@@ -179,7 +182,7 @@
             <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">-</h3>
             <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
                 <label>เนื้อหางานที่นักเรียนส่งมา:</label>
-                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all; color: #f59e0b;">-</div>
+                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all; color: #f59e0b; white-space: pre-wrap;">-</div>
             </div>
             <div class="form-group"><label>ให้คะแนน (เต็ม <span id="grade-max-points" style="color:#10b981; font-weight:bold;">-</span>)</label><input type="number" id="grade-input-score"></div>
             <button class="btn-action btn-success" style="width: 100%; justify-content: center;" onclick="saveScore()">บันทึกคะแนนเข้าระบบ</button>
@@ -229,19 +232,14 @@
             } catch (e) {
                 console.error(e);
                 btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ดึงข้อมูลล้มเหลว';
-                
-                // แจ้งเตือนเมื่อระบบล่ม เพื่อไม่ให้มีของปลอมค้าง
                 document.getElementById('activities-list').innerHTML = '<div class="empty-state">ไม่สามารถเชื่อมต่อ Google Sheets ได้</div>';
                 document.getElementById('matrix-body').innerHTML = '<tr><td colspan="7" class="empty-state">ดึงข้อมูลล้มเหลว</td></tr>';
             }
         }
 
-        // 🌟 อัปเดต Dropdown ให้มีเฉพาะข้อมูลที่มีอยู่จริง
         function updateRoomSelectors() {
-            // ค้นหาว่ามีห้องอะไรบ้างในชีต Students จริงๆ เท่านั้น
             const rooms = [...new Set(db.students.map(s => s.room))].filter(Boolean).sort();
             
-            // อัปเดต Dropdown ห้องเรียน
             const actRoom = document.getElementById('act-room');
             const matrixRoom = document.getElementById('matrix-room');
             const viewRoom = document.getElementById('view-class-room');
@@ -250,7 +248,6 @@
             if(matrixRoom) matrixRoom.innerHTML = '<option value="all">ดูผลรวมทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
             if(viewRoom) viewRoom.innerHTML = '<option value="all">ดูสถิติรวมทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
 
-            // อัปเดต Dropdown กิจกรรมในหน้า Matrix ให้ดึงเฉพาะงานที่มีอยู่จริง
             const matrixAct = document.getElementById('matrix-act');
             if(matrixAct) {
                 if(db.activities.length === 0) {
@@ -261,10 +258,11 @@
             }
         }
 
-        // 🌟 บันทึกกิจกรรม
+        // 🌟 บันทึกกิจกรรม (แก้ให้รองรับระบบ "แก้ไขข้อมูลเดิม")
         async function saveActivity() {
             const data = {
                 action: "saveActivity",
+                id: document.getElementById('act-edit-id').value, // 🌟 เพิ่มบรรทัดนี้ เพื่อบอกสคริปต์ว่าแก้งานเดิมหรือสร้างใหม่
                 type: document.getElementById('act-type').value,
                 status: document.getElementById('act-status').value,
                 title: document.getElementById('act-title').value,
@@ -273,7 +271,7 @@
                 time: document.getElementById('act-time').value,
                 target: "all",
                 room: document.getElementById('act-room').value,
-                points: document.getElementById('act-points').value || "0", // ถ้าไม่ใส่ ให้เป็น 0 ไปเลย ไม่ปลอมแปลงเป็น 10
+                points: document.getElementById('act-points').value || "0",
                 link: document.getElementById('act-link').value,
                 doc_link: document.getElementById('act-doc').value,
                 yt_link: document.getElementById('act-yt').value
@@ -281,15 +279,21 @@
             if(!data.title) return alert("กรุณาใส่ชื่อหัวข้องาน");
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("โพสต์ข้อมูลลง Google Sheets เรียบร้อย!");
-                // ล้างค่าฟอร์ม
+                alert("บันทึกข้อมูลลง Google Sheets เรียบร้อย!");
+                
+                // ล้างค่าฟอร์มให้สะอาด เผื่อสร้างงานใหม่
+                document.getElementById('act-edit-id').value = '';
                 document.getElementById('act-title').value = '';
                 document.getElementById('act-desc').value = '';
+                document.getElementById('act-link').value = '';
+                document.getElementById('act-yt').value = '';
+                document.getElementById('act-doc').value = '';
+                
                 loadAllData();
             } catch (e) { alert("บันทึกไม่สำเร็จ!"); }
         }
 
-        // 🌟 แสดงรายการกิจกรรม (ข้อมูลจริง)
+        // 🌟 แสดงรายการกิจกรรม
         function renderActivitiesList() {
             const list = document.getElementById('activities-list');
             if (!db.activities || db.activities.length === 0) {
@@ -301,13 +305,46 @@
                     <div>
                         <strong style="font-size: 1.1rem;">${act.Title}</strong> 
                         <span class="badge ${act.Status === 'open' ? 'badge-green' : 'badge-red'}">${act.Status === 'open' ? 'เปิด' : 'ปิด'}</span>
-                        <br><small style="color:#cbd5e1;">กำหนดส่ง: ${act.Date || '-'} | ห้องเป้าหมาย: ${act.Room} | คะแนนเต็ม: ${act.Points}</small>
+                        <br><small style="color:#cbd5e1;">กำหนดส่ง: ${act.Date || '-'} | ห้อง: ${act.Room} | คะแนน: ${act.Points}</small>
+                    </div>
+                    <div style="display:flex; gap:8px;">
+                        <button class="btn-action" onclick="editActivity('${act.ID}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-danger" onclick="deleteActivity('${act.ID}')"><i class="fas fa-trash"></i></button>
                     </div>
                 </div>
             `).join('');
         }
 
-        // 🌟 ตาราง Matrix ตรวจงาน (ข้อมูลจริง)
+        // 🌟 ฟังก์ชันลบกิจกรรม
+        async function deleteActivity(actId) {
+            if(!confirm("⚠️ คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้? ข้อมูลใน Google Sheets จะหายไป")) return;
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "deleteActivity", id: actId }) });
+            alert("ลบกิจกรรมเรียบร้อยแล้ว");
+            loadAllData();
+        }
+
+        // 🌟 ฟังก์ชันดึงกิจกรรมมาแก้ไข
+        function editActivity(actId) {
+            const act = db.activities.find(a => a.ID == actId);
+            if(!act) return;
+
+            document.getElementById('act-edit-id').value = act.ID; // เซฟ ID ไว้รอกดบันทึก
+            document.getElementById('act-type').value = act.Type || 'task';
+            document.getElementById('act-status').value = act.Status || 'open';
+            document.getElementById('act-title').value = act.Title;
+            document.getElementById('act-desc').value = act.Description;
+            document.getElementById('act-date').value = act.Date;
+            document.getElementById('act-time').value = act.Time;
+            document.getElementById('act-points').value = act.Points;
+            document.getElementById('act-link').value = act.Link;
+            document.getElementById('act-doc').value = act.Doc;
+            document.getElementById('act-yt').value = act.YouTube;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            alert("📌 ดึงข้อมูลกิจกรรมขึ้นมาที่ฟอร์มแล้ว หากแก้ไขเสร็จให้กด 'โพสต์กิจกรรม' อีกครั้ง");
+        }
+
+        // 🌟 ตาราง Matrix ตรวจงาน
         function renderMatrix() {
             const actId = document.getElementById('matrix-act').value;
             const room = document.getElementById('matrix-room').value;
@@ -327,7 +364,6 @@
             }
 
             body.innerHTML = filtered.map(s => {
-                // ค้นหาการส่งงานที่ตรงกับ รหัสเด็ก และ ID งาน จริงๆ
                 const sub = db.submissions.find(item => item.student_id == s.student_id && item.activity_id == actId);
                 return `<tr>
                     <td>${s.student_id}</td>
@@ -341,21 +377,34 @@
             }).join('');
         }
 
+        // 🌟 ตัวแปลงข้อความ JSON ยึกยือให้เป็นภาษาคน
+        function parseWorkContent(content) {
+            if (!content) return "ยังไม่มีการส่งงาน";
+            try {
+                // เช็คว่าถ้ามันเป็นหน้าตา JSON แบบ {"12345":"ข้อความ"}
+                if (typeof content === 'string' && content.trim().startsWith('{') && content.trim().endsWith('}')) {
+                    const parsed = JSON.parse(content);
+                    return Object.values(parsed).join('\n\n'); // ดึงมาเฉพาะข้อความเพียวๆ
+                }
+            } catch(e) {}
+            return content; // ถ้าเป็นข้อความปกติอยู่แล้ว ก็แค่โชว์เฉยๆ
+        }
+
         // 🌟 Modal ให้คะแนน (ดึงข้อมูล Activity มาโชว์คะแนนเต็มจริงๆ)
         function openGrade(stdId, actId) {
             const std = db.students.find(s => s.student_id == stdId);
             const act = db.activities.find(a => a.ID == actId);
             const sub = db.submissions.find(item => item.student_id == stdId && item.activity_id == actId);
             
-            // วางข้อมูลจริงลง Modal
             document.getElementById('grade-student-name').innerText = "ตรวจงานของ: " + (std ? std.name : stdId);
-            document.getElementById('grade-work-content').innerText = sub ? (sub.work_content || "ส่งงานเปล่า") : "นักเรียนยังไม่ได้ส่งงานนี้เข้าระบบ";
             
-            // กำหนดคะแนนเต็ม ตามที่ดึงมาจากฐานข้อมูล (ไม่ใช่เลข 10 ลอยๆ)
+            // 🌟 เรียกใช้ parseWorkContent เปลี่ยนข้อความยึกยือให้เป็นภาษาคน 🌟
+            document.getElementById('grade-work-content').innerText = sub ? parseWorkContent(sub.work_content) : "นักเรียนยังไม่ได้ส่งงานนี้เข้าระบบ";
+            
             const maxPoints = act ? act.Points : 0;
             document.getElementById('grade-max-points').innerText = maxPoints;
             document.getElementById('grade-input-score').max = maxPoints;
-            document.getElementById('grade-input-score').value = sub ? sub.score : ''; // ถ้าเคยให้แล้วดึงมาโชว์
+            document.getElementById('grade-input-score').value = sub ? sub.score : '';
             
             document.getElementById('gradeModal').classList.add('active');
             window.currentGrading = { stdId, actId };
