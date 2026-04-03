@@ -10,80 +10,94 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* ==================== โครงสร้างหลักและพื้นหลัง ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; display: flex; flex-direction: column;}
         
-        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); }
-        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); }
-        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); }
-        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
-        /* เอฟเฟกต์พื้นหลังระยิบระยับ */
+        /* เอฟเฟกต์พื้นหลัง */
         .sparkle { position: fixed; width: 4px; height: 4px; background: white; border-radius: 50%; opacity: 0; pointer-events: none; z-index: 1; animation: sparkleAnim 3s infinite; }
         @keyframes sparkleAnim { 0%, 100% { opacity: 0; transform: scale(0); } 50% { opacity: 0.6; transform: scale(1); } }
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
         
-        .content-layer { position: relative; z-index: 10; }
+        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
+        .theme-particle { position: absolute; top: -10vh; pointer-events: none; animation: fallDown linear forwards; z-index: 1; }
+        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(30px) rotate(360deg); opacity: 0; } }
+
+        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; flex: 1; }
         
-        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
-        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
-        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        .theme-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        /* ==================== Header ==================== */
+        header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 15px;}
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px; transition: 0.3s;}
+        .logo:hover { transform: scale(1.02); }
         
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; }
-        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; display: flex; align-items: center; gap: 12px; transition: 0.3s; }
-        .logo:hover { transform: scale(1.02); letter-spacing: 1px; }
-        
-        .nav-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; align-items: center; }
-        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; position: relative; overflow: hidden; }
-        .nav-links a::before { content: ''; position: absolute; bottom: 0; left: 50%; width: 0; height: 2px; background: #60a5fa; transition: 0.3s; transform: translateX(-50%); }
-        .nav-links a:hover::before, .nav-links a.active::before { width: 70%; }
-        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); transform: translateY(-2px); }
+        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; flex-wrap: wrap;}
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; font-size: 0.95rem; }
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        .nav-links a:hover, .nav-links a.active { color: #fff; background: #3b82f6; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
         
         .login-area { display: flex; align-items: center; gap: 15px; }
-        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; font-family: 'Prompt'; display: flex; align-items: center; gap: 10px; transition: all 0.3s; position: relative; overflow: hidden; }
-        .login-btn:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 5px 20px rgba(59,130,246,0.4); }
-        .login-btn:active { transform: scale(0.98); }
+        .login-btn { background: #3b82f6; border: none; padding: 10px 25px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; font-family: 'Prompt'; display: flex; align-items: center; gap: 8px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); transition: 0.3s;}
+        .login-btn:hover { transform: translateY(-2px); background: #2563eb; }
         
-        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; backdrop-filter: blur(5px); transition: 0.3s; }
-        .user-info:hover { background: rgba(255,255,255,0.25); transform: scale(1.02); }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; transition: 0.3s; }
-        .user-avatar:hover { transform: scale(1.1); border-color: #ffd700; }
-        .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
-        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; color: white; cursor: pointer; font-size: 0.8rem; transition: 0.3s; }
-        .logout-btn:hover { background: #ef4444; transform: scale(1.05); }
+        .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 5px; border-radius: 50px; border: 1px solid rgba(255,255,255,0.1); }
+        body[data-theme="snow"] .user-info, body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); }
+        .user-avatar { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; background: white; }
+        .user-name { font-size: 0.9rem; font-weight: 500; color: inherit; }
+        .logout-btn { background: rgba(239, 68, 68, 0.2); border: none; padding: 6px 12px; border-radius: 30px; cursor: pointer; color: #ef4444; font-size: 0.8rem; transition: 0.2s;}
+        .logout-btn:hover { background: #ef4444; color: white; }
+
+        /* Theme Switcher */
+        .theme-switcher { background: rgba(0,0,0,0.3); backdrop-filter: blur(12px); padding: 10px 20px; display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; position: sticky; top: 75px; z-index: 99; border-radius: 50px; width: fit-content; margin: 15px auto; border: 1px solid rgba(255,255,255,0.1); }
+        body[data-theme="snow"] .theme-switcher, body[data-theme="love"] .theme-switcher { background: rgba(255,255,255,0.5); border-color: rgba(0,0,0,0.1); }
+        .theme-btn { background: transparent; border: 1px solid rgba(255,255,255,0.2); padding: 8px 18px; border-radius: 40px; color: inherit; font-weight: 500; cursor: pointer; transition: 0.3s; font-family: 'Prompt'; font-size: 0.85rem; }
+        body[data-theme="snow"] .theme-btn, body[data-theme="love"] .theme-btn { border-color: rgba(0,0,0,0.1); }
+        .theme-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
+
+        /* ==================== โครงสร้างหน้าเว็บแบบสมส่วน (Proportional Layout) ==================== */
+        .page-content-wrapper { padding: 20px; max-width: 1050px; margin: 0 auto; width: 100%; z-index: 10; position: relative; flex: 1; display: flex; flex-direction: column; gap: 40px; }
         
-        .hero { display: flex; align-items: center; justify-content: space-between; padding: 40px 80px; min-height: 80vh; flex-wrap: wrap; gap: 40px; }
+        .hero { display: flex; align-items: center; justify-content: space-between; padding: 40px; flex-wrap: wrap; gap: 40px; background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-top: 10px; }
+        body[data-theme="snow"] .hero, body[data-theme="love"] .hero { background: rgba(255, 255, 255, 0.8); border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
         .hero-content { flex: 1; min-width: 300px; animation: fadeInUp 1s ease-out; }
         @keyframes fadeInUp { from { opacity: 0; transform: translateY(40px); } to { opacity: 1; transform: translateY(0); } }
-        .hero-badge { display: inline-block; background: rgba(59,130,246,0.2); padding: 8px 20px; border-radius: 40px; font-size: 0.85rem; border: 1px solid rgba(59,130,246,0.5); margin-bottom: 24px; animation: badgePulse 2s infinite; }
-        @keyframes badgePulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0.4); } 50% { box-shadow: 0 0 0 8px rgba(59,130,246,0); } }
         
-        .hero-content h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; background: linear-gradient(135deg, #fff, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; animation: titleGlow 3s infinite; }
-        @keyframes titleGlow { 0%, 100% { filter: drop-shadow(0 0 0px rgba(96,165,250,0)); } 50% { filter: drop-shadow(0 0 10px rgba(96,165,250,0.5)); } }
+        .hero-badge { display: inline-block; background: rgba(59,130,246,0.2); padding: 8px 20px; border-radius: 40px; font-size: 0.85rem; border: 1px solid rgba(59,130,246,0.5); margin-bottom: 20px; color: #60a5fa; font-weight: 600;}
+        body[data-theme="snow"] .hero-badge, body[data-theme="love"] .hero-badge { color: #3b82f6; border-color: #3b82f6; }
         
-        .hero-content p { font-size: 1.1rem; margin-bottom: 32px; line-height: 1.6; color: #cbd5e1; }
+        .hero-content h1 { font-size: 2.8rem; font-weight: 800; line-height: 1.2; margin-bottom: 20px; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; }
+        .hero-content p { font-size: 1.1rem; margin-bottom: 30px; line-height: 1.6; opacity: 0.8; }
         
-        .hero-robot { flex: 1; min-width: 350px; text-align: center; position: relative; cursor: pointer; }
+        .hero-robot { flex: 1; min-width: 300px; text-align: center; position: relative; cursor: pointer; }
         .robot-container { position: relative; display: inline-block; transition: transform 0.2s; }
         .robot-container:hover { transform: scale(1.02); }
-        .robot-main { width: 100%; max-width: 380px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.3)); pointer-events: none; transition: filter 0.3s; }
+        .robot-main { width: 100%; max-width: 350px; filter: drop-shadow(0 20px 30px rgba(0,0,0,0.2)); pointer-events: none; transition: filter 0.3s; }
         .robot-container:hover .robot-main { filter: drop-shadow(0 0 20px rgba(59,130,246,0.5)); }
         
         .robot-glow { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 120%; height: 120%; border-radius: 50%; animation: glowPulse 3s infinite; pointer-events: none; }
         @keyframes glowPulse { 0%, 100% { opacity: 0.5; transform: translate(-50%, -50%) scale(1); } 50% { opacity: 1; transform: translate(-50%, -50%) scale(1.1); } }
         
-        .outfit-icon { position: absolute; bottom: -30px; right: 20px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-radius: 30px; padding: 8px 15px; display: flex; gap: 12px; cursor: pointer; border: 1px solid #ffd700; transition: 0.2s; z-index: 20; }
+        .outfit-icon { position: absolute; bottom: -20px; right: 10px; background: rgba(0,0,0,0.6); backdrop-filter: blur(8px); border-radius: 30px; padding: 8px 15px; display: flex; gap: 10px; cursor: pointer; border: 1px solid #ffd700; transition: 0.2s; z-index: 20; align-items: center;}
         .outfit-icon:hover { transform: scale(1.1) translateY(-3px); background: rgba(0,0,0,0.8); box-shadow: 0 0 15px rgba(255,215,0,0.5); }
-        .outfit-icon i { font-size: 1.3rem; color: #ffd700; transition: 0.2s; }
-        .outfit-icon:hover i { transform: rotate(10deg); }
-        .outfit-icon span { font-size: 0.7rem; color: white; }
+        .outfit-icon i { font-size: 1.2rem; color: #ffd700; transition: 0.2s; }
+        .outfit-icon span { font-size: 0.8rem; color: white; font-weight: 600;}
         
-        /* แอนิเมชันการกระโดด */
+        /* แอนิเมชันหุ่นยนต์ */
         @keyframes bounce1 { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-25px)} }
         @keyframes bounce2 { 0%,100%{transform:translateY(0) rotate(0deg)} 25%{transform:translateY(-18px) rotate(-8deg)} 75%{transform:translateY(8px) rotate(8deg)} }
         @keyframes bounce3 { 0%,100%{transform:scale(1)} 50%{transform:scale(1.15)} }
@@ -103,58 +117,63 @@
         .autoDance2 { animation: autoDance2 0.6s ease-in-out infinite; }
         .autoDance3 { animation: autoDance3 0.7s ease-in-out infinite; }
         
-        /* Speech Bubble สวยงาม */
+        /* คำพูดหุ่นยนต์ */
         .speech-bubble { position: fixed; background: white; color: #1e293b; padding: 12px 20px; border-radius: 30px; font-weight: 600; font-size: 1rem; box-shadow: 0 8px 25px rgba(0,0,0,0.2); z-index: 200; animation: bubblePop 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); pointer-events: none; white-space: nowrap; border: 2px solid #ffd700; }
         .speech-bubble::before { content: ''; position: absolute; bottom: -15px; left: 50%; transform: translateX(-50%); width: 0; height: 0; border-left: 15px solid transparent; border-right: 15px solid transparent; border-top: 15px solid white; }
         @keyframes bubblePop { 0% { opacity: 0; transform: scale(0.5) translateY(20px); } 100% { opacity: 1; transform: scale(1) translateY(0); } }
         
-        /* เอฟเฟกต์หัวใจลอย */
         .floating-heart { position: fixed; font-size: 1.5rem; pointer-events: none; z-index: 200; animation: floatHeart 1.5s ease-out forwards; }
         @keyframes floatHeart { 0% { opacity: 1; transform: translateY(0) scale(1); } 100% { opacity: 0; transform: translateY(-100px) scale(1.5); } }
-        
-        /* เอฟเฟกต์ระเบิดแสงเมื่อคลิก */
         .click-flash { position: fixed; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,215,0,0) 70%); pointer-events: none; z-index: 200; animation: flashRipple 0.6s ease-out forwards; }
         @keyframes flashRipple { 0% { transform: scale(0); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
+
+        /* ==================== 🌟 Features Section (ปรับให้เป็นการ์ดใส) 🌟 ==================== */
+        .features { margin-bottom: 20px; }
+        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
         
-        .wardrobe-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); backdrop-filter: blur(12px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
-        .wardrobe-modal.active { visibility: visible; opacity: 1; }
-        .wardrobe-content { background: linear-gradient(135deg, #1e293b, #0f172a); border-radius: 40px; padding: 30px; max-width: 550px; width: 90%; border: 2px solid #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.3); animation: modalPop 0.3s cubic-bezier(0.68,-0.55,0.265,1.55); }
-        @keyframes modalPop { 0% { transform: scale(0.8); opacity: 0; } 100% { transform: scale(1); opacity: 1; } }
+        .feature-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(10px); padding: 30px 20px; border-radius: 24px; text-align: center; border: 1px solid rgba(255,255,255,0.1); cursor: pointer; transition: 0.3s; color: inherit; }
+        body[data-theme="snow"] .feature-card, body[data-theme="love"] .feature-card { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.1); box-shadow: 0 5px 15px rgba(0,0,0,0.05);}
+        .feature-card:hover { transform: translateY(-8px); border-color: #3b82f6; box-shadow: 0 15px 30px rgba(0,0,0,0.2); background: rgba(255,255,255,0.1); }
+        body[data-theme="snow"] .feature-card:hover, body[data-theme="love"] .feature-card:hover { background: rgba(255,255,255,1); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
         
+        .feature-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 15px; font-size: 2rem; color: white; transition: 0.3s; box-shadow: 0 8px 20px rgba(59,130,246,0.3); }
+        .feature-card:hover .feature-icon { transform: scale(1.1) rotate(5deg); }
+        .feature-card h4 { font-size: 1.1rem; margin-bottom: 5px; }
+        .feature-card p { font-size: 0.85rem; opacity: 0.8; }
+        
+        /* Modals */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
+        .modal.active { visibility: visible; opacity: 1; }
+        .modal-content, .wardrobe-content { background: rgba(30, 41, 59, 0.95); border-radius: 24px; padding: 35px; width: 90%; max-width: 400px; border: 1px solid rgba(59,130,246,0.4); position: relative; text-align: center; color: white; box-shadow: 0 20px 40px rgba(0,0,0,0.4); }
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content,
+        body[data-theme="snow"] .wardrobe-content, body[data-theme="love"] .wardrobe-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 1.8rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7; transition: 0.2s; }
+        .close-modal:hover { opacity: 1; color: #ef4444; }
+
+        /* ตู้เสื้อผ้า */
+        .wardrobe-content { max-width: 550px; border-color: #ffd700; box-shadow: 0 0 30px rgba(255,215,0,0.2);}
+        body[data-theme="snow"] .wardrobe-content, body[data-theme="love"] .wardrobe-content { border-color: #f59e0b; }
         .wardrobe-content h3 { color: #ffd700; margin-bottom: 20px; display: flex; align-items: center; gap: 10px; justify-content: center; }
-        .close-wardrobe { float: right; font-size: 1.8rem; cursor: pointer; color: white; background: none; border: none; margin-top: -10px; transition: 0.3s; }
-        .close-wardrobe:hover { transform: rotate(90deg) scale(1.2); color: #ffd700; }
+        body[data-theme="snow"] .wardrobe-content h3, body[data-theme="love"] .wardrobe-content h3 { color: #f59e0b; }
         
         .dressup-grid { display: flex; flex-wrap: wrap; gap: 12px; justify-content: center; margin: 20px 0; }
-        .dressup-category { background: rgba(255,255,255,0.1); border-radius: 20px; padding: 12px; min-width: 130px; transition: 0.3s; }
-        .dressup-category:hover { transform: translateY(-3px); background: rgba(255,255,255,0.2); }
-        .dressup-category label { display: block; font-size: 0.75rem; color: #ffd700; margin-bottom: 8px; }
-        .dressup-category select { width: 100%; padding: 8px; border-radius: 20px; border: none; background: rgba(255,255,255,0.9); font-family: 'Prompt'; font-size: 0.8rem; transition: 0.2s; }
-        .dressup-category select:focus { outline: none; box-shadow: 0 0 10px rgba(255,215,0,0.5); }
+        .dressup-category { background: rgba(255,255,255,0.05); border-radius: 16px; padding: 12px; min-width: 130px; transition: 0.3s; border: 1px solid rgba(255,255,255,0.1);}
+        body[data-theme="snow"] .dressup-category, body[data-theme="love"] .dressup-category { background: rgba(0,0,0,0.03); border-color: rgba(0,0,0,0.1); }
         
-        .save-outfit-btn { background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; padding: 12px 30px; border-radius: 40px; color: #1e293b; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Prompt'; width: 100%; margin-top: 15px; font-size: 1rem; position: relative; overflow: hidden; }
-        .save-outfit-btn:hover { transform: scale(1.02); box-shadow: 0 0 20px rgba(255,215,0,0.5); }
-        .save-outfit-btn:active { transform: scale(0.98); }
+        .dressup-category label { display: block; font-size: 0.75rem; color: #ffd700; margin-bottom: 8px; font-weight: 600;}
+        body[data-theme="snow"] .dressup-category label, body[data-theme="love"] .dressup-category label { color: #f59e0b; }
         
-        .features { padding: 60px 80px; background: rgba(0,0,0,0.3); }
-        .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 30px; }
-        .feature-card { background: rgba(30, 41, 59, 0.6); padding: 32px; border-radius: 24px; text-align: center; border: 1px solid rgba(59,130,246,0.2); cursor: pointer; transition: 0.3s; color: white; backdrop-filter: blur(5px); }
-        .feature-card:hover { transform: translateY(-10px) scale(1.02); border-color: #3b82f6; box-shadow: 0 20px 30px -10px rgba(0,0,0,0.3); }
-        .feature-icon { width: 70px; height: 70px; background: linear-gradient(135deg, #3b82f6, #2563eb); border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; font-size: 2rem; color: white; transition: 0.3s; }
-        .feature-card:hover .feature-icon { transform: scale(1.1) rotate(5deg); }
+        .dressup-category select { width: 100%; padding: 8px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-family: 'Prompt'; font-size: 0.85rem; }
+        body[data-theme="snow"] .dressup-category select, body[data-theme="love"] .dressup-category select { background: white; border-color: #cbd5e1; color: #1e293b;}
         
-        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
-        .login-modal.active { visibility: visible; opacity: 1; }
-        .modal-content { background: rgba(30, 41, 59, 0.95); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); position: relative; animation: modalPop 0.3s ease-out; }
-        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: white; background: none; border: none; transition: 0.3s; }
-        .close-modal:hover { transform: rotate(90deg) scale(1.2); color: #ffd700; }
-        
-        /* อนุภาคร่วงหล่น */
-        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-        .theme-particle { position: absolute; top: -10vh; pointer-events: none; animation: fallDown linear forwards; z-index: 1; }
-        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(30px) rotate(360deg); opacity: 0; } }
+        .save-outfit-btn { background: linear-gradient(135deg, #ffd700, #ff8c00); border: none; padding: 12px 30px; border-radius: 40px; color: #1e293b; font-weight: bold; cursor: pointer; transition: 0.3s; font-family: 'Prompt'; width: 100%; margin-top: 15px; font-size: 1rem; box-shadow: 0 5px 15px rgba(255,215,0,0.3);}
+        .save-outfit-btn:hover { transform: scale(1.02); box-shadow: 0 5px 25px rgba(255,215,0,0.5); }
 
-        @media (max-width: 768px) { .hero { padding: 40px 20px; flex-direction: column; } .speech-bubble { white-space: normal; font-size: 0.8rem; } .features { padding: 40px 20px; } }
+        footer { text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; font-size: 0.85rem; opacity: 0.8; }
+        body[data-theme="snow"] footer, body[data-theme="love"] footer { border-top-color: rgba(0,0,0,0.1); }
+
+        @media (max-width: 768px) { .hero { flex-direction: column; padding: 30px 20px; text-align: center;} .page-content-wrapper{ padding: 15px; } }
     </style>
 </head>
 <body data-theme="default">
@@ -163,14 +182,13 @@
 
     <div class="content-layer">
         <header>
-            <div class="logo"><i class="fas fa-robot"></i><span>ห้องเรียนวิทยาการคำนวณ By TECHNOLOGY COMPUTER</span></div>
+            <a href="index.html" class="logo"><i class="fas fa-robot"></i><span>PROT Smart Workspace</span></a>
             <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
                 <ul class="nav-links">
                     <li><a href="index.html" class="active">หน้าหลัก</a></li>
                     <li><a href="student.html">ห้องเรียนของฉัน</a></li>
                     <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
                     <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
-                    <li><a href="extra_subjects.html">วิชาเพิ่มเติม</a></li>
                 </ul>
                 <div class="login-area" id="loginArea">
                     <button class="login-btn" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน</button>
@@ -179,108 +197,111 @@
         </header>
 
         <div class="theme-switcher">
-            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
+            <button class="theme-btn active" data-theme="default">🤖 เริ่มต้น</button>
             <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
             <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
             <button class="theme-btn" data-theme="halloween">🎃 ฮัลโลวีน</button>
             <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
         </div>
 
-        <div class="hero">
-            <div class="hero-content">
-                <span class="hero-badge"><i class="fas fa-microchip"></i> วิทยาการคำนวณ ม.4</span>
-                <h1>เรียนรู้ Coding & Robotics <br>สู่โลกแห่งอนาคต</h1>
-                <p>พัฒนาทักษะการเขียนโปรแกรม Python, Arduino และนวัตกรรมหุ่นยนต์ PROT ROBOT พร้อมระบบการเรียนรู้แบบ Interactive</p>
-            </div>
-            <div class="hero-robot" id="heroRobot">
-                <div class="robot-container" id="robotContainer">
-                    <div class="robot-glow" id="robotGlow"></div>
-                    <svg class="robot-main" id="robotSvg" viewBox="0 0 400 400" fill="none">
-                        <defs><clipPath id="headClip"><rect x="120" y="100" width="160" height="160" rx="30"/></clipPath></defs>
-                        <path id="antenna" d="M200 100 L190 70 L210 70 Z" fill="#f59e0b"/>
-                        <circle id="antennaBall" cx="200" cy="70" r="8" fill="#ff6b6b"/>
-                        <rect id="robotHead" x="120" y="100" width="160" height="160" rx="30" fill="#3b82f6"/>
-                        <path id="hairStyle" d="" fill="#8B4513" opacity="0"/>
-                        <rect id="leftBrow" x="155" y="140" width="25" height="6" rx="3" fill="#4a2c1a" opacity="0.8"/>
-                        <rect id="rightBrow" x="220" y="140" width="25" height="6" rx="3" fill="#4a2c1a" opacity="0.8"/>
-                        <circle cx="170" cy="160" r="14" fill="white" id="leftEyeWhite"/>
-                        <circle cx="230" cy="160" r="14" fill="white" id="rightEyeWhite"/>
-                        <circle cx="172" cy="158" r="8" fill="#0f172a" id="leftPupil"/>
-                        <circle cx="232" cy="158" r="8" fill="#0f172a" id="rightPupil"/>
-                        <circle cx="150" cy="175" r="10" fill="#ff9999" opacity="0.3" id="leftCheek"/>
-                        <circle cx="250" cy="175" r="10" fill="#ff9999" opacity="0.3" id="rightCheek"/>
-                        <path id="foreheadPattern" d="" fill="#ffd700" opacity="0"/>
-                        <rect id="robotBody" x="150" y="260" width="100" height="80" rx="20" fill="#2563eb"/>
-                        <path id="shirtPattern" d="" fill="#ffd700" opacity="0"/>
-                        <rect id="leftArm" x="110" y="280" width="40" height="20" rx="10" fill="#3b82f6"/>
-                        <rect id="rightArm" x="250" y="280" width="40" height="20" rx="10" fill="#3b82f6"/>
-                        <rect id="leftLeg" x="165" y="340" width="30" height="35" rx="10" fill="#1e3a5f"/>
-                        <rect id="rightLeg" x="205" y="340" width="30" height="35" rx="10" fill="#1e3a5f"/>
-                        <ellipse id="leftShoe" cx="180" cy="378" rx="20" ry="8" fill="#4a4a4a"/>
-                        <ellipse id="rightShoe" cx="220" cy="378" rx="20" ry="8" fill="#4a4a4a"/>
-                    </svg>
+        <div class="page-content-wrapper">
+            <div class="hero">
+                <div class="hero-content">
+                    <span class="hero-badge"><i class="fas fa-microchip"></i> วิทยาการคำนวณ ม.4</span>
+                    <h1>เรียนรู้ Coding & Robotics <br>สู่โลกแห่งอนาคต</h1>
+                    <p>พัฒนาทักษะการเขียนโปรแกรม Python, Arduino และนวัตกรรมหุ่นยนต์ PROT ROBOT พร้อมระบบการเรียนรู้แบบ Interactive</p>
                 </div>
-                <div id="outfitIcon" class="outfit-icon" style="display: none;">
-                    <i class="fas fa-tshirt"></i>
-                    <i class="fas fa-shoe-prints"></i>
-                    <i class="fas fa-crown"></i>
-                    <span>แต่งตัว!</span>
+                <div class="hero-robot" id="heroRobot">
+                    <div class="robot-container" id="robotContainer">
+                        <div class="robot-glow" id="robotGlow"></div>
+                        <svg class="robot-main" id="robotSvg" viewBox="0 0 400 400" fill="none">
+                            <defs><clipPath id="headClip"><rect x="120" y="100" width="160" height="160" rx="30"/></clipPath></defs>
+                            <path id="antenna" d="M200 100 L190 70 L210 70 Z" fill="#f59e0b"/>
+                            <circle id="antennaBall" cx="200" cy="70" r="8" fill="#ff6b6b"/>
+                            <rect id="robotHead" x="120" y="100" width="160" height="160" rx="30" fill="#3b82f6"/>
+                            <path id="hairStyle" d="" fill="#8B4513" opacity="0"/>
+                            <rect id="leftBrow" x="155" y="140" width="25" height="6" rx="3" fill="#4a2c1a" opacity="0.8"/>
+                            <rect id="rightBrow" x="220" y="140" width="25" height="6" rx="3" fill="#4a2c1a" opacity="0.8"/>
+                            <circle cx="170" cy="160" r="14" fill="white" id="leftEyeWhite"/>
+                            <circle cx="230" cy="160" r="14" fill="white" id="rightEyeWhite"/>
+                            <circle cx="172" cy="158" r="8" fill="#0f172a" id="leftPupil"/>
+                            <circle cx="232" cy="158" r="8" fill="#0f172a" id="rightPupil"/>
+                            <circle cx="150" cy="175" r="10" fill="#ff9999" opacity="0.3" id="leftCheek"/>
+                            <circle cx="250" cy="175" r="10" fill="#ff9999" opacity="0.3" id="rightCheek"/>
+                            <path id="foreheadPattern" d="" fill="#ffd700" opacity="0"/>
+                            <rect id="robotBody" x="150" y="260" width="100" height="80" rx="20" fill="#2563eb"/>
+                            <path id="shirtPattern" d="" fill="#ffd700" opacity="0"/>
+                            <rect id="leftArm" x="110" y="280" width="40" height="20" rx="10" fill="#3b82f6"/>
+                            <rect id="rightArm" x="250" y="280" width="40" height="20" rx="10" fill="#3b82f6"/>
+                            <rect id="leftLeg" x="165" y="340" width="30" height="35" rx="10" fill="#1e3a5f"/>
+                            <rect id="rightLeg" x="205" y="340" width="30" height="35" rx="10" fill="#1e3a5f"/>
+                            <ellipse id="leftShoe" cx="180" cy="378" rx="20" ry="8" fill="#4a4a4a"/>
+                            <ellipse id="rightShoe" cx="220" cy="378" rx="20" ry="8" fill="#4a4a4a"/>
+                        </svg>
+                    </div>
+                    <div id="outfitIcon" class="outfit-icon" style="display: none;">
+                        <i class="fas fa-tshirt"></i>
+                        <span>แต่งตัว!</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="features">
+                <h2 style="text-align:center; margin-bottom:30px; color:inherit; font-size: 1.5rem;"><i class="fas fa-star" style="color:#f59e0b;"></i> ทำไมต้องเรียนกับเรา?</h2>
+                <div class="features-grid">
+                    <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='python.html'; else openLoginModal()">
+                        <div class="feature-icon"><i class="fab fa-python"></i></div><h4>ห้อง Lab Python</h4><p>ฝึกเขียนโค้ดภาษา Python</p>
+                    </div>
+                    <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='robotics.html'; else openLoginModal()">
+                        <div class="feature-icon"><i class="fas fa-robot"></i></div><h4>PROT ROBOT</h4><p>สร้างหุ่นยนต์ด้วยโครงงานจริง</p>
+                    </div>
+                    <div class="feature-card" onclick="window.location.href='teacher_profile.html';">
+                        <div class="feature-icon"><i class="fas fa-chalkboard-teacher"></i></div><h4>ผู้สอนมืออาชีพ</h4><p>TECHNOLOGY COMPUTER</p>
+                    </div>
                 </div>
             </div>
         </div>
 
-        <div class="features">
-            <h2 style="text-align:center; margin-bottom:50px; color:#60a5fa;">✨ ทำไมต้องเรียนกับเรา?</h2>
-            <div class="features-grid">
-                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='python.html'; else openLoginModal()">
-                    <div class="feature-icon"><i class="fas fa-code"></i></div><h4>เรียนรู้ผ่านการลงมือทำ</h4><p>ฝึกเขียน Python และ Arduino</p>
-                </div>
-                <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='robotics.html'; else openLoginModal()">
-                    <div class="feature-icon"><i class="fas fa-robot"></i></div><h4>PROT ROBOT Innovation</h4><p>สร้างหุ่นยนต์ด้วยโครงงานจริง</p>
-                </div>
-                <div class="feature-card" onclick="window.location.href='teacher_profile.html';">
-                    <div class="feature-icon"><i class="fas fa-chalkboard-user"></i></div><h4>ผู้สอนมืออาชีพ</h4><p>TECHNOLOGY COMPUTER</p>
-                </div>
-            </div>
-        </div>
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | วิทยาการคำนวณเพื่ออนาคต</p>
+        </footer>
     </div>
 
-    <div id="wardrobeModal" class="wardrobe-modal">
+    <div id="wardrobeModal" class="modal">
         <div class="wardrobe-content">
-            <button class="close-wardrobe" onclick="closeWardrobe()">&times;</button>
+            <button class="close-modal" onclick="closeWardrobe()">&times;</button>
             <h3><i class="fas fa-tshirt"></i> ตู้เสื้อผ้าหุ่นยนต์ <i class="fas fa-smile-wink"></i></h3>
             <div class="dressup-grid">
-                <div class="dressup-category"><label><i class="fas fa-palette"></i> สีหน้า/ผิว</label>
+                <div class="dressup-category"><label><i class="fas fa-palette"></i> สีผิว</label>
                     <select id="skinColor"><option value="#3b82f6">💙 ฟ้า</option><option value="#60a5fa">🌀 ฟ้าอ่อน</option><option value="#fcd34d">🌟 ทอง</option><option value="#f472b6">🌸 ชมพู</option><option value="#34d399">🍃 เขียว</option><option value="#a78bfa">💜 ม่วง</option></select></div>
-                <div class="dressup-category"><label><i class="fas fa-smile"></i> รูปปาก/หน้า</label>
+                <div class="dressup-category"><label><i class="fas fa-smile"></i> หน้าตา</label>
                     <select id="faceMouth"><option value="smile">😊 ยิ้ม</option><option value="happy">😄 ดีใจ</option><option value="love">😍 รัก</option><option value="wink">😉 ขยิบตา</option><option value="cool">😎 เท่</option></select></div>
-                <div class="dressup-category"><label><i class="fas fa-fill-drip"></i> สีเสื้อผ้า</label>
+                <div class="dressup-category"><label><i class="fas fa-fill-drip"></i> สีเสื้อ</label>
                     <select id="shirtColor"><option value="#2563eb">🔵 น้ำเงิน</option><option value="#dc2626">🔴 แดง</option><option value="#ea580c">🟠 ส้ม</option><option value="#16a34a">🟢 เขียว</option><option value="#9333ea">🟣 ม่วง</option><option value="#fbbf24">🟡 เหลือง</option><option value="#ec4899">🌸 ชมพู</option></select></div>
-                <div class="dressup-category"><label><i class="fas fa-shield-alt"></i> ลวดลายเสื้อ</label>
+                <div class="dressup-category"><label><i class="fas fa-shield-alt"></i> ลายเสื้อ</label>
                     <select id="pattern"><option value="none">✨ ไม่มี</option><option value="star">⭐ ดาว</option><option value="heart">❤️ หัวใจ</option><option value="circle">⚪ วงกลม</option><option value="stripe">📏 ลายเส้น</option></select></div>
                 <div class="dressup-category"><label><i class="fas fa-shoe-prints"></i> รองเท้า</label>
                     <select id="shoeColor"><option value="#4a4a4a">⚫ ดำ</option><option value="#dc2626">🔴 แดง</option><option value="#fbbf24">🟡 ทอง</option><option value="#ffffff">⚪ ขาว</option><option value="#8b4513">🤎 น้ำตาล</option></select></div>
                 <div class="dressup-category"><label><i class="fas fa-crown"></i> หมวก/ผม</label>
                     <select id="hatStyle"><option value="none">🚫 ไม่มี</option><option value="cap">🧢 แคป</option><option value="crown">👑 มงกุฎ</option><option value="flower">🌸 ดอกไม้</option><option value="bow">🎀 โบว์</option></select></div>
             </div>
-            <button class="save-outfit-btn" onclick="saveOutfit()"><i class="fas fa-cloud-upload-alt"></i> 💾 กดเพื่อบันทึก</button>
+            <button class="save-outfit-btn" onclick="saveOutfit()"><i class="fas fa-save"></i> บันทึกชุดเก่ง</button>
         </div>
     </div>
 
-    <div id="loginModal" class="login-modal">
+    <div id="loginModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="closeLoginModal()">&times;</button>
-            <h3 style="color: white;"><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
-            <p style="margin-bottom: 20px; color: #cbd5e1;">กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
-            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
-            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large"></div>
+            <h3 style="color: inherit; margin-bottom: 10px;"><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 25px;">กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
+            <div id="g_id_onload" data-client_id="YOUR_CLIENT_ID" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
+            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="center" style="display: flex; justify-content: center;"></div>
         </div>
     </div>
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6LgfZ1EMcKAh8shNWgqHzqHJgF76GFA79jECZbketXpu_r0ghIOUCu1LH0TICLmZj1A/exec";
         
-        // ========== เอฟเฟกต์เสริม ==========
         function createClickFlash(x, y) {
             const flash = document.createElement('div');
             flash.className = 'click-flash';
@@ -290,15 +311,10 @@
             setTimeout(() => flash.remove(), 600);
         }
 
-        // ฟังก์ชันส่งเวลาไปอัปเดตใน Google Sheets
         function updateLastActive(email, type) {
             fetch(SCRIPT_URL, {
-            method: 'POST',
-            body: JSON.stringify({
-            action: 'updateTimestamp',
-            email: email,
-            type: type // 'last_login' หรือ 'last_update'
-                })
+            method: 'POST', mode: 'no-cors',
+            body: JSON.stringify({ action: 'updateTimestamp', email: email, type: type })
             }).catch(e => console.log("Timestamp Error:", e));
         }
         
@@ -331,19 +347,6 @@
             }, 3000);
         }
         
-        function createSparkles() {
-            for(let i = 0; i < 50; i++) {
-                const sparkle = document.createElement('div');
-                sparkle.className = 'sparkle';
-                sparkle.style.left = Math.random() * 100 + '%';
-                sparkle.style.top = Math.random() * 100 + '%';
-                sparkle.style.animationDelay = Math.random() * 5 + 's';
-                sparkle.style.animationDuration = (Math.random() * 2 + 2) + 's';
-                document.body.appendChild(sparkle);
-            }
-        }
-        
-        // ========== ฟังก์ชันหลัก ==========
         async function saveOutfit() {
             if (!localStorage.getItem('is_logged_in')) {
                 alert('⚠️ กรุณาเข้าสู่ระบบก่อนบันทึกชุด');
@@ -365,22 +368,18 @@
             
             localStorage.setItem(`robot_outfit_${email}`, JSON.stringify(outfitData));
             
-            // ตรงส่วนที่ fetch สำเร็จ
-try {
-    await fetch(SCRIPT_URL, {
-        method: 'POST',
-        mode: 'no-cors',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(outfitData)
-    });
-    showSpeechBubble('💾 บันทึกชุดเรียบร้อย! 💕');
-    
-    // 🌟 เพิ่มบรรทัดนี้ เพื่ออัปเดตเวลาแก้ประวัติล่าสุด
-    updateLastActive(email, 'last_update');
-    
-} catch(e) {
-    showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
-}
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(outfitData)
+                });
+                showSpeechBubble('💾 บันทึกชุดน่ารักๆ เรียบร้อย! 💕');
+                updateLastActive(email, 'last_update');
+            } catch(e) {
+                showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
+            }
             closeWardrobe();
         }
         
@@ -399,13 +398,11 @@ try {
                     document.getElementById('pattern').value = data.pattern;
                     document.getElementById('hatStyle').value = data.hatStyle;
                     updateRobotOutfit();
-                    showSpeechBubble('🎉 โหลดชุดจากคลาวด์สำเร็จ! น่ารักมากกก 💖');
+                    showSpeechBubble('🎉 โหลดชุดสำเร็จ! วันนี้ก็หล่อเหมือนเดิม 💖');
                     startAutoDance();
                     return;
                 }
-            } catch(e) {
-                console.log("โหลดข้อมูลไม่สำเร็จ", e);
-            }
+            } catch(e) {}
             
             const saved = localStorage.getItem(`robot_outfit_${email}`);
             if (saved) {
@@ -417,11 +414,11 @@ try {
                 document.getElementById('pattern').value = outfit.pattern;
                 document.getElementById('hatStyle').value = outfit.hatStyle;
                 updateRobotOutfit();
-                showSpeechBubble('🎉 ยินดีต้อนรับกลับ! นี่คือหุ่นยนต์ของคุณนะคะ 💖');
+                showSpeechBubble('🎉 ยินดีต้อนรับกลับ! 💖');
                 startAutoDance();
             } else {
                 updateRobotOutfit();
-                showSpeechBubble('🤖 สวัสดี! กดที่ไอคอนเสื้อผ้าเพื่อแต่งตัวหุ่นยนต์ของคุณเลย 🎨');
+                showSpeechBubble('🤖 สวัสดี! กดที่ไอคอนเสื้อผ้าเพื่อแต่งตัวให้เราสิ 🎨');
                 startAutoDance();
             }
         }
@@ -555,42 +552,33 @@ try {
         }
         function closeWardrobe() { document.getElementById('wardrobeModal').classList.remove('active'); }
         
-        function decodeJwtResponse(token) {
-            let base64Url = token.split('.')[1];
-            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join('')));
-        }
-        
         function handleCredentialResponse(response) {
-    const userData = decodeJwtResponse(response.credential);
-    const userEmail = userData.email;
-    if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
-        localStorage.setItem('student_name', userData.name);
-        localStorage.setItem('student_email', userEmail);
-        localStorage.setItem('student_pic', userData.picture);
-        localStorage.setItem('is_logged_in', 'true');
-        if (userEmail === 'ratchapon@prot.ac.th' || userEmail === 'teacher@prot.ac.th') {
-            window.location.href = 'teacher_dashboard.html';
-            return;
+            const userData = decodeJwtResponse(response.credential);
+            const userEmail = userData.email;
+            if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userEmail);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                if (userEmail === 'ratchapon@prot.ac.th' || userEmail === 'teacher@prot.ac.th') {
+                    window.location.href = 'teacher_dashboard.html';
+                    return;
+                }
+                closeLoginModal();
+                updateLoginUI();
+                document.getElementById('outfitIcon').style.display = 'flex';
+                loadOutfit();
+                createFloatingHeart(window.innerWidth/2, window.innerHeight/2);
+                updateLastActive(userEmail, 'last_login'); 
+            } else {
+                alert('❌ อีเมลนี้ไม่ได้รับอนุญาต');
+            }
         }
-        closeLoginModal();
-        updateLoginUI();
-        document.getElementById('outfitIcon').style.display = 'flex';
-        loadOutfit();
-        createFloatingHeart(window.innerWidth/2, window.innerHeight/2);
-        
-        // 🌟 เพิ่มบรรทัดนี้ เพื่ออัปเดตเวลาใช้งานล่าสุด
-        updateLastActive(userEmail, 'last_login'); 
-        
-    } else {
-        alert('❌ อีเมลนี้ไม่ได้รับอนุญาต');
-    }
-}
         
         function updateLoginUI() {
             const name = localStorage.getItem('student_name');
             const pic = localStorage.getItem('student_pic');
-            document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
+            document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar" alt="avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()" title="ออกจากระบบ"><i class="fas fa-sign-out-alt"></i></button></div>`;
         }
         
         function logout() {
@@ -640,14 +628,22 @@ try {
             document.body.setAttribute("data-theme", themeKey);
             localStorage.setItem('smart_theme', themeKey);
             document.getElementById("robotGlow").style.background = `radial-gradient(circle, ${themes[themeKey].glowColor} 0%, rgba(0,0,0,0) 70%)`;
-            const msg = themeKey === 'snow' ? '❄️ ธีมหิมะ เย็นสบาย~' : themeKey === 'forest' ? '🌿 ธีมป่าเขียว สดชื่น!' : themeKey === 'halloween' ? '🎃 ธีมฮัลโลวีน สนุกสุดๆ!' : themeKey === 'love' ? '🌸 ธีมซากุระ หวานละมุน~' : '🤖 ธีมเริ่มต้น คลาสสิค!';
-            showSpeechBubble(msg);
+            
+            // Only show message if user clicked, not on initial load
+            if (event) {
+                const msg = themeKey === 'snow' ? '❄️ ธีมหิมะ เย็นสบาย~' : themeKey === 'forest' ? '🌿 ธีมป่าเขียว สดชื่น!' : themeKey === 'halloween' ? '🎃 ธีมฮัลโลวีน สนุกสุดๆ!' : themeKey === 'love' ? '🌸 ธีมซากุระ หวานละมุน~' : '🤖 ธีมเริ่มต้น คลาสสิค!';
+                showSpeechBubble(msg);
+            }
             startThemeParticles(themeKey);
+            
+            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
+            const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
+            if(activeBtn) activeBtn.classList.add("active");
         }
         
         document.getElementById('heroRobot')?.addEventListener('click', (e) => {
             e.stopPropagation();
-            if(localStorage.getItem('is_logged_in')) {
+            if(localStorage.getItem('is_logged_in') === 'true') {
                 playRandomBounce(e);
             } else {
                 showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะมาเล่นด้วยกันได้เลย!');
@@ -664,19 +660,13 @@ try {
             document.getElementById(id)?.addEventListener('change', updateRobotOutfit)
         );
         
-        document.querySelectorAll(".theme-btn").forEach(btn => btn.addEventListener("click", () => { 
-            applyTheme(btn.getAttribute("data-theme")); 
-            document.querySelectorAll(".theme-btn").forEach(b=>b.classList.remove("active")); 
-            btn.classList.add("active"); 
-        }));
+        document.querySelectorAll(".theme-btn").forEach(btn => {
+            btn.addEventListener("click", (e) => applyTheme(btn.getAttribute("data-theme")));
+        });
         
         window.onload = function() {
-            createSparkles();
-            blinkEyesRandomly();
-            
             const savedTheme = localStorage.getItem('smart_theme') || "default";
             applyTheme(savedTheme);
-            document.querySelector(`.theme-btn[data-theme="${savedTheme}"]`)?.classList.add("active");
             
             if (localStorage.getItem('is_logged_in') === 'true') { 
                 updateLoginUI(); 
