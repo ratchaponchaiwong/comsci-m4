@@ -16,78 +16,138 @@
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
 
-        .sidebar { width: 280px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px 0; z-index: 100; transition: 0.3s; height: 100vh; overflow-y: auto;}
-        body[data-theme="snow"] .sidebar, body[data-theme="love"] .sidebar { background: rgba(255,255,255,0.85); border-right-color: rgba(0,0,0,0.1); }
+        /* พื้นหลังเคลื่อนไหวแบบ Glassmorphism */
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.2) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
+        .bg-animation .circle:nth-child(1) { width: 500px; height: 500px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 700px; height: 700px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+
+        /* แถบด้านซ้าย */
+        .sidebar { width: 280px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px 0; z-index: 100; transition: 0.3s; height: 100vh; overflow-y: auto;}
+        body[data-theme="snow"] .sidebar, body[data-theme="love"] .sidebar { background: rgba(255,255,255,0.6); border-right-color: rgba(0,0,0,0.1); }
         .sidebar-brand { font-size: 1.3rem; font-weight: 800; color: #60a5fa; padding: 0 20px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 5px; padding: 0 15px; }
+        body[data-theme="snow"] .sidebar-brand, body[data-theme="love"] .sidebar-brand { border-bottom-color: rgba(0,0,0,0.1); }
+        
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 5px; padding: 0 15px; flex: 1; }
         .nav-menu li { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; opacity: 0.8; }
         .nav-menu li:hover { background: rgba(59, 130, 246, 0.2); opacity: 1; color: #60a5fa; }
         .nav-menu li.active { background: #3b82f6; color: white; opacity: 1; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
+        
+        .theme-switcher-sidebar { display: flex; justify-content: center; gap: 10px; padding: 20px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; }
+        body[data-theme="snow"] .theme-switcher-sidebar, body[data-theme="love"] .theme-switcher-sidebar { border-top-color: rgba(0,0,0,0.1); }
+        .theme-btn { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); padding: 8px 12px; border-radius: 20px; color: inherit; cursor: pointer; transition: 0.2s;}
+        body[data-theme="snow"] .theme-btn, body[data-theme="love"] .theme-btn { border-color: rgba(0,0,0,0.1); background: rgba(0,0,0,0.05); }
+        .theme-btn:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
 
+        /* พื้นที่เนื้อหา */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; position: relative; z-index: 10; }
-        .header-bar { padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; background: rgba(15, 23, 42, 0.9); backdrop-filter: blur(10px); border-bottom: 1px solid rgba(255,255,255,0.05);}
-        .content-body { padding: 30px; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 100px; }
+        .header-bar { padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1);}
+        body[data-theme="snow"] .header-bar, body[data-theme="love"] .header-bar { background: rgba(255, 255, 255, 0.5); border-bottom-color: rgba(0,0,0,0.1); }
+        .content-body { padding: 30px 20px; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 100px; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); color: inherit;}
-        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.9); color: black; border-color: rgba(0,0,0,0.1); }
+        /* การ์ดแบบ Glassmorphism */
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 24px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: inherit; transition: 0.3s;}
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.85); color: #1e293b; border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
         .form-group { margin-bottom: 15px; }
         .form-group.full { grid-column: span 2; }
-        label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 500; opacity: 0.9; color: #60a5fa;}
-        body[data-theme="love"] label { color: #e11d48; }
+        label { display: block; font-size: 0.95rem; margin-bottom: 8px; font-weight: 600; color: #60a5fa; }
+        body[data-theme="snow"] label, body[data-theme="love"] label { color: #3b82f6; }
         
-        input, select, textarea { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; font-size: 0.95rem; }
+        input, select, textarea { width: 100%; padding: 12px 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; font-size: 0.95rem; transition: 0.3s; }
         body[data-theme="snow"] input, body[data-theme="snow"] select, body[data-theme="snow"] textarea, body[data-theme="love"] input, body[data-theme="love"] select, body[data-theme="love"] textarea { background: white; border-color: #cbd5e1; }
+        input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
         
         .btn-action { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; display: inline-flex; align-items: center; gap: 8px;}
-        .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
-        .btn-action:disabled { opacity: 0.7; cursor: not-allowed; }
+        .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.3); }
+        .btn-action:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
         .btn-danger { background: #ef4444 !important; }
+        .btn-danger:hover { box-shadow: 0 5px 15px rgba(239,68,68,0.3) !important; }
         .btn-success { background: #10b981 !important; }
+        .btn-success:hover { box-shadow: 0 5px 15px rgba(16,185,129,0.3) !important; }
         .btn-warning { background: #f59e0b !important; }
 
-        .list-item { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
+        .list-item { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 15px; margin-bottom: 12px; border-left: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;}
+        body[data-theme="snow"] .list-item, body[data-theme="love"] .list-item { background: rgba(0,0,0,0.05); }
+        .list-item:hover { background: rgba(0,0,0,0.3); transform: translateX(5px); }
+        body[data-theme="snow"] .list-item:hover, body[data-theme="love"] .list-item:hover { background: rgba(0,0,0,0.1); }
         
-        table { width: 100%; border-collapse: collapse; margin-top: 15px; }
-        th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        th { font-weight: 600; color: #60a5fa; background: rgba(0,0,0,0.2);}
+        /* 🌟 ตารางตรวจงานที่สวยและอ่านง่ายขึ้น 🌟 */
+        .table-responsive { overflow-x: auto; width: 100%; border-radius: 15px; }
+        table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
+        body[data-theme="snow"] table, body[data-theme="love"] table { border-color: rgba(0,0,0,0.1); }
+        th { font-weight: 600; color: white; background: rgba(59,130,246,0.4); padding: 15px; text-align: left; }
+        body[data-theme="snow"] th, body[data-theme="love"] th { background: rgba(59,130,246,0.1); color: #3b82f6; }
+        td { padding: 15px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;}
+        body[data-theme="snow"] td, body[data-theme="love"] td { background: rgba(255,255,255,0.6); border-bottom-color: rgba(0,0,0,0.05); }
+        tr:last-child td { border-bottom: none; }
+        tr:hover td { background: rgba(59,130,246,0.2); }
+        body[data-theme="snow"] tr:hover td, body[data-theme="love"] tr:hover td { background: rgba(59,130,246,0.05); }
 
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
-        .modal-content { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px; color: white; position: relative; max-height: 90vh; overflow-y: auto;}
-        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: #ffffff; color: #1e293b; }
+        .modal-content { background: rgba(30, 41, 59, 0.95); padding: 35px; border-radius: 24px; width: 90%; max-width: 600px; color: white; position: relative; max-height: 90vh; overflow-y: auto; border: 1px solid rgba(59,130,246,0.4); box-shadow: 0 20px 40px rgba(0,0,0,0.4);}
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: #ffffff; color: #1e293b; border-color: rgba(0,0,0,0.1); }
         .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
+        .close-modal:hover { color: #ef4444; opacity: 1; }
         
-        .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
-        .badge-red { background: rgba(239,68,68,0.2); color: #ef4444; }
-        .badge-green { background: rgba(16,185,129,0.2); color: #10b981; }
+        .badge { padding: 6px 12px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
+        .badge-red { background: rgba(239,68,68,0.2); color: #ef4444; border: 1px solid rgba(239,68,68,0.5);}
+        .badge-green { background: rgba(16,185,129,0.2); color: #10b981; border: 1px solid rgba(16,185,129,0.5);}
 
-        .empty-state { text-align: center; padding: 20px; color: #94a3b8; font-style: italic; }
+        .empty-state { text-align: center; padding: 30px; color: #94a3b8; font-style: italic; font-size: 1.1rem; }
+
+        /* Responsive สำหรับมือถือ / iPad */
+        .mobile-toggle { display: none; background: #3b82f6; border: none; color: white; padding: 10px 15px; border-radius: 10px; cursor: pointer; font-size: 1.2rem; }
+        
+        @media (max-width: 900px) {
+            body { flex-direction: column; }
+            .sidebar { width: 100%; height: auto; border-right: none; border-bottom: 1px solid rgba(255,255,255,0.1); padding: 15px 0; }
+            .nav-menu { flex-direction: row; overflow-x: auto; white-space: nowrap; padding-bottom: 10px; }
+            .nav-menu li { padding: 10px 15px; flex-shrink: 0; }
+            .theme-switcher-sidebar { display: none; } /* ซ่อนบนมือถือเพื่อประหยัดพื้นที่ */
+            .main-content { overflow-y: auto; }
+            .form-grid { grid-template-columns: 1fr; }
+            .form-group.full { grid-column: span 1; }
+            .header-bar { padding: 15px; flex-direction: column; align-items: flex-start; gap: 15px; }
+        }
     </style>
 </head>
 <body data-theme="default">
+
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
 
     <div class="sidebar">
         <div class="sidebar-brand"><i class="fas fa-user-shield"></i> Admin Hub</div>
         <ul class="nav-menu">
             <li class="active" onclick="switchTab('tab-activities', this)"><i class="fas fa-edit"></i> 1. จัดการกิจกรรม/สั่งงาน</li>
             <li onclick="switchTab('tab-matrix', this)"><i class="fas fa-tasks"></i> 2. ตรวจงาน (Matrix)</li>
-            <li onclick="switchTab('tab-cms', this)"><i class="fas fa-pager"></i> 3. จัดการเนื้อหาเว็บ (CMS)</li>
+            <li onclick="switchTab('tab-cms', this)"><i class="fas fa-pager"></i> 3. จัดการเนื้อหาเว็บ</li>
             <li onclick="switchTab('tab-classview', this)"><i class="fas fa-users-class"></i> 4. ข้อมูลรายห้องเรียน</li>
             <li><a href="index.html" style="color: inherit; text-decoration: none; display: flex; gap: 12px; width: 100%;"><i class="fas fa-home"></i> กลับหน้าหลัก</a></li>
         </ul>
+        <div class="theme-switcher-sidebar">
+            <button class="theme-btn" onclick="applyTheme('default')">🤖</button>
+            <button class="theme-btn" onclick="applyTheme('snow')">❄️</button>
+            <button class="theme-btn" onclick="applyTheme('forest')">🌿</button>
+            <button class="theme-btn" onclick="applyTheme('love')">🌸</button>
+        </div>
     </div>
 
     <div class="main-content">
         <div class="header-bar">
-            <h2 style="font-size: 1.3rem;"><i class="fas fa-cogs"></i> ระบบบริหารจัดการงาน</h2>
+            <h2 style="font-size: 1.4rem; color: inherit;"><i class="fas fa-cogs" style="color: #60a5fa;"></i> ระบบบริหารจัดการงาน</h2>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <button class="btn-action btn-success" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
+                <button class="btn-action btn-success" onclick="loadAllData()" id="btn-global-sync"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูลล่าสุด</button>
             </div>
         </div>
 
@@ -95,8 +155,7 @@
             
             <div id="tab-activities" class="tab-content active">
                 <div class="glass-card">
-                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> สร้าง/แก้ไข โพสต์กิจกรรม</h3>
-                    
+                    <h3 style="margin-bottom: 25px; color: #60a5fa; font-size: 1.3rem;"><i class="fas fa-plus-circle"></i> สร้าง/แก้ไข โพสต์กิจกรรม</h3>
                     <input type="hidden" id="act-edit-id" value="">
                     
                     <div class="form-grid">
@@ -105,6 +164,7 @@
                                 <option value="task">⚙️ งานปฎิบัติ (มีคะแนน)</option>
                                 <option value="activity">💡 กิจกรรม (ไม่มีคะแนน)</option>
                                 <option value="content">📖 เนื้อหาความรู้ (อ่านอย่างเดียว)</option>
+                                <option value="exam">🎯 แบบทดสอบ (จับเวลา/กันโกง)</option>
                             </select>
                         </div>
                         <div class="form-group"><label>สถานะการรับงาน</label>
@@ -112,7 +172,7 @@
                         </div>
                         
                         <div class="form-group full"><label>ชื่อหัวข้องาน</label><input type="text" id="act-title" placeholder="เช่น ใบงานที่ 1 การเขียนโปรแกรมเบื้องต้น"></div>
-                        <div class="form-group full"><label>คำสั่ง / รายละเอียดงาน</label><textarea id="act-desc" rows="2" placeholder="อธิบายสิ่งที่นักเรียนต้องทำ..."></textarea></div>
+                        <div class="form-group full"><label>คำสั่ง / รายละเอียดงาน</label><textarea id="act-desc" rows="3" placeholder="อธิบายสิ่งที่นักเรียนต้องทำ..."></textarea></div>
                         
                         <div class="form-group"><label>📅 วันที่กำหนดส่ง</label><input type="date" id="act-date"></div>
                         <div class="form-group"><label>⏰ เวลาที่กำหนดส่ง</label><input type="time" id="act-time" value="23:59"></div>
@@ -130,7 +190,8 @@
                             <select id="act-room-num">
                                 <option value="ทุกห้อง">-- ทุกห้องในชั้นนี้ --</option>
                                 <option value="1">ห้อง 1</option><option value="2">ห้อง 2</option><option value="3">ห้อง 3</option>
-                                <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option>
+                                <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option>
+                                <option value="6">ห้อง 6</option>
                                 <option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option>
                                 <option value="10">ห้อง 10</option><option value="11">ห้อง 11</option><option value="12">ห้อง 12</option>
                                 <option value="13">ห้อง 13</option><option value="14">ห้อง 14</option><option value="15">ห้อง 15</option>
@@ -140,14 +201,14 @@
                         <div class="form-group"><label>🏆 คะแนนเต็ม</label><input type="number" id="act-points" value="10"></div>
                         
                         <div class="form-group">
-                            <label>🔗 ลิงก์ปลายทาง (ห้องเรียน Lab)</label>
+                            <label>🔗 ลิงก์ปลายทาง (ระบบพาไป)</label>
                             <select id="act-link">
-                                <option value="#">-- ไม่มี (ส่งงานในห้องเรียน) --</option>
+                                <option value="#">-- ไม่มี (ส่งงานในหน้าห้องเรียนปกติ) --</option>
                                 <option value="content.html">📖 หน้าเนื้อหาความรู้</option>
+                                <option value="worksheet1.html">📝 ใบงานกิจกรรม (แบบฝังเว็บ)</option>
                                 <option value="python.html">🐍 Lab: เขียนโปรแกรม Python</option>
                                 <option value="robotics.html">🤖 Lab: ต่อวงจร Robotics (Wokwi)</option>
-                                <option value="python_and_robotics.html">🦾 Lab: Python + Robotics</option>
-                                <option value="quiz.html">สอบกลางภาค</option>
+                                <option value="quiz.html">🎯 แบบทดสอบ/สอบกลางภาค</option>
                             </select>
                         </div>
 
@@ -155,9 +216,9 @@
                         <div class="form-group full"><label><i class="fas fa-file-pdf" style="color:#3b82f6;"></i> ลิงก์ใบงาน PDF / Google Docs</label><input type="text" id="act-doc" placeholder="https://drive.google.com/..."></div>
                     </div>
                     
-                    <div style="margin-top: 20px; display: flex; gap: 10px;">
-                        <button class="btn-action" onclick="saveActivity()" id="btn-save-act" style="flex:1; justify-content: center;"><i class="fas fa-paper-plane"></i> บันทึกและโพสต์กิจกรรม</button>
-                        <button class="btn-action btn-danger" onclick="resetForm()" id="btn-cancel-edit" style="display:none;"><i class="fas fa-times"></i> ยกเลิกการแก้ไข</button>
+                    <div style="margin-top: 25px; display: flex; gap: 15px;">
+                        <button class="btn-action" onclick="saveActivity()" id="btn-save-act" style="flex:1; justify-content: center; padding: 15px; font-size: 1.1rem;"><i class="fas fa-paper-plane"></i> บันทึกและโพสต์กิจกรรม</button>
+                        <button class="btn-action btn-danger" onclick="resetForm()" id="btn-cancel-edit" style="display:none; padding: 15px;"><i class="fas fa-times"></i> ยกเลิกการแก้ไข</button>
                     </div>
                 </div>
 
@@ -169,27 +230,29 @@
 
             <div id="tab-matrix" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-clipboard-check"></i> ตารางตรวจงาน</h3>
-                    <div class="form-grid">
-                        <div class="form-group"><label>1. เลือกงานที่จะตรวจ</label><select id="matrix-act" onchange="renderMatrix()"></select></div>
-                        <div class="form-group"><label>2. เลือกห้องเรียน</label><select id="matrix-room" onchange="renderMatrix()"></select></div>
+                    <h3 style="margin-bottom: 25px; color: #60a5fa; font-size: 1.3rem;"><i class="fas fa-clipboard-check"></i> ตารางตรวจงาน (Matrix)</h3>
+                    <div class="form-grid" style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; margin-bottom: 20px;">
+                        <div class="form-group" style="margin-bottom: 0;"><label>1. เลือกงานที่จะตรวจ</label><select id="matrix-act" onchange="renderMatrix()"></select></div>
+                        <div class="form-group" style="margin-bottom: 0;"><label>2. เลือกห้องเรียน</label><select id="matrix-room" onchange="renderMatrix()"></select></div>
                     </div>
-                    <table style="display:block; overflow-x:auto;">
-                        <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ</th><th>ห้อง</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr></thead>
-                        <tbody id="matrix-body"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ-สกุล</th><th>ห้อง</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr></thead>
+                            <tbody id="matrix-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
             
             <div id="tab-cms" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="color: #f59e0b; margin-bottom: 20px;"><i class="fas fa-trophy"></i> อัปโหลดผลงานสู่หน้าเว็บ (Portfolio)</h3>
+                    <h3 style="color: #f59e0b; margin-bottom: 25px; font-size: 1.3rem;"><i class="fas fa-trophy"></i> อัปโหลดผลงานสู่หน้าเว็บ (Portfolio)</h3>
                     <div class="form-grid">
                         <div class="form-group full"><label>ชื่อผลงาน/กิจกรรม</label><input type="text" id="cms-p-title" placeholder="พิมพ์ชื่อผลงาน..."></div>
                         <div class="form-group full"><label>ลิงก์รูปภาพ (URL)</label><input type="text" id="cms-p-img" placeholder="เช่น https://imgur.com/... หรือ Google Drive Link"></div>
                         <div class="form-group full"><label>คำอธิบายสั้นๆ</label><textarea id="cms-p-desc" rows="3" placeholder="อธิบายเกี่ยวกับผลงานชิ้นนี้..."></textarea></div>
                     </div>
-                    <button class="btn-action btn-warning" onclick="saveCMSPortfolio()" id="btn-save-port"><i class="fas fa-upload"></i> เผยแพร่ผลงาน</button>
+                    <button class="btn-action btn-warning" onclick="saveCMSPortfolio()" id="btn-save-port" style="margin-top: 15px;"><i class="fas fa-upload"></i> เผยแพร่ผลงาน</button>
                 </div>
                 <div class="glass-card">
                     <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-images"></i> ผลงานในฐานข้อมูล</h3>
@@ -199,15 +262,17 @@
 
             <div id="tab-classview" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="color: #3b82f6; margin-bottom: 20px;"><i class="fas fa-users-class"></i> ข้อมูลและสถิติรายบุคคล</h3>
-                    <div class="form-group" style="max-width: 300px;">
-                        <label>เลือกห้องเรียนเพื่อดูสถิติ</label>
+                    <h3 style="color: #3b82f6; margin-bottom: 25px; font-size: 1.3rem;"><i class="fas fa-users-class"></i> ข้อมูลและสถิติรายบุคคล</h3>
+                    <div class="form-group" style="max-width: 300px; background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-bottom: 20px;">
+                        <label style="margin-bottom: 10px;">กรองตามห้องเรียน</label>
                         <select id="view-class-room" onchange="renderClassViewTable()"></select>
                     </div>
-                    <table style="display:block; overflow-x:auto;">
-                        <thead><tr><th>รหัส</th><th>เลขที่/ชื่อ</th><th>การเข้าใช้งานล่าสุด</th><th>ส่งงานแล้ว</th><th>ค้างส่ง</th><th>คะแนนรวมสะสม</th></tr></thead>
-                        <tbody id="class-view-body"></tbody>
-                    </table>
+                    <div class="table-responsive">
+                        <table>
+                            <thead><tr><th>รหัส</th><th>เลขที่/ชื่อ</th><th>การใช้งานล่าสุด</th><th>ส่งงานแล้ว</th><th>ค้างส่ง</th><th>คะแนนรวมสะสม</th></tr></thead>
+                            <tbody id="class-view-body"></tbody>
+                        </table>
+                    </div>
                 </div>
             </div>
 
@@ -217,16 +282,16 @@
     <div id="gradeModal" class="modal">
         <div class="modal-content">
             <button class="close-modal" onclick="document.getElementById('gradeModal').classList.remove('active')">×</button>
-            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">ตรวจงาน</h3>
-            <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
-                <label>ผลงานที่นักเรียนส่งมา:</label>
-                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all; color: #f59e0b; line-height: 1.5;"></div>
+            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 15px; font-size: 1.3rem;"><i class="fas fa-edit"></i> ตรวจงาน</h3>
+            <div style="background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1);">
+                <label style="color: #94a3b8;"><i class="fas fa-file-alt"></i> ผลงานที่นักเรียนส่งมา:</label>
+                <div id="grade-work-content" style="margin-top: 15px; font-family: monospace; word-break: break-all; color: #f59e0b; line-height: 1.6; font-size: 0.95rem; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px;"></div>
             </div>
             <div class="form-group">
-                <label>ระบุคะแนน (เต็ม <span id="grade-max-points" style="color: #10b981; font-weight: bold;">-</span>)</label>
-                <input type="number" id="grade-input-score" placeholder="กรอกคะแนนที่นี่...">
+                <label style="font-size: 1.1rem;">ระบุคะแนน (เต็ม <span id="grade-max-points" style="color: #10b981; font-weight: bold;">-</span>)</label>
+                <input type="number" id="grade-input-score" placeholder="กรอกคะแนนที่นี่..." style="font-size: 1.2rem; padding: 15px; text-align: center;">
             </div>
-            <button class="btn-action btn-success" id="btn-save-score" style="width: 100%; justify-content: center;" onclick="saveScore()">
+            <button class="btn-action btn-success" id="btn-save-score" style="width: 100%; justify-content: center; padding: 15px; font-size: 1.1rem; margin-top: 10px;" onclick="saveScore()">
                 <i class="fas fa-save"></i> บันทึกคะแนน
             </button>
         </div>
@@ -238,7 +303,6 @@
         
         let db = { activities: [], students: [], submissions: [], portfolios: [] };
 
-        // ฟังก์ชันสลับหน้าต่าง Tabs 
         function switchTab(tabId, el) {
             document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
@@ -250,9 +314,8 @@
             if(tabId === 'tab-cms') renderPortfoliosList();
         }
 
-        // ดึงข้อมูลทั้งหมด
         async function loadAllData() {
-            const btn = document.querySelector('button[onclick="loadAllData()"]');
+            const btn = document.getElementById('btn-global-sync');
             btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังอัปเดต...';
             try {
                 const resp = await fetch(`${SCRIPT_URL}?action=readAll`);
@@ -262,19 +325,19 @@
                 renderMatrix();
                 renderClassViewTable();
                 renderPortfoliosList();
-                btn.innerHTML = '<i class="fas fa-check-circle"></i> ข้อมูลล่าสุดแล้ว';
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> อัปเดตข้อมูลล่าสุดสำเร็จ';
+                setTimeout(() => { btn.innerHTML = '<i class="fas fa-sync-alt"></i> อัปเดตข้อมูลล่าสุด'; }, 3000);
             } catch (e) {
-                btn.innerHTML = '<i class="fas fa-times"></i> ผิดพลาด';
+                btn.innerHTML = '<i class="fas fa-times"></i> เกิดข้อผิดพลาด';
             }
         }
 
-        // อัปเดต Dropdown ห้องเรียนในหน้าต่างๆ
         function updateRoomSelectors() {
             const rooms = [...new Set((db.students || []).map(s => s.room))].filter(Boolean).sort();
             const matrixRoom = document.getElementById('matrix-room');
             const viewRoom = document.getElementById('view-class-room');
             
-            const roomOptions = '<option value="all">แสดงทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
+            const roomOptions = '<option value="all">-- แสดงทุกห้องเรียน --</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
             
             if(matrixRoom) matrixRoom.innerHTML = roomOptions;
             if(viewRoom) viewRoom.innerHTML = roomOptions;
@@ -323,7 +386,7 @@
                 loadAllData();
             } catch (e) { 
                 alert("❌ บันทึกไม่สำเร็จ"); 
-                btn.innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> บันทึกและโพสต์กิจกรรม';
                 btn.disabled = false;
             }
         }
@@ -351,13 +414,13 @@
                 return `
                 <div class="list-item">
                     <div>
-                        <strong>${actTitle}</strong> 
-                        <span class="badge ${actStatus === 'open' ? 'badge-green' : 'badge-red'}">${actStatus === 'open' ? 'เปิด' : 'ปิด'}</span>
-                        <br><small style="color: #94a3b8;">เป้าหมาย: ${actRoom} | กำหนดส่ง: ${actDate} ${actTime} | ${actPoints} คะแนน</small>
+                        <strong style="font-size: 1.1rem; display:block; margin-bottom:5px;">${actTitle}</strong> 
+                        <span class="badge ${actStatus === 'open' ? 'badge-green' : 'badge-red'}">${actStatus === 'open' ? 'เปิดให้ทำ' : 'ปิดรับงาน'}</span>
+                        <br><small style="color: #94a3b8; line-height:1.8;">เป้าหมาย: <b>${actRoom}</b> | กำหนดส่ง: <b>${actDate} ${actTime}</b> | <b>${actPoints}</b> คะแนน</small>
                     </div>
-                    <div style="display:flex; gap:8px;">
-                        <button class="btn-action" onclick="editActivity('${actId}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-danger" onclick="deleteActivity('${actId}')"><i class="fas fa-trash"></i></button>
+                    <div style="display:flex; flex-direction: column; gap:8px;">
+                        <button class="btn-action" onclick="editActivity('${actId}')"><i class="fas fa-edit"></i> แก้ไข</button>
+                        <button class="btn-action btn-danger" onclick="deleteActivity('${actId}')"><i class="fas fa-trash"></i> ลบ</button>
                     </div>
                 </div>`;
             }).join('');
@@ -407,7 +470,7 @@
         }
 
         async function deleteActivity(actId) {
-            if(!confirm("⚠️ ลบกิจกรรมนี้ออกจากฐานข้อมูล?")) return;
+            if(!confirm("⚠️ แน่ใจหรือไม่ที่จะลบกิจกรรมนี้ออกจากฐานข้อมูล? (ข้อมูลการส่งงานของเด็กจะไม่ถูกลบ)")) return;
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "deleteActivity", id: actId }) });
             loadAllData();
         }
@@ -417,12 +480,12 @@
             document.getElementById('act-title').value = '';
             document.getElementById('act-desc').value = '';
             const btn = document.getElementById('btn-save-act');
-            btn.innerHTML = '<i class="fas fa-paper-plane"></i> โพสต์กิจกรรม';
+            btn.innerHTML = '<i class="fas fa-paper-plane"></i> บันทึกและโพสต์กิจกรรม';
             btn.disabled = false;
             document.getElementById('btn-cancel-edit').style.display = 'none';
         }
 
-        // ===================== ระบบตรวจงาน (Matrix) =====================
+        // ===================== ระบบตรวจงาน =====================
         function renderMatrix() {
             const actId = document.getElementById('matrix-act').value;
             const room = document.getElementById('matrix-room').value;
@@ -441,38 +504,30 @@
                 return `<tr>
                     <td>${s.student_id || '-'}</td>
                     <td>${s.number || '-'}</td>
-                    <td>${s.name || 'นักเรียน'}</td>
+                    <td><b>${s.name || 'นักเรียน'}</b></td>
                     <td>${s.room || '-'}</td>
                     <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ค้างส่ง'}</span></td>
-                    <td style="font-weight:bold;">${sub ? (sub.score || '0') : '-'}</td>
-                    <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')">ตรวจ</button></td>
+                    <td style="font-weight:bold; color: #60a5fa; font-size:1.1rem;">${sub ? (sub.score || '0') : '-'}</td>
+                    <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')"><i class="fas fa-search"></i> ตรวจ</button></td>
                 </tr>`;
             }).join('');
         }
 
-        // 🌟 อัปเกรดระบบตัวแปลงลิงก์อัตโนมัติ (Clickable Links) 🌟
         function parseWork(content) {
             if (!content) return "ยังไม่มีการส่งงาน";
             let text = String(content);
-            
             try {
-                // เช็คของเก่าที่เป็นรูปแบบ JSON
                 if (text.trim().startsWith('{')) {
                     const parsed = JSON.parse(text);
                     text = Object.values(parsed).join('\n\n');
                 }
             } catch(e) {}
 
-            // แปลง < และ > เป็น HTML Entity ก่อน เพื่อป้องกันการแทรกโค้ด (XSS)
             text = text.replace(/</g, "&lt;").replace(/>/g, "&gt;");
-
-            // ใช้ Regex จับลิงก์ แล้วแปลงเป็นปุ่มกด
             const urlRegex = /(https?:\/\/[^\s]+)/g;
             text = text.replace(urlRegex, function(url) {
-                return `<a href="${url}" target="_blank" style="color: #60a5fa; text-decoration: underline; font-weight: 600; display: inline-block; margin-top: 5px; background: rgba(59,130,246,0.1); padding: 5px 10px; border-radius: 8px;"><i class="fas fa-external-link-alt"></i> เปิดดูผลงาน (Link)</a><br><small style="color: #94a3b8; font-size: 0.75rem;">(${url})</small>`;
+                return `<a href="${url}" target="_blank" style="color: #60a5fa; text-decoration: none; font-weight: bold; display: inline-block; margin-top: 8px; background: rgba(59,130,246,0.2); padding: 8px 12px; border-radius: 8px; border: 1px solid #3b82f6;"><i class="fas fa-external-link-alt"></i> คลิกเปิดดูผลงาน/ลิงก์</a><br><small style="color: #94a3b8; font-size: 0.8rem;">(${url})</small>`;
             });
-
-            // ขึ้นบรรทัดใหม่
             return text.replace(/\n/g, '<br>');
         }
 
@@ -481,9 +536,7 @@
             const act = (db.activities || []).find(a => (a.ID || a.id) == actId);
             const sub = (db.submissions || []).find(item => item.student_id == stdId && item.activity_id == actId);
             
-            document.getElementById('grade-student-name').innerText = "ตรวจงานของ: " + (std ? std.name : stdId);
-            
-            // ⚠️ ใช้ innerHTML แทน innerText เพื่อให้ปุ่มลิงก์ทำงานได้
+            document.getElementById('grade-student-name').innerHTML = "<i class='fas fa-user-edit'></i> ตรวจงานของ: <span style='color:white;'>" + (std ? std.name : stdId) + "</span>";
             document.getElementById('grade-work-content').innerHTML = sub ? parseWork(sub.work_content) : "นักเรียนยังไม่ได้ส่งงานนี้เข้าระบบ";
             
             const maxPoints = act ? (act.Points || act.points) : '-';
@@ -516,7 +569,7 @@
             }
         }
 
-        // ===================== ระบบ CMS (Portfolio) =====================
+        // ===================== ระบบ CMS =====================
         async function saveCMSPortfolio() {
             const title = document.getElementById('cms-p-title').value;
             const imgLink = document.getElementById('cms-p-img').value;
@@ -552,20 +605,19 @@
                 list.innerHTML = '<div class="empty-state">ยังไม่มีผลงานในระบบ</div>';
                 return;
             }
-            // แสดงผลลัพธ์ย้อนกลับ (ใหม่สุดขึ้นก่อน)
             list.innerHTML = [...db.portfolios].reverse().map(p => `
-                <div class="list-item" style="align-items: flex-start; background: rgba(0,0,0,0.1); border-left: 4px solid #f59e0b;">
-                    <img src="${p.ImageLink || p.image_link}" onerror="this.src='https://via.placeholder.com/80'" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px; border: 1px solid rgba(255,255,255,0.2);">
+                <div class="list-item" style="align-items: flex-start; border-left: 4px solid #f59e0b;">
+                    <img src="${p.ImageLink || p.image_link}" onerror="this.src='https://via.placeholder.com/80'" style="width: 80px; height: 80px; object-fit: cover; border-radius: 12px; margin-right: 15px; border: 1px solid rgba(255,255,255,0.2);">
                     <div style="flex: 1;">
-                        <strong style="color: #f59e0b;">${p.Title || p.title}</strong><br>
+                        <strong style="color: #f59e0b; font-size:1.1rem;">${p.Title || p.title}</strong><br>
                         <small style="color: #94a3b8;">อัปโหลดเมื่อ: ${p.Date || p.date}</small>
-                        <p style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">${p.Description || p.desc || '-'}</p>
+                        <p style="font-size: 0.9rem; margin-top: 8px; opacity: 0.9; line-height: 1.5;">${p.Description || p.desc || '-'}</p>
                     </div>
                 </div>
             `).join('');
         }
 
-        // ===================== ระบบ Class View (สถิติ) =====================
+        // ===================== ระบบ Class View =====================
         function renderClassViewTable() {
             const room = document.getElementById('view-class-room').value;
             const body = document.getElementById('class-view-body');
@@ -584,11 +636,14 @@
                 <td><small style="opacity:0.8;">${s.last_login || 'ไม่เคยเข้า'}</small></td>
                 <td><span class="badge badge-green">${s.sent_count || 0} งาน</span></td>
                 <td><span class="badge badge-red">${s.pending_count || 0} งาน</span></td>
-                <td style="font-weight:bold; color:#60a5fa;">${s.total_score || 0}</td>
+                <td style="font-weight:bold; color:#60a5fa; font-size:1.1rem;">${s.total_score || 0}</td>
             </tr>`).join('');
         }
 
-        function applyTheme(theme) { document.body.setAttribute("data-theme", theme); }
+        function applyTheme(theme) { 
+            document.body.setAttribute("data-theme", theme); 
+            localStorage.setItem('admin_theme', theme);
+        }
 
         window.onload = () => {
             applyTheme(localStorage.getItem('admin_theme') || 'default');
