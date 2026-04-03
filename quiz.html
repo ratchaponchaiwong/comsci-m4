@@ -8,12 +8,11 @@
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="mobile-web-app-capable" content="yes">
-    <meta name="display" content="standalone">
-    <link rel="apple-touch-icon" href="https://ui-avatars.com/api/?name=PROT&background=3b82f6&color=fff"> <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        /* ป้องกันการคลุมดำก๊อปปี้ข้อความ */
         body { font-family: 'Prompt', sans-serif; transition: 0.5s; overflow-x: hidden; min-height: 100vh; user-select: none; -webkit-user-select: none; }
         
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a, #1e293b); color: white; }
@@ -25,9 +24,10 @@
         .watermark-container { position: fixed; inset:0; pointer-events:none; z-index:9999; display:grid; grid-template-columns:repeat(3, 1fr); opacity:0.06; }
         .watermark-item { transform:rotate(-30deg); display:flex; align-items:center; justify-content:center; white-space:nowrap; font-size:1.1rem; font-weight: bold; }
         
-        body.lost-focus { filter: blur(30px) grayscale(1) brightness(0.5) !important; transition: 0.1s; }
+        body.lost-focus { filter: blur(20px) grayscale(1) brightness(0.5) !important; transition: 0.2s; }
         
-        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.98); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+        /* 🌟 หน้าจอเตือนก่อนแบน 🌟 */
+        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; backdrop-filter: blur(10px); }
         
         .qcard { margin-top: 20px; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
         body[data-theme="snow"] .qcard, body[data-theme="love"] .qcard { background: rgba(255, 255, 255, 0.9); color: #1e293b; border-color: rgba(0,0,0,0.1); }
@@ -48,10 +48,13 @@
 </head>
 <body data-theme="default">
     <div id="watermark" class="watermark-container"></div>
+    
     <div id="split-warning">
-        <i class="fas fa-expand fa-4x" style="color:red; margin-bottom:20px;"></i>
-        <h2>ตรวจพบการแบ่งหน้าจอ!</h2>
-        <p>กรุณาขยายจอให้เต็มเพื่อสอบต่อ</p>
+        <i class="fas fa-exclamation-triangle fa-5x" style="color:#facc15; margin-bottom:20px;"></i>
+        <h2 style="color:#facc15;">⚠️ ตรวจพบความผิดปกติ!</h2>
+        <p id="warning-text" style="font-size:1.2rem; margin:15px 0;">ระบบตรวจพบการสลับหน้าจอ หรือแบ่งหน้าจอ</p>
+        <p style="font-size:1.1rem;">กรุณากลับสู่หน้าข้อสอบภายใน <span id="warning-time" style="font-size:2rem; font-weight:bold; color:#ef4444;">3</span> วินาที</p>
+        <p style="font-size:0.9rem; opacity:0.7; margin-top:15px;">(หากไม่กลับมาภายในเวลาที่กำหนด ระบบจะระงับสิทธิ์ทันที)</p>
     </div>
     
     <header style="background: rgba(0,0,0,0.5); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; padding-top: max(15px, env(safe-area-inset-top));">
@@ -68,10 +71,6 @@
                 <div id="uId" style="color:#60a5fa;">🆔 รหัสประจำตัว: -</div>
             </div>
             
-            <div id="ios-webapp-guide" style="display:none; background:rgba(245, 158, 11, 0.2); border:1px solid #fbbf24; padding:15px; border-radius:10px; margin-bottom:20px; color:#fbbf24; font-size:0.9rem; text-align:left;">
-                <i class="fas fa-info-circle"></i> <b>สำหรับ iPad/iPhone:</b> แนะนำให้กดปุ่มแชร์ <i class="fas fa-share-square"></i> แล้วเลือก <b>"เพิ่มไปยังหน้าจอโฮม (Add to Home Screen)"</b> เพื่อเข้าสอบแบบเต็มจอและป้องกันระบบแจ้งเตือนผิดพลาดครับ
-            </div>
-
             <button class="btn-main" onclick="startExam()" id="btnBegin">เริ่มการสอบ</button>
             <div id="countdown" style="display:none; color: #ff6600; margin-top: 15px; font-weight:bold;">กรุณารอระบบเข้าที่... 5</div>
         </div>
@@ -91,11 +90,14 @@
     <div class="progress-bar" id="dotsArea" style="display:none;"></div>
 
     <script>
+        // 🌟 ใส่ URL ของครูตรงนี้ให้ถูกต้อง 🌟
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
         const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         let examStarted = false, canBan = false, userIP = "unknown", drawn = [], ans = [], timerHandle, timeLeft = 2400;
-        let initialWidth = window.innerWidth; // 🌟 เก็บความกว้างจอตอนเริ่ม
+        
+        let cheatTimer = null;
+        let countdownInterval = null;
 
         const bank = [
             { "id": 1, "question": "ข้อใดอธิบายหน้าที่ของระบบรับรู้ (Perception) ในหุ่นยนต์ได้ถูกต้องที่สุด", "options": ["ทำหน้าที่รับข้อมูลจากสภาพแวดล้อมผ่านเซนเซอร์", "ทำหน้าที่จัดเก็บข้อมูลการทำงาน", "ทำหน้าที่ควบคุมแรงบิดของมอเตอร์", "ทำหน้าที่แปลงโปรแกรมเป็นคำสั่งเครื่อง"] },
@@ -203,15 +205,11 @@
         function startExam() {
             if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามใช้ 2 จอ ห้ามเปิดแอปซ้อน ห้ามสลับหน้าจอ\nระบบจะจับตาดูคุณตลอดเวลา หากฝ่าฝืนจะถูกระงับสิทธิ์ทันที!")) return;
             
-            // ขยายหน้าจอบน PC หรือ Android
             if (document.documentElement.requestFullscreen) {
                 document.documentElement.requestFullscreen().catch(()=>{});
             }
             
-            initialWidth = window.innerWidth; // 🌟 เก็บค่าความกว้างหน้าจอไว้เช็คแบ่งจอ
-            
             document.getElementById('btnBegin').style.display = 'none';
-            document.getElementById('ios-webapp-guide').style.display = 'none';
             const cd = document.getElementById('countdown'); 
             cd.style.display = 'block';
             let c = 5; 
@@ -275,10 +273,39 @@
             });
         }
 
+        // =========================================================
+        // 🌟 1. ระบบให้อภัยอัจฉริยะ (Smart Forgiveness) 🌟
+        // =========================================================
+        function showWarning(msg) {
+            document.getElementById('split-warning').style.display = 'flex';
+            document.getElementById('warning-text').innerText = msg;
+            let time = 3;
+            document.getElementById('warning-time').innerText = time;
+            
+            clearInterval(countdownInterval);
+            countdownInterval = setInterval(() => {
+                time--;
+                document.getElementById('warning-time').innerText = time;
+                if(time <= 0) clearInterval(countdownInterval);
+            }, 1000);
+
+            clearTimeout(cheatTimer);
+            cheatTimer = setTimeout(() => {
+                ban(msg);
+            }, 3000); // ให้เวลา 3 วินาทีในการกลับมา
+        }
+
+        function hideWarning() {
+            document.getElementById('split-warning').style.display = 'none';
+            clearTimeout(cheatTimer);
+            clearInterval(countdownInterval);
+        }
+
         async function ban(reason) {
             if(!canBan || !examStarted) return;
             examStarted = false; 
             clearInterval(timerHandle);
+            hideWarning();
             
             localStorage.setItem('is_banned', 'true');
             
@@ -292,36 +319,57 @@
             window.location.href = "student.html";
         }
 
-        // ==================================================
-        // 🌟 แก้ไข: ตรวจจับเฉพาะความกว้าง (Width) ป้องกันเลื่อนจอแล้วเด้ง 🌟
-        // ==================================================
-        
+        // =========================================================
+        // 🌟 2. ตัวตรวจจับที่แม่นยำขึ้น 🌟
+        // =========================================================
         window.addEventListener('blur', () => { 
-            if(canBan) ban("แอบสลับหน้าจอหรือใช้งานแอปอื่นพร้อมกัน"); 
+            if(canBan) {
+                document.body.classList.add('lost-focus');
+                showWarning("คุณแอบสลับหน้าจอ ออกจากการทำข้อสอบ หรือถูกแจ้งเตือนบังจอ"); 
+            }
         });
         
         window.addEventListener('focus', () => { 
-            document.body.classList.remove('lost-focus'); 
+            if(canBan) {
+                document.body.classList.remove('lost-focus');
+                hideWarning(); // ถ้ารีบกลับมาภายใน 3 วิ ระบบจะยกโทษให้
+            }
         });
 
         document.addEventListener('visibilitychange', () => {
-            if (canBan && document.visibilityState === 'hidden') ban("ระบบตรวจพบการซ่อนหน้าต่างหรือเปิดแอปซ้อน");
+            if (canBan) {
+                if (document.visibilityState === 'hidden') {
+                    showWarning("ระบบตรวจพบการซ่อนหน้าต่างหรือเปิดแอปซ้อน");
+                } else {
+                    hideWarning();
+                }
+            }
         });
 
         document.addEventListener('contextmenu', event => event.preventDefault());
 
-        // 🌟 แก้ไข onresize ให้เช็คแค่ความกว้าง ไม่สนความสูง
-        window.onresize = () => { 
-            if(canBan) {
-                // ถ้าความกว้างหายไปเกิน 20% แสดงว่าเด็กดึงแอปอื่นมาแปะด้านข้าง (Split Screen)
-                if(window.innerWidth < initialWidth * 0.8) {
-                    document.getElementById('split-warning').style.display = 'flex';
-                    ban("ย่อหน้าต่างหรือแบ่งหน้าจอ 2 ฝั่ง");
-                } else {
-                    document.getElementById('split-warning').style.display = 'none';
-                }
+        // 🌟 3. ปรับระบบตรวจจับ 2 จอ ไม่ให้แบนมั่วตอนหมุนไอแพด 🌟
+        let lastWidth = window.innerWidth;
+        let lastHeight = window.innerHeight;
+        
+        window.addEventListener('resize', () => { 
+            if(!canBan) return;
+            let currentWidth = window.innerWidth;
+            let currentHeight = window.innerHeight;
+            
+            // ตรวจว่าแบ่งจอจริงไหม: ความกว้างหายไปเยอะ (เกิน 30%) แต่ความสูงยังเกือบเท่าเดิม
+            if(currentWidth < lastWidth * 0.7 && currentHeight >= lastHeight * 0.9) {
+                showWarning("ไม่อนุญาตให้ใช้โหมดแบ่งหน้าจอ (Split View)");
+            } else {
+                hideWarning(); // ถ้าแค่หมุนจอ ความสูงจะเปลี่ยนไปด้วย ระบบจะปล่อยผ่าน
             }
-        };
+            
+            // อัปเดตค่าความจำจอ (เฉพาะตอนไม่ได้แบ่งจอ)
+            if(currentWidth >= lastWidth * 0.7) {
+                lastWidth = currentWidth;
+                lastHeight = currentHeight;
+            }
+        });
 
         // ==================================================
         
@@ -350,6 +398,7 @@
             examStarted = false; 
             canBan = false; 
             clearInterval(timerHandle);
+            hideWarning();
             
             document.getElementById('btnSubmit').disabled = true;
             document.getElementById('btnSubmit').innerHTML = "<i class='fas fa-spinner fa-spin'></i> กำลังส่งข้อสอบ...";
@@ -409,13 +458,6 @@
             
             document.getElementById('uName').innerText = "👤 ผู้สอบ: " + localStorage.getItem('student_name');
             document.getElementById('uId').innerText = "🆔 รหัสประจำตัว: " + sid;
-
-            // ตรวจสอบว่าเปิดบน iOS Safari หรือไม่ เพื่อโชว์คำแนะนำให้แอดลงหน้าโฮม
-            const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-            const isStandalone = window.navigator.standalone; // เช็คว่าเป็น Web App แล้วหรือยัง
-            if(isIOS && !isStandalone) {
-                document.getElementById('ios-webapp-guide').style.display = 'block';
-            }
             
             const wm = document.getElementById('watermark');
             const txt = localStorage.getItem('student_name') + " (" + sid + ")";
