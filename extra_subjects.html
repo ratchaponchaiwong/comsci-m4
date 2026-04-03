@@ -2,444 +2,74 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>วิชาเพิ่มเติม | PROT Smart Workspace</title>
-    
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
     <style>
-        /* ==================== 1. CSS โครงสร้างหลัก ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; min-height: 100vh; color: white; background: #0f172a; }
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
+        .logo { font-size: 1.5rem; font-weight: 700; color: #60a5fa; text-decoration: none; display: flex; align-items: center; gap: 10px;}
+        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; }
+        .nav-links a:hover, .nav-links a.active { color: #10b981; background: rgba(16,185,129,0.1); }
         
-        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
-        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
-        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
-        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
+        .header-title { text-align: center; margin-bottom: 40px; color: #10b981; font-size: 2.2rem; }
         
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
-        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
-        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="halloween"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,69,0,0.2) 0%, rgba(255,69,0,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
-        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
-        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-        .bg-animation .circle:nth-child(3) { width: 300px; height: 300px; top: 50%; left: 50%; animation-duration: 18s; animation-delay: -10s; }
-        
-        .content-layer { position: relative; z-index: 10; min-height: 100vh; display: flex; flex-direction: column; }
-        
-        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
-        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; backdrop-filter: blur(4px); font-size: 0.9rem; }
-        .theme-btn:hover { transform: scale(1.05); background: rgba(255,255,255,0.4); }
-        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-        
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px; transition: background 0.3s; }
-        body[data-theme="snow"] header { background: rgba(200, 220, 250, 0.8); border-bottom-color: rgba(255,255,255,0.5); }
-        body[data-theme="forest"] header { background: rgba(30, 60, 30, 0.8); border-bottom-color: rgba(100,200,100,0.3); }
-        body[data-theme="halloween"] header { background: rgba(40, 20, 40, 0.8); border-bottom-color: rgba(255,100,0,0.3); }
-        body[data-theme="love"] header { background: rgba(255, 180, 190, 0.8); border-bottom-color: rgba(255,105,180,0.5); }
-        
-        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; background-clip: text; color: transparent; display: flex; align-items: center; gap: 12px; text-decoration: none; }
-        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; background-clip: text; }
-        body[data-theme="forest"] .logo { background: linear-gradient(135deg, #90ee90, #6b8e23); -webkit-background-clip: text; background-clip: text; }
-        body[data-theme="halloween"] .logo { background: linear-gradient(135deg, #ff8c00, #ff4500); -webkit-background-clip: text; background-clip: text; }
-        
-        .nav-links { display: flex; gap: 24px; list-style: none; flex-wrap: wrap; margin: 0; padding: 0; align-items: center; }
-        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
-        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
-        body[data-theme="forest"] .nav-links a { color: #d4ffd4; }
-        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
-        
-        .login-area { display: flex; align-items: center; gap: 15px; }
-        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: all 0.3s; font-family: 'Prompt'; font-size: 0.95rem; display: flex; align-items: center; gap: 10px; box-shadow: 0 4px 15px rgba(59,130,246,0.3); }
-        .login-btn:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(59,130,246,0.4); }
-        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; backdrop-filter: blur(4px); }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; }
-        .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
-        body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
-        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; color: inherit; cursor: pointer; font-size: 0.8rem; transition: 0.2s; }
-        
-        footer { text-align: center; padding: 30px; border-top: 1px solid rgba(59,130,246,0.2); margin-top: auto; position: relative; z-index: 10; }
-        
-        .login-modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: all 0.3s; }
-        .login-modal.active { visibility: visible; opacity: 1; }
-        .login-modal-content { background: rgba(30, 41, 59, 0.95); backdrop-filter: blur(16px); border-radius: 32px; padding: 48px; max-width: 450px; width: 90%; text-align: center; border: 1px solid rgba(59,130,246,0.5); box-shadow: 0 25px 50px rgba(0,0,0,0.3); }
-        .login-modal-content h3 { font-size: 1.8rem; margin-bottom: 16px; color: white; }
-        .login-modal-content p { color: #94a3b8; margin-bottom: 28px; }
-        .close-modal { position: absolute; top: 20px; right: 30px; font-size: 2rem; cursor: pointer; color: white; background: none; border: none; }
-        .theme-particle { position: absolute; pointer-events: none; animation: floatParticle linear forwards; z-index: 1; }
-        @keyframes floatParticle { 0% { transform: translateY(100vh) rotate(0deg); opacity: 1; } 100% { transform: translateY(-20vh) rotate(360deg); opacity: 0; } }
-        
-        .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; z-index: 10; position: relative; }
-
-        /* ==================== 2. CSS เฉพาะหน้า วิชาเพิ่มเติม ==================== */
-        .page-header { text-align: center; margin-bottom: 40px; }
-        .page-header h1 { font-size: 2.5rem; margin-bottom: 15px; display: flex; align-items: center; justify-content: center; gap: 15px; color: #60a5fa; }
-        body[data-theme="snow"] .page-header h1, body[data-theme="love"] .page-header h1 { color: #3b82f6; }
-        .page-header p { font-size: 1.1rem; opacity: 0.9; }
-
-        .subjects-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(350px, 1fr)); gap: 30px; margin-bottom: 50px; }
-
-        .subject-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 28px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); transition: all 0.3s; cursor: pointer; color: inherit; }
-        body[data-theme="snow"] .subject-card, body[data-theme="love"] .subject-card { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
-        .subject-card:hover { transform: translateY(-8px); box-shadow: 0 15px 35px rgba(0,0,0,0.3); border-color: #3b82f6; background: rgba(59,130,246,0.1); }
-        
-        .icon-box { width: 80px; height: 80px; background: rgba(59,130,246,0.15); border-radius: 24px; display: flex; align-items: center; justify-content: center; font-size: 2.5rem; color: #60a5fa; margin-bottom: 20px; border: 1px solid rgba(59,130,246,0.3); transition: 0.3s; }
-        body[data-theme="snow"] .icon-box, body[data-theme="love"] .icon-box { color: #3b82f6; border-color: rgba(59,130,246,0.2); }
-        .subject-card:hover .icon-box { background: #3b82f6; color: white; transform: scale(1.05); }
-
-        .subject-card h3 { font-size: 1.4rem; margin-bottom: 12px; color: #60a5fa; transition: 0.3s; }
-        body[data-theme="snow"] .subject-card h3, body[data-theme="love"] .subject-card h3 { color: #2563eb; }
-        .subject-card:hover h3 { color: inherit; }
-        
-        .subject-card p { font-size: 0.95rem; line-height: 1.6; margin-bottom: 15px; opacity: 0.85; }
-        
-        .badge { display: inline-block; padding: 5px 15px; background: rgba(59,130,246,0.2); color: #60a5fa; border-radius: 30px; font-size: 0.75rem; font-weight: 600; margin-right: 10px; margin-bottom: 10px; border: 1px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] .badge, body[data-theme="love"] .badge { background: #dbeafe; color: #2563eb; }
-        
-        .badge-info { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border-color: rgba(245, 158, 11, 0.3); }
-        body[data-theme="snow"] .badge-info, body[data-theme="love"] .badge-info { background: #fef3c7; color: #d97706; }
-
-        .card-footer { margin-top: 20px; padding-top: 15px; border-top: 1px solid rgba(255,255,255,0.1); display: flex; justify-content: space-between; align-items: center; }
-        body[data-theme="snow"] .card-footer, body[data-theme="love"] .card-footer { border-top-color: rgba(0,0,0,0.1); }
-        
-        .btn-enroll { background: #3b82f6; color: white; padding: 8px 24px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 600; transition: 0.3s; border: none; cursor: pointer; font-family: 'Prompt', sans-serif; }
-        .btn-enroll:hover { background: #2563eb; transform: scale(1.05); box-shadow: 0 4px 15px rgba(59,130,246,0.4); }
-        .duration { font-size: 0.8rem; display: flex; align-items: center; gap: 5px; opacity: 0.8; }
-
-        .info-banner { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 28px; padding: 40px; text-align: center; border: 1px solid rgba(255,255,255,0.1); margin-top: 40px; color: inherit; box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
-        body[data-theme="snow"] .info-banner, body[data-theme="love"] .info-banner { background: rgba(255, 255, 255, 0.7); border-color: rgba(0,0,0,0.1); }
-        .info-banner h3 { margin-bottom: 15px; color: #60a5fa; font-size: 1.4rem; }
-        body[data-theme="snow"] .info-banner h3, body[data-theme="love"] .info-banner h3 { color: #3b82f6; }
-        .info-banner p { margin-bottom: 25px; opacity: 0.9; }
-        
-        .btn-contact { background: #3b82f6; color: white; padding: 12px 30px; border-radius: 40px; text-decoration: none; display: inline-flex; align-items: center; gap: 10px; transition: 0.3s; font-weight: 600; border: none; }
-        .btn-contact:hover { background: #2563eb; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
-
-        .footer-buttons { text-align: center; margin-top: 40px; display: flex; justify-content: center; gap: 20px; flex-wrap: wrap; }
-        .btn-back, .btn-workspace { background: #3b82f6; color: white; padding: 12px 32px; border-radius: 50px; text-decoration: none; font-weight: 600; transition: 0.3s; display: inline-flex; align-items: center; gap: 10px; border: none; cursor: pointer; }
-        .btn-back:hover, .btn-workspace:hover { background: #2563eb; transform: translateY(-3px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        .btn-workspace { background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.2); }
-        body[data-theme="snow"] .btn-workspace, body[data-theme="love"] .btn-workspace { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.1); color: inherit; }
-        .btn-workspace:hover { background: rgba(255,255,255,0.2); }
-
-        @media (max-width: 768px) {
-            header { padding: 12px 20px; flex-direction: column; }
-            .page-header h1 { font-size: 1.8rem; flex-direction: column; }
-            .subjects-grid { grid-template-columns: 1fr; }
-        }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
+        .subj-card { background: rgba(30, 41, 59, 0.7); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; border-top: 5px solid #10b981;}
+        .subj-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(16,185,129,0.2); }
+        .subj-img { width: 100%; height: 180px; object-fit: cover; background: #1e293b; }
+        .subj-info { padding: 25px; }
+        .subj-code { background: rgba(16,185,129,0.2); color: #10b981; padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 15px; }
+        .subj-title { font-size: 1.3rem; font-weight: 700; color: white; line-height: 1.4; }
     </style>
 </head>
-<body data-theme="default">
-    <div class="bg-animation">
-        <div class="circle"></div><div class="circle"></div><div class="circle"></div>
-    </div>
-    <div id="particleContainer" style="position: fixed; top:0; left:0; width:100%; height:100%; pointer-events: none; z-index: 1;"></div>
+<body>
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
+        <ul class="nav-links">
+            <li><a href="index.html">หน้าหลัก</a></li>
+            <li><a href="student.html">ห้องเรียนของฉัน</a></li>
+            <li><a href="extra_subjects.html" class="active">วิชาเพิ่มเติม</a></li>
+        </ul>
+    </header>
 
-    <div class="content-layer">
-        <header>
-            <a href="index.html" class="logo">
-                <i class="fas fa-robot"></i>
-                <span>PROT Smart Workspace</span>
-            </a>
-            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
-                <ul class="nav-links">
-                    <li><a href="index.html">หน้าหลัก</a></li>
-                    <li><a href="student.html">ห้องเรียนของฉัน</a></li>
-                    <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
-                    <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
-                    <li><a href="extra_subjects.html" class="active">วิชาเพิ่มเติม</a></li>
-                    <li><a href="contact.html">ติดต่อ</a></li>
-                </ul>
-                <div class="login-area" id="loginArea">
-                    <button class="login-btn" id="showLoginBtn">
-                        <i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน
-                    </button>
-                </div>
-            </div>
-        </header>
-
-        <div class="theme-switcher">
-            <button class="theme-btn" data-theme="default" title="เริ่มต้น">🤖</button>
-            <button class="theme-btn" data-theme="snow" title="หิมะ">❄️</button>
-            <button class="theme-btn" data-theme="forest" title="ธรรมชาติ">🌿</button>
-            <button class="theme-btn" data-theme="halloween" title="ฮัลโลวีน">🎃</button>
-            <button class="theme-btn" data-theme="love" title="ความรัก">🌸</button>
-        </div>
-
-        <div class="page-content-wrapper">
-            
-            <div class="page-header">
-                <h1><i class="fas fa-plus-circle"></i> รายวิชาเพิ่มเติม</h1>
-                <p>ยกระดับทักษะดิจิทัลสู่ความเป็นมืออาชีพ เรียนกับผู้เชี่ยวชาญตัวจริง</p>
-            </div>
-
-            <div class="subjects-grid">
-                <div class="subject-card" onclick="enrollSubject('การสร้างหุ่นยนต์อัตโนมัติ (PROT ROBOT)')">
-                    <div class="icon-box"><i class="fas fa-robot"></i></div>
-                    <h3>การสร้างหุ่นยนต์อัตโนมัติ (PROT ROBOT)</h3>
-                    <p>เรียนรู้การออกแบบโครงสร้างหุ่นยนต์ การติดตั้งมอเตอร์ และการเขียนโปรแกรมควบคุมด้วยเซนเซอร์ประเภทต่างๆ เพื่อใช้งานในภาคเกษตรกรรมและอุตสาหกรรม</p>
-                    <div>
-                        <span class="badge">🤖 เปิดรับสมัคร ม.4 - ม.6</span>
-                        <span class="badge badge-info">📅 เรียน 12 สัปดาห์</span>
-                    </div>
-                    <div class="card-footer">
-                        <span class="duration"><i class="fas fa-clock"></i> จันทร์-พุธ 15:00-17:00</span>
-                        <button class="btn-enroll" onclick="event.stopPropagation(); enrollSubject('การสร้างหุ่นยนต์อัตโนมัติ (PROT ROBOT)')">สมัครเรียน <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <div class="subject-card" onclick="enrollSubject('Internet of Things (IoT) เบื้องต้น')">
-                    <div class="icon-box"><i class="fas fa-microchip"></i></div>
-                    <h3>Internet of Things (IoT) เบื้องต้น</h3>
-                    <p>เน้นการใช้งานบอร์ด ESP32 เชื่อมต่อกับระบบ Cloud เพื่อสร้างอุปกรณ์ Smart Home, ระบบรดน้ำต้นไม้อัตโนมัติผ่านมือถือ และการเก็บข้อมูลแบบ Real-time</p>
-                    <div>
-                        <span class="badge">🌐 เน้นปฏิบัติ 100%</span>
-                        <span class="badge badge-info">📅 เรียน 8 สัปดาห์</span>
-                    </div>
-                    <div class="card-footer">
-                        <span class="duration"><i class="fas fa-clock"></i> อังคาร-พฤหัส 13:00-15:00</span>
-                        <button class="btn-enroll" onclick="event.stopPropagation(); enrollSubject('Internet of Things (IoT) เบื้องต้น')">สมัครเรียน <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <div class="subject-card" onclick="enrollSubject('Mobile App Development with Flutter')">
-                    <div class="icon-box"><i class="fab fa-android"></i></div>
-                    <h3>Mobile App Development with Flutter</h3>
-                    <p>เรียนรู้การพัฒนาแอปพลิเคชันมือถือทั้ง iOS และ Android ด้วย Flutter Framework สร้างแอปควบคุมหุ่นยนต์และ IoT Devices</p>
-                    <div>
-                        <span class="badge">📱 Cross-Platform</span>
-                        <span class="badge badge-info">📅 เรียน 10 สัปดาห์</span>
-                    </div>
-                    <div class="card-footer">
-                        <span class="duration"><i class="fas fa-clock"></i> พุธ-ศุกร์ 16:00-18:00</span>
-                        <button class="btn-enroll" onclick="event.stopPropagation(); enrollSubject('Mobile App Development with Flutter')">สมัครเรียน <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <div class="subject-card" onclick="enrollSubject('AI & Machine Learning for Beginners')">
-                    <div class="icon-box"><i class="fas fa-brain"></i></div>
-                    <h3>AI & Machine Learning for Beginners</h3>
-                    <p>พื้นฐานปัญญาประดิษฐ์และการเรียนรู้ของเครื่อง การประยุกต์ใช้ AI ในการจำแนกรูปภาพ วิเคราะห์ข้อมูล และสร้างโมเดล Machine Learning</p>
-                    <div>
-                        <span class="badge">🤖 AI สายฮาร์ดคอร์</span>
-                        <span class="badge badge-info">📅 เรียน 14 สัปดาห์</span>
-                    </div>
-                    <div class="card-footer">
-                        <span class="duration"><i class="fas fa-clock"></i> เสาร์ 09:00-12:00</span>
-                        <button class="btn-enroll" onclick="event.stopPropagation(); enrollSubject('AI & Machine Learning for Beginners')">สมัครเรียน <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <div class="subject-card" onclick="enrollSubject('การออกแบบ UX/UI สำหรับนวัตกรรม')">
-                    <div class="icon-box"><i class="fas fa-palette"></i></div>
-                    <h3>การออกแบบ UX/UI สำหรับนวัตกรรม</h3>
-                    <p>เรียนรู้หลักการออกแบบประสบการณ์ผู้ใช้ (UX) และส่วนติดต่อผู้ใช้ (UI) สำหรับแอปพลิเคชันและเว็บไซต์ เน้นการทำโครงงานจริง</p>
-                    <div>
-                        <span class="badge">🎨 Creative</span>
-                        <span class="badge badge-info">📅 เรียน 8 สัปดาห์</span>
-                    </div>
-                    <div class="card-footer">
-                        <span class="duration"><i class="fas fa-clock"></i> จันทร์ 13:00-16:00</span>
-                        <button class="btn-enroll" onclick="event.stopPropagation(); enrollSubject('การออกแบบ UX/UI สำหรับนวัตกรรม')">สมัครเรียน <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-
-                <div class="subject-card" onclick="enrollSubject('Cybersecurity & Ethical Hacking')">
-                    <div class="icon-box"><i class="fas fa-shield-alt"></i></div>
-                    <h3>Cybersecurity & Ethical Hacking</h3>
-                    <p>เรียนรู้พื้นฐานความปลอดภัยทางไซเบอร์ เทคนิคการป้องกันภัยคุกคาม และการทดสอบระบบแบบมีจริยธรรม (Ethical Hacking)</p>
-                    <div>
-                        <span class="badge">🔒 Security</span>
-                        <span class="badge badge-info">📅 เรียน 10 สัปดาห์</span>
-                    </div>
-                    <div class="card-footer">
-                        <span class="duration"><i class="fas fa-clock"></i> พฤหัส 13:00-16:00</span>
-                        <button class="btn-enroll" onclick="event.stopPropagation(); enrollSubject('Cybersecurity & Ethical Hacking')">สมัครเรียน <i class="fas fa-arrow-right"></i></button>
-                    </div>
-                </div>
-            </div>
-
-            <div class="info-banner">
-                <h3><i class="fas fa-question-circle"></i> ไม่แน่ใจว่าควรเรียนวิชาไหนดี?</h3>
-                <p>ปรึกษาครูรัชพลได้โดยตรง เพื่อวางแผนการเรียนให้เหมาะสมกับความสนใจและเป้าหมายของคุณ</p>
-                <a href="contact.html" class="btn-contact"><i class="fas fa-comment-dots"></i> ติดต่อสอบถาม</a>
-            </div>
-
-            <div class="footer-buttons">
-                <a href="student.html" class="btn-workspace"><i class="fas fa-robot"></i> กลับสู่ Smart Workspace</a>
-                <a href="index.html" class="btn-back"><i class="fas fa-home"></i> หน้าหลักระบบ</a>
-            </div>
-
-        </div>
-
-        <footer>
-            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | วิทยาการคำนวณเพื่ออนาคต</p>
-        </footer>
-    </div>
-
-    <div id="loginModal" class="login-modal">
-        <button class="close-modal" onclick="closeLoginModal()">×</button>
-        <div class="login-modal-content">
-            <h3><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
-            <p>กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
-            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
-            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
-        </div>
+    <div class="container">
+        <h2 class="header-title"><i class="fas fa-book"></i> รายวิชาเพิ่มเติมที่เปิดสอน</h2>
+        <div id="loading" style="text-align: center; font-size: 1.2rem; color: #10b981;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</div>
+        <div class="grid" id="subjects-grid"></div>
     </div>
 
     <script>
-        // ==================== THEME & PARTICLE SYSTEM ====================
-        const themes = {
-            default: { particleChar: "✨", particleColor: "rgba(59,130,246,0.6)" },
-            snow: { particleChar: "❄️", particleColor: "rgba(255,255,255,0.7)" },
-            forest: { particleChar: "🍃", particleColor: "rgba(144,238,144,0.6)" },
-            halloween: { particleChar: "🎃", particleColor: "rgba(255,69,0,0.5)" },
-            love: { particleChar: "🌸", particleColor: "rgba(255,105,180,0.6)" }
-        };
-        let particleInterval = null;
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
-        function applyTheme(themeKey) {
-            document.body.setAttribute("data-theme", themeKey);
-            localStorage.setItem('smart_theme', themeKey);
-            
-            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
-            const activeBtn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
-            if(activeBtn) activeBtn.classList.add("active");
-
-            startThemeParticles(themeKey);
-        }
-        
-        function startThemeParticles(theme) {
-            const container = document.getElementById("particleContainer");
-            if(particleInterval) clearInterval(particleInterval);
-            container.innerHTML = "";
-            const themeData = themes[theme];
-            
-            function createParticle() {
-                const particle = document.createElement("div");
-                particle.className = "theme-particle";
-                particle.style.position = "absolute";
-                particle.style.left = Math.random() * 100 + "%";
-                particle.style.fontSize = (Math.random() * 20 + 15) + "px";
-                particle.style.opacity = Math.random() * 0.6 + 0.3;
-                particle.style.animationDuration = Math.random() * 8 + 5 + "s";
-                particle.style.animationDelay = Math.random() * 5 + "s";
-                particle.style.textShadow = `0 0 5px ${themeData.particleColor}`;
-                particle.innerHTML = themeData.particleChar;
-                container.appendChild(particle);
-                setTimeout(() => particle.remove(), 10000);
+        window.onload = async () => {
+            try {
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getCMS&t=" + Date.now());
+                const data = await res.json();
+                const subjs = data.subjects || [];
+                const grid = document.getElementById('subjects-grid');
+                
+                if(subjs.length === 0) {
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#94a3b8; font-size:1.1rem;">ยังไม่มีการเปิดสอนวิชาเพิ่มเติมในขณะนี้</div>';
+                } else {
+                    grid.innerHTML = subjs.map(s => `
+                        <div class="subj-card">
+                            <img src="${s.img || 'https://via.placeholder.com/400x200?text=Subject'}" class="subj-img" onerror="this.src='https://via.placeholder.com/400x200?text=Image+Error'">
+                            <div class="subj-info">
+                                <div class="subj-code"><i class="fas fa-barcode"></i> รหัสวิชา: ${s.code}</div>
+                                <div class="subj-title">${s.title}</div>
+                            </div>
+                        </div>
+                    `).join('');
+                }
+                document.getElementById('loading').style.display = 'none';
+            } catch(e) {
+                document.getElementById('loading').innerHTML = '<span style="color:#ef4444;">⚠️ ไม่สามารถดึงข้อมูลได้ในขณะนี้</span>';
             }
-            for(let i = 0; i < 15; i++) setTimeout(() => createParticle(), i * 150);
-            particleInterval = setInterval(() => createParticle(), 800);
-        }
-
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
-
-        // ==================== LOGIN SYSTEM ====================
-        function decodeJwtResponse(token) {
-            let base64Url = token.split('.')[1];
-            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) {
-                return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2);
-            }).join('')));
-        }
-        
-        function handleCredentialResponse(response) {
-            const userData = decodeJwtResponse(response.credential);
-            if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
-                localStorage.setItem('student_name', userData.name);
-                localStorage.setItem('student_email', userData.email);
-                localStorage.setItem('student_pic', userData.picture);
-                localStorage.setItem('is_logged_in', 'true');
-                closeLoginModal();
-                updateLoginUI(userData.name, userData.picture);
-            } else {
-                alert('อีเมลนี้ไม่ได้รับอนุญาต');
-            }
-        }
-        
-        function updateLoginUI(userName, userPic) {
-            const loginArea = document.getElementById('loginArea');
-            loginArea.innerHTML = `
-                <div class="user-info">
-                    <img src="${userPic}" class="user-avatar" alt="avatar">
-                    <span class="user-name">${userName.split(' ')[0]}</span>
-                    <button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button>
-                </div>
-            `;
-        }
-        
-        function logout() {
-            if(confirm('⚠️ คุณต้องการออกจากระบบใช่หรือไม่?')) {
-                localStorage.removeItem('is_logged_in');
-                localStorage.removeItem('student_name');
-                localStorage.removeItem('student_email');
-                localStorage.removeItem('student_pic');
-                location.reload();
-            }
-        }
-        
-        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
-        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
-
-        // ==================== ENROLL SYSTEM ====================
-        function enrollSubject(subjectName) {
-            if (localStorage.getItem('is_logged_in') !== 'true') {
-                alert('⚠️ กรุณาเข้าสู่ระบบก่อนทำการสมัครเรียนครับ');
-                openLoginModal();
-                return;
-            }
-            
-            const studentName = localStorage.getItem('student_name') || 'นักเรียน';
-            const studentEmail = localStorage.getItem('student_email') || 'ไม่พบอีเมล';
-            
-            alert(`✅ ลงทะเบียนเรียนสำเร็จ!\n\n📚 รายวิชา: ${subjectName}\n👤 ชื่อ: ${studentName}\n📧 อีเมล: ${studentEmail}\n\n🎉 ทางโรงเรียนจะส่งรายละเอียดเพิ่มเติมให้ภายใน 24 ชั่วโมงครับ`);
-            
-            // บันทึกวิชาที่สมัครลง LocalStorage เพื่อให้สามารถไปแสดงผลในหน้าอื่นๆ ได้ในอนาคต
-            let enrolledSubjects = JSON.parse(localStorage.getItem('enrolled_subjects') || '[]');
-            if (!enrolledSubjects.includes(subjectName)) {
-                enrolledSubjects.push(subjectName);
-                localStorage.setItem('enrolled_subjects', JSON.stringify(enrolledSubjects));
-            }
-        }
-
-        // ==================== INITIALIZE ====================
-        window.onload = function() {
-            const savedTheme = localStorage.getItem('smart_theme') || "default";
-            applyTheme(savedTheme);
-            
-            if (localStorage.getItem('is_logged_in') === 'true') {
-                updateLoginUI(localStorage.getItem('student_name'), localStorage.getItem('student_pic'));
-            } else {
-                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
-            }
-
-            // Animate items on load
-            const observer = new IntersectionObserver((entries) => {
-                entries.forEach((entry, index) => {
-                    if(entry.isIntersecting) {
-                        setTimeout(() => {
-                            entry.target.style.opacity = '1';
-                            entry.target.style.transform = 'translateY(0)';
-                        }, index * 100);
-                    }
-                });
-            }, { threshold: 0.1 });
-            
-            document.querySelectorAll('.subject-card').forEach((card) => {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(30px)';
-                card.style.transition = 'all 0.5s ease';
-                observer.observe(card);
-            });
         };
     </script>
 </body>
