@@ -3,548 +3,399 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</title>
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>แบบทดสอบ | PROT Smart Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; cursor: default; min-height: 100vh; }
-        
-        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
-        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
-        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
-        
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
-        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
-        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.4) 0%, rgba(255,255,255,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
-        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
-        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
-        
-        #particleContainer { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 1; overflow: hidden; }
-        .theme-particle { position: absolute; top: -10vh; pointer-events: none; animation: fallDown linear forwards; z-index: 1; }
-        @keyframes fallDown { 0% { transform: translateY(0) translateX(0) rotate(0deg); opacity: 0; } 10% { opacity: 1; } 90% { opacity: 1; } 100% { transform: translateY(110vh) translateX(20px) rotate(360deg); opacity: 0; } }
-        
-        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; min-height: 100vh; }
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3); flex-wrap: wrap; gap: 15px;}
-        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
-        .logo { font-size: 1.6rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px;}
-        
-        .nav-links { display: flex; gap: 24px; list-style: none; align-items: center; flex-wrap: wrap;}
-        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 12px; border-radius: 30px; }
-        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
-        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(96,165,250,0.1); }
-        
-        .login-area { display: flex; align-items: center; gap: 15px; }
-        .login-btn { background: linear-gradient(135deg, #3b82f6, #2563eb); border: none; padding: 10px 24px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; font-family: 'Prompt'; display: flex; align-items: center; gap: 10px;}
-        .user-info { display: flex; align-items: center; gap: 12px; background: rgba(255,255,255,0.15); padding: 5px 15px 5px 10px; border-radius: 50px; }
-        .user-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid #3b82f6; background: white; }
-        .user-name { font-size: 0.9rem; font-weight: 500; color: white; }
-        body[data-theme="snow"] .user-name, body[data-theme="love"] .user-name { color: #1e293b; }
-        .logout-btn { background: rgba(255,255,255,0.2); border: none; padding: 5px 12px; border-radius: 30px; cursor: pointer; color: inherit; font-size: 0.8rem;}
+        body { font-family: 'Prompt', sans-serif; transition: 0.5s; overflow-x: hidden; min-height: 100vh; }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a, #1e293b); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff, #f0f8ff); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a, #3e7a3e); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5, #ff85a0); color: #1e293b; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a, #401040); color: white; }
 
-        .theme-switcher { background: rgba(0,0,0,0.5); backdrop-filter: blur(12px); padding: 12px 20px; display: flex; justify-content: center; gap: 15px; flex-wrap: wrap; position: sticky; top: 70px; z-index: 99; border-radius: 50px; width: fit-content; margin: 10px auto; border: 1px solid rgba(255,255,255,0.2); }
-        .theme-btn { background: rgba(255,255,255,0.2); border: none; padding: 8px 20px; border-radius: 40px; color: white; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; }
-        .theme-btn.active { background: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.5); }
-
-        .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; }
-        .dashboard-container { display: grid; grid-template-columns: 320px 1fr; gap: 30px; }
-        
-        .glass-card { background: rgba(30, 41, 59, 0.6); backdrop-filter: blur(12px); border-radius: 28px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); color: inherit; height: fit-content;}
-        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); }
-        
-        .profile-pic-large { width: 110px; height: 110px; border-radius: 50%; margin: 0 auto 15px auto; border: 4px solid #3b82f6; object-fit: cover; display: none; background: white;}
-        .student-details { background: rgba(0,0,0,0.2); padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 0.95rem; text-align: left; }
-        body[data-theme="snow"] .student-details, body[data-theme="love"] .student-details { background: rgba(0,0,0,0.05); }
-        .student-details div { margin-bottom: 8px; border-bottom: 1px dashed rgba(255,255,255,0.1); padding-bottom: 8px; }
-        body[data-theme="snow"] .student-details div, body[data-theme="love"] .student-details div { border-bottom-color: rgba(0,0,0,0.1); }
-        
-        .tracking-box { background: rgba(59, 130, 246, 0.1); padding: 15px; border-radius: 15px; margin-bottom: 15px; font-size: 0.85rem; text-align: left; border: 1px solid rgba(59, 130, 246, 0.3); }
-        body[data-theme="snow"] .tracking-box, body[data-theme="love"] .tracking-box { background: rgba(0,0,0,0.02); border-color: rgba(0,0,0,0.1); }
-        .tracking-box div { margin-bottom: 6px; }
-
-        .btn-edit-profile { background: rgba(59,130,246,0.2); border: 1px solid #3b82f6; color: inherit; padding: 8px 15px; border-radius: 20px; font-size: 0.85rem; cursor: pointer; font-family: 'Prompt'; width: 100%; font-weight: 600; margin-bottom: 15px;}
-        
-        .score-box { background: rgba(0,0,0,0.2); border-radius: 20px; padding: 20px; margin-top: 15px; }
-        body[data-theme="snow"] .score-box, body[data-theme="love"] .score-box { background: rgba(0,0,0,0.05); }
-        .score-box h2 { color: #60a5fa; font-size: 2.5rem; margin: 5px 0; }
-        .progress-bar-bg { background: rgba(0,0,0,0.3); height: 10px; border-radius: 5px; overflow: hidden; }
-        .progress-bar-fill { background: #3b82f6; height: 100%; width: 0%; transition: 0.5s; }
-        
-        .content-area { display: flex; flex-direction: column; gap: 30px; }
-        .section-header { font-size: 1.3rem; font-weight: 700; display: flex; align-items: center; gap: 12px; color: inherit;}
-        
-        .task-card { background: rgba(0,0,0,0.2); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px; transition: 0.3s; }
-        body[data-theme="snow"] .task-card, body[data-theme="love"] .task-card { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
-        .task-card:hover { transform: translateY(-3px); box-shadow: 0 10px 20px rgba(0,0,0,0.2); }
-        .task-info h4 { margin: 0 0 8px 0; font-size: 1.1rem; }
-        .task-meta { text-align: right; min-width: 150px; }
-        
-        .badge { padding: 6px 14px; border-radius: 30px; font-size: 0.75rem; font-weight: 600; display: inline-block; margin-bottom: 8px; }
-        .badge.pending { background: rgba(245, 158, 11, 0.2); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.5); }
-        .badge.submitted { background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid rgba(59, 130, 246, 0.5); }
-        .badge.done { background: rgba(16, 185, 129, 0.2); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.5); }
-        .badge.late { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); }
-        
-        /* 🛡️ CSS Badge สำหรับคนโกง */
-        .badge.banned { background: rgba(239, 68, 68, 0.2); color: #ef4444; border: 1px solid rgba(239, 68, 68, 0.5); }
-
-        .btn-action { background: #3b82f6; color: white; padding: 8px 20px; border-radius: 30px; text-decoration: none; font-size: 0.85rem; font-weight: 600; display: inline-flex; align-items: center; gap: 8px; transition: 0.2s; border: none; cursor: pointer; font-family: 'Prompt'; }
-        .btn-action.btn-locked { background: #64748b; cursor: not-allowed; opacity: 0.8; color: white;}
-        .btn-action:hover:not(.btn-locked) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
-        
-        .btn-refresh { background: rgba(59,130,246,0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 6px 15px; border-radius: 20px; font-size: 0.8rem; cursor: pointer; font-family: 'Prompt'; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-weight: 600;}
-        .btn-refresh:hover { background: #3b82f6; color: white; }
-        .btn-refresh i.spin { animation: fa-spin 1s infinite linear; }
-
-        .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); backdrop-filter: blur(8px); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
-        .modal.active { visibility: visible; opacity: 1; }
-        .modal-content { background: rgba(30, 41, 59, 0.95); border-radius: 25px; padding: 40px; width: 90%; max-width: 450px; border: 1px solid rgba(59,130,246,0.5); position: relative; text-align: center; color: inherit;}
-        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: rgba(255, 255, 255, 0.95); color: #1e293b; border-color: rgba(0,0,0,0.1);}
-        
-        .form-group-edit { text-align: left; margin-bottom: 15px; }
-        .form-group-edit label { display: block; font-size: 0.85rem; margin-bottom: 5px; opacity: 0.9; }
-        .form-group-edit input, .form-group-edit select { width: 100%; padding: 12px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
-        body[data-theme="snow"] .form-group-edit input, body[data-theme="snow"] .form-group-edit select { background: white; border-color: #cbd5e1; color: #1e293b; }
-        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
+        .watermark-container { position: fixed; inset:0; pointer-events:none; z-index:9999; display:grid; grid-template-columns:repeat(3, 1fr); opacity:0.06; }
+        .watermark-item { transform:rotate(-30deg); display:flex; align-items:center; justify-content:center; white-space:nowrap; font-size:1.1rem; font-weight: bold; }
+        body.lost-focus { filter: blur(45px) grayscale(1) !important; }
+        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+        .qcard { margin-top: 20px; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        body[data-theme="snow"] .qcard, body[data-theme="love"] .qcard { background: rgba(255, 255, 255, 0.9); color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        .option { padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; cursor: pointer; transition: 0.3s; display:flex; align-items:flex-start; gap:10px; }
+        body[data-theme="snow"] .option, body[data-theme="love"] .option { border-color: rgba(0,0,0,0.1); }
+        .option:hover { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; }
+        .option.selected { background: #3b82f6 !important; color: white !important; border-color: #60a5fa; box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
+        .option-label { font-weight: 800; color: #ff6600; width: 25px; }
+        body[data-theme="snow"] .option.selected .option-label, body[data-theme="love"] .option.selected .option-label { color: #fff; }
+        .btn-main { background: #3b82f6; color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; cursor: pointer; font-weight: bold; font-size:1.1rem; }
+        .progress-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; z-index: 1000; }
+        .dot { width: 30px; height: 30px; border-radius: 50%; background: #333; color: white; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .dot.active { background: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
     </style>
 </head>
 <body data-theme="default">
-    <div class="bg-animation"><div class="circle"></div><div class="circle"></div><div class="circle"></div></div>
-    <div id="particleContainer"></div>
+    <div id="watermark" class="watermark-container"></div>
+    <div id="split-warning"><i class="fas fa-expand fa-4x" style="color:red; margin-bottom:20px;"></i><h2>ตรวจพบการแบ่งหน้าจอ!</h2><p>กรุณาขยายจอให้เต็มและรอระบบเข้าที่สักครู่</p></div>
+    
+    <header style="background: rgba(0,0,0,0.5); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100;">
+        <div style="font-weight: 800; color: #60a5fa; font-size:1.2rem;"><i class="fas fa-robot"></i> PROT EXAM</div>
+        <div id="timer" style="color: #ff6600; font-weight: bold; font-size:1.2rem;">00:40:00</div>
+    </header>
 
-    <div class="content-layer">
-        <header>
-            <a href="index.html" class="logo"><i class="fas fa-robot"></i><span>ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</span></a>
-            <div style="display: flex; align-items: center; gap: 30px; flex-wrap: wrap;">
-                <ul class="nav-links">
-                    <li><a href="index.html">หน้าหลัก</a></li>
-                    <li><a href="student.html" class="active">ห้องเรียนของฉัน</a></li>
-                    <li><a href="teacher_profile.html">ข้อมูลผู้สอน</a></li>
-                    <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
-                </ul>
-                <div class="login-area" id="loginArea">
-                    <button class="login-btn" id="showLoginBtn"><i class="fas fa-sign-in-alt"></i> ลงชื่อเข้าเรียน</button>
-                </div>
+    <div style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+        <div class="qcard" id="screenStart" style="text-align: center;">
+            <h1 style="color:#60a5fa;">แบบทดสอบวิชาหุ่นยนต์</h1>
+            <p style="margin: 20px 0; opacity: 0.8;">สุ่ม 40 จาก 100 ข้อ | 40 นาที | คะแนนเต็ม 20</p>
+            <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:15px; margin-bottom:20px; text-align:left;">
+                <div id="uName" style="font-weight: bold; font-size:1.1rem; margin-bottom:5px;">👤 กำลังดึงข้อมูล...</div>
+                <div id="uId" style="color:#60a5fa;">🆔 รหัสประจำตัว: -</div>
             </div>
-        </header>
-
-        <div class="theme-switcher">
-            <button class="theme-btn" data-theme="default">🤖 เริ่มต้น</button>
-            <button class="theme-btn" data-theme="snow">❄️ หิมะ</button>
-            <button class="theme-btn" data-theme="forest">🌿 ป่าเขียว</button>
-            <button class="theme-btn" data-theme="love">🌸 ซากุระ</button>
+            <button class="btn-main" onclick="startExam()" id="btnBegin">เริ่มการสอบ</button>
+            <div id="countdown" style="display:none; color: #ff6600; margin-top: 15px; font-weight:bold;">กรุณารอระบบ Fullscreen เข้าที่... 10</div>
         </div>
 
-        <div class="page-content-wrapper">
-            <div class="dashboard-container">
-                
-                <div class="glass-card" style="text-align: center;">
-                    <img src="https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff" id="profile-pic-img" class="profile-pic-large" alt="Avatar">
-                    <h3 id="profile-name">นักเรียน</h3>
-                    <p id="profile-email" style="font-size:0.85rem; opacity:0.8; margin-bottom:15px;">กรุณาเข้าสู่ระบบ</p>
-                    
-                    <div class="student-details" id="student-details-box" style="display: none;">
-                        <div><i class="fas fa-id-badge"></i> รหัสประจำตัว: <span id="display-studentid" style="color:#60a5fa; font-weight:600;">-</span></div>
-                        <div><i class="fas fa-door-open"></i> ห้อง: <span id="display-room">-</span></div>
-                        <div><i class="fas fa-list-ol"></i> เลขที่: <span id="display-number">-</span></div>
-                    </div>
-                    
-                    <button class="btn-edit-profile" id="editProfileBtn" onclick="openEditProfileModal()" style="display: none;">
-                        <i class="fas fa-edit"></i> แก้ไขข้อมูลส่วนตัว
-                    </button>
+        <div id="screenExam" style="display:none; padding-bottom: 80px;">
+            <div id="questionArea"></div>
+            <button class="btn-main" id="btnSubmit" style="background:#10b981; margin: 40px 0;" onclick="submitFinal()">ส่งคำตอบทั้งหมด</button>
+        </div>
 
-                    <div class="tracking-box" id="tracking-box" style="display: none;">
-                        <div style="color: #3b82f6; font-weight: bold; border-bottom: 1px dashed rgba(255,255,255,0.2); padding-bottom: 8px; margin-bottom: 10px;"><i class="fas fa-chart-pie"></i> ประวัติการเรียน</div>
-                        <div><i class="fas fa-edit" style="opacity:0.7;"></i> แก้ไขประวัติล่าสุด: <br><span id="display-editdate" style="color:#60a5fa;">-</span></div>
-                        <div style="border-top: 1px dashed rgba(255,255,255,0.2); padding-top: 10px; margin-top: 10px;">
-                            <i class="fas fa-exclamation-circle" style="color:#ef4444;"></i> งานที่ค้างส่ง: <br><span id="display-missing" style="color:#ef4444; font-weight:bold;">-</span>
-                        </div>
-                    </div>
-                    
-                    <div class="score-box">
-                        <p><i class="fas fa-chart-line"></i> คะแนนเก็บรวม</p>
-                        <h2 id="total-score">0 <span style="font-size: 1rem;">/ 0</span></h2>
-                        <div class="progress-bar-bg"><div class="progress-bar-fill" id="progress-fill"></div></div>
-                        <p style="margin: 10px 0 0 0; font-size: 0.8rem;" id="progress-text">ความคืบหน้า 0%</p>
-                    </div>
-                </div>
-
-                <div class="content-area">
-                    <div id="status-msg" style="display:none; background: rgba(239, 68, 68, 0.2); color: #ef4444; padding: 15px; border-radius: 10px; font-size: 0.9rem; margin-bottom: 10px; border-left: 4px solid #ef4444;"></div>
-
-                    <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 3px solid #3b82f6; padding-bottom: 12px; margin-bottom: 20px;" id="lesson-header">
-                        <div class="section-header" style="border:none; margin:0; padding:0;"><i class="fas fa-book-open"></i> บทเรียนและงานที่มอบหมาย</div>
-                        <button id="btn-sync" onclick="fetchRealtimeData()" class="btn-refresh"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
-                    </div>
-
-                    <div id="dynamic-modules-container">
-                        <div style="text-align: center; padding: 20px; opacity: 0.6;">
-                            <i class="fas fa-lock"></i> กรุณาเข้าสู่ระบบเพื่อดูบทเรียน
-                        </div>
-                    </div>
-                </div>
-            </div>
+        <div class="qcard" id="screenResult" style="display:none; text-align: center;">
+            <h2 style="color:#3b82f6;">ประกาศผลคะแนน</h2>
+            <div id="scoreDisplay" style="font-size: 4.5rem; font-weight: 800; margin: 20px 0; color:#60a5fa;">0/20</div>
+            <button class="btn-main" onclick="window.location.href='student.html'">กลับหน้าห้องเรียน</button>
         </div>
     </div>
 
-    <div id="editProfileModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeEditProfileModal()">×</button>
-            <h3 style="color: inherit; margin-bottom: 20px;"><i class="fas fa-user-edit"></i> แก้ไขข้อมูลส่วนตัว</h3>
-            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 20px;">ข้อมูลจะถูกอัปเดตไปที่ Google Sheets ทันที</p>
-            
-            <div class="form-group-edit"><label>รหัสนักเรียน (ID)</label><input type="text" id="edit-studentid"></div>
-            <div class="form-group-edit"><label>ชื่อ-นามสกุล</label><input type="text" id="edit-name"></div>
-            <div class="form-group-edit">
-                <label>ชั้นและห้องเรียน</label>
-                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
-                    <select id="edit-grade">
-                        <option value="ม.1">ม.1</option><option value="ม.2">ม.2</option><option value="ม.3">ม.3</option>
-                        <option value="ม.4">ม.4</option><option value="ม.5">ม.5</option><option value="ม.6">ม.6</option>
-                    </select>
-                    <select id="edit-room-num">
-                        <option value="1">ห้อง 1</option><option value="2">ห้อง 2</option><option value="3">ห้อง 3</option>
-                        <option value="4">ห้อง 4</option><option value="5">ห้อง 5</option><option value="6">ห้อง 6</option>
-                        <option value="7">ห้อง 7</option><option value="8">ห้อง 8</option><option value="9">ห้อง 9</option>
-                        <option value="10">ห้อง 10</option><option value="11">ห้อง 11</option><option value="12">ห้อง 12</option>
-                        <option value="13">ห้อง 13</option><option value="14">ห้อง 14</option><option value="15">ห้อง 15</option>
-                    </select>
-                </div>
-            </div>
-            <div class="form-group-edit" style="margin-bottom: 25px;"><label>เลขที่</label><input type="number" id="edit-number"></div>
-            <button onclick="saveProfileData()" class="btn-action" style="width: 100%; justify-content: center;"><i class="fas fa-save"></i> บันทึกข้อมูล</button>
-            <div id="saving-status" style="margin-top: 15px; font-size: 0.85rem; color: #10b981; display: none;"><i class="fas fa-spinner fa-spin"></i> กำลังอัปเดตฐานข้อมูล...</div>
-        </div>
-    </div>
-
-    <div id="loginModal" class="modal">
-        <div class="modal-content" style="text-align: center;">
-            <button class="close-modal" onclick="closeLoginModal()">×</button>
-            <h3 style="color: inherit; margin-bottom: 20px;"><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
-            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
-            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="left"></div>
-        </div>
-    </div>
+    <div class="progress-bar" id="dotsArea" style="display:none;"></div>
 
     <script>
-        // 🌟 ตั้งค่า URL 🌟
-        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
+        // 🌟 ใส่ URL ของครูตรงนี้ 🌟
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
+        const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+        
+        let examStarted = false, canBan = false, userIP = "unknown", drawn = [], ans = [], timerHandle, timeLeft = 2400;
 
-        let userIP = "unknown";
-        let isStudentBanned = false;
-        let banReasonStr = "";
+        // คลังข้อสอบ 100 ข้อ
+        const bank = [
+            { "id": 1, "question": "ข้อใดอธิบายหน้าที่ของระบบรับรู้ (Perception) ในหุ่นยนต์ได้ถูกต้องที่สุด", "options": ["ทำหน้าที่รับข้อมูลจากสภาพแวดล้อมผ่านเซนเซอร์", "ทำหน้าที่จัดเก็บข้อมูลการทำงาน", "ทำหน้าที่ควบคุมแรงบิดของมอเตอร์", "ทำหน้าที่แปลงโปรแกรมเป็นคำสั่งเครื่อง"] },
+            { "id": 2, "question": "ส่วนใดของหุ่นยนต์มีหน้าที่วิเคราะห์ข้อมูลและตัดสินใจเลือกการทำงาน", "options": ["ระบบกลไกขับเคลื่อน", "แหล่งจ่ายพลังงาน", "ระบบการคิดวิเคราะห์ (Cognition)", "ระบบรับรู้"] },
+            { "id": 3, "question": "องค์ประกอบใดเกี่ยวข้องโดยตรงกับการเคลื่อนที่ของแขนกลหรือกลไก", "options": ["การประมวลผล", "การเคลื่อนไหว (Manipulation)", "การรับรู้", "การบันทึกข้อมูล"] },
+            { "id": 4, "question": "ข้อใดจัดเป็นอุปกรณ์ในกลุ่ม Perception", "options": ["มอเตอร์ DC", "เกียร์ทด", "แบตเตอรี่", "เซนเซอร์ตรวจจับระยะทาง"] },
+            { "id": 5, "question": "ข้อใดเป็นอุปกรณ์ที่อยู่ในกลุ่ม Manipulation มากที่สุด", "options": ["เซอร์โวมอเตอร์", "เซนเซอร์แสง", "ไมโครโฟน", "เซนเซอร์อุณหภูมิ"] },
+            { "id": 6, "question": "ข้อใดแสดงความสัมพันธ์ระหว่าง Perception และ Cognition ได้ถูกต้อง", "options": ["ทั้งสองทำหน้าที่เหมือนกัน", "Perception รับข้อมูล ส่วน Cognition วิเคราะห์ข้อมูล", "Cognition ทำงานก่อนรับข้อมูลเสมอ", "Perception ควบคุมมอเตอร์โดยตรง"] },
+            { "id": 7, "question": "หากหุ่นยนต์ต้องเริ่มรับรู้สิ่งแวดล้อมรอบตัว ขั้นตอนแรกควรเริ่มจากส่วนใด", "options": ["การรับรู้", "การคิดวิเคราะห์", "การขยับกลไก", "ตัวขับมอเตอร์"] },
+            { "id": 8, "question": "เหตุผลสำคัญที่ต้องมี Cognition ในหุ่นยนต์คือข้อใด", "options": ["เพื่อเพิ่มแรงบิดของมอเตอร์", "เพื่อเพิ่มแรงดันไฟฟ้า", "เพื่อเลือกการกระทำจากข้อมูลที่ตรวจพบ", "เพื่อเพิ่มความแม่นยำของสายไฟ"] },
+            { "id": 9, "question": "Perception มีความสำคัญต่อหุ่นยนต์อย่างไร", "options": ["ทำให้เชื่อมต่ออินเทอร์เน็ตได้", "ทำให้หุ่นยนต์หมุนล้อได้", "ทำให้ติดตั้งซอฟต์แวร์ได้", "ทำให้หุ่นยนต์รับรู้สภาพแวดล้อม"] },
+            { "id": 10, "question": "ข้อใดอธิบายความหมายของหุ่นยนต์ได้ครบถ้วนที่สุด", "options": ["โปรแกรมคอมพิวเตอร์ที่ไม่มีฮาร์ดแวร์", "ระบบที่สามารถรับรู้ ตัดสินใจ และกระทำได้", "เครื่องจักรที่ทำงานตามกลไกอย่างเดียว", "อุปกรณ์ที่ต้องต่ออินเทอร์เน็ตตลอดเวลา"] },
+            { "id": 11, "question": "ลำดับการทำงานพื้นฐานของหุ่นยนต์ควรเป็นข้อใด", "options": ["Perception → Cognition → Manipulation", "Cognition → Manipulation → Perception", "Manipulation → Cognition → Perception", "Perception → Manipulation → Cognition"] },
+            { "id": 12, "question": "ตัวอย่างใดแสดงการใช้ทั้ง Perception และ Manipulation", "options": ["อ่านค่าเซนเซอร์อย่างเดียว", "เปิดเว็บไซต์", "บันทึกไฟล์ลงเครื่อง", "ตรวจจับสิ่งกีดขวางแล้วเลี้ยวหลบ"] },
+            { "id": 13, "question": "เมื่อหุ่นยนต์ตรวจพบวัตถุใกล้ตัว คำว่า “ตรวจพบ” หมายถึงอะไร", "options": ["การตัดสินใจ", "การรับรู้", "การเคลื่อนไหว", "การเก็บข้อมูล"] },
+            { "id": 14, "question": "เมื่อระบบเลือกว่าจะเลี้ยวซ้ายหรือขวา กระบวนการนี้อยู่ในส่วนใด", "options": ["Perception", "Manipulation", "Cognition", "Sensor Shield"] },
+            { "id": 15, "question": "การที่หุ่นยนต์หมุนล้อเพื่อเปลี่ยนทิศทางจัดอยู่ในองค์ประกอบใด", "options": ["การเคลื่อนไหว", "การคิดวิเคราะห์", "การรับรู้", "การเขียนโปรแกรม"] },
+            { "id": 16, "question": "ข้อใดจับคู่ได้ถูกต้อง", "options": ["Manipulation = Internet", "Cognition = Sensor", "Perception = Motor", "Perception = Sensor / Cognition = Decision / Manipulation = Motor"] },
+            { "id": 17, "question": "ส่วนใดทำหน้าที่แปลงข้อมูลจากเซนเซอร์เป็นคำสั่งควบคุม", "options": ["Perception", "Cognition", "Manipulation", "Charging"] },
+            { "id": 18, "question": "ตัวอย่างใดแสดงบทบาทของ Cognition ชัดที่สุด", "options": ["อ่านค่าอุณหภูมิ", "หมุนมอเตอร์", "เปรียบเทียบค่าระยะแล้วตัดสินใจหยุด", "จ่ายไฟให้บอร์ด"] },
+            { "id": 19, "question": "ตัวอย่างใดจัดอยู่ใน Manipulation", "options": ["สั่งแขนกลยกวัตถุ", "วิเคราะห์ข้อมูล", "อ่านค่าแสง", "คำนวณความเร็ว"] },
+            { "id": 20, "question": "ตัวอย่างใดเป็น Perception", "options": ["วิเคราะห์ค่า", "มอเตอร์หมุน", "วางแผนเส้นทาง", "เซนเซอร์ส่งค่าระยะ"] },
+            { "id": 21, "question": "ผลลัพธ์จากระบบ Perception มักอยู่ในรูปแบบใดมากที่สุด", "options": ["แรงบิด", "ข้อมูลที่วัดได้", "การหมุนล้อ", "ความจุแบตเตอรี่"] },
+            { "id": 22, "question": "ผลลัพธ์ของ Manipulation มักแสดงออกในรูปแบบใด", "options": ["ค่าจากเซนเซอร์", "ตัวอักษรในโค้ด", "การเคลื่อนที่ทางกายภาพ", "ชื่อโดเมนเว็บไซต์"] },
+            { "id": 23, "question": "หน้าที่หลักของ Cognition คือข้อใด", "options": ["ประมวลผลและกำหนดการกระทำ", "วัดค่าทางกายภาพ", "เป็นแหล่งพลังงาน", "เป็นโครงสร้างทางกล"] },
+            { "id": 24, "question": "ข้อใดไม่ใช่ตัวอย่างของ Manipulation", "options": ["ล้อหมุนเคลื่อนที่", "แขนกลยกวัตถุ", "เซอร์โวหมุนตามองศา", "อ่านค่าระยะด้วยเซนเซอร์"] },
+            { "id": 25, "question": "ข้อใดไม่ใช่ตัวอย่างของ Perception", "options": ["เซนเซอร์ความชื้น", "บอร์ดวิเคราะห์ค่าที่วัดได้", "เซนเซอร์อุณหภูมิ", "เซนเซอร์แสง"] },
+            { "id": 26, "question": "ซอฟต์แวร์ใดมีคำอธิบายว่า Run JavaScript Everywhere", "options": ["Node-RED", "Wokwi", "Node.js", "DHT"] },
+            { "id": 27, "question": "Node-RED เหมาะกับงานลักษณะใดมากที่สุด", "options": ["สร้างโฟลว์เชื่อมอุปกรณ์และข้อมูล", "เขียนภาษา C อย่างเดียว", "ออกแบบชิ้นส่วนกลไก", "จัดการเอกสาร"] },
+            { "id": 28, "question": "หากต้องติดตั้ง Node-RED ควรติดตั้งสิ่งใดก่อน", "options": ["Wokwi", "DHT Sensor", "ESP-NOW", "Node.js"] },
+            { "id": 29, "question": "แพลตฟอร์มจำลองออนไลน์ที่นิยมใช้ทดลองวงจรคือข้อใด", "options": ["nodejs.org", "wokwi.com", "github.com", "arduino.cc"] },
+            { "id": 30, "question": "โปรเจกต์ DHT Sensor with ESP แสดงถึงงานแบบใด", "options": ["สั่งมอเตอร์หมุน", "เชื่อม ESP-NOW", "อ่านค่าจากเซนเซอร์แล้วแสดงผล", "ออกแบบกฎระเบียบ"] },
+            { "id": 31, "question": "DHT Sensor ใช้วัดค่าใดเป็นหลัก", "options": ["อุณหภูมิและความชื้น", "ระยะทางและความเร็ว", "แรงดันและกระแส", "พิกัด GPS"] },
+            { "id": 32, "question": "หากต้องการให้ Node-RED แสดงค่าจากเซนเซอร์ ข้อมูลควรมาจากที่ใด", "options": ["โปรแกรม Paint", "เครื่องพิมพ์", "BIOS", "บอร์ดไมโครคอนโทรลเลอร์ที่อ่านค่าเซนเซอร์"] },
+            { "id": 33, "question": "ข้อใดอธิบาย Node-RED ได้เหมาะสมที่สุด", "options": ["ตัวจำลองวงจร", "เครื่องมือสร้างการไหลของข้อมูล", "เซนเซอร์วัดค่า", "ไดรเวอร์มอเตอร์"] },
+            { "id": 34, "question": "อุปกรณ์ที่นิยมใช้ร่วมกับ Node-RED ในงาน IoT คือข้อใด", "options": ["เครื่องพิมพ์", "โปรเจกเตอร์", "ESP32", "PLC อย่างเดียว"] },
+            { "id": 35, "question": "IoT หมายถึงข้อใดมากที่สุด", "options": ["อุปกรณ์ที่เชื่อมต่อและแลกเปลี่ยนข้อมูลกันได้", "โปรแกรมตัดต่อวิดีโอ", "เกมออนไลน์", "ระบบปฏิบัติการมือถือ"] },
+            { "id": 36, "question": "ลำดับเริ่มต้นใช้งาน Node-RED ที่เหมาะสมคือข้อใด", "options": ["ติดตั้ง Node-RED ก่อน", "เปิด Wokwi ก่อน", "ติดตั้ง DHT ก่อน", "ติดตั้ง Node.js ก่อน"] },
+            { "id": 37, "question": "ข้อใดเกี่ยวข้องกับการติดตั้งซอฟต์แวร์โดยตรง", "options": ["การเลือกเซนเซอร์", "การติดตั้ง Node-RED", "การวัดอุณหภูมิ", "การสื่อสาร ESP-NOW"] },
+            { "id": 38, "question": "nodejs.org คือเว็บไซต์ของอะไร", "options": ["Node-RED", "ESP-NOW", "Node.js", "DHT"] },
+            { "id": 39, "question": "หากไม่ต้องการติดตั้งโปรแกรมในเครื่อง ควรเริ่มด้วยอะไร", "options": ["ใช้แพลตฟอร์มจำลองออนไลน์", "ปิดอินเทอร์เน็ต", "ถอดสายไฟทั้งหมด", "ลบไดรเวอร์จอ"] },
+            { "id": 40, "question": "เหตุผลที่นิยมใช้ Node-RED ในงาน IoT คือข้อใด", "options": ["เพิ่มแรงมอเตอร์", "ทำให้เซนเซอร์ไม่ใช้ไฟ", "ไม่ต้องเขียนโปรแกรมเลย", "เชื่อมข้อมูลและอุปกรณ์ได้สะดวก"] },
+            { "id": 41, "question": "Display Reading หมายถึงข้อใด", "options": ["ลบค่าที่อ่านได้", "แสดงค่าที่อ่านได้", "ซ่อนข้อมูล", "แปลงเป็นเสียง"] },
+            { "id": 42, "question": "ข้อใดเป็นตัวอย่างข้อมูลเซนเซอร์", "options": ["ชื่อโดเมน", "เวอร์ชันโปรแกรม", "อุณหภูมิ 28°C", "สีไอคอน"] },
+            { "id": 43, "question": "การจับคู่ใดถูกต้อง", "options": ["Node.js = รัน JavaScript / Node-RED = Flow / Wokwi = จำลองออนไลน์", "Node.js = เซนเซอร์", "Node-RED = มอเตอร์", "Wokwi = แหล่งจ่ายไฟ"] },
+            { "id": 44, "question": "หากต้องการให้ ESP ส่งค่ามายัง Node-RED สิ่งสำคัญคือข้อใด", "options": ["เพิ่มแรงดันแบตเตอรี่", "เพิ่มจำนวนมอเตอร์", "ลบโปรแกรมในบอร์ด", "ต้องมีช่องทางส่งข้อมูลจากบอร์ด"] },
+            { "id": 45, "question": "คำว่าโปรเจกต์ใน Wokwi มักหมายถึงอะไร", "options": ["รูปภาพอย่างเดียว", "งานตัวอย่างที่พร้อมทดลอง", "แบบฟอร์มลงชื่อ", "ตารางคะแนน"] },
+            { "id": 46, "question": "ข้อใดแสดงการทำงานแบบแสดงผลบน Node-RED ชัดที่สุด", "options": ["หมุนมอเตอร์อย่างเดียว", "บันทึกคะแนนลงสมุด", "ส่งค่าจากเซนเซอร์แล้วดูบนหน้าจอ", "เปิดเว็บดูวิดีโอ"] },
+            { "id": 47, "question": "ข้อใดไม่จำเป็นโดยตรงต่อการอ่านค่า DHT", "options": ["ปุ่ม Print Screen", "บอร์ดไมโครคอนโทรลเลอร์", "เซนเซอร์ DHT", "สายสัญญาณ"] },
+            { "id": 48, "question": "ข้อใดสอดคล้องกับงาน IoT", "options": ["วาดรูปในสมุด", "เล่นเกมออฟไลน์", "พิมพ์งานไม่ใช้ข้อมูล", "อ่านค่าเซนเซอร์แล้วส่งไปแสดงผล"] },
+            { "id": 49, "question": "Node-RED มักทำหน้าที่ใดในระบบ", "options": ["เพิ่มความจุแบตเตอรี่", "รับ จัดการ และแสดงข้อมูล", "เปลี่ยนเซนเซอร์เป็นมอเตอร์", "ทำให้สายไฟสั้นลง"] },
+            { "id": 50, "question": "การเรียนรู้และควบคุม IoT มักใช้ Node-RED ร่วมกับอะไร", "options": ["Excel", "Bluetooth อย่างเดียว", "ESP32", "Python อย่างเดียว"] },
+            { "id": 51, "question": "อุปกรณ์ที่มักใช้ร่วมกับ Node-RED คือข้อใด", "options": ["ESP32", "เครื่องพิมพ์เลเซอร์", "โปรเจกเตอร์ 4K", "ไมโครโฟนไร้สาย"] },
+            { "id": 52, "question": "คำว่า with ESP32 สื่อถึงอะไร", "options": ["Node-RED แทนที่ ESP32 ได้ทั้งหมด", "ESP32 ไม่เกี่ยวข้อง", "ESP32 ใช้กับมอเตอร์เท่านั้น", "Node-RED ทำงานร่วมกับ ESP32"] },
+            { "id": 53, "question": "แนวคิดการแสดงค่าเซนเซอร์บน Node-RED คือข้อใด", "options": ["ข้อมูลไหลจาก Node-RED ไปหาเซนเซอร์", "ข้อมูลไหลจากอุปกรณ์ไป Node-RED แล้วแสดงผล", "ข้อมูลอยู่ในเครื่องพิมพ์", "ข้อมูลอยู่ใน BIOS"] },
+            { "id": 54, "question": "การเปิดโปรเจกต์ตัวอย่าง Wokwi ต้องใช้อะไร", "options": ["โปรแกรมตัดต่อเสียง", "เกมเอนจิน", "เว็บเบราว์เซอร์", "แอปแผนที่"] },
+            { "id": 55, "question": "บทบาทของ Node.js ในบริบทนี้คือข้อใด", "options": ["เป็นพื้นฐานให้โปรแกรมอื่นทำงาน", "เป็นเซนเซอร์อุณหภูมิ", "เป็นมอเตอร์", "เป็นเกียร์ทด"] },
+            { "id": 56, "question": "คำว่าติดตั้งโปรแกรมเกี่ยวข้องกับงานประเภทใด", "options": ["เครื่องกล", "เคมี", "ศิลปะ", "ซอฟต์แวร์"] },
+            { "id": 57, "question": "โปรเจกต์ DHT Sensor with ESP ต้องมีอย่างน้อยอะไร", "options": ["เกียร์และโซ่", "บอร์ดและเซนเซอร์", "ลำโพงและไมค์", "จอ 4K"] },
+            { "id": 58, "question": "หากต้องการให้ Node-RED แสดงค่าต่อเนื่อง สิ่งสำคัญคือข้อใด", "options": ["เปลี่ยนสีธีม", "เปลี่ยนฟอนต์", "การส่งข้อมูลเข้ามาอย่างต่อเนื่อง", "ซ่อนปุ่มเมนู"] },
+            { "id": 59, "question": "ESP-NOW เหมาะกับงานลักษณะใด", "options": ["ควบคุมอุปกรณ์หลายตัวจากตัวหลัก", "ตัดต่อวิดีโอ", "พิมพ์เอกสารจำนวนมาก", "เล่นเกมออนไลน์"] },
+            { "id": 60, "question": "master ส่งข้อมูลไปหลาย slave คือโครงสร้างแบบใด", "options": ["หลายต่อหนึ่ง", "หนึ่งต่อหนึ่ง", "ส่งไม่ได้", "หนึ่งต่อหลาย"] },
+            { "id": 61, "question": "ตัวหลัก/ตัวรอง ใช้แทนคำใด", "options": ["client/server", "master/slave", "encoder/decoder", "publisher/subscriber"] },
+            { "id": 62, "question": "ESP-NOW สื่อสารได้แบบใด", "options": ["ทางเดียว", "รับอย่างเดียว", "สองทาง", "ส่งอย่างเดียว"] },
+            { "id": 63, "question": "บอร์ดสองตัวคุยกันและแลกเปลี่ยนข้อมูลโดยตรง คือข้อใด", "options": ["การสื่อสารสองทาง", "การสื่อสารอ่านอย่างเดียว", "ผ่านเครื่องพิมพ์", "ผ่าน HDMI"] },
+            { "id": 64, "question": "การเพิ่มหลายบอร์ดใน ESP32 ช่วยให้เกิดอะไร", "options": ["เพิ่มแรงดันไฟ", "เพิ่มความละเอียดจอ", "ปิด Wi‑Fi", "สื่อสารกันเป็นเครือข่าย"] },
+            { "id": 65, "question": "ตัวอย่างโครงสร้างตัวหลักตัวเดียวคือข้อใด", "options": ["ทำบัญชี", "ควบคุมอุปกรณ์หลายตัวในบ้าน", "ตัดต่อเพลง", "สตรีมภาพยนตร์"] },
+            { "id": 66, "question": "ตัวส่งและตัวรับ หมายถึงอะไร", "options": ["การชาร์จแบตเตอรี่", "การพิมพ์งาน", "การส่งและรับข้อมูล", "การบีบอัดไฟล์"] },
+            { "id": 67, "question": "ข้อดีของหลายตัวรับคืออะไร", "options": ["ส่งคำสั่งไปหลายอุปกรณ์ได้", "มอเตอร์แรงขึ้น", "เซนเซอร์เร็วขึ้นเอง", "บอร์ดไม่ต้องใช้ไฟ"] },
+            { "id": 68, "question": "ตัวหลักสามารถส่งคำสั่งแบบใด", "options": ["เฉพาะคำสั่งเดียวกัน", "เฉพาะคำสั่งต่างกัน", "ส่งไม่ได้", "คำสั่งเดียวกันหรือแตกต่างกัน"] },
+            { "id": 69, "question": "สรุปคุณสมบัติ ESP-NOW ที่ถูกต้องคือข้อใด", "options": ["ส่งอย่างเดียว", "ส่งและรับข้อมูลได้ ขยายจำนวนบอร์ดได้", "รับอย่างเดียว", "ต้องใช้ LAN"] },
+            { "id": 70, "question": "เครือข่ายในบริบทนี้หมายถึงอะไร", "options": ["สายไฟหลายเส้น", "ไฟบ้าน 220V", "บอร์ดหลายตัวเชื่อมต่อและแลกเปลี่ยนข้อมูล", "การพิมพ์เอกสารร่วมกัน"] },
+            { "id": 71, "question": "หากต้องการให้หลายบอร์ดสื่อสารกัน สิ่งสำคัญคือข้อใด", "options": ["กำหนดให้ส่งและรับข้อมูลได้", "เพิ่มความละเอียดจอ", "เพิ่ม RAM", "ลบเบราว์เซอร์"] },
+            { "id": 72, "question": "ข้อใดไม่สอดคล้องกับ ESP-NOW", "options": ["สื่อสารสองทางได้", "ตัวหลักส่งหลายตัวรองได้", "แลกเปลี่ยนข้อมูลโดยตรง", "จำเป็นต้องใช้ตารางคำนวณ"] },
+            { "id": 73, "question": "ตัวหลักหมายถึงบทบาทใด", "options": ["รับอย่างเดียว", "ส่งข้อมูลหรือสั่งงานเป็นหลัก", "เป็นเซนเซอร์อย่างเดียว", "เป็นมอเตอร์อย่างเดียว"] },
+            { "id": 74, "question": "ตัวรองหมายถึงบทบาทใด", "options": ["เป็นแหล่งจ่ายไฟ", "เป็นแม่ข่าย", "รับข้อมูลและทำตามคำสั่ง", "เป็นหน้าจออย่างเดียว"] },
+            { "id": 75, "question": "ตัวอย่างรีโมทควบคุมที่ตรงแนวคิดคือข้อใด", "options": ["ตัวหลักสั่งเปิดปิดหลายจุด", "บันทึกเสียง", "พิมพ์รายงาน", "ดูหนังออนไลน์"] },
+            { "id": 76, "question": "แลกเปลี่ยนข้อมูลกันได้ หมายถึงข้อใด", "options": ["ส่งได้อย่างเดียว", "รับได้อย่างเดียว", "ไม่ส่งข้อมูล", "แต่ละบอร์ดส่งและรับได้"] },
+            { "id": 77, "question": "ความต่างระหว่างทางเดียวกับสองทางคือข้อใด", "options": ["ทางเดียวส่งรับด้านเดียว สองทางส่งรับได้", "ทางเดียวส่งหรือรับด้านเดียว สองทางส่งรับได้", "ทั้งสองเหมือนกัน", "สองทางใช้ HDMI"] },
+            { "id": 78, "question": "หากต้องการระบบเครือข่ายหลายบอร์ด ควรทำอย่างไร", "options": ["ลดเหลือบอร์ดเดียว", "ปิดการส่งข้อมูล", "เพิ่มบอร์ดเพื่อเชื่อมต่อกัน", "ใช้โปรเจกเตอร์แทน"] },
+            { "id": 79, "question": "ภาพรวมระบบ IoT ที่เหมาะสมคือข้อใด", "options": ["อ่านค่า ควบคุม และส่งข้อมูลให้ระบบจัดการ", "ต้องเป็นคอมพิวเตอร์ตั้งโต๊ะทั้งหมด", "ทำงานโดยไม่ใช้ข้อมูล", "ใช้โปรแกรมเอกสารเท่านั้น"] },
+            { "id": 80, "question": "ในระบบ ESP32 + Node-RED อุปกรณ์ปลายทางคือข้อใด", "options": ["ESP32", "nodejs.org", "wokwi.com", "Node-RED"] },
+            { "id": 81, "question": "หากต้องการทดลองโค้ดอย่างรวดเร็ว ควรเลือกอะไร", "options": ["โปรแกรมเอกสาร", "โปรเจกต์บน Wokwi", "โปรแกรมวาดรูป", "โปรแกรมเล่นเพลง"] },
+            { "id": 82, "question": "เหตุผลที่ MAC Address สำคัญใน ESP-NOW คือข้อใด", "options": ["ใช้คำนวณอุณหภูมิ", "ใช้แทนชื่อ Wi‑Fi", "ใช้ระบุอุปกรณ์เพื่อสื่อสาร", "ใช้แทนแรงดันไฟ"] },
+            { "id": 83, "question": "หากต้องการให้บอร์ดสองตัวรู้จักกัน ต้องใช้อะไร", "options": ["ตัวระบุอุปกรณ์ เช่น MAC Address", "ความละเอียดจอ", "สีธีม", "จำนวนฟอนต์"] },
+            { "id": 84, "question": "คำว่าสั่งงาน หมายถึงอะไร", "options": ["เพิ่มกระแสไฟ", "คัดลอกไฟล์", "ติดตั้งไดรเวอร์เสียง", "ส่งข้อมูลคำสั่งไปให้อีกบอร์ดทำตาม"] },
+            { "id": 85, "question": "ข้อมูลใดเหมาะส่งระหว่างบอร์ด", "options": ["ความยาวสาย USB", "สถานะเปิด/ปิด", "ชื่อผู้ใช้", "สีพื้นหลังเว็บ"] },
+            { "id": 86, "question": "หากต้องการควบคุมหลายบอร์ดเป็นกลุ่ม ควรทำอย่างไร", "options": ["ให้ทุกตัวทำงานอิสระ", "ตัดการสื่อสารทั้งหมด", "มีตัวหลักส่งคำสั่งไปหลายตัวรอง", "ใช้เครื่องพิมพ์เป็นตัวกลาง"] },
+            { "id": 87, "question": "ระบบควบคุมระยะไกลตัวอย่างคือข้อใด", "options": ["ควบคุมไฟในบ้านจากตัวหลัก", "วาดภาพบนกระดาษ", "เล่นดนตรี", "อ่านหนังสือ"] },
+            { "id": 88, "question": "คำที่เหมาะสมแทนคำอ่อนไหวคือข้อใด", "options": ["ถูก/ผิด", "เร็ว/ช้า", "สูง/ต่ำ", "ตัวหลัก/ตัวรอง"] },
+            { "id": 89, "question": "ตัวอย่างการสื่อสารสองทางคือข้อใด", "options": ["A ส่งอย่างเดียว", "A ส่งค่าไป B และ B ตอบกลับ A", "B รับอย่างเดียว", "ไม่มีการส่งข้อมูล"] },
+            { "id": 90, "question": "ประโยชน์ของการสื่อสารสองทางคือข้อใด", "options": ["ชาร์จแบตเร็วขึ้น", "หน้าจอใหญ่ขึ้น", "ยืนยันผลหรือสถานะตอบกลับได้", "พิมพ์เร็วขึ้น"] },
+            { "id": 91, "question": "หากต้องการแสดงผลบน Node-RED ต้องมีสิ่งใดแน่นอน", "options": ["ค่าที่อ่านได้จากเซนเซอร์", "เครื่องพิมพ์", "โปรเจกเตอร์", "เกมออนไลน์"] },
+            { "id": 92, "question": "หัวข้อใดอยู่ในกลุ่มการติดตั้ง", "options": ["การตั้งรหัส Wi‑Fi", "การตั้งค่าปริ้นเตอร์", "การเลือกสีเว็บ", "การติดตั้ง Node.js และ Node-RED"] },
+            { "id": 93, "question": "หากยังไม่พร้อมติดตั้ง Node-RED ควรเริ่มจากอะไร", "options": ["เปลี่ยนสายไฟทั้งหมด", "ทดลองตัวอย่างออนไลน์", "อัปเกรดจอภาพ", "ติดตั้งโปรแกรมตัดต่อวิดีโอ"] },
+            { "id": 94, "question": "Flow ใน Node-RED หมายถึงอะไร", "options": ["ชนิดของเซนเซอร์", "ชนิดของมอเตอร์", "ลำดับการเชื่อมต่อของโหนดและข้อมูล", "ชนิดแบตเตอรี่"] },
+            { "id": 95, "question": "Node-RED ช่วยให้ทำสิ่งใดง่ายขึ้น", "options": ["เชื่อมอุปกรณ์และข้อมูลเข้าด้วยกัน", "เพิ่มแรงบิดมอเตอร์", "ไม่ต้องต่อสายเลย", "ไม่ต้องเขียนโค้ดทุกกรณี"] },
+            { "id": 96, "question": "การจับคู่ใดถูกต้อง", "options": ["DHT + ESP = แสดงผล", "Node.js = เซนเซอร์", "ESP-NOW = โปรแกรมกราฟิก", "DHT + ESP = อ่านค่า / Node-RED = แสดงผล"] },
+            { "id": 97, "question": "เหตุผลที่ตัวอย่างโปรเจกต์ช่วยเรียนรู้ได้ดีคือข้อใด", "options": ["ไม่ต้องใช้ไฟฟ้า", "เห็นภาพการเชื่อมต่อและผลลัพธ์เร็ว", "ไม่ต้องมีอุปกรณ์เลย", "ไม่ต้องใช้เวลา"] },
+            { "id": 98, "question": "แนวคิดขยายระบบได้ของ ESP-NOW คือข้อใด", "options": ["ลดจำนวนบอร์ดเป็นศูนย์", "ใช้บอร์ดเดียวแทนทุกอย่าง", "เพิ่มจำนวนบอร์ดให้สื่อสารได้หลายตัว", "ปิดการสื่อสาร"] },
+            { "id": 99, "question": "บทบาทการสื่อสารในระบบหุ่นยนต์และ IoT คือข้อใด", "options": ["ทำให้อุปกรณ์แลกเปลี่ยนข้อมูลและควบคุมกันได้", "ทำให้มอเตอร์หมุนโดยไม่ใช้ไฟ", "ทำให้เซนเซอร์ไม่ต้องต่อ", "ทำให้โปรแกรมไม่มีเงื่อนไข"] },
+            { "id": 100, "question": "ตัวย่อใดมักใช้ร่วมกับคำว่า Broker", "options": ["GPS", "PWM", "I2C", "MQTT"] }
+        ];
 
-        function getVal(obj, ...keys) {
-            if (!obj) return undefined;
-            for (let key of keys) {
-                const realKey = Object.keys(obj).find(k => String(k).trim().toLowerCase() === String(key).trim().toLowerCase());
-                if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) return obj[realKey];
+        function startExam() {
+            if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามกดออกจากแอป ห้ามย่อหน้าต่าง ห้ามกดปุ่มย้อนกลับกลับ(Back) บนมือถือ\nหากฝ่าฝืนสิทธิ์การสอบจะถูกระงับและหมดสิทธิ์สอบทันที!")) return;
+            
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(()=>{});
             }
-            return undefined;
+            
+            document.getElementById('btnBegin').style.display = 'none';
+            const cd = document.getElementById('countdown'); 
+            cd.style.display = 'block';
+            let c = 10;
+            
+            const t = setInterval(() => {
+                c--; 
+                cd.innerText = `กำลังเข้าสู่โหมดคุมสอบใน... ${c}`;
+                if(c <= 0) {
+                    clearInterval(t); 
+                    cd.style.display = 'none';
+                    document.getElementById('screenStart').style.display = 'none';
+                    document.getElementById('screenExam').style.display = 'block';
+                    document.getElementById('dotsArea').style.display = 'flex';
+                    examStarted = true; 
+                    setTimeout(() => { canBan = true; }, 1000); 
+                    
+                    timerHandle = setInterval(() => {
+                        timeLeft--;
+                        document.getElementById('timer').innerText = new Date(timeLeft * 1000).toISOString().substr(11, 8);
+                        if(timeLeft <= 0) submitFinal();
+                    }, 1000);
+                }
+            }, 1000);
+            
+            drawn = bank.sort(()=>0.5-Math.random()).slice(0,40);
+            answers = new Array(40).fill(null);
+            renderQuestions();
         }
 
-        // --- ระบบ Theme ---
-        function applyTheme(themeKey) {
-            document.body.setAttribute("data-theme", themeKey);
-            localStorage.setItem('smart_theme', themeKey);
-            document.querySelectorAll(".theme-btn").forEach(b => b.classList.remove("active"));
-            const btn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
-            if(btn) btn.classList.add("active");
+        function renderQuestions() {
+            const area = document.getElementById('questionArea');
+            const dots = document.getElementById('dotsArea');
+            area.innerHTML = ''; dots.innerHTML = '';
+            const letters = ['a','b','c','d'];
+            
+            drawn.forEach((q, i) => {
+                const d = document.createElement('div'); 
+                d.className = 'dot'; 
+                d.innerText = i + 1; 
+                d.onclick = () => document.getElementsByClassName('qcard')[i+1].scrollIntoView({behavior:'smooth', block:'start'});
+                dots.appendChild(d);
+                
+                const card = document.createElement('div'); 
+                card.className = 'qcard';
+                card.innerHTML = `<p style="font-weight:700; margin-bottom:15px; font-size:1.1rem;">ข้อที่ ${i+1}: ${q.question}</p><div class='options'></div>`;
+                
+                q.options.forEach((opt, oi) => {
+                    const btn = document.createElement('div'); 
+                    btn.className = 'option'; 
+                    btn.innerHTML = `<span class="option-label">${letters[oi]})</span> <span>${opt}</span>`;
+                    btn.onclick = () => { 
+                        [...card.querySelectorAll('.option')].forEach(x => x.classList.remove('selected'));
+                        btn.classList.add('selected'); 
+                        ans[i] = letters[oi];
+                        dots.children[i].classList.add('active');
+                    };
+                    card.querySelector('.options').appendChild(btn);
+                });
+                area.appendChild(card);
+            });
         }
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
+
+        async function ban(reason) {
+            if(!canBan || !examStarted) return;
+            examStarted = false; 
+            clearInterval(timerHandle);
+            
+            localStorage.setItem('is_banned', 'true');
+            
+            const sid = localStorage.getItem(localStorage.getItem('student_email') + '_studentid');
+            await fetch(VALIDATOR_URL, {
+                method: 'POST', mode: 'no-cors',
+                body: JSON.stringify({action:"reportViolation", student_id:sid, ip:userIP, name:localStorage.getItem('student_name'), reason:reason})
+            });
+            
+            alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์และหมดสิทธิ์สอบแล้ว!");
+            window.location.href = "student.html";
+        }
+
+        // ระบบจับโกง สลับจอ/แบ่งจอ
+        window.onblur = () => { if(canBan) ban("สลับหน้าจอหรือเปิดแอปอื่น"); };
+        window.onfocus = () => { document.body.classList.remove('lost-focus'); };
+        window.onresize = () => { if(canBan && window.innerHeight < screen.height * 0.75) ban("แบ่งหน้าจอหรือย่อหน้าต่าง"); };
+
+        // 🛡️ ระบบล็อกปุ่ม ย้อนกลับ (Back Button)
+        window.history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function(event) {
+            window.history.pushState(null, null, window.location.href);
+            if (examStarted) alert("🚨 ระบบไม่อนุญาตให้กดย้อนกลับระหว่างการสอบ!");
         });
 
-        // --- ระบบ Login Google ---
-        function decodeJwtResponse(token) {
-            let base64Url = token.split('.')[1];
-            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
-            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')));
-        }
-        function handleCredentialResponse(response) {
-            const userData = decodeJwtResponse(response.credential);
-            if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
-                localStorage.setItem('student_email', userData.email);
-                localStorage.setItem('student_name', userData.name); 
-                localStorage.setItem('student_pic', userData.picture);
-                localStorage.setItem('is_logged_in', 'true');
-                closeLoginModal();
-                fetchRealtimeData(); 
-            } else {
-                alert('ไม่อนุญาตให้อีเมลนี้เข้าสู่ระบบ');
+        // 🛡️ ป้องกันดูข้อสอบย้อนหลังจากแคช (Cache)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted || localStorage.getItem('is_banned') === 'true') {
+                if (localStorage.getItem('is_banned') === 'true') {
+                    document.body.innerHTML = `
+                    <div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'>
+                        <i class='fas fa-ban fa-5x' style='color:red; margin-bottom:20px;'></i>
+                        <h1 style='color:red; font-family:Prompt;'>❌ หมดสิทธิ์สอบ</h1>
+                        <p style='font-family:Prompt; color:#333; margin-top:10px;'>คุณถูกระงับสิทธิ์ไปแล้ว ไม่สามารถดูข้อสอบย้อนหลังได้</p>
+                    </div>`;
+                    setTimeout(() => { window.location.href = "student.html"; }, 1500);
+                }
             }
-        }
-        function logout() {
-            if(confirm('⚠️ ต้องการออกจากระบบ?')) {
-                localStorage.removeItem('is_logged_in');
-                window.location.reload();
-            }
-        }
-        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
-        function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
+        });
 
-        let db = { activities: [], students: [], submissions: [] };
-        
-        // --- 🌟 ดึงข้อมูลสด และ ตรวจการแบน 🌟 ---
-        async function fetchRealtimeData() {
-            const email = localStorage.getItem('student_email');
-            if (!email) return;
-
-            const btnSync = document.getElementById('btn-sync');
-            const container = document.getElementById('dynamic-modules-container');
+        async function submitFinal() {
+            if(!confirm("ยืนยันการส่งข้อสอบ?")) return;
+            examStarted = false; 
+            canBan = false; 
+            clearInterval(timerHandle);
             
-            if(btnSync) btnSync.innerHTML = '<i class="fas fa-sync-alt spin"></i> กำลังอัปเดต...';
-            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
+            document.getElementById('btnSubmit').disabled = true;
+            document.getElementById('btnSubmit').innerHTML = "<i class='fas fa-spinner fa-spin'></i> กำลังส่งข้อสอบ...";
+
+            const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
             
             try {
-                // 1. ดึงข้อมูลนักเรียนและกิจกรรมจากชีตหลัก
-                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
-                db = await res.json();
+                // 1. ตรวจคำตอบ
+                const res = await fetch(VALIDATOR_URL, {
+                    method: 'POST', 
+                    body: JSON.stringify({action: "evaluate", answers: data})
+                }).then(r => r.json());
                 
-                // 2. ดึง IP Address
-                try {
-                    const ipRes = await fetch('https://api64.ipify.org?format=json');
-                    const ipData = await ipRes.json();
-                    userIP = ipData.ip;
-                } catch(e) {}
-
-                const myData = db.students.find(s => {
-                    let sheetEmail = getVal(s, 'email', 'e-mail', 'อีเมล');
-                    return sheetEmail && String(sheetEmail).trim().toLowerCase() === email.trim().toLowerCase();
-                }) || {};
+                // 2. เตรียมข้อมูล (รวมชื่อนักเรียนด้วย)
+                const email = localStorage.getItem('student_email');
+                const sid = localStorage.getItem(email + '_studentid');
+                const sname = localStorage.getItem('student_name'); // 🌟 ดึงชื่อนักเรียนมาด้วย
                 
-                const studentId = getVal(myData, 'student_id', 'รหัส', 'id') || '-';
-
-                // 3. ตรวจสอบสถานะการทุจริตจาก Validator Script
-                if(studentId !== '-' && studentId !== '') {
-                    try {
-                        const banRes = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}`);
-                        const banData = await banRes.json();
-                        isStudentBanned = banData.banned;
-                        banReasonStr = banData.reason || "ทุจริตการสอบ";
-                        
-                        if(isStudentBanned) {
-                            localStorage.setItem('is_banned', 'true');
-                        } else {
-                            localStorage.removeItem('is_banned'); // ปลดแบนถ้าครูลบชื่อในชีตแล้ว
-                        }
-                    } catch(e) { console.log("Ban check skipped"); }
-                }
-
-                fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateTimestamp", type: "last_login", email: email }) });
-
-                renderDashboard(email, myData);
+                const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
+                const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
                 
-                if(btnSync) btnSync.innerHTML = '<i class="fas fa-check"></i> อัปเดตแล้ว';
-                document.getElementById('status-msg').style.display = 'none';
-
-            } catch(e) { 
-                container.innerHTML = '<div style="text-align:center; color:#ef4444;">เชื่อมต่อฐานข้อมูลล้มเหลว โปรดลองอัปเดตอีกครั้ง</div>';
-                if(btnSync) btnSync.innerHTML = '<i class="fas fa-sync-alt"></i> ลองใหม่';
+                // 3. ส่งข้อมูล + ชื่อนักเรียน ไปบันทึกลง Sheet
+                await fetch(MAIN_URL, {
+                    method:'POST', 
+                    mode:'no-cors', 
+                    body:JSON.stringify({
+                        action:"submitWork", 
+                        student_id: sid, 
+                        student_name: sname, 
+                        activity_id: actId, 
+                        work_content: log
+                    })
+                });
+                
+                await fetch(MAIN_URL, {
+                    method:'POST', 
+                    mode:'no-cors', 
+                    body:JSON.stringify({
+                        action:"saveScore", 
+                        student_id: sid, 
+                        student_name: sname, 
+                        activity_id: actId, 
+                        score: res.finalScore
+                    })
+                });
+                
+                // 4. แสดงผล
+                document.getElementById('screenExam').style.display = 'none';
+                document.getElementById('dotsArea').style.display = 'none';
+                document.getElementById('screenResult').style.display = 'block';
+                document.getElementById('scoreDisplay').innerText = res.finalScore + "/20";
+            } catch(e) {
+                alert("❌ การเชื่อมต่อล้มเหลว กรุณากดส่งใหม่อีกครั้ง");
+                document.getElementById('btnSubmit').disabled = false;
+                document.getElementById('btnSubmit').innerText = "ส่งคำตอบทั้งหมด";
             }
         }
 
-        // --- 🌟 วาดหน้า Dashboard 🌟 ---
-        function renderDashboard(email, myData) {
-            const studentId = getVal(myData, 'student_id', 'รหัส', 'id') || '-';
-            const room = getVal(myData, 'room', 'ห้อง', 'ชั้น') || '-';
-            const number = getVal(myData, 'number', 'เลขที่', 'no') || '-';
-            const name = getVal(myData, 'name', 'ชื่อ', 'ชื่อ-สกุล') || localStorage.getItem('student_name') || 'นักเรียน';
-            const editDate = getVal(myData, 'last_update', 'อัปเดตล่าสุด') || '-';
-            const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
-
-            document.getElementById('profile-name').innerText = name;
-            document.getElementById('profile-email').innerText = email;
-            document.getElementById('profile-pic-img').src = pic;
-            document.getElementById('profile-pic-img').style.display = 'block';
-            document.getElementById('display-studentid').innerText = studentId;
-            document.getElementById('display-room').innerText = room;
-            document.getElementById('display-number').innerText = number;
-            document.getElementById('display-editdate').innerText = editDate;
+        window.onload = async () => {
+            const theme = localStorage.getItem('smart_theme') || "default";
+            document.body.setAttribute("data-theme", theme);
             
-            document.getElementById('student-details-box').style.display = 'block';
-            document.getElementById('tracking-box').style.display = 'block';
-            document.getElementById('editProfileBtn').style.display = 'inline-block';
-            document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
-
-            const container = document.getElementById('dynamic-modules-container');
+            try { const ip = await fetch('https://api64.ipify.org?format=json').then(r=>r.json()); userIP = ip.ip; } catch(e) {}
             
-            if (room === '-' || room === '') {
-                container.innerHTML = `<div class="task-card" style="justify-content:center; border-left:4px solid #f59e0b; flex-direction:column; text-align:center;">
-                    <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b; margin-bottom: 10px;"></i>
-                    <h3 style="color: #f59e0b;">ยังไม่ได้ระบุห้องเรียน</h3>
-                    <p>กรุณากดปุ่ม <b>"แก้ไขข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุรหัสประจำตัวและห้องเรียนของคุณให้ตรงกับระบบครับ</p>
-                </div>`;
-                return;
+            const email = localStorage.getItem('student_email');
+            const sid = localStorage.getItem(email + '_studentid');
+            
+            if(!sid || sid === '-') { 
+                alert("ไม่มีรหัสประจำตัว กรุณากลับไปแก้ไขข้อมูลส่วนตัวก่อนครับ!"); 
+                window.location.href = "student.html"; 
+                return; 
             }
-
-            const myActivities = db.activities.filter(act => {
-                const targetRoom = getVal(act, 'room', 'ห้อง') || 'ทุกห้อง';
-                return targetRoom === 'ทุกห้อง' || targetRoom === room;
-            });
-
-            if (myActivities.length === 0) {
-                container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนสำหรับห้อง ${room}</p></div>`;
-                return;
+            
+            document.getElementById('uName').innerText = "👤 ผู้สอบ: " + localStorage.getItem('student_name');
+            document.getElementById('uId').innerText = "🆔 รหัสประจำตัว: " + sid;
+            
+            const wm = document.getElementById('watermark');
+            const txt = localStorage.getItem('student_name') + " (" + sid + ")";
+            for(let i=0; i<15; i++) {
+                const div = document.createElement('div');
+                div.className = 'watermark-item';
+                div.innerText = txt;
+                wm.appendChild(div);
             }
-
-            container.innerHTML = '';
-            let totalMaxPoints = 0, totalEarned = 0, submittedCount = 0;
-            let gradableCount = myActivities.filter(a => getVal(a, 'type', 'ประเภท') !== 'content').length;
-            let missingTasks = [];
-
-            myActivities.forEach(act => {
-                const actId = getVal(act, 'id', 'รหัสงาน');
-                const actType = getVal(act, 'type', 'ประเภท');
-                const actTitle = getVal(act, 'title', 'ชื่อหัวข้อ');
-                const actPoints = parseInt(getVal(act, 'points', 'คะแนนเต็ม') || 0);
-                const actStatusStr = getVal(act, 'status', 'สถานะ'); 
-                const linkPath = getVal(act, 'link', 'ลิงก์') || '#';
-                
-                const submission = db.submissions.find(sub => getVal(sub, 'student_id', 'รหัส') == studentId && getVal(sub, 'activity_id', 'รหัสงาน') == actId);
-                
-                let isContent = (actType === 'content');
-                let isExam = (actType === 'exam' || String(linkPath).includes('quiz.html')); 
-                
-                let tColor = '#3b82f6', tIcon = '📝', tName = 'งาน';
-                if(isContent) { tColor = '#a855f7'; tIcon = '📖'; tName = 'เนื้อหา'; }
-                else if(actType === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
-                else if(isExam) { tColor = '#f97316'; tIcon = '🎯'; tName = 'แบบทดสอบ'; } 
-
-                let badgeHtml = '', btnHtml = '', scoreHtml = '';
-                let isClosed = (actStatusStr === 'closed');
-                let targetUrl = linkPath !== '#' ? `${linkPath}?actid=${actId}` : '#';
-
-                const btnLocked = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดระบบ</button>`;
-
-                if (isContent) {
-                    badgeHtml = `<span class="badge" style="background:${tColor}33; color:${tColor}; border:1px solid ${tColor}80;">${tIcon} ${tName}</span>`;
-                    btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<a href="${targetUrl}" class="btn-action" style="background:${tColor};">เปิดอ่าน</a>` : '');
-                } else {
-                    totalMaxPoints += actPoints;
-                    
-                    // 🛡️ หากเป็นข้อสอบ และ พบว่าโดนแบน (ดึงค่าจาก API)
-                    if (isExam && isStudentBanned) {
-                        missingTasks.push(actTitle);
-                        badgeHtml = `<span class="badge banned">❌ ระงับสิทธิ์</span>`;
-                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; color:#ef4444; font-weight:bold;">เหตุผล: ${banReasonStr}</div>`;
-                        btnHtml = `<button class="btn-action" style="background:#ef4444; cursor:not-allowed;" onclick="alert('🚨 ยุติการสอบ: ตรวจพบพฤติกรรมการทุจริต (${banReasonStr}) กรุณาติดต่อครูผู้สอนเพื่อขอสอบใหม่ครับ')">❌ หมดสิทธิ์สอบ</button>`;
-                    }
-                    // ถ้าทำไปแล้ว ส่งงานแล้ว
-                    else if (submission) {
-                        submittedCount++;
-                        let subScore = getVal(submission, 'score', 'คะแนน');
-                        if (subScore !== undefined && subScore !== "") {
-                            totalEarned += parseInt(subScore);
-                            badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
-                            scoreHtml = `<div style="color:#10b981; font-weight:600; font-size:0.9rem; margin-top:5px;">คะแนน: ${subScore} / ${actPoints}</div>`;
-                            // 🌟 ปุ่มสีเขียวสำหรับงานที่ทำแล้ว 🌟
-                            btnHtml = `<button class="btn-action btn-locked" style="background:#10b981; cursor:not-allowed; opacity: 0.9;" disabled><i class="fas fa-check"></i> ส่งแล้ว</button>`;
-                        } else {
-                            badgeHtml = `<span class="badge submitted">✅ รอตรวจ</span>`;
-                            scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${actPoints})</div>`;
-                            btnHtml = isClosed ? btnLocked : (targetUrl !== '#' ? `<a href="${targetUrl}" class="btn-action" style="background:#f59e0b;"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
-                        }
-                    } 
-                    // ถ้ายังไม่ทำและยังไม่หมดเวลา
-                    else {
-                        missingTasks.push(actTitle);
-                        badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
-                        scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${actPoints}</div>`;
-                        btnHtml = isClosed ? btnLocked : (targetUrl !== '#' ? `<a href="${targetUrl}" class="btn-action" style="background:${tColor};">เริ่มทำ <i class="fas fa-arrow-right"></i></a>` : '');
-                    }
-                }
-
-                let deadlineDate = getVal(act, 'date', 'วันที่') || '-';
-                let deadlineTime = getVal(act, 'time', 'เวลา') || '-';
-                if(String(deadlineDate).includes('T')) deadlineDate = String(deadlineDate).split('T')[0];
-                if(String(deadlineTime).includes('T')) deadlineTime = String(deadlineTime).split('T')[1].substring(0,5);
-
-                container.innerHTML += `
-                    <div class="task-card" style="border-left: 5px solid ${isClosed ? '#ef4444' : tColor};">
-                        <div class="task-info">
-                            <h4 style="color:${isClosed ? '#ef4444' : tColor};">${tIcon} ${actTitle}</h4>
-                            <p style="font-size:0.85rem; opacity:0.8;">${getVal(act, 'desc', 'description', 'รายละเอียด') || ''}</p>
-                            <small style="color:${tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${deadlineDate} | ${deadlineTime}</small>
-                        </div>
-                        <div class="task-meta">${badgeHtml}${scoreHtml}<div style="margin-top:8px;">${btnHtml}</div></div>
+            
+            try {
+                const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}`).then(r=>r.json());
+                if(res.banned) {
+                    localStorage.setItem('is_banned', 'true');
+                    document.body.innerHTML = `
+                    <div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'>
+                        <i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i>
+                        <h1 style='color:red; font-family:Prompt;'>คุณถูกระงับสิทธิ์การสอบ!</h1>
+                        <p style='font-family:Prompt; color:#333;'>${res.reason}</p>
+                        <button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;">กลับหน้าหลัก</button>
                     </div>`;
-            });
-
-            let progressPercent = gradableCount > 0 ? Math.round((submittedCount / gradableCount) * 100) : 0;
-            document.getElementById('total-score').innerHTML = `${totalEarned} <span style="font-size: 1rem;">/ ${totalMaxPoints}</span>`;
-            document.getElementById('progress-fill').style.width = progressPercent + '%';
-            document.getElementById('progress-text').innerHTML = `ความคืบหน้า ${progressPercent}%`;
-
-            if (missingTasks.length > 0) {
-                document.getElementById('display-missing').innerHTML = missingTasks.length + " งาน<br><span style='font-size:0.75rem; color:#f87171; font-weight:normal;'>(" + missingTasks.join(", ") + ")</span>";
-            } else if (gradableCount > 0) {
-                document.getElementById('display-missing').innerHTML = "<span style='color:#10b981;'>ไม่มีงานค้าง 🎉</span>";
-            } else {
-                document.getElementById('display-missing').innerText = "-";
-            }
-        }
-
-        // --- ฟังก์ชันแก้ไขโปรไฟล์ ---
-        function openEditProfileModal() {
-            const email = localStorage.getItem('student_email');
-            const myData = db.students.find(s => getVal(s, 'email') === email) || {};
-            
-            document.getElementById('edit-studentid').value = getVal(myData, 'student_id') || '';
-            document.getElementById('edit-name').value = getVal(myData, 'name') || localStorage.getItem('student_name') || "";
-            document.getElementById('edit-number').value = getVal(myData, 'number') || '';
-            
-            const storedRoom = getVal(myData, 'room') || 'ม.4/1';
-            if(storedRoom.includes('/')) {
-                const parts = storedRoom.split('/');
-                document.getElementById('edit-grade').value = parts[0];
-                document.getElementById('edit-room-num').value = parts[1];
-            }
-            document.getElementById('editProfileModal').classList.add('active');
-        }
-        
-        function closeEditProfileModal() { document.getElementById('editProfileModal').classList.remove('active'); }
-
-        function saveProfileData() {
-            const studentId = document.getElementById('edit-studentid').value.trim();
-            const name = document.getElementById('edit-name').value.trim();
-            const room = document.getElementById('edit-grade').value + "/" + document.getElementById('edit-room-num').value;
-            const number = document.getElementById('edit-number').value.trim();
-            const email = localStorage.getItem('student_email');
-
-            if (!name || !number || !studentId) return alert('⚠️ กรุณากรอกรหัสนักเรียน, ชื่อ และเลขที่ให้ครบถ้วน');
-            
-            document.getElementById('saving-status').style.display = 'block';
-            document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปเดตข้อมูลไปที่ฐานข้อมูล...';
-
-            fetch(GOOGLE_SCRIPT_URL, {
-                method: 'POST',
-                mode: 'no-cors',
-                body: JSON.stringify({ action: "updateProfile", email: email, student_id: studentId, name: name, room: room, number: number })
-            }).then(() => {
-                document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
-                setTimeout(() => {
-                    closeEditProfileModal(); 
-                    document.getElementById('saving-status').style.display = 'none';
-                    fetchRealtimeData(); 
-                }, 1500);
-            });
-        }
-
-        window.onload = () => {
-            const savedTheme = localStorage.getItem('smart_theme') || "default";
-            applyTheme(savedTheme);
-            if (localStorage.getItem('is_logged_in') === 'true') {
-                fetchRealtimeData();
-            } else {
-                document.getElementById('showLoginBtn').addEventListener('click', openLoginModal);
-            }
+                }
+            } catch(e) {}
         };
     </script>
 </body>
