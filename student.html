@@ -232,19 +232,18 @@
         // 🌟 1. ใส่ URL Google Apps Script ของครูตรงนี้ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
 
-        // 🌟 ฟังก์ชันอัจฉริยะ ป้องกันปัญหาพิมพ์เล็ก-ใหญ่/เว้นวรรค ใน Google Sheets 🌟
+        // 🌟 ตัวแปรเก็บเวลามาตรฐานสากล (Internet Time) 🌟
+        let currentRealTime = new Date().getTime();
+
         function getVal(obj, ...keys) {
             if (!obj) return undefined;
             for (let key of keys) {
                 const realKey = Object.keys(obj).find(k => String(k).trim().toLowerCase() === String(key).trim().toLowerCase());
-                if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) {
-                    return obj[realKey];
-                }
+                if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) return obj[realKey];
             }
             return undefined;
         }
 
-        // --- ระบบ Theme ---
         function applyTheme(themeKey) {
             document.body.setAttribute("data-theme", themeKey);
             localStorage.setItem('smart_theme', themeKey);
@@ -252,11 +251,8 @@
             const btn = document.querySelector(`.theme-btn[data-theme="${themeKey}"]`);
             if(btn) btn.classList.add("active");
         }
-        document.querySelectorAll(".theme-btn").forEach(btn => {
-            btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme")));
-        });
+        document.querySelectorAll(".theme-btn").forEach(btn => btn.addEventListener("click", () => applyTheme(btn.getAttribute("data-theme"))));
 
-        // --- ระบบ Login Google ---
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -276,17 +272,13 @@
             }
         }
         function logout() {
-            if(confirm('⚠️ ต้องการออกจากระบบ?')) {
-                localStorage.removeItem('is_logged_in');
-                window.location.reload();
-            }
+            if(confirm('⚠️ ต้องการออกจากระบบ?')) { localStorage.removeItem('is_logged_in'); window.location.reload(); }
         }
         function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
 
         let db = { activities: [], students: [], submissions: [] };
         
-        // --- 🌟 ดึงข้อมูลสด 100% (เพิ่มระบบกำจัด Cache) 🌟 ---
         async function fetchRealtimeData() {
             const email = localStorage.getItem('student_email');
             if (!email) return;
@@ -295,8 +287,18 @@
             const container = document.getElementById('dynamic-modules-container');
             
             if(btnSync) btnSync.innerHTML = '<i class="fas fa-sync-alt spin"></i> กำลังอัปเดต...';
-            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
+            container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูล...</div>';
             
+            // 🌟 ดึงเวลามาตรฐานสากลจาก WorldTimeAPI 🌟
+            try {
+                const timeRes = await fetch('https://worldtimeapi.org/api/timezone/Asia/Bangkok');
+                const timeData = await timeRes.json();
+                currentRealTime = new Date(timeData.datetime).getTime();
+            } catch(e) {
+                // ถ้า API ล่ม ให้สำรองกลับมาใช้เวลาในเครื่องเด็ก
+                currentRealTime = new Date().getTime();
+            }
+
             try {
                 const cacheBuster = new Date().getTime();
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + cacheBuster);
@@ -315,9 +317,7 @@
             }
         }
 
-        // --- 🌟 จัดการแสดงผลหน้าจอ 🌟 ---
         function renderDashboard(email) {
-            // 🌟 สำคัญ: reverse() ดึงข้อมูลจากบรรทัดล่าสุด เผื่อมีชื่อเด็กซ้ำในชีต
             const studentsArray = Array.isArray(db.students) ? [...db.students].reverse() : [];
             const myData = studentsArray.find(s => {
                 let sheetEmail = getVal(s, 'email', 'e-mail', 'อีเมล');
@@ -331,7 +331,6 @@
             const editDate = getVal(myData, 'last_update', 'อัปเดตล่าสุด') || '-';
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
 
-            // อัปเดตโปรไฟล์ลง localStorage เพื่อให้หน้า Lab (python.html) ดึงไปใช้ถูกตัว
             localStorage.setItem(email + '_studentid', studentId !== '-' ? studentId : '');
             
             document.getElementById('profile-name').innerText = name;
@@ -381,7 +380,6 @@
                 const actPoints = parseInt(getVal(act, 'points', 'คะแนนเต็ม') || 0);
                 const actStatusStr = getVal(act, 'status', 'สถานะ'); 
                 
-                // 🌟 ระบบค้นหาการส่งงานที่เข้มแข็งที่สุด (ตัดช่องว่าง) 🌟
                 const submission = db.submissions.find(sub => {
                     const sId = getVal(sub, 'student_id', 'รหัส');
                     const aId = getVal(sub, 'activity_id', 'รหัสงาน', 'id');
@@ -393,12 +391,39 @@
                 if(isContent) { tColor = '#a855f7'; tIcon = '📖'; tName = 'เนื้อหา'; }
                 else if(actType === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
 
-                let badgeHtml = '', btnHtml = '', scoreHtml = '';
                 let isClosed = (actStatusStr === 'closed');
                 let linkPath = getVal(act, 'link', 'ลิงก์') || '#';
                 if(linkPath !== '#') linkPath += `?actid=${actId}`;
 
+                // 🌟 ตรวจสอบเวลาสากลว่า "เลยกำหนดส่ง" หรือยัง 🌟
+                let isPastDeadline = false;
+                let rawDate = getVal(act, 'date', 'วันที่');
+                let rawTime = getVal(act, 'time', 'เวลา');
+                let displayDate = rawDate || '-';
+                let displayTime = rawTime || '-';
+
+                if (rawDate && !isContent) {
+                    if (String(rawDate).includes('T')) displayDate = String(rawDate).split('T')[0];
+                    if (String(rawTime).includes('T')) {
+                        displayTime = String(rawTime).split('T')[1].substring(0,5);
+                    } else if (String(rawTime).length >= 5) {
+                        displayTime = String(rawTime).substring(0,5);
+                    }
+
+                    try {
+                        let timeObj = (displayTime !== '-') ? displayTime : '23:59';
+                        if (timeObj.split(':').length === 2) timeObj += ':00'; // ทำให้เป็น HH:mm:ss
+                        
+                        let deadlineTime = new Date(`${displayDate}T${timeObj}`).getTime();
+                        if (currentRealTime > deadlineTime) {
+                            isPastDeadline = true; // เลยเวลาสากลแล้ว!
+                        }
+                    } catch(e) {}
+                }
+
+                let badgeHtml = '', btnHtml = '', scoreHtml = '';
                 const btnLocked = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดระบบ</button>`;
+                const btnLate = `<button class="btn-action btn-locked" disabled style="background:#ef4444;"><i class="fas fa-ban"></i> หมดเวลาส่งงาน</button>`;
 
                 if (isContent) {
                     badgeHtml = `<span class="badge" style="background:${tColor}33; color:${tColor}; border:1px solid ${tColor}80;">${tIcon} ${tName}</span>`;
@@ -417,27 +442,33 @@
                         } else {
                             badgeHtml = `<span class="badge submitted">✅ รอตรวจ</span>`;
                             scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">ส่งแล้ว รอให้คะแนน (เต็ม ${actPoints})</div>`;
-                            btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:#f59e0b;"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
+                            
+                            if (isPastDeadline) {
+                                btnHtml = btnLate; // หมดเวลาแก้ไข
+                            } else {
+                                btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:#f59e0b;"><i class="fas fa-pencil-alt"></i> แก้ไขงาน</a>` : '');
+                            }
                         }
                     } else {
                         missingTasks.push(actTitle);
-                        badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
                         scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${actPoints}</div>`;
-                        btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:${tColor};">เริ่มทำ <i class="fas fa-arrow-right"></i></a>` : '');
+                        
+                        if (isPastDeadline) {
+                            badgeHtml = `<span class="badge late">❌ หมดเวลา</span>`;
+                            btnHtml = btnLate; // ห้ามเริ่มทำ
+                        } else {
+                            badgeHtml = `<span class="badge pending">⏳ ค้างส่งงาน</span>`;
+                            btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:${tColor};">เริ่มทำ <i class="fas fa-arrow-right"></i></a>` : '');
+                        }
                     }
                 }
 
-                let deadlineDate = getVal(act, 'date', 'วันที่') || '-';
-                let deadlineTime = getVal(act, 'time', 'เวลา') || '-';
-                if(String(deadlineDate).includes('T')) deadlineDate = String(deadlineDate).split('T')[0];
-                if(String(deadlineTime).includes('T')) deadlineTime = String(deadlineTime).split('T')[1].substring(0,5);
-
                 container.innerHTML += `
-                    <div class="task-card" style="border-left: 5px solid ${isClosed ? '#ef4444' : tColor};">
+                    <div class="task-card" style="border-left: 5px solid ${isClosed ? '#ef4444' : (isPastDeadline && !isContent ? '#ef4444' : tColor)};">
                         <div class="task-info">
-                            <h4 style="color:${isClosed ? '#ef4444' : tColor};">${tIcon} ${actTitle}</h4>
+                            <h4 style="color:${isClosed ? '#ef4444' : (isPastDeadline && !isContent ? '#ef4444' : tColor)};">${tIcon} ${actTitle}</h4>
                             <p style="font-size:0.85rem; opacity:0.8;">${getVal(act, 'desc', 'description', 'รายละเอียด') || ''}</p>
-                            <small style="color:${tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${deadlineDate} | ${deadlineTime}</small>
+                            <small style="color:${isPastDeadline && !isContent ? '#ef4444' : tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${displayDate} | ${displayTime}</small>
                         </div>
                         <div class="task-meta">${badgeHtml}${scoreHtml}<div style="margin-top:8px;">${btnHtml}</div></div>
                     </div>`;
