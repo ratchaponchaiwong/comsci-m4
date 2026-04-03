@@ -286,7 +286,7 @@
 
         let db = { activities: [], students: [], submissions: [] };
         
-        // --- 🌟 ดึงข้อมูลสด 100% 🌟 ---
+        // --- 🌟 ดึงข้อมูลสด 100% (เพิ่มระบบกำจัด Cache) 🌟 ---
         async function fetchRealtimeData() {
             const email = localStorage.getItem('student_email');
             if (!email) return;
@@ -298,7 +298,9 @@
             container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
             
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
+                // 🌟 ตัวช่วยกัน Cache: เติมเวลาปัจจุบันต่อท้ายลิงก์ เพื่อบังคับให้ดึงข้อมูลใหม่ทุกรอบ!
+                const cacheBuster = new Date().getTime();
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + cacheBuster);
                 db = await res.json();
                 
                 // ส่ง PING ให้ชีตรู้ว่าล็อกอินเข้ามา
@@ -317,7 +319,7 @@
 
         // --- 🌟 จัดการแสดงผลหน้าจอ 🌟 ---
         function renderDashboard(email) {
-            // ดึงข้อมูลนักเรียนด้วยฟังก์ชันอัจฉริยะ ป้องกันการพิมพ์ผิดในชีต
+            // ดึงข้อมูลนักเรียน
             const myData = db.students.find(s => {
                 let sheetEmail = getVal(s, 'email', 'e-mail', 'อีเมล');
                 return sheetEmail && String(sheetEmail).trim().toLowerCase() === email.trim().toLowerCase();
@@ -330,6 +332,7 @@
             const editDate = getVal(myData, 'last_update', 'อัปเดตล่าสุด') || '-';
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
 
+            // อัปเดตโปรไฟล์
             document.getElementById('profile-name').innerText = name;
             document.getElementById('profile-email').innerText = email;
             document.getElementById('profile-pic-img').src = pic;
@@ -373,14 +376,18 @@
             let missingTasks = [];
 
             myActivities.forEach(act => {
-                const actId = getVal(act, 'id', 'รหัสงาน');
+                const actId = getVal(act, 'id', 'รหัสงาน', 'ID');
                 const actType = getVal(act, 'type', 'ประเภท');
                 const actTitle = getVal(act, 'title', 'ชื่อหัวข้อ');
                 const actPoints = parseInt(getVal(act, 'points', 'คะแนนเต็ม') || 0);
                 const actStatusStr = getVal(act, 'status', 'สถานะ'); 
                 
-                // ตรวจการส่งงาน
-                const submission = db.submissions.find(sub => getVal(sub, 'student_id', 'รหัส') == studentId && getVal(sub, 'activity_id', 'รหัสงาน') == actId);
+                // 🌟 อัปเกรดระบบเทียบ รหัสนักเรียน และ รหัสงาน (ตัดช่องว่างทิ้ง) 🌟
+                const submission = db.submissions.find(sub => {
+                    const sId = getVal(sub, 'student_id', 'รหัส');
+                    const aId = getVal(sub, 'activity_id', 'รหัสงาน', 'id');
+                    return sId && aId && String(sId).trim() === String(studentId).trim() && String(aId).trim() === String(actId).trim();
+                });
                 
                 let isContent = (actType === 'content');
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'งาน';
@@ -451,7 +458,6 @@
             }
         }
 
-        // --- 🌟 บันทึกข้อมูลส่วนตัว 🌟 ---
         function openEditProfileModal() {
             const email = localStorage.getItem('student_email');
             const myData = db.students.find(s => getVal(s, 'email') === email) || {};
@@ -485,11 +491,10 @@
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // สำคัญ! ให้ส่งได้โดยไม่ติดบล็อก
+                mode: 'no-cors',
                 body: JSON.stringify({ action: "updateProfile", email: email, student_id: studentId, name: name, room: room, number: number })
             }).then(() => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
-                // หน่วงเวลา 1.5 วินาที ให้ Google Sheets เซฟเสร็จ ก่อนจะโหลดมาโชว์ใหม่
                 setTimeout(() => {
                     closeEditProfileModal(); 
                     document.getElementById('saving-status').style.display = 'none';
