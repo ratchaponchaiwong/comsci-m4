@@ -3,111 +3,80 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>แบบทดสอบออนไลน์ | PROT Smart Workspace</title>
-    
-    <script src="https://accounts.google.com/gsi/client" async defer></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <title>แบบทดสอบ | PROT Smart Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    
     <style>
-        /* ==================== 1. CSS ธีมหลัก ==================== */
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; overflow-x: hidden; position: relative; }
-        
-        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
-        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
-        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
-        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
-        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
-        
-        .bg-animation { position: fixed; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
-        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
-
-        /* ==================== 2. CSS ระบบคุมสอบ ==================== */
-        .page-content-wrapper { padding: 40px 20px; max-width: 850px; margin: 0 auto; position: relative; z-index: 10; }
-        .qcard { margin-top: 20px; padding: 30px; border-radius: 24px; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.15); backdrop-filter: blur(15px); }
-        body[data-theme="snow"] .qcard, body[data-theme="love"] .qcard { background: rgba(255, 255, 255, 0.9); color: #1e293b; border-color: rgba(0,0,0,0.1); }
-        
-        .option { padding: 15px 20px; border-radius: 15px; border: 2px solid rgba(255,255,255,0.1); margin-top: 12px; cursor: pointer; transition: 0.3s; display:flex; align-items:flex-start; gap:10px; }
-        body[data-theme="snow"] .option, body[data-theme="love"] .option { border-color: rgba(0,0,0,0.1); }
-        .option:hover { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; }
-        .option.selected { background: #3b82f6 !important; color: white !important; border-color: #60a5fa; box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
-        .option-label { font-weight: 800; color: #ff6600; }
-        body[data-theme="snow"] .option.selected .option-label, body[data-theme="love"] .option.selected .option-label { color: #fff; }
+        body { font-family: 'Prompt', sans-serif; transition: 0.5s; overflow-x: hidden; min-height: 100vh; }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a, #1e293b); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff, #f0f8ff); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a, #3e7a3e); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5, #ff85a0); color: #1e293b; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a, #401040); color: white; }
 
         .watermark-container { position: fixed; inset:0; pointer-events:none; z-index:9999; display:grid; grid-template-columns:repeat(3, 1fr); opacity:0.06; }
         .watermark-item { transform:rotate(-30deg); display:flex; align-items:center; justify-content:center; white-space:nowrap; font-size:1.1rem; font-weight: bold; }
-        
-        body.lost-focus { filter: blur(45px) grayscale(1) !important; transition: 0.4s; }
-        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(15, 23, 42, 0.98); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
-        
-        .btn-start { background: linear-gradient(135deg, #3b82f6, #2563eb); color: white; border: none; padding: 20px 40px; border-radius: 50px; font-weight: bold; cursor: pointer; width: 100%; font-size: 1.2rem; box-shadow: 0 10px 20px rgba(59,130,246,0.3); transition: 0.3s; }
-        .btn-start:hover { transform: translateY(-3px); box-shadow: 0 15px 25px rgba(59,130,246,0.4); }
-        .btn-submit { background: #10b981; color: white; border: none; padding: 22px; border-radius: 50px; width: 100%; margin: 50px 0; font-weight: bold; cursor: pointer; font-size: 1.1rem; box-shadow: 0 10px 20px rgba(16,185,129,0.3); }
-        
-        .progress-indicator { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(15, 23, 42, 0.9); padding: 10px; display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; z-index: 1000; border-top: 2px solid #3b82f6; backdrop-filter: blur(10px); }
-        .dot { width: 32px; height: 32px; border-radius: 50%; border: 1px solid #444; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; background: #1a1a1a; color: #888; cursor: pointer; }
-        .dot.active { background: #3b82f6; color: white; border-color: #fff; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
+        body.lost-focus { filter: blur(45px) grayscale(1) !important; }
+        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; }
+        .qcard { margin-top: 20px; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
+        body[data-theme="snow"] .qcard, body[data-theme="love"] .qcard { background: rgba(255, 255, 255, 0.9); color: #1e293b; border-color: rgba(0,0,0,0.1); }
+        .option { padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.1); margin-top: 10px; cursor: pointer; transition: 0.3s; display:flex; align-items:flex-start; gap:10px; }
+        body[data-theme="snow"] .option, body[data-theme="love"] .option { border-color: rgba(0,0,0,0.1); }
+        .option:hover { background: rgba(59, 130, 246, 0.15); border-color: #3b82f6; }
+        .option.selected { background: #3b82f6 !important; color: white !important; border-color: #60a5fa; box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
+        .option-label { font-weight: 800; color: #ff6600; width: 25px; }
+        body[data-theme="snow"] .option.selected .option-label, body[data-theme="love"] .option.selected .option-label { color: #fff; }
+        .btn-main { background: #3b82f6; color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; cursor: pointer; font-weight: bold; font-size:1.1rem; }
+        .progress-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; z-index: 1000; }
+        .dot { width: 30px; height: 30px; border-radius: 50%; background: #333; color: white; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
+        .dot.active { background: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
     </style>
 </head>
 <body data-theme="default">
-    <div class="bg-animation"><div class="circle" style="width:400px; height:400px; top:-100px; left:-100px;"></div></div>
-    <div id="particleContainer" style="position: fixed; inset:0; pointer-events: none; z-index: 1;"></div>
     <div id="watermark" class="watermark-container"></div>
-    <div id="split-warning">
-        <i class="fas fa-expand fa-4x" style="color:red; margin-bottom:20px;"></i>
-        <h2>⚠️ ตรวจพบการพยายามแบ่งหน้าจอ!</h2>
-        <p>ระบบไม่อนุญาตให้ใช้โหมดหน้าต่างเล็ก กรุณาขยายหน้าจอให้เต็มเพื่อสอบต่อ</p>
-    </div>
+    <div id="split-warning"><i class="fas fa-expand fa-4x" style="color:red; margin-bottom:20px;"></i><h2>ตรวจพบการแบ่งหน้าจอ!</h2><p>กรุณาขยายจอให้เต็มและรอระบบเข้าที่สักครู่</p></div>
+    
+    <header style="background: rgba(0,0,0,0.5); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100;">
+        <div style="font-weight: 800; color: #60a5fa; font-size:1.2rem;"><i class="fas fa-robot"></i> PROT EXAM</div>
+        <div id="timer" style="color: #ff6600; font-weight: bold; font-size:1.2rem;">00:40:00</div>
+    </header>
 
-    <div class="content-layer">
-        <header style="background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(12px); padding: 16px 40px; display: flex; justify-content: space-between; align-items:center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(59,130,246,0.3);">
-            <div style="font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent;"><i class="fas fa-robot"></i> PROT EXAM</div>
-            <div id="timerDisplay" style="font-weight: bold; color: #ff6600; font-size: 1.3rem; background: rgba(0,0,0,0.3); padding: 5px 20px; border-radius: 30px; border: 1px solid rgba(255,102,0,0.3);">00:40:00</div>
-        </header>
-
-        <div class="page-content-wrapper">
-            <div class="qcard" id="screenStart" style="text-align: center;">
-                <h1 style="margin-bottom: 10px; color: #60a5fa;"><i class="fas fa-file-alt"></i> แบบทดสอบปลายภาค</h1>
-                <p style="opacity: 0.8; margin-bottom: 30px;">สุ่ม 40 ข้อจากคลัง 100 ข้อ | เวลา 40 นาที | คะแนนเต็ม 20</p>
-                <div id="uInfo" style="margin-bottom: 35px; text-align: left; padding: 25px; background: rgba(0,0,0,0.25); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1);">
-                    <div id="uName" style="font-size: 1.2rem; font-weight: 600; margin-bottom: 5px;">👤 กำลังดึงข้อมูล...</div>
-                    <div id="uId" style="color: #60a5fa; font-family: monospace;">🆔 รหัสประจำตัว: -</div>
-                </div>
-                <button class="btn-start" onclick="startExam()" id="btnBegin">
-                    <i class="fas fa-expand-arrows-alt"></i> เริ่มการสอบและขยายหน้าจอ
-                </button>
-                <div id="countdown" style="display:none; color: #ff6600; margin-top: 15px; font-weight: bold; font-size: 1.1rem;">กำลังขยายหน้าจอ กรุณารอสักครู่... 10</div>
+    <div style="max-width: 800px; margin: 40px auto; padding: 0 20px;">
+        <div class="qcard" id="screenStart" style="text-align: center;">
+            <h1 style="color:#60a5fa;">แบบทดสอบวิชาหุ่นยนต์</h1>
+            <p style="margin: 20px 0; opacity: 0.8;">สุ่ม 40 จาก 100 ข้อ | 40 นาที | คะแนนเต็ม 20</p>
+            <div style="background:rgba(0,0,0,0.2); padding:20px; border-radius:15px; margin-bottom:20px; text-align:left;">
+                <div id="uName" style="font-weight: bold; font-size:1.1rem; margin-bottom:5px;">👤 กำลังดึงข้อมูล...</div>
+                <div id="uId" style="color:#60a5fa;">🆔 รหัสประจำตัว: -</div>
             </div>
+            <button class="btn-main" onclick="startExam()" id="btnBegin">เริ่มการสอบ</button>
+            <div id="countdown" style="display:none; color: #ff6600; margin-top: 15px; font-weight:bold;">กรุณารอระบบ Fullscreen เข้าที่... 10</div>
+        </div>
 
-            <div id="screenExam" style="display:none; padding-bottom: 100px;">
-                <div id="questionContainer"></div>
-                <button id="btnSubmit" onclick="confirmSubmit()" class="btn-submit"><i class="fas fa-paper-plane"></i> ส่งคำตอบทั้งหมด</button>
-            </div>
+        <div id="screenExam" style="display:none; padding-bottom: 80px;">
+            <div id="questionArea"></div>
+            <button class="btn-main" id="btnSubmit" style="background:#10b981; margin: 40px 0;" onclick="submitFinal()">ส่งคำตอบทั้งหมด</button>
+        </div>
 
-            <div class="qcard" id="screenResult" style="display:none; text-align:center;">
-                <h2 style="color: #3b82f6;">📊 ประกาศผลสอบ</h2>
-                <div style="font-size: 4.5rem; font-weight: 900; margin: 20px 0; background: linear-gradient(135deg, #3b82f6, #60a5fa); -webkit-background-clip: text; color: transparent;" id="rScore">0/20</div>
-                <p id="rDetail" style="margin-bottom: 30px; font-size: 1.1rem; opacity: 0.9;"></p>
-                <button onclick="window.location.href='student.html'" class="btn-start" style="width: auto;"><i class="fas fa-home"></i> กลับสู่หน้าห้องเรียน</button>
-            </div>
+        <div class="qcard" id="screenResult" style="display:none; text-align: center;">
+            <h2 style="color:#3b82f6;">ประกาศผลคะแนน</h2>
+            <div id="scoreDisplay" style="font-size: 4.5rem; font-weight: 800; margin: 20px 0; color:#60a5fa;">0/20</div>
+            <button class="btn-main" onclick="window.location.href='student.html'">กลับหน้าห้องเรียน</button>
         </div>
     </div>
 
-    <div class="progress-indicator" id="progressDots" style="display:none;"></div>
+    <div class="progress-bar" id="dotsArea" style="display:none;"></div>
 
     <script>
-        // 🌟 1. ลิงก์ API (ครูนำลิงก์มาเปลี่ยนตรงนี้นะครับ) 🌟
+        // 🌟 ใส่ URL ของครูตรงนี้ 🌟
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
-        const MAIN_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+        const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
-        let examStarted = false, examFinished = false, timeLeft = 2400, timer = null, userIP = "";
-        let drawnQuestions = [], answers = [];
-        let canTriggerBan = false;
+        let examStarted = false, canBan = false, userIP = "unknown", drawn = [], ans = [], timerHandle, timeLeft = 2400;
 
-        // 🌟 2. คลังข้อสอบครบ 100 ข้อ (สลับตัวเลือก a-d แล้ว) 🌟
-        const questionBank = [
+        // คลังข้อสอบ 100 ข้อ
+        const bank = [
             { "id": 1, "question": "ข้อใดอธิบายหน้าที่ของระบบรับรู้ (Perception) ในหุ่นยนต์ได้ถูกต้องที่สุด", "options": ["ทำหน้าที่รับข้อมูลจากสภาพแวดล้อมผ่านเซนเซอร์", "ทำหน้าที่จัดเก็บข้อมูลการทำงาน", "ทำหน้าที่ควบคุมแรงบิดของมอเตอร์", "ทำหน้าที่แปลงโปรแกรมเป็นคำสั่งเครื่อง"] },
             { "id": 2, "question": "ส่วนใดของหุ่นยนต์มีหน้าที่วิเคราะห์ข้อมูลและตัดสินใจเลือกการทำงาน", "options": ["ระบบกลไกขับเคลื่อน", "แหล่งจ่ายพลังงาน", "ระบบการคิดวิเคราะห์ (Cognition)", "ระบบรับรู้"] },
             { "id": 3, "question": "องค์ประกอบใดเกี่ยวข้องโดยตรงกับการเคลื่อนที่ของแขนกลหรือกลไก", "options": ["การประมวลผล", "การเคลื่อนไหว (Manipulation)", "การรับรู้", "การบันทึกข้อมูล"] },
@@ -210,159 +179,224 @@
             { "id": 100, "question": "ตัวย่อใดมักใช้ร่วมกับคำว่า Broker", "options": ["GPS", "PWM", "I2C", "MQTT"] }
         ];
 
-        // 🌟 3. ระบบ Anti-Cheat & 10s Grace Period 🌟
-        async function banUser(reason) {
-            if(!canTriggerBan || examFinished || !examStarted) return;
-            examFinished = true; clearInterval(timer);
+        function startExam() {
+            if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามกดออกจากแอป ห้ามย่อหน้าต่าง ห้ามกดปุ่มย้อนกลับกลับ(Back) บนมือถือ\nหากฝ่าฝืนสิทธิ์การสอบจะถูกระงับและหมดสิทธิ์สอบทันที!")) return;
+            
+            if (document.documentElement.requestFullscreen) {
+                document.documentElement.requestFullscreen().catch(()=>{});
+            }
+            
+            document.getElementById('btnBegin').style.display = 'none';
+            const cd = document.getElementById('countdown'); 
+            cd.style.display = 'block';
+            let c = 10;
+            
+            const t = setInterval(() => {
+                c--; 
+                cd.innerText = `กำลังเข้าสู่โหมดคุมสอบใน... ${c}`;
+                if(c <= 0) {
+                    clearInterval(t); 
+                    cd.style.display = 'none';
+                    document.getElementById('screenStart').style.display = 'none';
+                    document.getElementById('screenExam').style.display = 'block';
+                    document.getElementById('dotsArea').style.display = 'flex';
+                    examStarted = true; 
+                    setTimeout(() => { canBan = true; }, 1000); 
+                    
+                    timerHandle = setInterval(() => {
+                        timeLeft--;
+                        document.getElementById('timer').innerText = new Date(timeLeft * 1000).toISOString().substr(11, 8);
+                        if(timeLeft <= 0) submitFinal();
+                    }, 1000);
+                }
+            }, 1000);
+            
+            drawn = bank.sort(()=>0.5-Math.random()).slice(0,40);
+            answers = new Array(40).fill(null);
+            renderQuestions();
+        }
+
+        function renderQuestions() {
+            const area = document.getElementById('questionArea');
+            const dots = document.getElementById('dotsArea');
+            area.innerHTML = ''; dots.innerHTML = '';
+            const letters = ['a','b','c','d'];
+            
+            drawn.forEach((q, i) => {
+                const d = document.createElement('div'); 
+                d.className = 'dot'; 
+                d.innerText = i + 1; 
+                d.onclick = () => document.getElementsByClassName('qcard')[i+1].scrollIntoView({behavior:'smooth', block:'start'});
+                dots.appendChild(d);
+                
+                const card = document.createElement('div'); 
+                card.className = 'qcard';
+                card.innerHTML = `<p style="font-weight:700; margin-bottom:15px; font-size:1.1rem;">ข้อที่ ${i+1}: ${q.question}</p><div class='options'></div>`;
+                
+                q.options.forEach((opt, oi) => {
+                    const btn = document.createElement('div'); 
+                    btn.className = 'option'; 
+                    btn.innerHTML = `<span class="option-label">${letters[oi]})</span> <span>${opt}</span>`;
+                    btn.onclick = () => { 
+                        [...card.querySelectorAll('.option')].forEach(x => x.classList.remove('selected'));
+                        btn.classList.add('selected'); 
+                        ans[i] = letters[oi];
+                        dots.children[i].classList.add('active');
+                    };
+                    card.querySelector('.options').appendChild(btn);
+                });
+                area.appendChild(card);
+            });
+        }
+
+        async function ban(reason) {
+            if(!canBan || !examStarted) return;
+            examStarted = false; 
+            clearInterval(timerHandle);
+            
+            localStorage.setItem('is_banned', 'true');
+            
             const sid = localStorage.getItem(localStorage.getItem('student_email') + '_studentid');
             await fetch(VALIDATOR_URL, {
                 method: 'POST', mode: 'no-cors',
-                body: JSON.stringify({ action:"reportViolation", student_id: sid, ip: userIP, name: localStorage.getItem('student_name'), reason: reason })
+                body: JSON.stringify({action:"reportViolation", student_id:sid, ip:userIP, name:localStorage.getItem('student_name'), reason:reason})
             });
-            alert("🚨 ตรวจพบการทุจริต: " + reason + "\nสิทธิ์การสอบถูกระงับทันที!");
+            
+            alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์และหมดสิทธิ์สอบแล้ว!");
             window.location.href = "student.html";
         }
 
-        function startExam() {
-            if(!confirm("⚠️ ห้ามออกจากหน้าจอ ห้ามสลับแอป ห้ามแบ่งจอ มิฉะนั้นจะถูกแบนทันที ตกลงหรือไม่?")) return;
-            if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+        // ระบบจับโกง สลับจอ/แบ่งจอ
+        window.onblur = () => { if(canBan) ban("สลับหน้าจอหรือเปิดแอปอื่น"); };
+        window.onfocus = () => { document.body.classList.remove('lost-focus'); };
+        window.onresize = () => { if(canBan && window.innerHeight < screen.height * 0.75) ban("แบ่งหน้าจอหรือย่อหน้าต่าง"); };
 
-            document.getElementById('btnBegin').style.display = 'none';
-            const countdownEl = document.getElementById('countdown');
-            countdownEl.style.display = 'block';
+        // 🛡️ ระบบล็อกปุ่ม ย้อนกลับ (Back Button)
+        window.history.pushState(null, null, window.location.href);
+        window.addEventListener('popstate', function(event) {
+            window.history.pushState(null, null, window.location.href);
+            if (examStarted) alert("🚨 ระบบไม่อนุญาตให้กดย้อนกลับระหว่างการสอบ!");
+        });
 
-            let count = 10;
-            const introTimer = setInterval(() => {
-                count--;
-                countdownEl.innerText = `กำลังเข้าสู่โหมดคุมสอบใน... ${count}`;
-                if(count <= 0) {
-                    clearInterval(introTimer);
-                    countdownEl.style.display = 'none';
-                    document.getElementById('screenStart').style.display = 'none';
-                    document.getElementById('screenExam').style.display = 'block';
-                    document.getElementById('progressDots').style.display = 'flex';
-                    examStarted = true;
-                    canTriggerBan = true; // เปิดเกราะป้องกันหลัง 10 วิ
-                    startMainTimer();
+        // 🛡️ ป้องกันดูข้อสอบย้อนหลังจากแคช (Cache)
+        window.addEventListener('pageshow', function(event) {
+            if (event.persisted || localStorage.getItem('is_banned') === 'true') {
+                if (localStorage.getItem('is_banned') === 'true') {
+                    document.body.innerHTML = `
+                    <div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'>
+                        <i class='fas fa-ban fa-5x' style='color:red; margin-bottom:20px;'></i>
+                        <h1 style='color:red; font-family:Prompt;'>❌ หมดสิทธิ์สอบ</h1>
+                        <p style='font-family:Prompt; color:#333; margin-top:10px;'>คุณถูกระงับสิทธิ์ไปแล้ว ไม่สามารถดูข้อสอบย้อนหลังได้</p>
+                    </div>`;
+                    setTimeout(() => { window.location.href = "student.html"; }, 1500);
                 }
-            }, 1000);
-
-            drawnQuestions = questionBank.sort(() => 0.5 - Math.random()).slice(0, 40);
-            answers = new Array(40).fill(null);
-            renderQuestions();
-            renderDots();
-        }
-
-        function startMainTimer() {
-            timer = setInterval(() => {
-                timeLeft--;
-                document.getElementById('timerDisplay').innerText = new Date(timeLeft * 1000).toISOString().substr(11, 8);
-                if(timeLeft <= 0) submitExam("timeout");
-            }, 1000);
-        }
-
-        // Proctoring Events
-        window.onblur = () => { if(canTriggerBan) { document.body.classList.add('lost-focus'); banUser("แอบสลับหน้าจอหรือแคปภาพ"); } };
-        window.onfocus = () => document.body.classList.remove('lost-focus');
-        window.onresize = () => { 
-            if(canTriggerBan && window.innerHeight < screen.height * 0.75) {
-                document.getElementById('split-warning').style.display='flex';
-                banUser("แบ่งหน้าจอ");
-            } else {
-                document.getElementById('split-warning').style.display='none';
             }
-        };
+        });
 
-        function renderQuestions() {
-            const container = document.getElementById('questionContainer');
-            const letters = ['a','b','c','d'];
-            container.innerHTML = "";
-            drawnQuestions.forEach((q, idx) => {
-                const div = document.createElement('div'); div.className = 'qcard';
-                div.innerHTML = `<p style="font-weight:700; margin-bottom:15px; font-size:1.1rem;">ข้อที่ ${idx+1}: ${q.question}</p><div class="options"></div>`;
-                q.options.forEach((opt, i) => {
-                    const op = document.createElement('div'); op.className = 'option';
-                    op.innerHTML = `<span class="option-label">${letters[i]})</span> <span>${opt}</span>`;
-                    op.onclick = () => {
-                        [...div.querySelectorAll('.option')].forEach(x => x.classList.remove('selected'));
-                        op.classList.add('selected'); answers[idx] = letters[i];
-                        document.getElementById('progressDots').children[idx].classList.add('active');
-                    };
-                    div.querySelector('.options').appendChild(op);
-                });
-                container.appendChild(div);
-            });
-        }
-
-        function renderDots() {
-            const dots = document.getElementById('progressDots');
-            dots.innerHTML = "";
-            for(let i=0; i<40; i++) { 
-                const d = document.createElement('div'); d.className='dot'; d.innerText=i+1; 
-                d.onclick = () => document.getElementsByClassName('qcard')[i+1].scrollIntoView({behavior:'smooth'});
-                dots.appendChild(d); 
-            }
-        }
-
-        async function submitExam() {
-            examFinished = true; clearInterval(timer);
+        async function submitFinal() {
+            if(!confirm("ยืนยันการส่งข้อสอบ?")) return;
+            examStarted = false; 
+            canBan = false; 
+            clearInterval(timerHandle);
+            
             document.getElementById('btnSubmit').disabled = true;
-            document.getElementById('btnSubmit').innerHTML = "<i class='fas fa-spinner fa-spin'></i> กำลังตรวจคำตอบ...";
+            document.getElementById('btnSubmit').innerHTML = "<i class='fas fa-spinner fa-spin'></i> กำลังส่งข้อสอบ...";
 
-            const submissionData = drawnQuestions.map((q, i) => ({ id: String(q.id), ans: answers[i] }));
+            const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
+            
             try {
-                const resp = await fetch(VALIDATOR_URL, { method: 'POST', body: JSON.stringify({ action: "evaluate", answers: submissionData }) });
-                const result = await resp.json();
-                const sid = localStorage.getItem(localStorage.getItem('student_email') + '_studentid');
-                const log = `📊 สอบ: ถูก ${result.correct}/40 | คะแนน: ${result.finalScore}/20`;
-                await fetch(MAIN_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "submitWork", student_id: sid, activity_id: "FINAL_EXAM", work_content: log }) });
-                await fetch(MAIN_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "saveScore", student_id: sid, activity_id: "FINAL_EXAM", score: result.finalScore }) });
+                // 1. ตรวจคำตอบ
+                const res = await fetch(VALIDATOR_URL, {
+                    method: 'POST', 
+                    body: JSON.stringify({action: "evaluate", answers: data})
+                }).then(r => r.json());
+                
+                // 2. เตรียมข้อมูล (รวมชื่อนักเรียนด้วย)
+                const email = localStorage.getItem('student_email');
+                const sid = localStorage.getItem(email + '_studentid');
+                const sname = localStorage.getItem('student_name'); // 🌟 ดึงชื่อนักเรียนมาด้วย
+                
+                const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
+                const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
+                
+                // 3. ส่งข้อมูล + ชื่อนักเรียน ไปบันทึกลง Sheet
+                await fetch(MAIN_URL, {
+                    method:'POST', 
+                    mode:'no-cors', 
+                    body:JSON.stringify({
+                        action:"submitWork", 
+                        student_id: sid, 
+                        student_name: sname, 
+                        activity_id: actId, 
+                        work_content: log
+                    })
+                });
+                
+                await fetch(MAIN_URL, {
+                    method:'POST', 
+                    mode:'no-cors', 
+                    body:JSON.stringify({
+                        action:"saveScore", 
+                        student_id: sid, 
+                        student_name: sname, 
+                        activity_id: actId, 
+                        score: res.finalScore
+                    })
+                });
+                
+                // 4. แสดงผล
                 document.getElementById('screenExam').style.display = 'none';
-                document.getElementById('progressDots').style.display = 'none';
+                document.getElementById('dotsArea').style.display = 'none';
                 document.getElementById('screenResult').style.display = 'block';
-                document.getElementById('rScore').innerText = result.finalScore + " / 20";
-                document.getElementById('rDetail').innerText = `ถูกต้อง ${result.correct} จาก 40 ข้อ`;
-            } catch(e) { alert("เกิดข้อผิดพลาดในการส่งข้อมูล"); document.getElementById('btnSubmit').disabled = false; }
+                document.getElementById('scoreDisplay').innerText = res.finalScore + "/20";
+            } catch(e) {
+                alert("❌ การเชื่อมต่อล้มเหลว กรุณากดส่งใหม่อีกครั้ง");
+                document.getElementById('btnSubmit').disabled = false;
+                document.getElementById('btnSubmit').innerText = "ส่งคำตอบทั้งหมด";
+            }
         }
-
-        function confirmSubmit() { if(confirm("ตรวจทานครบถ้วนและต้องการส่งคำตอบใช่หรือไม่?")) submitExam(); }
 
         window.onload = async () => {
-            try { const r = await fetch('https://api64.ipify.org?format=json'); const d = await r.json(); userIP = d.ip; } catch(e) { userIP = "unknown"; }
+            const theme = localStorage.getItem('smart_theme') || "default";
+            document.body.setAttribute("data-theme", theme);
+            
+            try { const ip = await fetch('https://api64.ipify.org?format=json').then(r=>r.json()); userIP = ip.ip; } catch(e) {}
+            
             const email = localStorage.getItem('student_email');
             const sid = localStorage.getItem(email + '_studentid');
-            if(!sid || sid === '-') { alert("ไม่พบข้อมูลรหัสประจำตัว กรุณาอัปเดตข้อมูลส่วนตัวก่อนครับ!"); window.location.href="student.html"; return; }
+            
+            if(!sid || sid === '-') { 
+                alert("ไม่มีรหัสประจำตัว กรุณากลับไปแก้ไขข้อมูลส่วนตัวก่อนครับ!"); 
+                window.location.href = "student.html"; 
+                return; 
+            }
             
             document.getElementById('uName').innerText = "👤 ผู้สอบ: " + localStorage.getItem('student_name');
             document.getElementById('uId').innerText = "🆔 รหัสประจำตัว: " + sid;
             
-            const theme = localStorage.getItem('smart_theme') || "default";
-            document.body.setAttribute("data-theme", theme);
-            // สร้างธีม Particles
-            const themesData = {
-                default: { char: "✨", color: "rgba(59,130,246,0.6)" }, snow: { char: "❄️", color: "rgba(255,255,255,0.7)" },
-                forest: { char: "🍃", color: "rgba(144,238,144,0.6)" }, halloween: { char: "🎃", color: "rgba(255,69,0,0.5)" },
-                love: { char: "🌸", color: "rgba(255,105,180,0.6)" }
-            };
-            setInterval(() => {
-                const p = document.createElement("div"); p.style.position = "absolute"; p.style.left = Math.random()*100+"%"; p.style.top = "110%"; p.style.fontSize = Math.random()*20+10+"px"; p.style.transition = "10s linear"; p.innerHTML = themesData[theme].char; document.getElementById("particleContainer").appendChild(p); setTimeout(() => { p.style.top = "-10%"; p.style.opacity = "0"; }, 100); setTimeout(() => p.remove(), 10000);
-            }, 1000);
-
-            // ลายน้ำ
-            for(let i=0; i<15; i++){
-                const div = document.createElement('div'); div.className='watermark-item'; div.innerText = `${localStorage.getItem('student_name')} (${sid})`; document.getElementById('watermark').appendChild(div);
+            const wm = document.getElementById('watermark');
+            const txt = localStorage.getItem('student_name') + " (" + sid + ")";
+            for(let i=0; i<15; i++) {
+                const div = document.createElement('div');
+                div.className = 'watermark-item';
+                div.innerText = txt;
+                wm.appendChild(div);
             }
-
-            // Check Blacklist
-            const check = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}`);
-            const res = await check.json();
-            if(res.banned) {
-                document.body.innerHTML = `<div style='height:100vh; display:flex; flex-direction:column; align-items:center; justify-content:center; background:#fee2e2; text-align:center;'>
-                <i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i>
-                <h1 style='color:red;'>❌ สิทธิ์การสอบถูกระงับ</h1><p>เหตุผล: ${res.reason}</p>
-                <button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;">กลับหน้าหลัก</button></div>`;
-            }
+            
+            try {
+                const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}`).then(r=>r.json());
+                if(res.banned) {
+                    localStorage.setItem('is_banned', 'true');
+                    document.body.innerHTML = `
+                    <div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'>
+                        <i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i>
+                        <h1 style='color:red; font-family:Prompt;'>คุณถูกระงับสิทธิ์การสอบ!</h1>
+                        <p style='font-family:Prompt; color:#333;'>${res.reason}</p>
+                        <button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;">กลับหน้าหลัก</button>
+                    </div>`;
+                }
+            } catch(e) {}
         };
     </script>
 </body>
-</html>0
+</html>
