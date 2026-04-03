@@ -289,6 +289,18 @@
             document.body.appendChild(flash);
             setTimeout(() => flash.remove(), 600);
         }
+
+        // ฟังก์ชันส่งเวลาไปอัปเดตใน Google Sheets
+        function updateLastActive(email, type) {
+            fetch(SCRIPT_URL, {
+            method: 'POST',
+            body: JSON.stringify({
+            action: 'updateTimestamp',
+            email: email,
+            type: type // 'last_login' หรือ 'last_update'
+                })
+            }).catch(e => console.log("Timestamp Error:", e));
+        }
         
         function createFloatingHeart(x, y) {
             const heart = document.createElement('div');
@@ -353,17 +365,22 @@
             
             localStorage.setItem(`robot_outfit_${email}`, JSON.stringify(outfitData));
             
-            try {
-                await fetch(SCRIPT_URL, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(outfitData)
-                });
-                showSpeechBubble('💾 บันทึกชุดเรียบร้อย! 💕');
-            } catch(e) {
-                showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
-            }
+            // ตรงส่วนที่ fetch สำเร็จ
+try {
+    await fetch(SCRIPT_URL, {
+        method: 'POST',
+        mode: 'no-cors',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(outfitData)
+    });
+    showSpeechBubble('💾 บันทึกชุดเรียบร้อย! 💕');
+    
+    // 🌟 เพิ่มบรรทัดนี้ เพื่ออัปเดตเวลาแก้ประวัติล่าสุด
+    updateLastActive(email, 'last_update');
+    
+} catch(e) {
+    showSpeechBubble('💾 บันทึกในเครื่องเรียบร้อย');
+}
             closeWardrobe();
         }
         
@@ -545,26 +562,30 @@
         }
         
         function handleCredentialResponse(response) {
-            const userData = decodeJwtResponse(response.credential);
-            const userEmail = userData.email;
-            if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
-                localStorage.setItem('student_name', userData.name);
-                localStorage.setItem('student_email', userEmail);
-                localStorage.setItem('student_pic', userData.picture);
-                localStorage.setItem('is_logged_in', 'true');
-                if (userEmail === 'ratchapon@prot.ac.th' || userEmail === 'teacher@prot.ac.th') {
-                    window.location.href = 'teacher_dashboard.html';
-                    return;
-                }
-                closeLoginModal();
-                updateLoginUI();
-                document.getElementById('outfitIcon').style.display = 'flex';
-                loadOutfit();
-                createFloatingHeart(window.innerWidth/2, window.innerHeight/2);
-            } else {
-                alert('❌ อีเมลนี้ไม่ได้รับอนุญาต');
-            }
+    const userData = decodeJwtResponse(response.credential);
+    const userEmail = userData.email;
+    if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+        localStorage.setItem('student_name', userData.name);
+        localStorage.setItem('student_email', userEmail);
+        localStorage.setItem('student_pic', userData.picture);
+        localStorage.setItem('is_logged_in', 'true');
+        if (userEmail === 'ratchapon@prot.ac.th' || userEmail === 'teacher@prot.ac.th') {
+            window.location.href = 'teacher_dashboard.html';
+            return;
         }
+        closeLoginModal();
+        updateLoginUI();
+        document.getElementById('outfitIcon').style.display = 'flex';
+        loadOutfit();
+        createFloatingHeart(window.innerWidth/2, window.innerHeight/2);
+        
+        // 🌟 เพิ่มบรรทัดนี้ เพื่ออัปเดตเวลาใช้งานล่าสุด
+        updateLastActive(userEmail, 'last_login'); 
+        
+    } else {
+        alert('❌ อีเมลนี้ไม่ได้รับอนุญาต');
+    }
+}
         
         function updateLoginUI() {
             const name = localStorage.getItem('student_name');
