@@ -145,95 +145,193 @@
     </div>
 
     <script>
-        // --- 1. การตั้งค่า URL ---
-        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+    // 🌟 1. ตั้งค่าการเชื่อมต่อ (เปลี่ยน URL เป็นของคุณที่ได้จากการ Deploy)
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+    
+    // ตัวแปรเก็บข้อมูลจากฐานข้อมูล
+    let db = {
+        activities: [],
+        students: [],
+        submissions: []
+    };
+
+    // 🌟 2. ระบบจัดการหน้าจอ (Tab & Theme)
+    function switchTab(tabId, el) {
+        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+        document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
+        document.getElementById(tabId).classList.add('active');
+        el.classList.add('active');
         
-        let db = { activities: [], students: [], submissions: [] };
+        // ถ้ากด Tab Matrix หรือ ClassView ให้ Render ตารางใหม่เสมอเพื่อให้ข้อมูลสดใหม่
+        if(tabId === 'tab-matrix') renderMatrix();
+        if(tabId === 'tab-classview') renderClassView();
+    }
 
-        // --- 2. ระบบ Tab (สำคัญ) ---
-        function switchTab(tabId, el) {
-            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-            document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-            document.getElementById(tabId).classList.add('active');
-            el.classList.add('active');
-        }
+    function applyTheme(theme) {
+        document.body.setAttribute("data-theme", theme);
+        localStorage.setItem('admin_theme', theme);
+    }
 
-        // --- 3. ระบบดึงข้อมูลจาก Sheets (สำคัญ) ---
-        async function loadAllData() {
-            const btn = document.querySelector('button[onclick="loadAllData()"]');
-            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> Loading...';
+    // 🌟 3. ระบบดึงข้อมูล (Fetch Data)
+    async function loadAllData() {
+        const btn = document.querySelector('button[onclick="loadAllData()"]');
+        if(btn) btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังอัปเดต...';
+
+        try {
+            const resp = await fetch(`${SCRIPT_URL}?action=readAll`);
+            db = await resp.json();
             
-            try {
-                // ยิงไปที่ Apps Script (ต้องไปแก้ฝั่ง GS ให้รองรับ action=readAll)
-                const response = await fetch(`${SCRIPT_URL}?action=readAll`);
-                const data = await response.json();
-                
-                db = data; // บันทึกข้อมูลลงตัวแปรหลัก
-                
-                renderActivitiesList();
-                updateSelectOptions();
-                renderMatrix();
-                
-                btn.innerHTML = '<i class="fas fa-sync-alt"></i> อัปเดตข้อมูล';
-            } catch (e) {
-                console.error(e);
-                alert("โหลดข้อมูลไม่สำเร็จ ตรวจสอบ SCRIPT_URL หรือ Permission ของ Sheets");
-                btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> ผิดพลาด';
-            }
+            // อัปเดต UI ทั้งหมด
+            renderActivitiesList(); // รายการงานที่สั่ง
+            updateRoomSelectors();  // รายชื่อห้องใน Dropdown
+            renderMatrix();         // ตารางตรวจงาน
+            renderClassView();      // ข้อมูลเชิงลึกรายห้อง
+
+            if(btn) btn.innerHTML = '<i class="fas fa-check-circle"></i> ข้อมูลล่าสุดแล้ว';
+        } catch (e) {
+            console.error("Error:", e);
+            if(btn) btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> เชื่อมต่อล้มเหลว';
         }
+    }
 
-        function renderActivitiesList() {
-            const container = document.getElementById('activities-list');
-            container.innerHTML = db.activities.map(act => `
-                <div style="background:rgba(0,0,0,0.2); padding:15px; border-radius:10px; margin-bottom:10px; display:flex; justify-content:space-between;">
-                    <div><strong>${act.title}</strong><br><small>${act.type} | ${act.points} คะแนน</small></div>
-                    <button class="btn-action btn-danger" onclick="deleteAct('${act.id}')"><i class="fas fa-trash"></i></button>
-                </div>
-            `).join('') || "ไม่มีข้อมูล";
-        }
-
-        function updateSelectOptions() {
-            const matrixAct = document.getElementById('matrix-act');
-            matrixAct.innerHTML = db.activities.map(a => `<option value="${a.id}">${a.title}</option>`).join('');
-            
-            const rooms = [...new Set(db.students.map(s => s.room))];
-            const matrixRoom = document.getElementById('matrix-room');
-            matrixRoom.innerHTML = '<option value="all">ทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
-        }
-
-        function renderMatrix() {
-            const selectedAct = document.getElementById('matrix-act').value;
-            const selectedRoom = document.getElementById('matrix-room').value;
-            const body = document.getElementById('matrix-body');
-            
-            let filtered = db.students;
-            if (selectedRoom !== 'all') filtered = db.students.filter(s => s.room === selectedRoom);
-
-            body.innerHTML = filtered.map(s => {
-                const sub = db.submissions.find(sub => sub.student_id === s.student_id && sub.activity_id === selectedAct);
-                return `
-                    <tr>
-                        <td>${s.student_id}</td>
-                        <td>${s.number}</td>
-                        <td>${s.name}</td>
-                        <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
-                        <td>${sub ? (sub.score || 0) : '-'}</td>
-                        <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${selectedAct}')">ตรวจ</button></td>
-                    </tr>
-                `;
-            }).join('');
-        }
-
-        function applyTheme(theme) {
-            document.body.setAttribute('data-theme', theme);
-            localStorage.setItem('prot_admin_theme', theme);
-        }
-
-        // --- รันตอนโหลดหน้าจอ ---
-        window.onload = () => {
-            applyTheme(localStorage.getItem('prot_admin_theme') || 'default');
-            loadAllData();
+    // 🌟 4. ระบบจัดการกิจกรรม (Activities - 13 Columns)
+    async function saveActivity() {
+        const data = {
+            action: "saveActivity",
+            type: document.getElementById('act-type').value,
+            status: document.getElementById('act-status').value,
+            title: document.getElementById('act-title').value,
+            desc: document.getElementById('act-desc').value,
+            date: document.getElementById('act-date').value,
+            time: document.getElementById('act-time').value,
+            target: "all",
+            room: document.getElementById('act-room').value,
+            points: document.getElementById('act-points').value,
+            link: document.getElementById('act-link').value,
+            doc_link: document.getElementById('act-doc').value,
+            yt_link: document.getElementById('act-yt').value
         };
-    </script>
+
+        if(!data.title) return alert("กรุณาใส่ชื่อหัวข้องาน");
+
+        try {
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+            alert("🚀 บันทึกและโพสต์กิจกรรมเรียบร้อย!");
+            loadAllData(); // โหลดข้อมูลใหม่
+        } catch (e) { alert("บันทึกไม่สำเร็จ!"); }
+    }
+
+    function renderActivitiesList() {
+        const list = document.getElementById('activities-list');
+        if (db.activities.length === 0) return list.innerHTML = "ยังไม่มีงานที่สั่ง";
+
+        list.innerHTML = db.activities.map(act => `
+            <div class="list-item">
+                <div>
+                    <strong>${act.Title}</strong> 
+                    <span class="badge ${act.Status === 'open' ? 'badge-green' : 'badge-red'}">${act.Status}</span>
+                    <br><small>ห้อง: ${act.Room} | คะแนน: ${act.Points} | ส่ง: ${act.Date}</small>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button class="btn-action" style="padding:5px 10px;"><i class="fas fa-edit"></i></button>
+                    <button class="btn-action btn-danger" style="padding:5px 10px;"><i class="fas fa-trash"></i></button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // 🌟 5. ระบบตารางตรวจงาน (Matrix)
+    function renderMatrix() {
+        const actId = document.getElementById('matrix-act').value;
+        const room = document.getElementById('matrix-room').value;
+        const body = document.getElementById('matrix-body');
+        
+        let filtered = db.students;
+        if (room !== 'all') filtered = db.students.filter(s => s.room == room);
+
+        body.innerHTML = filtered.map(s => {
+            const sub = db.submissions.find(item => item.student_id == s.student_id && item.activity_id == actId);
+            return `
+                <tr>
+                    <td>${s.student_id}</td>
+                    <td>${s.number}</td>
+                    <td>${s.name}</td>
+                    <td>${s.room}</td>
+                    <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
+                    <td>${sub ? (sub.score || 0) : '-'}</td>
+                    <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')">ตรวจ</button></td>
+                </tr>
+            `;
+        }).join('');
+    }
+
+    // 🌟 6. ระบบข้อมูลรายห้อง (Class View - ติดตามพฤติกรรม)
+    function renderClassView() {
+        const room = document.getElementById('view-class-room').value;
+        const body = document.getElementById('class-view-body');
+        let filtered = (room === 'all') ? db.students : db.students.filter(s => s.room == room);
+
+        body.innerHTML = filtered.map(s => `
+            <tr>
+                <td><strong>${s.number}. ${s.name}</strong><br><small>รหัส: ${s.student_id}</small></td>
+                <td><small>${s.last_login || 'ยังไม่เข้าระบบ'}</small></td>
+                <td style="text-align:center;"><span class="badge badge-green">${s.sent_count}</span></td>
+                <td style="text-align:center;"><span class="badge badge-red">${s.pending_count}</span></td>
+                <td style="text-align:center; font-weight:bold; color:#60a5fa;">${s.total_score}</td>
+                <td><button class="btn-action" onclick="alert('รหัส: ${s.student_id}\\nลงทะเบียน: ${s.reg_date}')">ประวัติ</button></td>
+            </tr>
+        `).join('');
+    }
+
+    // 🌟 7. ฟังก์ชันตัวช่วย (Helpers)
+    function updateRoomSelectors() {
+        const rooms = [...new Set(db.students.map(s => s.room))].sort();
+        const selects = ['act-room', 'matrix-room', 'view-class-room'];
+        
+        selects.forEach(id => {
+            const el = document.getElementById(id);
+            const current = el.value;
+            el.innerHTML = (id === 'act-room') ? '<option value="ทุกห้อง">ทุกห้อง</option>' : '<option value="all">ดูทุกห้อง</option>';
+            rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
+            el.value = current;
+        });
+
+        const matrixAct = document.getElementById('matrix-act');
+        matrixAct.innerHTML = db.activities.map(a => `<option value="${a.ID}">${a.Title}</option>`).join('');
+    }
+
+    function openGrade(stdId, actId) {
+        const std = db.students.find(s => s.student_id == stdId);
+        const sub = db.submissions.find(item => item.student_id == stdId && item.activity_id == actId);
+        
+        document.getElementById('grade-student-name').innerText = "ตรวจงาน: " + std.name;
+        document.getElementById('grade-work-content').innerText = sub ? sub.work_content : "ยังไม่มีการส่งงาน";
+        document.getElementById('gradeModal').classList.add('active');
+        
+        // เก็บ ID ไว้บันทึกคะแนน
+        window.currentGrading = { stdId, actId };
+    }
+
+    async function saveScore() {
+        const score = document.getElementById('grade-input-score').value;
+        const data = {
+            action: "saveScore",
+            student_id: window.currentGrading.stdId,
+            activity_id: window.currentGrading.actId,
+            score: score
+        };
+
+        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+        alert("บันทึกคะแนนแล้ว!");
+        document.getElementById('gradeModal').classList.remove('active');
+        loadAllData();
+    }
+
+    // 🌟 8. เริ่มต้นระบบเมื่อโหลดหน้าเสร็จ
+    window.onload = () => {
+        applyTheme(localStorage.getItem('admin_theme') || 'default');
+        loadAllData();
+    };
+</script>
 </body>
 </html>
