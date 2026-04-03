@@ -2,66 +2,104 @@
 <html lang="th">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
     <title>ห้องเรียนเนื้อหา | PROT Smart Workspace</title>
+    
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* CSS หลักจาก Template */
         * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s, color 0.3s;}
-        body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; cursor: default; }
         
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
         
-        .content-layer { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; }
+        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; flex: 1; }
         
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
-        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
+        header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px;}
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 10px;}
         body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
+        
+        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; font-size: 0.95rem;}
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        .nav-links a:hover { color: #fff; background: #3b82f6; }
         
         .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 4px 12px 4px 8px; border-radius: 50px; }
         body[data-theme="snow"] .user-info, body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3b82f6; }
         .user-name { font-size: 0.85rem; font-weight: 500; color: inherit; }
 
-        :root { --panel-bg: rgba(30, 41, 59, 0.6); --border-ws: rgba(255,255,255,0.1); --accent: #a855f7; }
-        body[data-theme="snow"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(0,0,0,0.1); --accent: #9333ea; }
-        body[data-theme="forest"] { --panel-bg: rgba(30, 60, 30, 0.6); --accent: #a855f7; }
-        body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(255,105,180,0.3); --accent: #d946ef; }
+        :root { --panel-bg: rgba(255,255,255,0.05); --border-ws: rgba(255,255,255,0.1); --accent: #a855f7; }
+        body[data-theme="snow"] { --panel-bg: rgba(255, 255, 255, 0.8); --border-ws: rgba(0,0,0,0.1); --accent: #9333ea; }
+        body[data-theme="forest"] { --panel-bg: rgba(255,255,255,0.05); --accent: #a855f7; }
+        body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.8); --border-ws: rgba(255,105,180,0.3); --accent: #d946ef; }
 
-        .workspace-wrapper { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; }
+        .workspace-wrapper { display: flex; flex: 1; padding: 20px; gap: 20px; max-width: 1400px; margin: 0 auto; width: 100%; transition: 0.3s; }
         
-        .sidebar { width: 250px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; }
-        .task-title { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; }
-        .task-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; }
+        .sidebar { width: 280px; background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 24px; padding: 25px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.15); transition: 0.3s;}
+        body[data-theme="snow"] .sidebar, body[data-theme="love"] .sidebar { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
-        .btn-submit { background: rgba(255,255,255,0.2); color: inherit; border: 1px solid var(--border-ws); padding: 12px; width: 100%; border-radius: 10px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; margin-top: auto; transition: 0.3s;}
+        .task-title { color: var(--accent); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; line-height: 1.4;}
+        .task-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 20px; line-height: 1.6;}
+        
+        .btn-focus { background: rgba(168, 85, 247, 0.2); color: var(--accent); border: 1px solid var(--accent); padding: 10px 15px; border-radius: 12px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; gap: 8px; margin-bottom: 15px;}
+        .btn-focus:hover { background: var(--accent); color: white; }
+
+        .btn-submit { background: rgba(255,255,255,0.1); color: inherit; border: 1px solid var(--border-ws); padding: 12px; width: 100%; border-radius: 12px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; margin-top: auto; transition: 0.3s;}
         body[data-theme="snow"] .btn-submit, body[data-theme="love"] .btn-submit { background: rgba(0,0,0,0.05); }
-        .btn-submit:hover { background: var(--accent); color: white; border-color: var(--accent);}
+        .btn-submit:hover { background: #3b82f6; color: white; border-color: #3b82f6;}
         
-        .main-panel { flex: 1; background: var(--panel-bg); border-radius: 20px; border: 1px solid var(--border-ws); overflow: hidden;}
-        .main-panel iframe { width: 100%; height: 100%; border: none; background: white; }
+        .main-panel { flex: 1; background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 24px; border: 1px solid var(--border-ws); overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.15); display: flex; flex-direction: column; transition: 0.3s;}
+        body[data-theme="snow"] .main-panel, body[data-theme="love"] .main-panel { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .main-panel iframe { flex: 1; width: 100%; height: 100%; min-height: 65vh; border: none; background: white; }
+
+        footer { text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; font-size: 0.85rem; opacity: 0.8; }
+        body[data-theme="snow"] footer, body[data-theme="love"] footer { border-top-color: rgba(0,0,0,0.1); }
+
+        /* 🎯 โหมดโฟกัส 🎯 */
+        body.focus-mode header { display: none !important; }
+        body.focus-mode footer { display: none !important; }
+        body.focus-mode .workspace-wrapper { padding: 10px; max-width: 100%; height: 100vh; }
+        body.focus-mode .sidebar { width: 220px; }
+        
+        #exit-focus-btn { display: none; position: fixed; top: 15px; right: 15px; z-index: 10000; background: #ef4444; color: white; border: none; padding: 10px 20px; border-radius: 30px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; box-shadow: 0 4px 15px rgba(239, 68, 68, 0.4); transition: 0.3s; align-items: center; gap: 8px; }
+        #exit-focus-btn:hover { background: #dc2626; transform: scale(1.05); }
+        body.focus-mode #exit-focus-btn { display: flex; }
+
+        @media (max-width: 768px) {
+            .workspace-wrapper { flex-direction: column; overflow-y: auto; }
+            .sidebar { width: 100%; height: auto; flex-shrink: 0; }
+        }
     </style>
 </head>
 <body data-theme="default">
     <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
     
+    <button id="exit-focus-btn" onclick="toggleFocusMode()"><i class="fas fa-compress-arrows-alt"></i> ย่อเมนูคืน</button>
+
     <div class="content-layer">
         <header>
             <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
-            <div class="user-info" id="loginArea"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</div>
+            <div style="display: flex; gap: 15px; align-items: center;">
+                <ul class="nav-links"><li><a href="student.html"><i class="fas fa-arrow-left"></i> กลับห้องเรียน</a></li></ul>
+                <div class="user-info" id="loginArea"><i class="fas fa-spinner fa-spin"></i></div>
+            </div>
         </header>
 
         <div class="workspace-wrapper">
@@ -69,18 +107,30 @@
                 <div class="task-title" id="task-title"><i class="fas fa-book-open"></i> บทเรียนและเนื้อหา</div>
                 <div class="task-desc" id="task-desc">ศึกษาเนื้อหาจากสื่อที่คุณครูแนบมาให้ เมื่อเข้าใจแล้วสามารถกลับไปทำกิจกรรมอื่นต่อได้เลย</div>
                 
-                <button class="btn-submit" onclick="window.location.href='student.html'">
-                    <i class="fas fa-arrow-left"></i> กลับห้องเรียน
-                </button>
+                <button class="btn-focus" onclick="toggleFocusMode()"><i class="fas fa-expand-arrows-alt"></i> ขยายจอเต็มที่</button>
+                <button class="btn-submit" onclick="window.location.href='student.html'"><i class="fas fa-home"></i> กลับไปหน้าหลัก</button>
             </div>
 
             <div class="main-panel">
-                <iframe id="content-frame" src="" title="Learning Content"></iframe>
+                <iframe id="content-frame" src="" title="Learning Content" allowfullscreen></iframe>
             </div>
         </div>
+
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล | วิทยาการคำนวณเพื่ออนาคต</p>
+        </footer>
     </div>
 
     <script>
+        function toggleFocusMode() {
+            document.body.classList.toggle('focus-mode');
+            if (document.body.classList.contains('focus-mode')) {
+                if (document.documentElement.requestFullscreen) document.documentElement.requestFullscreen().catch(()=>{});
+            } else {
+                if (document.exitFullscreen) document.exitFullscreen().catch(()=>{});
+            }
+        }
+
         function loadUserData() {
             const email = localStorage.getItem('student_email');
             if (!email) { window.location.href = "student.html"; return; }
@@ -95,11 +145,8 @@
                 document.getElementById('task-title').innerHTML = `<i class="fas fa-book-open"></i> ${currentAct.title}`;
                 document.getElementById('task-desc').innerText = currentAct.desc;
                 
-                // เลือกว่าจะโชว์ Youtube หรือ เอกสาร
                 let targetUrl = currentAct.yt || currentAct.doc || "https://www.youtube.com/embed/dQw4w9WgXcQ";
-                if(targetUrl.includes("youtube.com/watch?v=")) {
-                    targetUrl = targetUrl.replace("watch?v=", "embed/");
-                }
+                if(targetUrl.includes("youtube.com/watch?v=")) targetUrl = targetUrl.replace("watch?v=", "embed/");
                 document.getElementById('content-frame').src = targetUrl;
             }
         }
