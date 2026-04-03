@@ -9,18 +9,59 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* 🌟 โครงสร้างพื้นฐาน 🌟 */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
             font-family: 'Prompt', 'Inter', sans-serif; 
-            background-color: #f8fafc; /* พื้นหลังสีเทาอ่อน สบายตา */
+            background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #f8fafc 100%);
             color: #1e293b; 
             padding-bottom: 60px;
+            position: relative;
+            min-height: 100vh;
+        }
+        
+        /* 🌟 เอฟเฟกต์พื้นหลัง 🌟 */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" opacity="0.05"><path fill="none" d="M20 20 L80 20 M20 40 L80 40 M20 60 L80 60 M20 80 L80 80 M40 20 L40 80 M60 20 L60 80" stroke="%233b82f6" stroke-width="1"/><circle cx="50" cy="50" r="10" stroke="%233b82f6" stroke-width="1" fill="none"/></svg>');
+            background-repeat: repeat;
+            pointer-events: none;
+            z-index: 0;
+        }
+        
+        /* 🌟 อนุภาคลอย 🌟 */
+        .floating-particle {
+            position: fixed;
+            pointer-events: none;
+            z-index: 1;
+            font-size: 0.8rem;
+            opacity: 0;
+            animation: floatUp 8s linear infinite;
+        }
+        @keyframes floatUp {
+            0% {
+                transform: translateY(100vh) translateX(0) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.4;
+            }
+            90% {
+                opacity: 0.4;
+            }
+            100% {
+                transform: translateY(-20vh) translateX(50px) rotate(360deg);
+                opacity: 0;
+            }
         }
         
         /* 🌟 ส่วนหัว (Header) 🌟 */
         .header { 
-            background: #0f172a; 
+            background: linear-gradient(135deg, #0f172a 0%, #1e293b 100%);
             padding: 20px 40px; 
             display: flex; 
             justify-content: space-between; 
@@ -28,15 +69,26 @@
             position: sticky; 
             top: 0; 
             z-index: 100;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(96,165,250,0.3);
         }
         .header h1 { 
             font-size: 1.5rem; 
-            color: #60a5fa; 
+            background: linear-gradient(135deg, #60a5fa, #3b82f6);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
             display: flex;
             align-items: center;
             gap: 10px;
+            animation: titleGlow 3s infinite;
         }
+        @keyframes titleGlow {
+            0%, 100% { text-shadow: 0 0 0px rgba(96,165,250,0); }
+            50% { text-shadow: 0 0 10px rgba(96,165,250,0.5); }
+        }
+        
         .back-btn { 
             color: white; 
             text-decoration: none; 
@@ -48,10 +100,13 @@
             display: flex;
             align-items: center;
             gap: 8px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(255,255,255,0.2);
         }
         .back-btn:hover { 
             background: #3b82f6; 
-            transform: translateY(-2px);
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(59,130,246,0.4);
         }
 
         /* 🌟 พื้นที่แสดงผลงาน 🌟 */
@@ -59,6 +114,8 @@
             max-width: 1200px; 
             margin: 40px auto; 
             padding: 0 20px; 
+            position: relative;
+            z-index: 2;
         }
         .section-title { 
             font-size: 1.8rem; 
@@ -66,47 +123,101 @@
             margin-bottom: 30px; 
             color: #1e40af; 
             border-left: 5px solid #3b82f6; 
-            padding-left: 15px; 
+            padding-left: 15px;
+            position: relative;
+            display: inline-block;
+        }
+        .section-title::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 0;
+            width: 60%;
+            height: 3px;
+            background: linear-gradient(90deg, #3b82f6, transparent);
+            border-radius: 3px;
         }
 
         /* 🌟 Grid กล่องผลงาน (Card Layout) 🌟 */
         .portfolio-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); /* เรียงกล่องอัตโนมัติตามขนาดจอ */
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
             gap: 30px;
+            animation: fadeInUp 0.6s ease-out;
+        }
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .card {
-            background: white;
-            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
             overflow: hidden; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
-            border: 1px solid #e2e8f0;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            border: 1px solid rgba(255,255,255,0.5);
             display: flex;
             flex-direction: column;
             cursor: pointer;
+            position: relative;
+        }
+        
+        .card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, rgba(59,130,246,0.1), rgba(96,165,250,0.05));
+            opacity: 0;
+            transition: 0.4s;
+            pointer-events: none;
+            border-radius: 20px;
+        }
+        
+        .card:hover::before {
+            opacity: 1;
         }
 
         .card:hover {
-            transform: translateY(-10px);
-            box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-            border-color: #93c5fd;
+            transform: translateY(-12px) scale(1.02);
+            box-shadow: 0 25px 40px rgba(0,0,0,0.15);
+            border-color: rgba(59,130,246,0.5);
         }
 
-        /* บังคับรูปภาพให้ขนาดเท่ากันเป๊ะ และไม่เบี้ยว */
+        .img-container {
+            overflow: hidden;
+            position: relative;
+        }
+        
+        .img-container::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, transparent 70%, rgba(0,0,0,0.3) 100%);
+            pointer-events: none;
+        }
+
         .card-img {
             width: 100%;
             height: 200px; 
             object-fit: cover; 
-            border-bottom: 1px solid #e2e8f0;
-            transition: transform 0.5s ease;
+            transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
         .card:hover .card-img {
-            transform: scale(1.05);
-        }
-        .img-container {
-            overflow: hidden;
+            transform: scale(1.08);
         }
 
         .card-body {
@@ -122,6 +233,10 @@
             color: #0f172a;
             margin-bottom: 10px;
             line-height: 1.4;
+            transition: 0.3s;
+        }
+        .card:hover .card-title {
+            color: #3b82f6;
         }
 
         .card-desc {
@@ -129,7 +244,6 @@
             color: #64748b;
             margin-bottom: 20px;
             line-height: 1.6;
-            /* ตัดคำถ้ายาวเกิน 3 บรรทัด */
             display: -webkit-box;
             -webkit-line-clamp: 3;
             -webkit-box-orient: vertical;
@@ -153,15 +267,67 @@
             display: flex;
             align-items: center;
             gap: 5px;
+            transition: 0.3s;
         }
-        .read-more:hover { color: #2563eb; }
-        .post-date { color: #94a3b8; font-size: 0.8rem;}
+        .read-more:hover { 
+            color: #1d4ed8; 
+            gap: 10px;
+        }
+        .post-date { 
+            color: #94a3b8; 
+            font-size: 0.8rem;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
 
         .loader { 
             text-align: center; 
-            padding: 50px; 
+            padding: 60px; 
             font-size: 1.2rem; 
             color: #64748b; 
+            background: rgba(255,255,255,0.8);
+            border-radius: 30px;
+            backdrop-filter: blur(10px);
+        }
+        
+        .loader i {
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        /* 🌟 เอฟเฟกต์ Toast แจ้งเตือน 🌟 */
+        .toast-notification {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            background: linear-gradient(135deg, #1e293b, #0f172a);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 50px;
+            font-size: 0.9rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            z-index: 1000;
+            transform: translateX(120%);
+            transition: 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            border-left: 4px solid #3b82f6;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .toast-notification.show {
+            transform: translateX(0);
+        }
+        
+        /* 🌟 Responsive 🌟 */
+        @media (max-width: 768px) {
+            .header { padding: 15px 20px; flex-direction: column; gap: 10px; text-align: center; }
+            .section-title { font-size: 1.4rem; }
+            .portfolio-grid { gap: 20px; }
+            .card:hover { transform: translateY(-8px); }
         }
     </style>
 </head>
@@ -185,56 +351,164 @@
     <script>
         // 🌟 1. เปลี่ยน URL ตรงนี้ให้เป็น URL ของ Google Apps Script ของครู 🌟
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
-
+        
+        // 🌟 ฟังก์ชันสร้างอนุภาคลอย 🌟
+        function createFloatingParticles() {
+            const particles = ['✨', '⭐', '🌟', '💫', '⚡', '🎓', '📚', '🤖', '💻', '🎨', '📷', '🏆', '🎉', '💙'];
+            setInterval(() => {
+                const particle = document.createElement('div');
+                particle.className = 'floating-particle';
+                particle.innerHTML = particles[Math.floor(Math.random() * particles.length)];
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.fontSize = (Math.random() * 16 + 12) + 'px';
+                particle.style.animationDuration = (Math.random() * 6 + 6) + 's';
+                particle.style.animationDelay = Math.random() * 5 + 's';
+                document.body.appendChild(particle);
+                setTimeout(() => particle.remove(), 12000);
+            }, 800);
+        }
+        
+        // 🌟 ฟังก์ชันแสดง Toast แจ้งเตือน 🌟
+        function showToast(message, icon = 'fa-info-circle') {
+            const existingToast = document.querySelector('.toast-notification');
+            if(existingToast) existingToast.remove();
+            
+            const toast = document.createElement('div');
+            toast.className = 'toast-notification';
+            toast.innerHTML = `<i class="fas ${icon}"></i> ${message}`;
+            document.body.appendChild(toast);
+            
+            setTimeout(() => toast.classList.add('show'), 100);
+            setTimeout(() => {
+                toast.classList.remove('show');
+                setTimeout(() => toast.remove(), 500);
+            }, 3000);
+        }
+        
+        // 🌟 ฟังก์ชันแสดงเอฟเฟกต์คลิก 🌟
+        function createRippleEffect(event, element) {
+            const rect = element.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            const ripple = document.createElement('div');
+            ripple.style.position = 'absolute';
+            ripple.style.left = x + 'px';
+            ripple.style.top = y + 'px';
+            ripple.style.width = '0';
+            ripple.style.height = '0';
+            ripple.style.borderRadius = '50%';
+            ripple.style.background = 'rgba(59,130,246,0.4)';
+            ripple.style.transform = 'translate(-50%, -50%)';
+            ripple.style.transition = 'width 0.5s, height 0.5s, opacity 0.5s';
+            ripple.style.pointerEvents = 'none';
+            ripple.style.zIndex = '10';
+            
+            element.style.position = 'relative';
+            element.style.overflow = 'hidden';
+            element.appendChild(ripple);
+            
+            setTimeout(() => {
+                ripple.style.width = '200px';
+                ripple.style.height = '200px';
+                ripple.style.opacity = '0';
+            }, 10);
+            
+            setTimeout(() => ripple.remove(), 500);
+        }
+        
+        // 🌟 โหลดข้อมูลจาก Google Sheets 🌟
         async function loadPortfolios() {
             try {
-                // ดึงข้อมูลจากฐานข้อมูล
                 const response = await fetch(`${SCRIPT_URL}?action=readAll`);
                 const data = await response.json();
                 
                 const container = document.getElementById('portfolioContainer');
-                document.getElementById('loading').style.display = 'none';
+                const loadingDiv = document.getElementById('loading');
+                
+                // ซ่อน loader พร้อมแอนิเมชัน
+                loadingDiv.style.opacity = '0';
+                setTimeout(() => {
+                    loadingDiv.style.display = 'none';
+                }, 300);
 
-                // กรณีที่ยังไม่มีข้อมูลในระบบ
                 if (!data.portfolios || data.portfolios.length === 0) {
                     container.innerHTML = `
-                        <div style="grid-column: 1/-1; text-align:center; padding: 50px; background: white; border-radius: 12px; border: 1px solid #e2e8f0;">
-                            <i class="fas fa-folder-open" style="font-size: 3rem; color: #cbd5e1; margin-bottom: 15px;"></i>
+                        <div style="grid-column: 1/-1; text-align:center; padding: 60px; background: rgba(255,255,255,0.9); border-radius: 24px; backdrop-filter: blur(10px); border: 1px solid rgba(59,130,246,0.2);">
+                            <i class="fas fa-folder-open" style="font-size: 3.5rem; color: #cbd5e1; margin-bottom: 15px;"></i>
                             <h3 style="color: #64748b;">ยังไม่มีข้อมูลผลงาน/กิจกรรม</h3>
                             <p style="color: #94a3b8; font-size: 0.9rem;">รอคุณครูอัปเดตข้อมูลสักครู่นะครับ</p>
                         </div>`;
                     return;
                 }
 
-                // สลับข้อมูลให้รายการใหม่ล่าสุดขึ้นก่อน (.reverse()) และสร้างเป็น HTML Card
-                container.innerHTML = data.portfolios.reverse().map(item => `
-                    <div class="card" onclick="alert('อ่านรายละเอียดเพิ่มเติม: ${item.Title}')">
+                // สร้าง HTML Cards พร้อมแอนิเมชัน stagger
+                const cardsHTML = data.portfolios.reverse().map((item, index) => `
+                    <div class="card" data-index="${index}" style="animation: fadeInUp 0.5s ease-out ${index * 0.05}s both;">
                         <div class="img-container">
                             <img src="${item.ImageLink}" alt="รูปภาพกิจกรรม" class="card-img" onerror="this.src='https://images.unsplash.com/photo-1503676260728-1c00da094a0b?q=80&w=600&auto=format&fit=crop'">
                         </div>
                         <div class="card-body">
-                            <h3 class="card-title">${item.Title}</h3>
-                            <p class="card-desc">${item.Description || 'ไม่มีคำอธิบายเพิ่มเติม'}</p>
+                            <h3 class="card-title">${escapeHtml(item.Title)}</h3>
+                            <p class="card-desc">${escapeHtml(item.Description || 'ไม่มีคำอธิบายเพิ่มเติม')}</p>
                             <div class="card-footer">
-                                <span class="read-more">อ่านเพิ่ม <i class="fas fa-chevron-right" style="font-size: 0.7rem;"></i></span>
-                                <span class="post-date"><i class="far fa-calendar-alt"></i> ${item.Date || ''}</span>
+                                <span class="read-more">อ่านเพิ่ม <i class="fas fa-chevron-right" style="font-size: 0.7rem; transition: 0.3s;"></i></span>
+                                <span class="post-date"><i class="far fa-calendar-alt"></i> ${item.Date || 'ไม่ระบุวันที่'}</span>
                             </div>
                         </div>
                     </div>
                 `).join('');
 
+                container.innerHTML = cardsHTML;
+                
+                // เพิ่ม event listener ให้แต่ละ card
+                document.querySelectorAll('.card').forEach(card => {
+                    const title = card.querySelector('.card-title')?.innerText || 'กิจกรรม';
+                    card.addEventListener('click', (e) => {
+                        createRippleEffect(e, card);
+                        showToast(`✨ เปิดดู: ${title}`, 'fa-star');
+                        // สามารถเปลี่ยนเป็นลิงก์รายละเอียดเพิ่มเติมได้
+                        // alert(`📖 รายละเอียด: ${title}`);
+                    });
+                });
+                
+                showToast(`📊 โหลดข้อมูลสำเร็จ! มี ${data.portfolios.length} รายการ`, 'fa-check-circle');
+
             } catch (error) {
                 console.error("Error fetching portfolios:", error);
-                document.getElementById('loading').innerHTML = `
-                    <span style='color:#ef4444;'>
-                        <i class="fas fa-exclamation-triangle"></i> ดึงข้อมูลไม่สำเร็จ โปรดลองรีเฟรชหน้าเว็บใหม่
+                const loadingDiv = document.getElementById('loading');
+                loadingDiv.innerHTML = `
+                    <span style='color:#ef4444; display: flex; align-items: center; justify-content: center; gap: 10px;'>
+                        <i class="fas fa-exclamation-triangle"></i> ดึงข้อมูลไม่สำเร็จ กรุณารีเฟรชหน้าเว็บใหม่
                     </span>`;
+                showToast('❌ ดึงข้อมูลไม่สำเร็จ', 'fa-exclamation-triangle');
             }
         }
-
-        // เริ่มโหลดข้อมูลทันทีที่เปิดหน้าเว็บ
-        window.onload = loadPortfolios;
+        
+        // 🌟 ฟังก์ชันป้องกัน XSS 🌟
+        function escapeHtml(text) {
+            if(!text) return '';
+            const div = document.createElement('div');
+            div.textContent = text;
+            return div.innerHTML;
+        }
+        
+        // 🌟 เริ่มต้นเมื่อโหลดหน้า 🌟
+        window.onload = () => {
+            createFloatingParticles();
+            loadPortfolios();
+            
+            // เพิ่มเอฟเฟกต์ hover ให้ปุ่ม
+            const backBtn = document.querySelector('.back-btn');
+            if(backBtn) {
+                backBtn.addEventListener('mouseenter', () => {
+                    backBtn.style.transform = 'translateY(-3px)';
+                });
+                backBtn.addEventListener('mouseleave', () => {
+                    backBtn.style.transform = 'translateY(0)';
+                });
+            }
+        };
     </script>
-
 </body>
 </html>
