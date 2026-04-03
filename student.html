@@ -298,12 +298,10 @@
             container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
             
             try {
-                // 🌟 ตัวช่วยกัน Cache: เติมเวลาปัจจุบันต่อท้ายลิงก์ เพื่อบังคับให้ดึงข้อมูลใหม่ทุกรอบ!
                 const cacheBuster = new Date().getTime();
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + cacheBuster);
                 db = await res.json();
                 
-                // ส่ง PING ให้ชีตรู้ว่าล็อกอินเข้ามา
                 fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateTimestamp", type: "last_login", email: email }) });
 
                 renderDashboard(email);
@@ -319,8 +317,9 @@
 
         // --- 🌟 จัดการแสดงผลหน้าจอ 🌟 ---
         function renderDashboard(email) {
-            // ดึงข้อมูลนักเรียน
-            const myData = db.students.find(s => {
+            // 🌟 สำคัญ: reverse() ดึงข้อมูลจากบรรทัดล่าสุด เผื่อมีชื่อเด็กซ้ำในชีต
+            const studentsArray = Array.isArray(db.students) ? [...db.students].reverse() : [];
+            const myData = studentsArray.find(s => {
                 let sheetEmail = getVal(s, 'email', 'e-mail', 'อีเมล');
                 return sheetEmail && String(sheetEmail).trim().toLowerCase() === email.trim().toLowerCase();
             }) || {};
@@ -332,7 +331,9 @@
             const editDate = getVal(myData, 'last_update', 'อัปเดตล่าสุด') || '-';
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
 
-            // อัปเดตโปรไฟล์
+            // อัปเดตโปรไฟล์ลง localStorage เพื่อให้หน้า Lab (python.html) ดึงไปใช้ถูกตัว
+            localStorage.setItem(email + '_studentid', studentId !== '-' ? studentId : '');
+            
             document.getElementById('profile-name').innerText = name;
             document.getElementById('profile-email').innerText = email;
             document.getElementById('profile-pic-img').src = pic;
@@ -349,7 +350,6 @@
 
             const container = document.getElementById('dynamic-modules-container');
             
-            // เช็คว่ากรอกห้องแล้วหรือยัง
             if (room === '-' || room === '') {
                 container.innerHTML = `<div class="task-card" style="justify-content:center; border-left:4px solid #f59e0b; flex-direction:column; text-align:center;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b; margin-bottom: 10px;"></i>
@@ -359,7 +359,6 @@
                 return;
             }
 
-            // ดึงกิจกรรมที่ตรงกับห้อง
             const myActivities = db.activities.filter(act => {
                 const targetRoom = getVal(act, 'room', 'ห้อง') || 'ทุกห้อง';
                 return targetRoom === 'ทุกห้อง' || targetRoom === room;
@@ -382,7 +381,7 @@
                 const actPoints = parseInt(getVal(act, 'points', 'คะแนนเต็ม') || 0);
                 const actStatusStr = getVal(act, 'status', 'สถานะ'); 
                 
-                // 🌟 อัปเกรดระบบเทียบ รหัสนักเรียน และ รหัสงาน (ตัดช่องว่างทิ้ง) 🌟
+                // 🌟 ระบบค้นหาการส่งงานที่เข้มแข็งที่สุด (ตัดช่องว่าง) 🌟
                 const submission = db.submissions.find(sub => {
                     const sId = getVal(sub, 'student_id', 'รหัส');
                     const aId = getVal(sub, 'activity_id', 'รหัสงาน', 'id');
@@ -460,7 +459,8 @@
 
         function openEditProfileModal() {
             const email = localStorage.getItem('student_email');
-            const myData = db.students.find(s => getVal(s, 'email') === email) || {};
+            const studentsArray = Array.isArray(db.students) ? [...db.students].reverse() : [];
+            const myData = studentsArray.find(s => getVal(s, 'email') === email) || {};
             
             document.getElementById('edit-studentid').value = getVal(myData, 'student_id') || '';
             document.getElementById('edit-name').value = getVal(myData, 'name') || localStorage.getItem('student_name') || "";
