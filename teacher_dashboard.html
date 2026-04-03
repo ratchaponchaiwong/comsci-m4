@@ -9,7 +9,6 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* --- คง Style เดิมของคุณไว้ทั้งหมด --- */
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; height: 100vh; display: flex; overflow: hidden; color: white;}
         body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); }
@@ -21,7 +20,6 @@
         .sidebar { width: 280px; background: rgba(15, 23, 42, 0.85); backdrop-filter: blur(15px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px 0; z-index: 100; transition: 0.3s; height: 100vh; overflow-y: auto;}
         body[data-theme="snow"] .sidebar, body[data-theme="love"] .sidebar { background: rgba(255,255,255,0.85); border-right-color: rgba(0,0,0,0.1); }
         .sidebar-brand { font-size: 1.3rem; font-weight: 800; color: #60a5fa; padding: 0 20px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
-        
         .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 5px; padding: 0 15px; }
         .nav-menu li { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; opacity: 0.8; }
         .nav-menu li:hover { background: rgba(59, 130, 246, 0.2); opacity: 1; color: #60a5fa; }
@@ -36,33 +34,38 @@
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
         .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 25px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 8px 32px rgba(0,0,0,0.1); color: inherit;}
-        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.9); border-color: rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.9); color: black; border-color: rgba(0,0,0,0.1); box-shadow: 0 8px 32px rgba(0,0,0,0.05); }
 
         .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .form-group { margin-bottom: 15px; }
         .form-group.full { grid-column: span 2; }
-        input, select, textarea { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; }
+        label { display: block; font-size: 0.9rem; margin-bottom: 5px; font-weight: 500; opacity: 0.9; }
+        input, select, textarea { width: 100%; padding: 10px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: inherit; font-family: 'Prompt'; font-size: 0.95rem; }
+        body[data-theme="snow"] input, body[data-theme="snow"] select, body[data-theme="snow"] textarea, body[data-theme="love"] input, body[data-theme="love"] select, body[data-theme="love"] textarea { background: white; border-color: #cbd5e1; }
         
-        .btn-action { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; }
-        .btn-action:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
+        .btn-action { background: #3b82f6; color: white; padding: 10px 20px; border: none; border-radius: 12px; font-weight: 600; cursor: pointer; transition: 0.2s; font-family: 'Prompt'; display: inline-flex; align-items: center; gap: 8px;}
+        .btn-action:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2);}
         .btn-danger { background: #ef4444 !important; }
+        .btn-warning { background: #f59e0b !important; }
+        .btn-success { background: #10b981 !important; }
 
-        .table-responsive { overflow-x: auto; }
+        .list-item { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 12px; margin-bottom: 12px; border-left: 4px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; }
+        
         table { width: 100%; border-collapse: collapse; margin-top: 15px; }
         th, td { padding: 12px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.1); }
-        th { color: #60a5fa; background: rgba(0,0,0,0.2); }
+        th { font-weight: 600; color: #60a5fa; background: rgba(0,0,0,0.2);}
+
+        .theme-picker { display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 40px; }
+        .theme-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; transition: 0.2s; }
 
         .modal { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.8); z-index: 1000; display: flex; align-items: center; justify-content: center; visibility: hidden; opacity: 0; transition: 0.3s; }
         .modal.active { visibility: visible; opacity: 1; }
-        .modal-content { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px; position: relative; max-height: 90vh; overflow-y: auto;}
+        .modal-content { background: #1e293b; padding: 30px; border-radius: 20px; width: 90%; max-width: 600px; color: white; position: relative; max-height: 90vh; overflow-y: auto;}
+        .close-modal { position: absolute; top: 15px; right: 20px; font-size: 2rem; cursor: pointer; color: inherit; background: none; border: none; opacity: 0.7;}
         
         .badge { padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; }
         .badge-red { background: rgba(239,68,68,0.2); color: #ef4444; }
         .badge-green { background: rgba(16,185,129,0.2); color: #10b981; }
-
-        /* --- Theme Pickers --- */
-        .theme-picker { display: flex; gap: 8px; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 40px; }
-        .theme-btn { background: transparent; border: none; font-size: 1.2rem; cursor: pointer; }
     </style>
 </head>
 <body data-theme="default">
@@ -72,16 +75,15 @@
         <ul class="nav-menu">
             <li class="active" onclick="switchTab('tab-activities', this)"><i class="fas fa-edit"></i> 1. จัดการกิจกรรม/สั่งงาน</li>
             <li onclick="switchTab('tab-matrix', this)"><i class="fas fa-tasks"></i> 2. ตรวจงาน (Matrix)</li>
-            <li onclick="switchTab('tab-studentdb', this)"><i class="fas fa-search"></i> 3. ค้นหานักเรียน / CSV</li>
-            <li onclick="switchTab('tab-cms', this)"><i class="fas fa-pager"></i> 4. จัดการเนื้อหาเว็บ (CMS)</li>
-            <li onclick="switchTab('tab-classview', this)"><i class="fas fa-users-class"></i> 5. ข้อมูลรายห้องเรียน</li>
-            <li><a href="index.html" style="color: inherit; text-decoration: none; display: flex; gap: 12px;"><i class="fas fa-home"></i> กลับหน้าหลัก</a></li>
+            <li onclick="switchTab('tab-cms', this)"><i class="fas fa-pager"></i> 3. จัดการเนื้อหาเว็บ (CMS)</li>
+            <li onclick="switchTab('tab-classview', this)"><i class="fas fa-users-class"></i> 4. ข้อมูลรายห้องเรียน</li>
+            <li><a href="index.html" style="color: inherit; text-decoration: none; display: flex; gap: 12px; width: 100%;"><i class="fas fa-home"></i> กลับหน้าเว็บนักเรียน</a></li>
         </ul>
     </div>
 
     <div class="main-content">
         <div class="header-bar">
-            <h2><i class="fas fa-cogs"></i> ระบบบริหารจัดการ</h2>
+            <h2 style="font-size: 1.3rem;"><i class="fas fa-cogs"></i> ระบบบริหารจัดการหลังบ้าน</h2>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <div class="theme-picker">
                     <button class="theme-btn" onclick="applyTheme('default')">🤖</button>
@@ -89,249 +91,297 @@
                     <button class="theme-btn" onclick="applyTheme('forest')">🌿</button>
                     <button class="theme-btn" onclick="applyTheme('love')">🌸</button>
                 </div>
-                <button class="btn-action" style="background: #10b981;" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
+                <button class="btn-action btn-success" onclick="loadAllData()"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูล</button>
             </div>
         </div>
 
         <div class="content-body">
+            
             <div id="tab-activities" class="tab-content active">
                 <div class="glass-card">
-                    <h3 style="color: #60a5fa; margin-bottom:15px;">สร้างโพสต์กิจกรรม</h3>
+                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-plus-circle"></i> สร้างโพสต์กิจกรรม (13 คอลัมน์)</h3>
                     <div class="form-grid">
-                        <div class="form-group full"><label>ชื่อหัวข้องาน</label><input type="text" id="act-title"></div>
                         <div class="form-group"><label>ประเภท</label><select id="act-type"><option value="task">งานปฎิบัติ</option><option value="activity">กิจกรรม</option></select></div>
+                        <div class="form-group"><label>สถานะ</label><select id="act-status"><option value="open">🟢 เปิด</option><option value="closed">🔴 ปิด</option></select></div>
+                        <div class="form-group full"><label>ชื่อหัวข้องาน</label><input type="text" id="act-title"></div>
+                        <div class="form-group full"><label>คำสั่ง / รายละเอียด</label><textarea id="act-desc" rows="2"></textarea></div>
+                        <div class="form-group"><label>วันที่กำหนดส่ง</label><input type="date" id="act-date"></div>
+                        <div class="form-group"><label>เวลา</label><input type="time" id="act-time" value="23:59"></div>
+                        <div class="form-group"><label>ห้องเรียน</label><select id="act-room"><option value="ทุกห้อง">ทุกห้อง</option></select></div>
                         <div class="form-group"><label>คะแนนเต็ม</label><input type="number" id="act-points" value="10"></div>
-                        <div class="form-group full"><label>คำสั่ง</label><textarea id="act-desc" rows="2"></textarea></div>
+                        <div class="form-group full"><label>ลิงก์ปลายทาง Lab</label><input type="text" id="act-link" value="#"></div>
+                        <div class="form-group"><label>YouTube URL</label><input type="text" id="act-yt"></div>
+                        <div class="form-group"><label>PDF/Docs URL</label><input type="text" id="act-doc"></div>
                     </div>
-                    <button class="btn-action" onclick="saveActivity()"><i class="fas fa-save"></i> บันทึกกิจกรรม</button>
+                    <button class="btn-action" onclick="saveActivity()"><i class="fas fa-paper-plane"></i> โพสต์กิจกรรม</button>
                 </div>
                 <div class="glass-card">
-                    <h3>รายการงานที่สั่งแล้ว</h3>
-                    <div id="activities-list">กำลังโหลด...</div>
+                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-list"></i> กิจกรรมที่สั่งไปแล้ว</h3>
+                    <div id="activities-list">กำลังโหลดข้อมูล...</div>
                 </div>
             </div>
 
             <div id="tab-matrix" class="tab-content">
                 <div class="glass-card">
-                    <h3 style="color: #60a5fa; margin-bottom:15px;">ตารางตรวจงาน</h3>
-                    <div class="form-grid" style="margin-bottom:20px;">
+                    <h3 style="margin-bottom: 20px; color: #60a5fa;"><i class="fas fa-clipboard-check"></i> ตารางตรวจงาน</h3>
+                    <div class="form-grid">
                         <div class="form-group"><label>เลือกงาน</label><select id="matrix-act" onchange="renderMatrix()"></select></div>
-                        <div class="form-group"><label>เลือกห้อง</label><select id="matrix-room" onchange="renderMatrix()"><option value="all">ทุกห้อง</option></select></div>
+                        <div class="form-group"><label>เลือกห้อง</label><select id="matrix-room" onchange="renderMatrix()"><option value="all">ดูทุกห้อง</option></select></div>
                     </div>
-                    <div class="table-responsive">
-                        <table>
-                            <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr></thead>
-                            <tbody id="matrix-body"></tbody>
-                        </table>
-                    </div>
+                    <table style="display:block; overflow-x:auto;">
+                        <thead><tr><th>รหัส</th><th>เลขที่</th><th>ชื่อ</th><th>ห้อง</th><th>สถานะ</th><th>คะแนน</th><th>จัดการ</th></tr></thead>
+                        <tbody id="matrix-body"></tbody>
+                    </table>
                 </div>
             </div>
-            
-            <div id="tab-studentdb" class="tab-content"><div class="glass-card"><h3>ค้นหานักเรียน</h3></div></div>
-            <div id="tab-cms" class="tab-content"><div class="glass-card"><h3>จัดการ CMS</h3></div></div>
-            <div id="tab-classview" class="tab-content"><div class="glass-card"><h3>ข้อมูลรายห้อง</h3></div></div>
+
+            <div id="tab-cms" class="tab-content">
+                <div class="glass-card">
+                    <h3 style="color: #f59e0b; margin-bottom: 20px;"><i class="fas fa-trophy"></i> เพิ่มผลงานนักเรียน/กิจกรรม (Portfolio)</h3>
+                    <div class="form-grid">
+                        <div class="form-group full"><label>ชื่อผลงาน/กิจกรรม</label><input type="text" id="cms-p-title" placeholder="เช่น การสอบคัดเลือก..."></div>
+                        <div class="form-group full"><label>ลิงก์รูปภาพ (URL)</label><input type="text" id="cms-p-img" placeholder="https://..."></div>
+                        <div class="form-group full"><label>คำอธิบายสั้นๆ</label><textarea id="cms-p-desc" rows="3"></textarea></div>
+                    </div>
+                    <button class="btn-action btn-warning" onclick="saveCMSPortfolio()" id="btn-save-port"><i class="fas fa-plus"></i> อัปโหลดผลงานขึ้นเว็บ</button>
+                </div>
+                <div class="glass-card">
+                    <h3 style="color: #60a5fa; margin-bottom: 20px;"><i class="fas fa-images"></i> ผลงานที่โชว์บนหน้าเว็บนักเรียน</h3>
+                    <div id="cms-portfolio-list">กำลังโหลด...</div>
+                </div>
+            </div>
+
+            <div id="tab-classview" class="tab-content">
+                <div class="glass-card">
+                    <h3 style="color: #3b82f6; margin-bottom: 20px;"><i class="fas fa-users-class"></i> ข้อมูลเชิงลึกรายห้องเรียน</h3>
+                    <div class="form-group" style="max-width: 300px;">
+                        <select id="view-class-room" onchange="renderClassViewTable()"><option value="all">แสดงนักเรียนทั้งหมด</option></select>
+                    </div>
+                    <table style="display:block; overflow-x:auto;">
+                        <thead><tr><th>เลขที่/ชื่อ</th><th>ใช้งานล่าสุด</th><th>ส่งแล้ว</th><th>ค้างส่ง</th><th>คะแนนรวม</th></tr></thead>
+                        <tbody id="class-view-body"></tbody>
+                    </table>
+                </div>
+            </div>
 
         </div>
     </div>
 
     <div id="gradeModal" class="modal">
         <div class="modal-content">
-            <h3 id="grade-student-name">ตรวจงาน</h3>
-            <div style="background:rgba(0,0,0,0.2); padding:15px; margin:15px 0; border-radius:10px;" id="grade-work-content">ไม่มีไฟล์แนบ</div>
-            <div class="form-group"><label>ใส่คะแนน</label><input type="number" id="grade-input-score"></div>
-            <button class="btn-action" onclick="saveScore()">บันทึก</button>
-            <button class="btn-action btn-danger" onclick="document.getElementById('gradeModal').classList.remove('active')">ปิด</button>
+            <button class="close-modal" onclick="document.getElementById('gradeModal').classList.remove('active')">×</button>
+            <h3 id="grade-student-name" style="color: #60a5fa; margin-bottom: 10px;">ชื่อนักเรียน</h3>
+            <div style="background: rgba(0,0,0,0.1); padding: 15px; border-radius: 10px; margin-bottom: 20px;">
+                <label>เนื้อหางานที่ส่ง:</label>
+                <div id="grade-work-content" style="margin-top: 10px; font-family: monospace; word-break: break-all;"></div>
+            </div>
+            <div class="form-group"><label>ให้คะแนน</label><input type="number" id="grade-input-score"></div>
+            <button class="btn-action btn-success" style="width: 100%; justify-content: center;" onclick="saveScore()">บันทึกคะแนน</button>
         </div>
     </div>
 
     <script>
-    // 🌟 1. ตั้งค่าการเชื่อมต่อ (เปลี่ยน URL เป็นของคุณที่ได้จากการ Deploy)
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
-    
-    // ตัวแปรเก็บข้อมูลจากฐานข้อมูล
-    let db = {
-        activities: [],
-        students: [],
-        submissions: []
-    };
-
-    // 🌟 2. ระบบจัดการหน้าจอ (Tab & Theme)
-    function switchTab(tabId, el) {
-        document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-        document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
-        document.getElementById(tabId).classList.add('active');
-        el.classList.add('active');
+        // 🌟 1. เปลี่ยน URL ตรงนี้เป็น URL ของครู 🌟
+        const SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
-        // ถ้ากด Tab Matrix หรือ ClassView ให้ Render ตารางใหม่เสมอเพื่อให้ข้อมูลสดใหม่
-        if(tabId === 'tab-matrix') renderMatrix();
-        if(tabId === 'tab-classview') renderClassView();
-    }
+        let db = { activities: [], students: [], submissions: [], portfolios: [] };
 
-    function applyTheme(theme) {
-        document.body.setAttribute("data-theme", theme);
-        localStorage.setItem('admin_theme', theme);
-    }
-
-    // 🌟 3. ระบบดึงข้อมูล (Fetch Data)
-    async function loadAllData() {
-        const btn = document.querySelector('button[onclick="loadAllData()"]');
-        if(btn) btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังอัปเดต...';
-
-        try {
-            const resp = await fetch(`${SCRIPT_URL}?action=readAll`);
-            db = await resp.json();
+        // 🌟 Tab Switching & Theme
+        function switchTab(tabId, el) {
+            document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.nav-menu li').forEach(li => li.classList.remove('active'));
+            document.getElementById(tabId).classList.add('active');
+            el.classList.add('active');
             
-            // อัปเดต UI ทั้งหมด
-            renderActivitiesList(); // รายการงานที่สั่ง
-            updateRoomSelectors();  // รายชื่อห้องใน Dropdown
-            renderMatrix();         // ตารางตรวจงาน
-            renderClassView();      // ข้อมูลเชิงลึกรายห้อง
-
-            if(btn) btn.innerHTML = '<i class="fas fa-check-circle"></i> ข้อมูลล่าสุดแล้ว';
-        } catch (e) {
-            console.error("Error:", e);
-            if(btn) btn.innerHTML = '<i class="fas fa-exclamation-triangle"></i> เชื่อมต่อล้มเหลว';
+            if(tabId === 'tab-matrix') renderMatrix();
+            if(tabId === 'tab-classview') renderClassViewTable();
+            if(tabId === 'tab-cms') renderPortfoliosList();
         }
-    }
 
-    // 🌟 4. ระบบจัดการกิจกรรม (Activities - 13 Columns)
-    async function saveActivity() {
-        const data = {
-            action: "saveActivity",
-            type: document.getElementById('act-type').value,
-            status: document.getElementById('act-status').value,
-            title: document.getElementById('act-title').value,
-            desc: document.getElementById('act-desc').value,
-            date: document.getElementById('act-date').value,
-            time: document.getElementById('act-time').value,
-            target: "all",
-            room: document.getElementById('act-room').value,
-            points: document.getElementById('act-points').value,
-            link: document.getElementById('act-link').value,
-            doc_link: document.getElementById('act-doc').value,
-            yt_link: document.getElementById('act-yt').value
-        };
+        function applyTheme(theme) {
+            document.body.setAttribute("data-theme", theme);
+            localStorage.setItem('admin_theme', theme);
+        }
 
-        if(!data.title) return alert("กรุณาใส่ชื่อหัวข้องาน");
+        // 🌟 Fetch Data
+        async function loadAllData() {
+            const btn = document.querySelector('button[onclick="loadAllData()"]');
+            btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังอัปเดต...';
+            try {
+                const resp = await fetch(`${SCRIPT_URL}?action=readAll`);
+                db = await resp.json();
+                
+                updateRoomSelectors();
+                renderActivitiesList();
+                renderMatrix();
+                renderClassViewTable();
+                renderPortfoliosList();
+                
+                btn.innerHTML = '<i class="fas fa-check-circle"></i> ข้อมูลล่าสุดแล้ว';
+            } catch (e) {
+                btn.innerHTML = '<i class="fas fa-times"></i> ผิดพลาด';
+            }
+        }
 
-        try {
-            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-            alert("🚀 บันทึกและโพสต์กิจกรรมเรียบร้อย!");
-            loadAllData(); // โหลดข้อมูลใหม่
-        } catch (e) { alert("บันทึกไม่สำเร็จ!"); }
-    }
+        function updateRoomSelectors() {
+            const rooms = [...new Set(db.students.map(s => s.room))].filter(Boolean).sort();
+            const selects = ['act-room', 'matrix-room', 'view-class-room'];
+            
+            selects.forEach(id => {
+                const el = document.getElementById(id);
+                if(el) {
+                    const current = el.value;
+                    el.innerHTML = (id === 'act-room') ? '<option value="ทุกห้อง">ทุกห้อง</option>' : '<option value="all">ดูทุกห้อง</option>';
+                    rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
+                    el.value = current;
+                }
+            });
 
-    function renderActivitiesList() {
-        const list = document.getElementById('activities-list');
-        if (db.activities.length === 0) return list.innerHTML = "ยังไม่มีงานที่สั่ง";
+            const matrixAct = document.getElementById('matrix-act');
+            if(matrixAct) matrixAct.innerHTML = db.activities.map(a => `<option value="${a.ID}">${a.Title}</option>`).join('');
+        }
 
-        list.innerHTML = db.activities.map(act => `
-            <div class="list-item">
-                <div>
-                    <strong>${act.Title}</strong> 
-                    <span class="badge ${act.Status === 'open' ? 'badge-green' : 'badge-red'}">${act.Status}</span>
-                    <br><small>ห้อง: ${act.Room} | คะแนน: ${act.Points} | ส่ง: ${act.Date}</small>
+        // 🌟 TAB 1: Activities
+        async function saveActivity() {
+            const data = {
+                action: "saveActivity",
+                type: document.getElementById('act-type').value,
+                status: document.getElementById('act-status').value,
+                title: document.getElementById('act-title').value,
+                desc: document.getElementById('act-desc').value,
+                date: document.getElementById('act-date').value,
+                time: document.getElementById('act-time').value,
+                target: "all",
+                room: document.getElementById('act-room').value,
+                points: document.getElementById('act-points').value,
+                link: document.getElementById('act-link').value,
+                doc_link: document.getElementById('act-doc').value,
+                yt_link: document.getElementById('act-yt').value
+            };
+            if(!data.title) return alert("กรุณาใส่ชื่อหัวข้องาน");
+            try {
+                await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+                alert("โพสต์กิจกรรมเรียบร้อย!");
+                loadAllData();
+            } catch (e) { alert("บันทึกไม่สำเร็จ!"); }
+        }
+
+        function renderActivitiesList() {
+            const list = document.getElementById('activities-list');
+            if (!db.activities || db.activities.length === 0) return list.innerHTML = "ยังไม่มีงาน";
+            list.innerHTML = db.activities.map(act => `
+                <div class="list-item">
+                    <div>
+                        <strong>${act.Title}</strong> <span class="badge ${act.Status === 'open' ? 'badge-green' : 'badge-red'}">${act.Status}</span>
+                        <br><small>ห้อง: ${act.Room} | คะแนน: ${act.Points} | ส่ง: ${act.Date}</small>
+                    </div>
                 </div>
-                <div style="display:flex; gap:8px;">
-                    <button class="btn-action" style="padding:5px 10px;"><i class="fas fa-edit"></i></button>
-                    <button class="btn-action btn-danger" style="padding:5px 10px;"><i class="fas fa-trash"></i></button>
-                </div>
-            </div>
-        `).join('');
-    }
+            `).join('');
+        }
 
-    // 🌟 5. ระบบตารางตรวจงาน (Matrix)
-    function renderMatrix() {
-        const actId = document.getElementById('matrix-act').value;
-        const room = document.getElementById('matrix-room').value;
-        const body = document.getElementById('matrix-body');
-        
-        let filtered = db.students;
-        if (room !== 'all') filtered = db.students.filter(s => s.room == room);
+        // 🌟 TAB 2: Matrix & Grading
+        function renderMatrix() {
+            const actId = document.getElementById('matrix-act').value;
+            const room = document.getElementById('matrix-room').value;
+            const body = document.getElementById('matrix-body');
+            
+            let filtered = db.students;
+            if (room !== 'all') filtered = db.students.filter(s => s.room == room);
 
-        body.innerHTML = filtered.map(s => {
-            const sub = db.submissions.find(item => item.student_id == s.student_id && item.activity_id == actId);
-            return `
-                <tr>
-                    <td>${s.student_id}</td>
-                    <td>${s.number}</td>
-                    <td>${s.name}</td>
-                    <td>${s.room}</td>
+            body.innerHTML = filtered.map(s => {
+                const sub = db.submissions.find(item => item.student_id == s.student_id && item.activity_id == actId);
+                return `<tr>
+                    <td>${s.student_id}</td><td>${s.number}</td><td>${s.name}</td><td>${s.room}</td>
                     <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ยังไม่ส่ง'}</span></td>
                     <td>${sub ? (sub.score || 0) : '-'}</td>
                     <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')">ตรวจ</button></td>
-                </tr>
-            `;
-        }).join('');
-    }
+                </tr>`;
+            }).join('');
+        }
 
-    // 🌟 6. ระบบข้อมูลรายห้อง (Class View - ติดตามพฤติกรรม)
-    function renderClassView() {
-        const room = document.getElementById('view-class-room').value;
-        const body = document.getElementById('class-view-body');
-        let filtered = (room === 'all') ? db.students : db.students.filter(s => s.room == room);
+        function openGrade(stdId, actId) {
+            const std = db.students.find(s => s.student_id == stdId);
+            const sub = db.submissions.find(item => item.student_id == stdId && item.activity_id == actId);
+            
+            document.getElementById('grade-student-name').innerText = "ตรวจงาน: " + (std ? std.name : stdId);
+            document.getElementById('grade-work-content').innerText = sub ? sub.work_content : "ยังไม่มีการส่งงาน";
+            document.getElementById('gradeModal').classList.add('active');
+            window.currentGrading = { stdId, actId };
+        }
 
-        body.innerHTML = filtered.map(s => `
-            <tr>
+        async function saveScore() {
+            const data = {
+                action: "saveScore",
+                student_id: window.currentGrading.stdId,
+                activity_id: window.currentGrading.actId,
+                score: document.getElementById('grade-input-score').value
+            };
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
+            alert("บันทึกคะแนนแล้ว!");
+            document.getElementById('gradeModal').classList.remove('active');
+            loadAllData();
+        }
+
+        // 🌟 TAB 3: CMS (Portfolio)
+        async function saveCMSPortfolio() {
+            const title = document.getElementById('cms-p-title').value;
+            const imgLink = document.getElementById('cms-p-img').value;
+            const desc = document.getElementById('cms-p-desc').value;
+
+            if (!title || !imgLink) return alert("กรุณาใส่ชื่อและลิงก์รูปภาพครับ");
+
+            const btn = document.getElementById('btn-save-port');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังบันทึก...';
+
+            try {
+                await fetch(SCRIPT_URL, { 
+                    method: 'POST', 
+                    body: JSON.stringify({ action: "savePortfolio", title: title, image_link: imgLink, desc: desc }) 
+                });
+                alert("อัปโหลดผลงานสำเร็จ!");
+                document.getElementById('cms-p-title').value = '';
+                document.getElementById('cms-p-img').value = '';
+                document.getElementById('cms-p-desc').value = '';
+                loadAllData();
+            } catch (e) { alert("บันทึกไม่สำเร็จ"); }
+            finally { btn.innerHTML = '<i class="fas fa-plus"></i> อัปโหลดผลงานขึ้นเว็บ'; }
+        }
+
+        function renderPortfoliosList() {
+            const list = document.getElementById('cms-portfolio-list');
+            if (!db.portfolios || db.portfolios.length === 0) return list.innerHTML = "ยังไม่มีผลงาน";
+            
+            list.innerHTML = db.portfolios.reverse().map(p => `
+                <div class="list-item" style="align-items: flex-start;">
+                    <img src="${p.ImageLink}" style="width: 80px; height: 80px; object-fit: cover; border-radius: 8px; margin-right: 15px;">
+                    <div style="flex: 1;">
+                        <strong>${p.Title}</strong><br>
+                        <small style="color: #94a3b8;">อัปโหลดเมื่อ: ${p.Date}</small>
+                        <p style="font-size: 0.85rem; margin-top: 5px; opacity: 0.8;">${p.Description}</p>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        // 🌟 TAB 4: Class View
+        function renderClassViewTable() {
+            const room = document.getElementById('view-class-room').value;
+            const body = document.getElementById('class-view-body');
+            let filtered = (room === 'all') ? db.students : db.students.filter(s => s.room == room);
+
+            body.innerHTML = filtered.map(s => `<tr>
                 <td><strong>${s.number}. ${s.name}</strong><br><small>รหัส: ${s.student_id}</small></td>
-                <td><small>${s.last_login || 'ยังไม่เข้าระบบ'}</small></td>
-                <td style="text-align:center;"><span class="badge badge-green">${s.sent_count}</span></td>
-                <td style="text-align:center;"><span class="badge badge-red">${s.pending_count}</span></td>
-                <td style="text-align:center; font-weight:bold; color:#60a5fa;">${s.total_score}</td>
-                <td><button class="btn-action" onclick="alert('รหัส: ${s.student_id}\\nลงทะเบียน: ${s.reg_date}')">ประวัติ</button></td>
-            </tr>
-        `).join('');
-    }
+                <td><small>${s.last_login || '-'}</small></td>
+                <td><span class="badge badge-green">${s.sent_count || 0}</span></td>
+                <td><span class="badge badge-red">${s.pending_count || 0}</span></td>
+                <td style="font-weight:bold; color:#60a5fa;">${s.total_score || 0}</td>
+            </tr>`).join('');
+        }
 
-    // 🌟 7. ฟังก์ชันตัวช่วย (Helpers)
-    function updateRoomSelectors() {
-        const rooms = [...new Set(db.students.map(s => s.room))].sort();
-        const selects = ['act-room', 'matrix-room', 'view-class-room'];
-        
-        selects.forEach(id => {
-            const el = document.getElementById(id);
-            const current = el.value;
-            el.innerHTML = (id === 'act-room') ? '<option value="ทุกห้อง">ทุกห้อง</option>' : '<option value="all">ดูทุกห้อง</option>';
-            rooms.forEach(r => el.innerHTML += `<option value="${r}">${r}</option>`);
-            el.value = current;
-        });
-
-        const matrixAct = document.getElementById('matrix-act');
-        matrixAct.innerHTML = db.activities.map(a => `<option value="${a.ID}">${a.Title}</option>`).join('');
-    }
-
-    function openGrade(stdId, actId) {
-        const std = db.students.find(s => s.student_id == stdId);
-        const sub = db.submissions.find(item => item.student_id == stdId && item.activity_id == actId);
-        
-        document.getElementById('grade-student-name').innerText = "ตรวจงาน: " + std.name;
-        document.getElementById('grade-work-content').innerText = sub ? sub.work_content : "ยังไม่มีการส่งงาน";
-        document.getElementById('gradeModal').classList.add('active');
-        
-        // เก็บ ID ไว้บันทึกคะแนน
-        window.currentGrading = { stdId, actId };
-    }
-
-    async function saveScore() {
-        const score = document.getElementById('grade-input-score').value;
-        const data = {
-            action: "saveScore",
-            student_id: window.currentGrading.stdId,
-            activity_id: window.currentGrading.actId,
-            score: score
+        window.onload = () => {
+            applyTheme(localStorage.getItem('admin_theme') || 'default');
+            loadAllData();
         };
-
-        await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-        alert("บันทึกคะแนนแล้ว!");
-        document.getElementById('gradeModal').classList.remove('active');
-        loadAllData();
-    }
-
-    // 🌟 8. เริ่มต้นระบบเมื่อโหลดหน้าเสร็จ
-    window.onload = () => {
-        applyTheme(localStorage.getItem('admin_theme') || 'default');
-        loadAllData();
-    };
-</script>
+    </script>
 </body>
 </html>
