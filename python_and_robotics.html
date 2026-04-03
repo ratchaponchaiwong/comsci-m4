@@ -50,7 +50,6 @@
         body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.8); --border-ws: rgba(255,105,180,0.3); --editor-bg: #fff0f5; --output-bg: #ffffff; --accent: #ec4899; }
 
         .workspace-wrapper { display: flex; flex: 1; padding: 15px; gap: 15px; overflow: hidden; flex-direction: column; transition: 0.3s; max-width: 1600px; margin: 0 auto; width: 100%;}
-        @media (min-width: 900px) { .workspace-wrapper { flex-direction: row; } }
         
         .control-panel { background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; justify-content: space-between; align-items: center; gap: 15px; flex-wrap: wrap; box-shadow: 0 10px 30px rgba(0,0,0,0.15);}
         body[data-theme="snow"] .control-panel, body[data-theme="love"] .control-panel { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
@@ -66,11 +65,66 @@
         .btn-submit:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
         .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; border-color: #94a3b8; }
 
-        .split-container { display: flex; flex: 1; gap: 15px; overflow: hidden; flex-direction: column;}
+        /* 🌟 เมนูเลือกหน้าจอ 🌟 */
+        .view-toggle {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            padding: 6px;
+            border-radius: 20px;
+            gap: 5px;
+            border: 1px solid var(--border-ws);
+            margin: 10px auto 0 auto;
+            width: fit-content;
+        }
+        body[data-theme="snow"] .view-toggle, body[data-theme="love"] .view-toggle {
+            background: rgba(0,0,0,0.05);
+        }
+        .view-btn {
+            background: transparent;
+            border: none;
+            color: inherit;
+            padding: 8px 20px;
+            border-radius: 15px;
+            font-family: 'Prompt';
+            font-weight: 600;
+            cursor: pointer;
+            transition: 0.3s;
+            font-size: 0.9rem;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .view-btn.active {
+            background: var(--accent);
+            color: white;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.15);
+        }
+        .view-btn:hover:not(.active) {
+            background: rgba(255,255,255,0.1);
+        }
+        body[data-theme="snow"] .view-btn:hover:not(.active), body[data-theme="love"] .view-btn:hover:not(.active) {
+            background: rgba(0,0,0,0.05);
+        }
+
+        .split-container { display: flex; flex: 1; gap: 15px; overflow: hidden; flex-direction: column; transition: 0.3s;}
         @media (min-width: 900px) { .split-container { flex-direction: row; } }
 
-        .editor-section { flex: 1; display: flex; flex-direction: column; gap: 10px; background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); box-shadow: 0 10px 30px rgba(0,0,0,0.15);}
-        body[data-theme="snow"] .editor-section, body[data-theme="love"] .editor-section { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .editor-section, .wokwi-section { 
+            flex: 1; 
+            display: flex; 
+            flex-direction: column; 
+            background: var(--panel-bg); 
+            backdrop-filter: blur(15px); 
+            border-radius: 20px; 
+            border: 1px solid var(--border-ws); 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.15);
+            transition: 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            overflow: hidden;
+        }
+        body[data-theme="snow"] .editor-section, body[data-theme="snow"] .wokwi-section, 
+        body[data-theme="love"] .editor-section, body[data-theme="love"] .wokwi-section { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        
+        .editor-section { padding: 20px; gap: 10px; }
         
         .editor-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; }
         .btn-run { background: var(--accent); color: white; border: none; padding: 8px 20px; border-radius: 20px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; font-size: 0.85rem; transition: 0.2s;}
@@ -82,9 +136,6 @@
         
         .output-box { background: var(--output-bg); color: #86efac; padding: 15px; height: 130px; border-radius: 12px; font-family: monospace; border: 1px solid var(--border-ws); overflow-y: auto; font-size: 0.9rem;}
         body[data-theme="snow"] .output-box, body[data-theme="love"] .output-box { color: #15803d; }
-        
-        .wokwi-section { flex: 1; background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--border-ws); overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 10px 30px rgba(0,0,0,0.15); position: relative;}
-        body[data-theme="snow"] .wokwi-section, body[data-theme="love"] .wokwi-section { box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
         
         .wokwi-section iframe { flex: 1; width: 100%; border: none; background: white; }
 
@@ -132,8 +183,14 @@
                 </div>
             </div>
 
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="switchView('split', this)"><i class="fas fa-columns"></i> ⚖️ แบ่ง 2 จอ</button>
+                <button class="view-btn" onclick="switchView('python', this)"><i class="fab fa-python"></i> 🐍 ฝั่ง Python</button>
+                <button class="view-btn" onclick="switchView('robot', this)"><i class="fas fa-microchip"></i> 🤖 ฝั่งหุ่นยนต์</button>
+            </div>
+
             <div class="split-container">
-                <div class="editor-section">
+                <div class="editor-section" id="python-section">
                     <div class="editor-header">
                         <strong style="color: var(--accent); font-size: 1.1rem;"><i class="fab fa-python"></i> Python Editor</strong>
                         <div style="display: flex; gap: 10px;">
@@ -147,7 +204,7 @@ print("Hello, Python & Robotics!")
                     <div class="output-box" id="output">⚡ ผลลัพธ์ Python จะแสดงที่นี่...</div>
                 </div>
 
-                <div class="wokwi-section">
+                <div class="wokwi-section" id="robot-section">
                     <iframe src="https://wokwi.com/projects/new/arduino-uno" title="Arduino Simulator"></iframe>
                 </div>
             </div>
@@ -228,6 +285,27 @@ print("Hello, Python & Robotics!")
                 document.getElementById('task-title').innerHTML = `<i class="fas fa-laptop-code"></i> ห้องปฏิบัติการรวม (โหมดอิสระ)`;
                 document.getElementById('task-desc').innerText = `เขียนโค้ดและต่อวงจรได้อย่างอิสระ (ไม่มีการส่งงาน)`;
                 document.getElementById('submit-zone').style.display = 'none';
+            }
+        }
+
+        // 🌟 ฟังก์ชันสลับจอ (View Switcher) 🌟
+        function switchView(viewType, btnElement) {
+            // เคลียร์ปุ่ม active
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            const pythonSec = document.getElementById('python-section');
+            const robotSec = document.getElementById('robot-section');
+            
+            if (viewType === 'split') {
+                pythonSec.style.display = 'flex';
+                robotSec.style.display = 'flex';
+            } else if (viewType === 'python') {
+                pythonSec.style.display = 'flex';
+                robotSec.style.display = 'none';
+            } else if (viewType === 'robot') {
+                pythonSec.style.display = 'none';
+                robotSec.style.display = 'flex';
             }
         }
 
