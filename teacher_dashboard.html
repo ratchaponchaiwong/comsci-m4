@@ -228,17 +228,19 @@
         }
 
         function updateRoomSelectors() {
-            // ดึงห้องที่มีนักเรียนจริงมาแสดงในตัวเลือกตรวจงาน
             const rooms = [...new Set(db.students.map(s => s.room))].filter(Boolean).sort();
             const matrixRoom = document.getElementById('matrix-room');
             if(matrixRoom) matrixRoom.innerHTML = '<option value="all">แสดงทุกห้อง</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
 
             const matrixAct = document.getElementById('matrix-act');
-            if(matrixAct) matrixAct.innerHTML = db.activities.map(a => `<option value="${a.ID}">${a.Title}</option>`).join('');
+            if(matrixAct) matrixAct.innerHTML = db.activities.map(a => {
+                let actId = a.ID || a.id;
+                let actTitle = a.Title || a.title;
+                return `<option value="${actId}">${actTitle}</option>`;
+            }).join('');
         }
 
         async function saveActivity() {
-            // รวมระดับชั้นและห้องเข้าด้วยกัน เช่น ม.4/1
             const grade = document.getElementById('act-grade').value;
             const roomNum = document.getElementById('act-room-num').value;
             const fullRoom = (grade === "ทุกห้อง") ? "ทุกห้อง" : (roomNum === "ทุกห้อง" ? grade + "/ทุกห้อง" : grade + "/" + roomNum);
@@ -276,42 +278,75 @@
                 list.innerHTML = '<div class="empty-state">ยังไม่มีกิจกรรมในระบบ</div>';
                 return;
             }
-            list.innerHTML = db.activities.map(act => `
+            list.innerHTML = db.activities.map(act => {
+                // ตัวป้องกัน Header ตัวเล็ก-ใหญ่ ใน Google Sheets
+                let actId = act.ID || act.id;
+                let actTitle = act.Title || act.title;
+                let actStatus = act.Status || act.status;
+                let actRoom = act.Room || act.room;
+                let actPoints = act.Points || act.points;
+                
+                // แปลงวันที่ให้อ่านง่าย
+                let actDate = act.Date || act.date || '-';
+                if(String(actDate).includes('T')) actDate = String(actDate).split('T')[0];
+
+                let actTime = act.Time || act.time || '-';
+                if(String(actTime).includes('T')) actTime = String(actTime).split('T')[1].substring(0, 5);
+                else if(String(actTime).length >= 5) actTime = String(actTime).substring(0, 5);
+
+                return `
                 <div class="list-item">
                     <div>
-                        <strong>${act.Title}</strong> 
-                        <span class="badge ${act.Status === 'open' ? 'badge-green' : 'badge-red'}">${act.Status === 'open' ? 'เปิด' : 'ปิด'}</span>
-                        <br><small>เป้าหมาย: ${act.Room} | กำหนดส่ง: ${act.Date} ${act.Time} | ${act.Points} คะแนน</small>
+                        <strong>${actTitle}</strong> 
+                        <span class="badge ${actStatus === 'open' ? 'badge-green' : 'badge-red'}">${actStatus === 'open' ? 'เปิด' : 'ปิด'}</span>
+                        <br><small>เป้าหมาย: ${actRoom} | กำหนดส่ง: ${actDate} ${actTime} | ${actPoints} คะแนน</small>
                     </div>
                     <div style="display:flex; gap:8px;">
-                        <button class="btn-action" onclick="editActivity('${act.ID}')"><i class="fas fa-edit"></i></button>
-                        <button class="btn-action btn-danger" onclick="deleteActivity('${act.ID}')"><i class="fas fa-trash"></i></button>
+                        <button class="btn-action" onclick="editActivity('${actId}')"><i class="fas fa-edit"></i></button>
+                        <button class="btn-action btn-danger" onclick="deleteActivity('${actId}')"><i class="fas fa-trash"></i></button>
                     </div>
-                </div>
-            `).join('');
+                </div>`;
+            }).join('');
         }
 
+        // 🌟 ฟังก์ชันดึงข้อมูลมาแก้ไข (ปรับปรุงตัวต้านทาน Google Sheets) 🌟
         function editActivity(actId) {
-            const act = db.activities.find(a => a.ID == actId);
+            const act = db.activities.find(a => (a.ID || a.id) == actId);
             if(!act) return;
 
-            document.getElementById('act-edit-id').value = act.ID;
-            document.getElementById('act-type').value = act.Type;
-            document.getElementById('act-status').value = act.Status;
-            document.getElementById('act-title').value = act.Title;
-            document.getElementById('act-desc').value = act.Description;
-            document.getElementById('act-date').value = act.Date;
-            document.getElementById('act-time').value = act.Time;
-            document.getElementById('act-points').value = act.Points;
-            document.getElementById('act-link').value = act.Link;
-            document.getElementById('act-doc').value = act.Doc;
-            document.getElementById('act-yt').value = act.YouTube;
+            // ตัวช่วยดึงค่า ไม่ว่าคอลัมน์ใน Sheet จะเป็นพิมพ์เล็กหรือใหญ่
+            const getVal = (key1, key2) => act[key1] !== undefined ? act[key1] : (act[key2] !== undefined ? act[key2] : '');
 
-            // แยกชั้นกับห้องกลับคืน (เช่น ม.4/1)
-            if(act.Room && act.Room.includes('/')) {
-                const parts = act.Room.split('/');
-                document.getElementById('act-grade').value = parts[0];
-                document.getElementById('act-room-num').value = parts[1];
+            document.getElementById('act-edit-id').value = getVal('ID', 'id');
+            document.getElementById('act-type').value = getVal('Type', 'type') || 'task';
+            document.getElementById('act-status').value = getVal('Status', 'status') || 'open';
+            document.getElementById('act-title').value = getVal('Title', 'title');
+            document.getElementById('act-desc').value = getVal('Description', 'desc');
+            document.getElementById('act-points').value = getVal('Points', 'points');
+            document.getElementById('act-link').value = getVal('Link', 'link');
+            document.getElementById('act-doc').value = getVal('Doc', 'doc');
+            document.getElementById('act-yt').value = getVal('YouTube', 'yt_link') || getVal('youtube', 'yt_link');
+
+            // 🌟 แก้ปัญหา Date โดนแปลง 🌟
+            let rawDate = getVal('Date', 'date');
+            if (String(rawDate).includes('T')) rawDate = String(rawDate).split('T')[0]; 
+            document.getElementById('act-date').value = rawDate;
+
+            // 🌟 แก้ปัญหา Time โดนแปลง 🌟
+            let rawTime = getVal('Time', 'time');
+            if (String(rawTime).includes('T')) {
+                rawTime = String(rawTime).split('T')[1].substring(0, 5); 
+            } else if (String(rawTime).length >= 5) {
+                rawTime = String(rawTime).substring(0, 5);
+            }
+            document.getElementById('act-time').value = rawTime;
+
+            // 🌟 แยกชั้นกับห้องกลับไปที่ Dropdown 🌟
+            const roomVal = getVal('Room', 'room') || "ทุกห้อง";
+            if(roomVal.includes('/')) {
+                const parts = roomVal.split('/');
+                document.getElementById('act-grade').value = parts[0] || "ทุกห้อง";
+                document.getElementById('act-room-num').value = parts[1] || "ทุกห้อง";
             } else {
                 document.getElementById('act-grade').value = "ทุกห้อง";
                 document.getElementById('act-room-num').value = "ทุกห้อง";
@@ -347,7 +382,7 @@
             body.innerHTML = filtered.map(s => {
                 const sub = db.submissions.find(item => item.student_id == s.student_id && item.activity_id == actId);
                 return `<tr>
-                    <td>${s.student_id}</td><td>${s.number}</td><td>${s.name}</td><td>${s.room}</td>
+                    <td>${s.student_id || '-'}</td><td>${s.number || '-'}</td><td>${s.name || 'นักเรียน'}</td><td>${s.room || '-'}</td>
                     <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ค้างส่ง'}</span></td>
                     <td style="font-weight:bold;">${sub ? (sub.score || '0') : '-'}</td>
                     <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')">ตรวจ</button></td>
@@ -357,12 +392,12 @@
 
         function openGrade(stdId, actId) {
             const std = db.students.find(s => s.student_id == stdId);
-            const act = db.activities.find(a => a.ID == actId);
+            const act = db.activities.find(a => (a.ID || a.id) == actId);
             const sub = db.submissions.find(item => item.student_id == stdId && item.activity_id == actId);
             
-            document.getElementById('grade-student-name').innerText = "นักเรียน: " + std.name;
+            document.getElementById('grade-student-name').innerText = "นักเรียน: " + (std ? std.name : stdId);
             document.getElementById('grade-work-content').innerText = sub ? parseWork(sub.work_content) : "ยังไม่ส่งงาน";
-            document.getElementById('grade-max-points').innerText = act ? act.Points : '-';
+            document.getElementById('grade-max-points').innerText = act ? (act.Points || act.points) : '-';
             document.getElementById('grade-input-score').value = sub ? sub.score : '';
             document.getElementById('gradeModal').classList.add('active');
             window.currentGrading = { stdId, actId };
@@ -370,9 +405,9 @@
 
         function parseWork(content) {
             try {
-                if (content.startsWith('{')) {
+                if (typeof content === 'string' && content.trim().startsWith('{')) {
                     const parsed = JSON.parse(content);
-                    return Object.values(parsed).join('\n');
+                    return Object.values(parsed).join('\n\n');
                 }
             } catch(e) {}
             return content;
