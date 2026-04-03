@@ -232,11 +232,16 @@
         // 🌟 1. ใส่ URL Google Apps Script ของครูตรงนี้ 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
 
-        // --- ฟังก์ชันอัจฉริยะ ป้องกันปัญหาพิมพ์เล็ก-ใหญ่ ใน Google Sheets ---
-        function getVal(obj, key) {
+        // 🌟 ฟังก์ชันอัจฉริยะ ป้องกันปัญหาพิมพ์เล็ก-ใหญ่/เว้นวรรค ใน Google Sheets 🌟
+        function getVal(obj, ...keys) {
             if (!obj) return undefined;
-            const realKey = Object.keys(obj).find(k => k.toLowerCase() === key.toLowerCase());
-            return realKey ? obj[realKey] : undefined;
+            for (let key of keys) {
+                const realKey = Object.keys(obj).find(k => String(k).trim().toLowerCase() === String(key).trim().toLowerCase());
+                if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) {
+                    return obj[realKey];
+                }
+            }
+            return undefined;
         }
 
         // --- ระบบ Theme ---
@@ -265,7 +270,7 @@
                 localStorage.setItem('student_pic', userData.picture);
                 localStorage.setItem('is_logged_in', 'true');
                 closeLoginModal();
-                fetchRealtimeData(); // เรียกดึงข้อมูลสดทันทีที่ล็อกอิน
+                fetchRealtimeData(); 
             } else {
                 alert('ไม่อนุญาตให้อีเมลนี้เข้าสู่ระบบ');
             }
@@ -281,6 +286,7 @@
 
         let db = { activities: [], students: [], submissions: [] };
         
+        // --- 🌟 ดึงข้อมูลสด 100% 🌟 ---
         async function fetchRealtimeData() {
             const email = localStorage.getItem('student_email');
             if (!email) return;
@@ -292,11 +298,10 @@
             container.innerHTML = '<div style="text-align: center; padding: 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin"></i> กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
             
             try {
-                // ดึงฐานข้อมูลใหม่ทุกครั้ง
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
                 db = await res.json();
                 
-                // ส่ง PING เวลาเข้าใช้งาน
+                // ส่ง PING ให้ชีตรู้ว่าล็อกอินเข้ามา
                 fetch(GOOGLE_SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "updateTimestamp", type: "last_login", email: email }) });
 
                 renderDashboard(email);
@@ -310,15 +315,19 @@
             }
         }
 
+        // --- 🌟 จัดการแสดงผลหน้าจอ 🌟 ---
         function renderDashboard(email) {
-            // ดึงประวัตินักเรียนโดยใช้ getVal เพื่อแก้ปัญหาตัวเล็กตัวใหญ่
-            const myData = db.students.find(s => getVal(s, 'email') === email) || {};
+            // ดึงข้อมูลนักเรียนด้วยฟังก์ชันอัจฉริยะ ป้องกันการพิมพ์ผิดในชีต
+            const myData = db.students.find(s => {
+                let sheetEmail = getVal(s, 'email', 'e-mail', 'อีเมล');
+                return sheetEmail && String(sheetEmail).trim().toLowerCase() === email.trim().toLowerCase();
+            }) || {};
             
-            const studentId = getVal(myData, 'student_id') || '-';
-            const room = getVal(myData, 'room') || '-';
-            const number = getVal(myData, 'number') || '-';
-            const name = getVal(myData, 'name') || localStorage.getItem('student_name') || 'นักเรียน';
-            const editDate = getVal(myData, 'last_update') || '-';
+            const studentId = getVal(myData, 'student_id', 'รหัส', 'id') || '-';
+            const room = getVal(myData, 'room', 'ห้อง', 'ชั้น') || '-';
+            const number = getVal(myData, 'number', 'เลขที่', 'no') || '-';
+            const name = getVal(myData, 'name', 'ชื่อ', 'ชื่อ-สกุล') || localStorage.getItem('student_name') || 'นักเรียน';
+            const editDate = getVal(myData, 'last_update', 'อัปเดตล่าสุด') || '-';
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
 
             document.getElementById('profile-name').innerText = name;
@@ -336,39 +345,42 @@
             document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()"><i class="fas fa-sign-out-alt"></i></button></div>`;
 
             const container = document.getElementById('dynamic-modules-container');
+            
+            // เช็คว่ากรอกห้องแล้วหรือยัง
             if (room === '-' || room === '') {
                 container.innerHTML = `<div class="task-card" style="justify-content:center; border-left:4px solid #f59e0b; flex-direction:column; text-align:center;">
                     <i class="fas fa-exclamation-triangle" style="font-size: 2rem; color: #f59e0b; margin-bottom: 10px;"></i>
                     <h3 style="color: #f59e0b;">ยังไม่ได้ระบุห้องเรียน</h3>
-                    <p>กรุณากดปุ่ม <b>"แก้ไขข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุรหัสประจำตัวและห้องเรียนของคุณครับ</p>
+                    <p>กรุณากดปุ่ม <b>"แก้ไขข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุรหัสประจำตัวและห้องเรียนของคุณให้ตรงกับระบบครับ</p>
                 </div>`;
                 return;
             }
 
+            // ดึงกิจกรรมที่ตรงกับห้อง
             const myActivities = db.activities.filter(act => {
-                const targetRoom = getVal(act, 'room') || 'ทุกห้อง';
+                const targetRoom = getVal(act, 'room', 'ห้อง') || 'ทุกห้อง';
                 return targetRoom === 'ทุกห้อง' || targetRoom === room;
             });
 
             if (myActivities.length === 0) {
-                container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนหรือแบบฝึกหัดสำหรับห้อง ${room}</p></div>`;
+                container.innerHTML = `<div class="task-card" style="justify-content:center; opacity:0.7;"><p>ยังไม่มีบทเรียนสำหรับห้อง ${room}</p></div>`;
                 return;
             }
 
             container.innerHTML = '';
             let totalMaxPoints = 0, totalEarned = 0, submittedCount = 0;
-            let gradableCount = myActivities.filter(a => getVal(a, 'type') !== 'content').length;
+            let gradableCount = myActivities.filter(a => getVal(a, 'type', 'ประเภท') !== 'content').length;
             let missingTasks = [];
 
             myActivities.forEach(act => {
-                const actId = getVal(act, 'id');
-                const actType = getVal(act, 'type');
-                const actTitle = getVal(act, 'title');
-                const actPoints = parseInt(getVal(act, 'points') || 0);
-                const actStatusStr = getVal(act, 'status'); 
+                const actId = getVal(act, 'id', 'รหัสงาน');
+                const actType = getVal(act, 'type', 'ประเภท');
+                const actTitle = getVal(act, 'title', 'ชื่อหัวข้อ');
+                const actPoints = parseInt(getVal(act, 'points', 'คะแนนเต็ม') || 0);
+                const actStatusStr = getVal(act, 'status', 'สถานะ'); 
                 
-                // ค้นหาว่าเด็กคนนี้ส่งงานรหัสนี้หรือยัง
-                const submission = db.submissions.find(sub => getVal(sub, 'student_id') == studentId && getVal(sub, 'activity_id') == actId);
+                // ตรวจการส่งงาน
+                const submission = db.submissions.find(sub => getVal(sub, 'student_id', 'รหัส') == studentId && getVal(sub, 'activity_id', 'รหัสงาน') == actId);
                 
                 let isContent = (actType === 'content');
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'งาน';
@@ -377,7 +389,7 @@
 
                 let badgeHtml = '', btnHtml = '', scoreHtml = '';
                 let isClosed = (actStatusStr === 'closed');
-                let linkPath = getVal(act, 'link') || '#';
+                let linkPath = getVal(act, 'link', 'ลิงก์') || '#';
                 if(linkPath !== '#') linkPath += `?actid=${actId}`;
 
                 const btnLocked = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดระบบ</button>`;
@@ -390,7 +402,7 @@
                     
                     if (submission) {
                         submittedCount++;
-                        let subScore = getVal(submission, 'score');
+                        let subScore = getVal(submission, 'score', 'คะแนน');
                         if (subScore !== undefined && subScore !== "") {
                             totalEarned += parseInt(subScore);
                             badgeHtml = `<span class="badge done">⭐ ตรวจแล้ว</span>`;
@@ -409,8 +421,8 @@
                     }
                 }
 
-                let deadlineDate = getVal(act, 'date') || '-';
-                let deadlineTime = getVal(act, 'time') || '-';
+                let deadlineDate = getVal(act, 'date', 'วันที่') || '-';
+                let deadlineTime = getVal(act, 'time', 'เวลา') || '-';
                 if(String(deadlineDate).includes('T')) deadlineDate = String(deadlineDate).split('T')[0];
                 if(String(deadlineTime).includes('T')) deadlineTime = String(deadlineTime).split('T')[1].substring(0,5);
 
@@ -418,7 +430,7 @@
                     <div class="task-card" style="border-left: 5px solid ${isClosed ? '#ef4444' : tColor};">
                         <div class="task-info">
                             <h4 style="color:${isClosed ? '#ef4444' : tColor};">${tIcon} ${actTitle}</h4>
-                            <p style="font-size:0.85rem; opacity:0.8;">${getVal(act, 'desc') || getVal(act, 'description') || ''}</p>
+                            <p style="font-size:0.85rem; opacity:0.8;">${getVal(act, 'desc', 'description', 'รายละเอียด') || ''}</p>
                             <small style="color:${tColor}; display:block; margin-top:5px;"><i class="far fa-clock"></i> กำหนดส่ง: ${deadlineDate} | ${deadlineTime}</small>
                         </div>
                         <div class="task-meta">${badgeHtml}${scoreHtml}<div style="margin-top:8px;">${btnHtml}</div></div>
@@ -439,6 +451,7 @@
             }
         }
 
+        // --- 🌟 บันทึกข้อมูลส่วนตัว 🌟 ---
         function openEditProfileModal() {
             const email = localStorage.getItem('student_email');
             const myData = db.students.find(s => getVal(s, 'email') === email) || {};
@@ -472,15 +485,16 @@
 
             fetch(GOOGLE_SCRIPT_URL, {
                 method: 'POST',
-                mode: 'no-cors', // 🌟 ป้องกัน CORS Block
+                mode: 'no-cors', // สำคัญ! ให้ส่งได้โดยไม่ติดบล็อก
                 body: JSON.stringify({ action: "updateProfile", email: email, student_id: studentId, name: name, room: room, number: number })
             }).then(() => {
                 document.getElementById('saving-status').innerHTML = '✅ บันทึกสำเร็จ!';
+                // หน่วงเวลา 1.5 วินาที ให้ Google Sheets เซฟเสร็จ ก่อนจะโหลดมาโชว์ใหม่
                 setTimeout(() => {
                     closeEditProfileModal(); 
                     document.getElementById('saving-status').style.display = 'none';
                     fetchRealtimeData(); 
-                }, 1000);
+                }, 1500);
             });
         }
 
