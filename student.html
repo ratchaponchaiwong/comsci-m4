@@ -28,7 +28,7 @@
         .option-label { font-weight: 800; color: #ff6600; width: 25px; }
         body[data-theme="snow"] .option.selected .option-label, body[data-theme="love"] .option.selected .option-label { color: #fff; }
         .btn-main { background: #3b82f6; color: white; border: none; padding: 18px; border-radius: 50px; width: 100%; cursor: pointer; font-weight: bold; font-size:1.1rem; }
-        .progress-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; z-index: 1000; }
+        .progress-bar { position: fixed; bottom: 0; left: 0; width: 100%; background: rgba(0,0,0,0.8); padding: 10px; display: flex; flex-wrap: wrap; gap: 5px; justify-content: center; }
         .dot { width: 30px; height: 30px; border-radius: 50%; background: #333; color: white; font-size: 0.7rem; display: flex; align-items: center; justify-content: center; cursor: pointer; }
         .dot.active { background: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.5); }
     </style>
@@ -69,13 +69,10 @@
     <div class="progress-bar" id="dotsArea" style="display:none;"></div>
 
     <script>
-        // 🌟 ใส่ URL ของครูตรงนี้ 🌟
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
         const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
-        
         let examStarted = false, canBan = false, userIP = "unknown", drawn = [], ans = [], timerHandle, timeLeft = 2400;
 
-        // คลังข้อสอบ 100 ข้อ
         const bank = [
             { "id": 1, "question": "ข้อใดอธิบายหน้าที่ของระบบรับรู้ (Perception) ในหุ่นยนต์ได้ถูกต้องที่สุด", "options": ["ทำหน้าที่รับข้อมูลจากสภาพแวดล้อมผ่านเซนเซอร์", "ทำหน้าที่จัดเก็บข้อมูลการทำงาน", "ทำหน้าที่ควบคุมแรงบิดของมอเตอร์", "ทำหน้าที่แปลงโปรแกรมเป็นคำสั่งเครื่อง"] },
             { "id": 2, "question": "ส่วนใดของหุ่นยนต์มีหน้าที่วิเคราะห์ข้อมูลและตัดสินใจเลือกการทำงาน", "options": ["ระบบกลไกขับเคลื่อน", "แหล่งจ่ายพลังงาน", "ระบบการคิดวิเคราะห์ (Cognition)", "ระบบรับรู้"] },
@@ -177,7 +174,7 @@
             { "id": 98, "question": "แนวคิดขยายระบบได้ของ ESP-NOW คือข้อใด", "options": ["ลดจำนวนบอร์ดเป็นศูนย์", "ใช้บอร์ดเดียวแทนทุกอย่าง", "เพิ่มจำนวนบอร์ดให้สื่อสารได้หลายตัว", "ปิดการสื่อสาร"] },
             { "id": 99, "question": "บทบาทการสื่อสารในระบบหุ่นยนต์และ IoT คือข้อใด", "options": ["ทำให้อุปกรณ์แลกเปลี่ยนข้อมูลและควบคุมกันได้", "ทำให้มอเตอร์หมุนโดยไม่ใช้ไฟ", "ทำให้เซนเซอร์ไม่ต้องต่อ", "ทำให้โปรแกรมไม่มีเงื่อนไข"] },
             { "id": 100, "question": "ตัวย่อใดมักใช้ร่วมกับคำว่า Broker", "options": ["GPS", "PWM", "I2C", "MQTT"] }
-        ];
+        ]; 
 
         function startExam() {
             if(!confirm("⚠️ ข้อตกลงก่อนสอบ: \nห้ามกดออกจากแอป ห้ามย่อหน้าต่าง ห้ามกดปุ่มย้อนกลับกลับ(Back) บนมือถือ\nหากฝ่าฝืนสิทธิ์การสอบจะถูกระงับและหมดสิทธิ์สอบทันที!")) return;
@@ -254,6 +251,7 @@
             examStarted = false; 
             clearInterval(timerHandle);
             
+            // ล็อกประวัติในเครื่องทันที
             localStorage.setItem('is_banned', 'true');
             
             const sid = localStorage.getItem(localStorage.getItem('student_email') + '_studentid');
@@ -305,46 +303,18 @@
             const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
             
             try {
-                // 1. ตรวจคำตอบ
                 const res = await fetch(VALIDATOR_URL, {
                     method: 'POST', 
                     body: JSON.stringify({action: "evaluate", answers: data})
                 }).then(r => r.json());
                 
-                // 2. เตรียมข้อมูล (รวมชื่อนักเรียนด้วย)
-                const email = localStorage.getItem('student_email');
-                const sid = localStorage.getItem(email + '_studentid');
-                const sname = localStorage.getItem('student_name'); // 🌟 ดึงชื่อนักเรียนมาด้วย
-                
+                const sid = localStorage.getItem(localStorage.getItem('student_email') + '_studentid');
                 const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
                 const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
                 
-                // 3. ส่งข้อมูล + ชื่อนักเรียน ไปบันทึกลง Sheet
-                await fetch(MAIN_URL, {
-                    method:'POST', 
-                    mode:'no-cors', 
-                    body:JSON.stringify({
-                        action:"submitWork", 
-                        student_id: sid, 
-                        student_name: sname, 
-                        activity_id: actId, 
-                        work_content: log
-                    })
-                });
+                await fetch(MAIN_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:"submitWork", student_id:sid, activity_id:actId, work_content:log})});
+                await fetch(MAIN_URL, {method:'POST', mode:'no-cors', body:JSON.stringify({action:"saveScore", student_id:sid, activity_id:actId, score:res.finalScore})});
                 
-                await fetch(MAIN_URL, {
-                    method:'POST', 
-                    mode:'no-cors', 
-                    body:JSON.stringify({
-                        action:"saveScore", 
-                        student_id: sid, 
-                        student_name: sname, 
-                        activity_id: actId, 
-                        score: res.finalScore
-                    })
-                });
-                
-                // 4. แสดงผล
                 document.getElementById('screenExam').style.display = 'none';
                 document.getElementById('dotsArea').style.display = 'none';
                 document.getElementById('screenResult').style.display = 'block';
@@ -374,6 +344,7 @@
             document.getElementById('uName').innerText = "👤 ผู้สอบ: " + localStorage.getItem('student_name');
             document.getElementById('uId').innerText = "🆔 รหัสประจำตัว: " + sid;
             
+            // วาดลายน้ำ
             const wm = document.getElementById('watermark');
             const txt = localStorage.getItem('student_name') + " (" + sid + ")";
             for(let i=0; i<15; i++) {
@@ -383,6 +354,7 @@
                 wm.appendChild(div);
             }
             
+            // เช็คว่ามีประวัติโดนแบนในระบบเซิร์ฟเวอร์ไหม
             try {
                 const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}`).then(r=>r.json());
                 if(res.banned) {
