@@ -4,53 +4,89 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>ข้อมูลผู้สอน | PROT Smart Workspace</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; min-height: 100vh; color: white; }
-        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); }
-        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: -1; pointer-events: none; }
-        .circle { position: absolute; border-radius: 50%; animation: float 20s infinite ease-in-out; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); }
-        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
-        .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; min-height: 100vh; display: flex; flex-direction: column; cursor: default; }
         
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        .logo { font-size: 1.5rem; font-weight: 700; color: #60a5fa; text-decoration: none; display: flex; align-items: center; gap: 10px;}
-        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
-        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; }
-        .nav-links a:hover, .nav-links a.active { color: #60a5fa; background: rgba(59,130,246,0.1); }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
+        .bg-animation .circle:nth-child(1) { width: 500px; height: 500px; top: -150px; left: -150px; animation-duration: 25s; }
         
-        .container { max-width: 800px; margin: 40px auto; padding: 20px; text-align: center; }
-        .glass-card { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(12px); border-radius: 20px; padding: 40px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.2); }
-        .profile-img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 4px solid #60a5fa; margin-bottom: 20px; box-shadow: 0 5px 15px rgba(59,130,246,0.4); }
-        .bio-text { font-size: 1rem; line-height: 1.8; color: #cbd5e1; white-space: pre-wrap; margin-bottom: 30px; text-align: left; background: rgba(0,0,0,0.2); padding: 20px; border-radius: 15px; }
-        .yt-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 15px; overflow: hidden; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; flex: 1; }
+        
+        header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px;}
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 10px;}
+        
+        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; flex-wrap: wrap;}
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; font-size: 0.95rem;}
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        .nav-links a:hover, .nav-links a.active { color: #fff; background: #3b82f6; }
+
+        .page-content-wrapper { padding: 40px 20px; max-width: 900px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; align-items: center;}
+        
+        .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 30px; padding: 50px 40px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 15px 40px rgba(0,0,0,0.2); width: 100%; text-align: center; color: inherit; animation: fadeInUp 0.6s ease-out;}
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 15px 40px rgba(0,0,0,0.05); }
+        @keyframes fadeInUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+
+        .profile-img { width: 180px; height: 180px; border-radius: 50%; object-fit: cover; border: 4px solid #60a5fa; margin: 0 auto 25px auto; box-shadow: 0 10px 25px rgba(59,130,246,0.3); transition: 0.3s; }
+        .glass-card:hover .profile-img { transform: scale(1.05) rotate(3deg); }
+        
+        .teacher-name { color: #60a5fa; font-size: 2.2rem; margin-bottom: 25px; font-weight: 800; }
+        body[data-theme="snow"] .teacher-name, body[data-theme="love"] .teacher-name { color: #3b82f6; }
+        
+        .bio-text { font-size: 1.05rem; line-height: 1.8; opacity: 0.9; white-space: pre-wrap; text-align: left; background: rgba(0,0,0,0.2); padding: 30px; border-radius: 20px; border: 1px solid rgba(255,255,255,0.05); margin-bottom: 30px;}
+        body[data-theme="snow"] .bio-text, body[data-theme="love"] .bio-text { background: rgba(0,0,0,0.05); border-color: rgba(0,0,0,0.05); }
+        
+        .yt-container { position: relative; padding-bottom: 56.25%; height: 0; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1);}
         .yt-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; }
+
+        footer { text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; font-size: 0.85rem; opacity: 0.8; }
+        body[data-theme="snow"] footer, body[data-theme="love"] footer { border-top-color: rgba(0,0,0,0.1); }
     </style>
 </head>
 <body data-theme="default">
-    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
-    
-    <header>
-        <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
-        <ul class="nav-links">
-            <li><a href="index.html">หน้าหลัก</a></li>
-            <li><a href="student.html">ห้องเรียนของฉัน</a></li>
-            <li><a href="teacher_profile.html" class="active">ข้อมูลผู้สอน</a></li>
-            <li><a href="student_portfolio.html">ผลงานนักเรียน</a></li>
-        </ul>
-    </header>
+    <div class="bg-animation"><div class="circle"></div></div>
 
-    <div class="container">
-        <div id="loading" style="font-size: 1.2rem; color: #60a5fa;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูลครูผู้สอน...</div>
-        <div id="content" style="display: none;"></div>
+    <div class="content-layer">
+        <header>
+            <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
+            <ul class="nav-links">
+                <li><a href="index.html">หน้าหลัก</a></li>
+                <li><a href="student.html">ห้องเรียนของฉัน</a></li>
+                <li><a href="teacher_profile.html" class="active">ข้อมูลผู้สอน</a></li>
+            </ul>
+        </header>
+
+        <div class="page-content-wrapper">
+            <div id="loading" style="font-size: 1.2rem; opacity: 0.8; padding: 60px;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูลครูผู้สอน...</div>
+            <div id="content" style="display: none; width: 100%;"></div>
+        </div>
+
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</p>
+        </footer>
     </div>
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         window.onload = async () => {
+            document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getCMS&t=" + Date.now());
                 const data = await res.json();
@@ -63,14 +99,16 @@
                 let ytHtml = '';
                 if(t.yt) {
                     let ytUrl = t.yt.replace("watch?v=", "embed/").split("&")[0];
-                    ytHtml = `<h3 style="color:#60a5fa; margin-bottom:15px; text-align:left;"><i class="fab fa-youtube"></i> วิดีโอแนะนำตัว/รายวิชา</h3>
-                              <div class="yt-container"><iframe src="${ytUrl}" allowfullscreen></iframe></div>`;
+                    ytHtml = `
+                        <h3 style="color:inherit; margin-bottom:15px; text-align:left; font-size: 1.3rem;"><i class="fab fa-youtube" style="color:#ef4444;"></i> วิดีโอแนะนำตัว</h3>
+                        <div class="yt-container"><iframe src="${ytUrl}" allowfullscreen></iframe></div>
+                    `;
                 }
 
                 document.getElementById('content').innerHTML = `
                     <div class="glass-card">
                         <img src="${img}" class="profile-img" alt="Teacher">
-                        <h2 style="color: #60a5fa; font-size: 2rem; margin-bottom: 20px;">${name}</h2>
+                        <h2 class="teacher-name">${name}</h2>
                         <div class="bio-text">${bio}</div>
                         ${ytHtml}
                     </div>
@@ -78,7 +116,7 @@
                 document.getElementById('loading').style.display = 'none';
                 document.getElementById('content').style.display = 'block';
             } catch(e) {
-                document.getElementById('loading').innerHTML = '<span style="color:#ef4444;">⚠️ ไม่สามารถดึงข้อมูลได้ในขณะนี้</span>';
+                document.getElementById('loading').innerHTML = '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> ไม่สามารถดึงข้อมูลได้ในขณะนี้</span>';
             }
         };
     </script>
