@@ -4,49 +4,91 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>วิชาเพิ่มเติม | PROT Smart Workspace</title>
+    
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; min-height: 100vh; color: white; background: #0f172a; }
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
-        .logo { font-size: 1.5rem; font-weight: 700; color: #60a5fa; text-decoration: none; display: flex; align-items: center; gap: 10px;}
-        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; }
-        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; }
-        .nav-links a:hover, .nav-links a.active { color: #10b981; background: rgba(16,185,129,0.1); }
+        body { font-family: 'Prompt', 'Inter', sans-serif; transition: background 0.5s ease; min-height: 100vh; display: flex; flex-direction: column; cursor: default;}
         
-        .container { max-width: 1200px; margin: 40px auto; padding: 20px; }
-        .header-title { text-align: center; margin-bottom: 40px; color: #10b981; font-size: 2.2rem; }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
+        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
+        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
+        @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 50% { transform: translateY(-20px) scale(1.05); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
-        .subj-card { background: rgba(30, 41, 59, 0.7); border-radius: 20px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); transition: 0.3s; border-top: 5px solid #10b981;}
-        .subj-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(16,185,129,0.2); }
-        .subj-img { width: 100%; height: 180px; object-fit: cover; background: #1e293b; }
+        .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; flex: 1; }
+        
+        header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); position: sticky; top: 0; z-index: 100; flex-wrap: wrap; gap: 15px;}
+        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
+        .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 10px;}
+        
+        .nav-links { display: flex; gap: 20px; list-style: none; align-items: center; flex-wrap: wrap;}
+        .nav-links a { text-decoration: none; color: #e2e8f0; font-weight: 500; transition: 0.3s; padding: 8px 15px; border-radius: 30px; font-size: 0.95rem;}
+        body[data-theme="snow"] .nav-links a, body[data-theme="love"] .nav-links a { color: #2d3748; }
+        .nav-links a:hover, .nav-links a.active { color: #fff; background: #3b82f6; }
+
+        .page-content-wrapper { padding: 40px 20px; max-width: 1200px; margin: 0 auto; width: 100%; flex: 1; display: flex; flex-direction: column; gap: 30px; }
+        
+        .section-title { font-size: 1.8rem; font-weight: 700; color: #60a5fa; margin-bottom: 20px; text-align: center;}
+        body[data-theme="snow"] .section-title, body[data-theme="love"] .section-title { color: #3b82f6; }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 30px; }
+        
+        .subj-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid rgba(255,255,255,0.1); overflow: hidden; transition: 0.3s; box-shadow: 0 10px 30px rgba(0,0,0,0.15); border-top: 5px solid #3b82f6; cursor: pointer;}
+        body[data-theme="snow"] .subj-card, body[data-theme="love"] .subj-card { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
+        .subj-card:hover { transform: translateY(-8px); box-shadow: 0 15px 30px rgba(0,0,0,0.25); border-color: #60a5fa; }
+        
+        .subj-img { width: 100%; height: 180px; object-fit: cover; background: rgba(0,0,0,0.2); }
         .subj-info { padding: 25px; }
-        .subj-code { background: rgba(16,185,129,0.2); color: #10b981; padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 15px; }
-        .subj-title { font-size: 1.3rem; font-weight: 700; color: white; line-height: 1.4; }
+        
+        .subj-code { background: rgba(59,130,246,0.2); color: #60a5fa; padding: 6px 15px; border-radius: 20px; font-size: 0.85rem; font-weight: bold; display: inline-block; margin-bottom: 15px; border: 1px solid rgba(59,130,246,0.3); }
+        body[data-theme="snow"] .subj-code, body[data-theme="love"] .subj-code { color: #3b82f6; }
+        
+        .subj-title { font-size: 1.25rem; font-weight: 700; line-height: 1.4; color: inherit; }
+
+        footer { text-align: center; padding: 25px; border-top: 1px solid rgba(255,255,255,0.1); margin-top: auto; font-size: 0.85rem; opacity: 0.8; }
+        body[data-theme="snow"] footer, body[data-theme="love"] footer { border-top-color: rgba(0,0,0,0.1); }
     </style>
 </head>
-<body>
-    <header>
-        <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
-        <ul class="nav-links">
-            <li><a href="index.html">หน้าหลัก</a></li>
-            <li><a href="student.html">ห้องเรียนของฉัน</a></li>
-            <li><a href="extra_subjects.html" class="active">วิชาเพิ่มเติม</a></li>
-        </ul>
-    </header>
+<body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
 
-    <div class="container">
-        <h2 class="header-title"><i class="fas fa-book"></i> รายวิชาเพิ่มเติมที่เปิดสอน</h2>
-        <div id="loading" style="text-align: center; font-size: 1.2rem; color: #10b981;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</div>
-        <div class="grid" id="subjects-grid"></div>
+    <div class="content-layer">
+        <header>
+            <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
+            <ul class="nav-links">
+                <li><a href="index.html">หน้าหลัก</a></li>
+                <li><a href="student.html">ห้องเรียนของฉัน</a></li>
+                <li><a href="extra_subjects.html" class="active">วิชาเพิ่มเติม</a></li>
+            </ul>
+        </header>
+
+        <div class="page-content-wrapper">
+            <h2 class="section-title"><i class="fas fa-book"></i> รายวิชาเพิ่มเติมที่เปิดสอน</h2>
+            <div id="loading" style="text-align: center; font-size: 1.2rem; opacity: 0.8; padding: 40px;"><i class="fas fa-spinner fa-spin"></i> กำลังโหลดข้อมูล...</div>
+            <div class="grid" id="subjects-grid"></div>
+        </div>
+
+        <footer>
+            <p><i class="fas fa-copyright"></i> 2026 ห้องเรียนวิทยาการคำนวณ By ครูรัชพล</p>
+        </footer>
     </div>
 
     <script>
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         window.onload = async () => {
+            document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
             try {
                 const res = await fetch(GOOGLE_SCRIPT_URL + "?action=getCMS&t=" + Date.now());
                 const data = await res.json();
@@ -54,7 +96,7 @@
                 const grid = document.getElementById('subjects-grid');
                 
                 if(subjs.length === 0) {
-                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; color:#94a3b8; font-size:1.1rem;">ยังไม่มีการเปิดสอนวิชาเพิ่มเติมในขณะนี้</div>';
+                    grid.innerHTML = '<div style="grid-column: 1/-1; text-align:center; opacity:0.7; padding: 40px;">ยังไม่มีการเปิดสอนวิชาเพิ่มเติมในขณะนี้</div>';
                 } else {
                     grid.innerHTML = subjs.map(s => `
                         <div class="subj-card">
@@ -68,7 +110,7 @@
                 }
                 document.getElementById('loading').style.display = 'none';
             } catch(e) {
-                document.getElementById('loading').innerHTML = '<span style="color:#ef4444;">⚠️ ไม่สามารถดึงข้อมูลได้ในขณะนี้</span>';
+                document.getElementById('loading').innerHTML = '<span style="color:#ef4444;"><i class="fas fa-exclamation-triangle"></i> ไม่สามารถดึงข้อมูลได้ในขณะนี้</span>';
             }
         };
     </script>
