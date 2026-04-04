@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>ระบบทดสอบออนไลน์ | PROT Smart Workspace</title>
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; min-height: 100vh; user-select: none; }
+        .qcard { margin: 20px auto; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); max-width: 800px;}
+        .btn-main { background: #3b82f6; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 1.1rem; cursor: pointer; transition: 0.3s; font-weight: bold;}
+        .btn-main:disabled { background: #475569; cursor: not-allowed; }
+        
+        .option { padding: 15px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.2); margin-top: 10px; cursor: pointer; transition: 0.2s; display:flex; gap:10px; }
+        .option.selected { background: #3b82f6; border-color: #60a5fa; }
+        
+        .countdown-box { font-size: 2.5rem; font-weight: bold; color: #f59e0b; margin: 20px 0; text-shadow: 0 0 15px rgba(245,158,11,0.5); }
+    </style>
+</head>
+<body>
+
+    <header style="background: rgba(0,0,0,0.5); padding: 15px 20px; display: flex; justify-content: space-between; position: sticky; top:0; z-index:100;">
+        <div style="font-weight: 800; color: #60a5fa;"><i class="fas fa-robot"></i> PROT EXAM</div>
+        <div id="exam-timer" style="color: #ff6600; font-weight: bold;">--:--:--</div>
+    </header>
+
+    <div style="padding: 20px;">
+        <div class="qcard" id="screenStart" style="text-align: center;">
+            <h1 id="eTitle" style="color:#60a5fa; margin-bottom: 10px;">กำลังโหลดข้อมูล...</h1>
+            <p id="eMeta" style="opacity:0.8; margin-bottom: 20px;">กรุณารอสักครู่</p>
+            
+            <div id="countdown-area" style="display:none;">
+                <p>ระบบจะเปิดให้ทำข้อสอบในอีก</p>
+                <div class="countdown-box" id="cd-timer">00:00:00</div>
+            </div>
+
+            <button class="btn-main" id="btnBegin" style="display:none;" onclick="startExam()">เริ่มทำข้อสอบ</button>
+        </div>
+
+        <div id="screenExam" style="display:none; padding-bottom: 50px;">
+            <div id="questionArea"></div>
+            <button class="btn-main" style="background:#10b981; margin-top: 30px;" onclick="submitExam()">ส่งข้อสอบ</button>
+        </div>
+
+        <div class="qcard" id="screenResult" style="display:none; text-align: center;">
+            <h2>คะแนนที่ได้</h2>
+            <div id="scoreDisplay" style="font-size: 4rem; color:#10b981; margin: 20px 0; font-weight:bold;">0</div>
+            <button class="btn-main" onclick="window.location.href='student.html'">กลับห้องเรียน</button>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "https://script.google.com/macros/s/AKfycbw9pnMjkHA9233qQERlcmHqrmsOjQMDSIUGybkEyKq0z64C-i1m5p5aVGm34-a1PuV-Xw/exec"; // ของครู
+        let examConfig, examData = [], userAnswers = [];
+        let waitInterval, examInterval, examTimeLeft;
+
+        async function fetchExam() {
+            const actId = new URLSearchParams(window.location.search).get('actid');
+            if(!actId) return alert("ไม่พบรหัสวิชา");
+
+            const res = await fetch(`${API_URL}?action=getExamConfig&actid=${actId}`).then(r=>r.json());
+            if(res.error) {
+                document.getElementById('eTitle').innerText = "ไม่พบข้อสอบ";
+                document.getElementById('eMeta').innerText = "ครูยังไม่ได้เพิ่มข้อสอบเข้าระบบ";
+                return;
+            }
+
+            examConfig = res.config;
+            examData = res.questions;
+            userAnswers = new Array(examData.length).fill(null);
+
+            document.getElementById('eTitle').innerText = examConfig.title;
+            document.getElementById('eMeta').innerText = `ข้อสอบ ${examData.length} ข้อ | คะแนนเต็ม ${examConfig.totalScore}`;
+
+            checkTimeLogic();
+        }
+
+        function checkTimeLogic() {
+            const now = Date.now();
+            
+            // หมดเวลา
+            if (examConfig.endTime && now > examConfig.endTime) {
+                document.getElementById('eTitle').innerText = "หมดเวลาการทำข้อสอบ";
+                document.getElementById('eMeta').innerText = "ไม่สามารถทำข้อสอบชุดนี้ได้แล้ว";
+                return;
+            }
+
+            // ยังไม่ถึงเวลาเปิดสอบ -> โชว์ Countdown
+            if (examConfig.startTime && now < examConfig.startTime) {
+                document.getElementById('countdown-area').style.display = 'block';
+                waitInterval = setInterval(() => {
+                    let diff = examConfig.startTime - Date.now();
+                    if(diff <= 0) {
+                        clearInterval(waitInterval);
+                        document.getElementById('countdown-area').style.display = 'none';
+                        document.getElementById('btnBegin').style.display = 'block';
+                    } else {
+                        let h = Math.floor((diff % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                        let m = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
+                        let s = Math.floor((diff % (1000 * 60)) / 1000);
+                        document.getElementById('cd-timer').innerText = `${String(h).padStart(2,'0')}:${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                    }
+                }, 1000);
+            } else {
+                // อยู่ในเวลาสอบ
+                document.getElementById('btnBegin').style.display = 'block';
+            }
+        }
+
+        function startExam() {
+            if(!confirm("ห้ามออกหรือสลับหน้าต่างระหว่างสอบเด็ดขาด! ยืนยันการเริ่มสอบ?")) return;
+            
+            document.getElementById('screenStart').style.display = 'none';
+            document.getElementById('screenExam').style.display = 'block';
+            
+            const area = document.getElementById('questionArea');
+            examData.forEach((q, i) => {
+                let mediaHtml = q.media ? `<img src="${q.media}" style="max-width:100%; border-radius:10px; margin-bottom:15px;">` : '';
+                let optsHtml = q.options.map((opt, oIdx) => `
+                    <div class="option" onclick="selectAnswer(this, ${i}, ${oIdx+1})">
+                        <b>${oIdx+1}.</b> ${opt}
+                    </div>
+                `).join('');
+
+                area.innerHTML += `
+                    <div class="qcard">
+                        <p style="font-weight:bold; font-size:1.1rem; margin-bottom:15px;">ข้อ ${i+1}. ${q.question}</p>
+                        ${mediaHtml}
+                        ${optsHtml}
+                    </div>
+                `;
+            });
+
+            // ระบบนับเวลาสอบ (คำนวณจาก EndTime ถ้ามี)
+            examTimeLeft = examConfig.endTime ? Math.floor((examConfig.endTime - Date.now()) / 1000) : 3600; // Default 1 ชั่วโมง
+            examInterval = setInterval(() => {
+                examTimeLeft--;
+                let m = Math.floor(examTimeLeft / 60);
+                let s = examTimeLeft % 60;
+                document.getElementById('exam-timer').innerText = `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
+                if(examTimeLeft <= 0) submitExam();
+            }, 1000);
+        }
+
+        function selectAnswer(el, qIdx, ansIdx) {
+            let siblings = el.parentElement.querySelectorAll('.option');
+            siblings.forEach(s => s.classList.remove('selected'));
+            el.classList.add('selected');
+            userAnswers[qIdx] = { row: examData[qIdx].row, ansIdx: ansIdx };
+        }
+
+        async function submitExam() {
+            clearInterval(examInterval);
+            document.getElementById('screenExam').style.display = 'none';
+            
+            // ตัดข้อที่ไม่ได้ตอบออก
+            let answersToSend = userAnswers.filter(a => a !== null);
+
+            const res = await fetch(API_URL, {
+                method: 'POST',
+                body: JSON.stringify({ action: "evaluateExam", answers: answersToSend })
+            }).then(r=>r.json());
+
+            document.getElementById('screenResult').style.display = 'block';
+            document.getElementById('scoreDisplay').innerText = `${res.score} / ${examConfig.totalScore}`;
+            
+            // ... ระบบส่งข้อมูลกลับไปเซฟหน้าหลัก (เหมือนของเดิม) ...
+        }
+
+        window.onload = fetchExam;
+    </script>
+</body>
+</html>
