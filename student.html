@@ -322,15 +322,37 @@
         }
         function handleCredentialResponse(response) {
             const userData = decodeJwtResponse(response.credential);
-            if (userData.email.endsWith('@gmail.com') || userData.email.endsWith('@prot.ac.th')) {
-                localStorage.setItem('student_email', userData.email);
-                localStorage.setItem('student_name', userData.name); 
+            const userEmail = userData.email;
+
+            // 🌟 1. ดักจับอีเมลของครู (Admin) 🌟
+            // ครูสามารถเพิ่มอีเมลแอดมินของครูลงในวงเล็บนี้ได้เลยครับ
+            const adminEmails = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com']; 
+            
+            if (adminEmails.includes(userEmail)) {
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userEmail);
                 localStorage.setItem('student_pic', userData.picture);
                 localStorage.setItem('is_logged_in', 'true');
+                
+                alert('ยินดีต้อนรับเข้าสู่ระบบจัดการของผู้สอนครับ');
+                window.location.href = 'teacher_dashboard.html'; // เด้งไปหน้า Admin ทันที
+                return;
+            }
+
+            // 🌟 2. ถ้าเป็นอีเมลนักเรียนปกติ 🌟
+            if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
+                localStorage.setItem('student_name', userData.name);
+                localStorage.setItem('student_email', userEmail);
+                localStorage.setItem('student_pic', userData.picture);
+                localStorage.setItem('is_logged_in', 'true');
+                
                 closeLoginModal();
-                fetchRealtimeData(); 
+                // สั่งอัปเดตหน้าตาเว็บของแต่ละหน้า
+                if (typeof updateLoginUI === "function") updateLoginUI(userData.name, userData.picture);
+                if (typeof fetchRealtimeData === "function") fetchRealtimeData();
+                if (typeof loadOutfit === "function") loadOutfit();
             } else {
-                alert('ไม่อนุญาตให้อีเมลนี้เข้าสู่ระบบ');
+                alert('❌ อีเมลนี้ไม่ได้รับอนุญาตให้เข้าสู่ระบบ');
             }
         }
         function logout() {
