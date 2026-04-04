@@ -27,7 +27,6 @@
         
         .content-layer { position: relative; z-index: 10; display: flex; flex-direction: column; flex: 1; }
         
-        /* ==================== Header ==================== */
         header { background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(12px); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 100; border-bottom: 1px solid rgba(255,255,255,0.1); flex-wrap: wrap; gap: 15px;}
         body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.6); border-bottom-color: rgba(0,0,0,0.1); }
         .logo { font-size: 1.5rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; display: flex; align-items: center; gap: 12px;}
@@ -250,7 +249,6 @@
     </div>
 
     <script>
-        // 🌟 ตั้งค่า URL 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
 
@@ -265,6 +263,41 @@
                 if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) return obj[realKey];
             }
             return undefined;
+        }
+
+        // 🌟 ฟังก์ชันเช็คการหมดเวลา (อัจฉริยะ) 🌟
+        function isDeadlinePassed(act) {
+            let status = getVal(act, 'status', 'สถานะ');
+            if (status === 'closed') return true; // ถ้าครูปิดเองให้ถือว่าหมดเวลา
+
+            let rawDate = getVal(act, 'date', 'วันที่');
+            let rawTime = getVal(act, 'time', 'เวลา');
+            
+            if (!rawDate || String(rawDate).trim() === '-' || String(rawDate).trim() === '') return false;
+
+            let dStr = String(rawDate);
+            if (dStr.includes('T')) dStr = dStr.split('T')[0]; // ดึงเฉพาะ YYYY-MM-DD
+
+            let tStr = '23:59:59';
+            if (rawTime && String(rawTime).trim() !== '-' && String(rawTime).trim() !== '') {
+                let tmp = String(rawTime);
+                if (tmp.includes('T')) {
+                    // ถ้า Sheet แปลงเป็น Time Object (UTC) ให้ดึงชั่วโมง/นาทีออกมาตรงๆ
+                    let dObj = new Date(tmp);
+                    let hh = String(dObj.getHours()).padStart(2, '0');
+                    let mm = String(dObj.getMinutes()).padStart(2, '0');
+                    tStr = `${hh}:${mm}:00`;
+                } else {
+                    tStr = tmp.trim();
+                    if (tStr.split(':').length === 2) tStr += ':00';
+                }
+            }
+
+            // คำนวณเป็นเวลาปัจจุบันของเครื่องนักเรียน
+            let deadlineTime = new Date(`${dStr}T${tStr}`);
+            if (isNaN(deadlineTime.getTime())) return false; // ถ้าใส่ผิดฟอร์แมต ให้ปล่อยผ่าน
+            
+            return Date.now() > deadlineTime.getTime();
         }
 
         function applyTheme(themeKey) {
@@ -437,18 +470,13 @@
                 return;
             }
 
-            // 🌟 อัปเกรดระบบกรองห้องเรียนอัจฉริยะ (Smart Room Filter) 🌟
             const myActivities = db.activities.filter(act => {
                 let targetRoom = String(getVal(act, 'room', 'ห้อง', 'ชั้น') || 'ทุกห้อง').trim();
                 let currentRoom = String(room).trim();
                 
-                // 1. ถ้าครูสั่ง "ทุกห้อง" (ทุกระดับชั้น)
                 if (targetRoom === 'ทุกห้อง' || targetRoom === '' || targetRoom === 'all') return true;
-                
-                // 2. ถ้าครูระบุห้องตรงเป๊ะ (เช่น "ม.4/1")
                 if (targetRoom === currentRoom) return true;
                 
-                // 3. ถ้าครูสั่งแบบเหมาชั้น (เช่น "ม.4/ทุกห้อง")
                 if (targetRoom.includes('ทุกห้อง') || targetRoom.includes('all')) {
                     let targetGrade = targetRoom.split('/')[0].trim();
                     let myGrade = currentRoom.split('/')[0].trim();
@@ -473,7 +501,6 @@
                 const actType = getVal(act, 'type', 'ประเภท');
                 const actTitle = getVal(act, 'title', 'ชื่อหัวข้อ');
                 const actPoints = parseInt(getVal(act, 'points', 'คะแนนเต็ม') || 0);
-                const actStatusStr = getVal(act, 'status', 'สถานะ'); 
                 
                 const submission = db.submissions.find(sub => getVal(sub, 'student_id', 'รหัส') == studentId && getVal(sub, 'activity_id', 'รหัสงาน') == actId);
                 
@@ -486,11 +513,13 @@
                 else if(actType === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
                 else if(isExam) { tColor = '#f97316'; tIcon = '🎯'; tName = 'แบบทดสอบ'; } 
 
+                // 🌟 ประมวลผลล็อกปุ่มอัตโนมัติ ถ้าเลยเวลา 🌟
+                let isClosed = isDeadlinePassed(act);
+
                 let badgeHtml = '', btnHtml = '', scoreHtml = '';
-                let isClosed = (actStatusStr === 'closed');
                 if(linkPath !== '#') linkPath += `?actid=${actId}`;
 
-                const btnLocked = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> ปิดระบบ</button>`;
+                const btnLocked = `<button class="btn-action btn-locked" disabled><i class="fas fa-lock"></i> หมดเวลา</button>`;
 
                 if (isContent) {
                     badgeHtml = `<span class="badge" style="background:${tColor}33; color:${tColor}; border:1px solid ${tColor}80;">${tIcon} ${tName}</span>`;
@@ -519,13 +548,18 @@
                         }
                     } else {
                         missingTasks.push(actTitle);
-                        badgeHtml = `<span class="badge pending">⏳ ค้างส่ง</span>`;
                         scoreHtml = `<div style="font-size:0.8rem; margin-top:5px; opacity:0.8;">คะแนนเต็ม ${actPoints}</div>`;
                         
-                        if(isExam) {
-                            btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<button onclick="handleExamClick('${linkPath}')" class="btn-action" style="background:${tColor}; border:none; cursor:pointer;">เริ่มทำ <i class="fas fa-arrow-right"></i></button>` : '');
+                        if (isClosed) {
+                            badgeHtml = `<span class="badge late">🔒 หมดเวลา</span>`;
+                            btnHtml = btnLocked;
                         } else {
-                            btnHtml = isClosed ? btnLocked : (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:${tColor};">เริ่มทำ <i class="fas fa-arrow-right"></i></a>` : '');
+                            badgeHtml = `<span class="badge pending">⏳ ค้างส่ง</span>`;
+                            if(isExam) {
+                                btnHtml = `<button onclick="handleExamClick('${linkPath}')" class="btn-action" style="background:${tColor}; border:none; cursor:pointer;">เริ่มทำ <i class="fas fa-arrow-right"></i></button>`;
+                            } else {
+                                btnHtml = (linkPath !== '#' ? `<a href="${linkPath}" class="btn-action" style="background:${tColor};">เริ่มทำ <i class="fas fa-arrow-right"></i></a>` : '');
+                            }
                         }
                     }
                 }
@@ -536,11 +570,11 @@
                 if(String(deadlineTime).includes('T')) deadlineTime = String(deadlineTime).split('T')[1].substring(0,5);
 
                 container.innerHTML += `
-                    <div class="task-card" style="border-left: 5px solid ${isClosed ? '#ef4444' : tColor};">
+                    <div class="task-card" style="border-left: 5px solid ${isClosed ? '#64748b' : tColor}; opacity: ${isClosed && !submission && !isContent ? '0.7' : '1'};">
                         <div class="task-info">
-                            <h4 style="color:${isClosed ? '#ef4444' : tColor}; margin-bottom:5px;">${tIcon} ${actTitle}</h4>
+                            <h4 style="color:${isClosed && !submission && !isContent ? '#94a3b8' : tColor}; margin-bottom:5px;">${tIcon} ${actTitle}</h4>
                             <p style="font-size:0.85rem; opacity:0.8; margin-bottom:8px;">${getVal(act, 'desc', 'description', 'รายละเอียด') || ''}</p>
-                            <small style="color:${tColor}; background: ${tColor}22; padding: 3px 8px; border-radius: 10px;"><i class="far fa-clock"></i> กำหนดส่ง: ${deadlineDate} | ${deadlineTime}</small>
+                            <small style="color:${isClosed ? '#ef4444' : tColor}; background: ${isClosed ? '#ef444422' : tColor + '22'}; padding: 3px 8px; border-radius: 10px;"><i class="far fa-clock"></i> กำหนดส่ง: ${deadlineDate} | ${deadlineTime}</small>
                         </div>
                         <div class="task-meta">${badgeHtml}${scoreHtml}<div style="margin-top:10px;">${btnHtml}</div></div>
                     </div>`;
