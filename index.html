@@ -306,6 +306,13 @@
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6LgfZ1EMcKAh8shNWgqHzqHJgF76GFA79jECZbketXpu_r0ghIOUCu1LH0TICLmZj1A/exec";
         
+        // 🌟 เพิ่มฟังก์ชันถอดรหัสของ Google (ตัวแก้ปัญหาล็อกอินค้าง) 🌟
+        function decodeJwtResponse(token) {
+            let base64Url = token.split('.')[1];
+            let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
+            return JSON.parse(decodeURIComponent(atob(base64).split('').map(function(c) { return '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2); }).join('')));
+        }
+
         function createClickFlash(x, y) {
             const flash = document.createElement('div');
             flash.className = 'click-flash';
@@ -561,7 +568,6 @@
             const userEmail = userData.email;
 
             // 🌟 1. ดักจับอีเมลของครู (Admin) 🌟
-            // ครูสามารถเพิ่มอีเมลแอดมินของครูลงในวงเล็บนี้ได้เลยครับ
             const adminEmails = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com']; 
             
             if (adminEmails.includes(userEmail)) {
