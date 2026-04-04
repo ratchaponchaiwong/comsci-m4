@@ -290,12 +290,16 @@
     </div>
 
     <div id="loginModal" class="modal">
-        <div class="modal-content">
-            <button class="close-modal" onclick="closeLoginModal()">&times;</button>
+        <div class="modal-content" style="text-align: center;">
+            <button class="close-modal" onclick="closeLoginModal()">×</button>
             <h3 style="color: inherit; margin-bottom: 10px;"><i class="fas fa-user-graduate"></i> ลงชื่อเข้าเรียน</h3>
-            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 25px;">กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
-            <div id="g_id_onload" data-client_id="717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com" data-callback="handleCredentialResponse" data-auto_prompt="false"></div>
-            <div class="g_id_signin" data-type="standard" data-shape="rectangular" data-theme="outline" data-text="signin_with" data-size="large" data-logo_alignment="center" style="display: flex; justify-content: center;"></div>
+            <p style="font-size: 0.85rem; opacity: 0.8; margin-bottom: 15px;">กรุณาใช้อีเมล @gmail.com หรือ @prot.ac.th</p>
+            
+            <div id="in-app-warning" style="display: none; background: rgba(245, 158, 11, 0.2); border: 1px solid #f59e0b; color: #d97706; padding: 10px; border-radius: 10px; font-size: 0.8rem; margin-bottom: 15px;">
+                ⚠️ หากปุ่มล็อกอินไม่ทำงาน กรุณากดจุด 3 จุดมุมขวาบน แล้วเลือก <b>"เปิดในเบราว์เซอร์ (Safari/Chrome)"</b>
+            </div>
+
+            <div id="google-login-button" style="display: flex; justify-content: center; min-height: 44px;"></div>
         </div>
     </div>
 
