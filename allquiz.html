@@ -155,7 +155,7 @@
             if (!currentEmail || !adminEmails.includes(currentEmail)) { window.location.href = "index.html"; return; }
             
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=Admin";
-            document.getElementById('loginArea').innerHTML = `<img src="${pic}" style="width:35px; border-radius:50%; border:2px solid #3b82f6;"> <span style="font-size:0.9rem; margin-left:10px;">แอดมิน ${localStorage.getItem('student_name')?.split(' ')[0]}</span>`;
+            document.getElementById('loginArea').innerHTML = `<img src="${pic}" style="width:35px; border-radius:50%; border:2px solid #3b82f6;"> <span style="font-size:0.9rem; margin-left:10px;">แอดมิน ${localStorage.getItem('student_name')?.split(' ')[0] || ''}</span>`;
             
             fetchExamBank();
             addQuestionBox(); 
@@ -211,7 +211,6 @@
             document.getElementById('view-covers').style.display = 'none';
             document.getElementById('view-questions').style.display = 'block';
             
-            // 🌟 เพิ่มปุ่มลบแฟ้ม ไว้ข้างๆ ชื่อแฟ้ม 🌟
             document.getElementById('q-list-title').innerHTML = `
                 <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:15px; border-bottom: 2px dashed #3b82f6; padding-bottom: 15px;">
                     <span style="color: #60a5fa; font-size: 1.5rem; font-weight:bold;">📂 ชุดข้อสอบ: ${actid}</span>
@@ -228,22 +227,28 @@
             document.getElementById('view-covers').style.display = 'block';
         }
 
+        // 🌟 แก้บั๊กตัวเลขในช้อยส์ทำระบบพัง (ใส่ String คลุมก่อนเสมอ) 🌟
         function formatOpt(text) {
-            if(!text) return '-';
-            if(text.trim().startsWith('http')) return `<img src="${text}" class="opt-img">`;
-            return text;
+            if(text === undefined || text === null || text === '') return '-';
+            let strText = String(text).trim();
+            if(strText.startsWith('http')) return `<img src="${strText}" class="opt-img">`;
+            return strText;
         }
 
         function renderQuestionsList(qList) {
             const container = document.getElementById('questions-container');
             container.innerHTML = '';
+            
             qList.forEach((q, index) => {
-                const isA = (q.answer == '1' || q.answer == 'a' || q.answer == 'ก') ? 'correct' : '';
-                const isB = (q.answer == '2' || q.answer == 'b' || q.answer == 'ข') ? 'correct' : '';
-                const isC = (q.answer == '3' || q.answer == 'c' || q.answer == 'ค') ? 'correct' : '';
-                const isD = (q.answer == '4' || q.answer == 'd' || q.answer == 'ง') ? 'correct' : '';
+                const ansKey = String(q.answer).trim(); 
+                const isA = (ansKey === '1' || ansKey === 'a' || ansKey === 'ก') ? 'correct' : '';
+                const isB = (ansKey === '2' || ansKey === 'b' || ansKey === 'ข') ? 'correct' : '';
+                const isC = (ansKey === '3' || ansKey === 'c' || ansKey === 'ค') ? 'correct' : '';
+                const isD = (ansKey === '4' || ansKey === 'd' || ansKey === 'ง') ? 'correct' : '';
                 
-                const isShort = (!q.options.a || q.options.a.trim() === "");
+                // แก้บั๊ก: ป้องกัน Error ถ่าช้อยส์ a เป็นตัวเลข
+                const optAStr = (q.options.a === undefined || q.options.a === null) ? "" : String(q.options.a).trim();
+                const isShort = (optAStr === "");
 
                 container.innerHTML += `
                     <div class="q-card">
@@ -272,11 +277,9 @@
             });
         }
 
-        // 🌟 3. ฟังก์ชันลบข้อสอบ "ทั้งแฟ้ม" 🌟
         async function deleteExamSet(actid) {
             if(!confirm(`⚠️ คำเตือนขั้นสูงสุด!\n\nคุณแน่ใจหรือไม่ที่จะลบชุดข้อสอบรหัส "${actid}" ทิ้ง "ทั้งแฟ้ม"?\n\nการกระทำนี้จะลบข้อสอบทุกข้อในชุดนี้ออกจากฐานข้อมูลแบบถาวรและไม่สามารถกู้คืนได้!`)) return;
 
-            // เปลี่ยนปุ่มเป็นสถานะโหลด
             const btn = document.querySelector('#q-list-title .btn-danger');
             if(btn) {
                 btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังล้างข้อมูลทั้งแฟ้ม...';
@@ -290,7 +293,6 @@
                     body: JSON.stringify({ action: "deleteExamSet", actid: actid })
                 });
                 alert("✅ ลบชุดข้อสอบทั้งแฟ้มเรียบร้อยแล้ว!");
-                // ดึงข้อมูลใหม่ และเด้งกลับไปหน้าปก
                 fetchExamBank();
                 backToCovers();
             } catch(e) {
@@ -299,7 +301,6 @@
             }
         }
 
-        // 🌟 แก้ไข & ลบรายข้อ 🌟
         function openEditModal(q) {
             document.getElementById('edit-row').value = q.row;
             document.getElementById('edit-row-display').innerText = q.row;
@@ -351,7 +352,6 @@
             } catch(e) { alert("ลบไม่สำเร็จ"); }
         }
 
-        // 🌟 ระบบสร้าง 🌟
         function addQuestionBox() {
             const list = document.getElementById('create-q-list');
             const qId = `qbox-${Date.now()}`;
