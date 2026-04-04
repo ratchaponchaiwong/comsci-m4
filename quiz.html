@@ -12,12 +12,10 @@
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; min-height: 100vh; user-select: none; -webkit-user-select: none; overflow-x: hidden; }
         
-        /* 🌟 ลายน้ำกันแคปจอ 🌟 */
         .watermark-container { position: fixed; inset:0; pointer-events:none; z-index:9999; display:grid; grid-template-columns:repeat(3, 1fr); opacity:0.05; }
         .watermark-item { transform:rotate(-30deg); display:flex; align-items:center; justify-content:center; white-space:nowrap; font-size:1.2rem; font-weight: bold; color: white;}
         body.lost-focus { filter: blur(20px) grayscale(1) brightness(0.3) !important; pointer-events: none; transition: 0.2s; }
         
-        /* 🌟 หน้าจอเตือนระบบกันโกง 🌟 */
         #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(15,23,42,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; backdrop-filter: blur(15px); }
         .btn-return-fs { margin-top: 20px; background: #3b82f6; color: white; border: none; padding: 15px 30px; font-size: 1.2rem; border-radius: 50px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; box-shadow: 0 0 20px rgba(59,130,246,0.5); animation: pulse 1.5s infinite; }
         @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
@@ -39,7 +37,6 @@
         .btn-success { background: #10b981; }
 
         .option { padding: 15px 20px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2); margin-top: 12px; cursor: pointer; transition: 0.2s; display:flex; gap:15px; background: rgba(0,0,0,0.2); align-items: flex-start;}
-        .option:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.4); }
         .option.selected { background: rgba(59,130,246,0.2); border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.3); }
         .option.selected .opt-number { background: #3b82f6; color: white; border-color: #3b82f6;}
         
@@ -60,8 +57,7 @@
         <h2 style="color:#ef4444; font-size: 2rem;">⚠️ ตรวจพบการออกนอกพื้นที่สอบ!</h2>
         <p id="warning-text" style="font-size:1.2rem; margin:15px 0; color: #cbd5e1;">ระบบบังคับให้ทำข้อสอบแบบเต็มจอเท่านั้น</p>
         <p style="font-size:1.1rem;">ระบบจะระงับสิทธิ์การสอบของคุณในอีก</p>
-        <p><span id="warning-time" style="font-size:4rem; font-weight:bold; color:#ef4444; text-shadow: 0 0 20px rgba(239,68,68,0.5);">3</span> วินาที</p>
-        
+        <p><span id="warning-time" style="font-size:4rem; font-weight:bold; color:#ef4444;">3</span> วินาที</p>
         <button class="btn-return-fs" onclick="forceEnterFullscreen()"><i class="fas fa-expand-arrows-alt"></i> ขยายเต็มจอเพื่อกลับไปสอบต่อ</button>
     </div>
 
@@ -78,7 +74,6 @@
     <div class="container">
         <div class="qcard" id="screenStart" style="text-align: center; display: none;">
             <div class="student-info-bar" id="student-info-display"></div>
-            
             <h1 id="eTitle" style="color:#60a5fa; margin-bottom: 10px; font-size: 1.8rem;">ชื่อวิชา</h1>
             <p id="eMeta" style="opacity:0.8; margin-bottom: 20px; font-size: 1.1rem;">-</p>
             
@@ -127,13 +122,12 @@
         
         let examStarted = false, canBan = false, userIP = "unknown";
         let cheatTimer = null, countdownInterval = null;
-        let screenAvailWidth = window.screen.availWidth; // จำขนาดจอของจริงไว้
+        let screenAvailWidth = window.screen.availWidth; 
 
         window.onload = () => {
             if (localStorage.getItem('is_logged_in') !== 'true') {
                 alert("กรุณาลงชื่อเข้าใช้ก่อนทำข้อสอบครับ");
-                window.location.href = "index.html";
-                return;
+                window.location.href = "index.html"; return;
             }
 
             studentEmail = localStorage.getItem('student_email');
@@ -145,7 +139,6 @@
             document.getElementById('student-info-display').innerHTML = infoHtml;
             document.getElementById('exam-student-info').innerHTML = infoHtml;
 
-            // วาดลายน้ำ
             const wm = document.getElementById('watermark');
             const txt = `${studentName} (${studentId})`;
             for(let i=0; i<20; i++) {
@@ -158,7 +151,6 @@
             actId = new URLSearchParams(window.location.search).get('actid');
             if(!actId) { alert("❌ ไม่พบรหัสวิชา"); window.location.href = "student.html"; return; }
 
-            // เช็คว่าเคยโดนแบนไหม
             fetch('https://api64.ipify.org?format=json').then(r => r.json()).then(ipData => { userIP = ipData.ip; }).catch(e => { userIP = "unknown"; })
             .finally(async () => {
                 try {
@@ -175,7 +167,8 @@
 
         async function fetchExam() {
             try {
-                const res = await fetch(`${VALIDATOR_URL}?action=getExamConfig&actid=${actId}`).then(r => r.json());
+                // 🌟 แก้บั๊กสุ่มข้อสอบ 1 ข้อ: เติม &t=${Date.now()} ป้องกันการจำค่าเก่า (Cache) 🌟
+                const res = await fetch(`${VALIDATOR_URL}?action=getExamConfig&actid=${actId}&t=${Date.now()}`).then(r => r.json());
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('screenStart').style.display = 'block';
 
@@ -227,20 +220,13 @@
             }
         }
 
-        // =========================================================
-        // 🌟 ระบบบังคับเต็มจอ (Force Fullscreen) 🌟
-        // =========================================================
         function startExam() {
             if(!confirm("⚠️ ยืนยันการเข้าสู่โหมดสอบ?\n\nระบบจะบังคับขยายเต็มหน้าจอ ห้ามกดปุ่ม ESC ห้ามย่อจอ หรือสลับแท็บเด็ดขาด หากระบบจับได้จะระงับสิทธิ์ทันที!")) return;
             
-            // สั่งขยายเต็มจอ
             forceEnterFullscreen();
-            
             examStarted = true;
             document.getElementById('screenStart').style.display = 'none';
             document.getElementById('screenExam').style.display = 'block';
-            
-            // เปิดระบบตรวจจับการโกง หลังจากให้เวลาจัดจอ 2 วินาที
             setTimeout(() => { canBan = true; }, 2000);
 
             const area = document.getElementById('questionArea');
@@ -257,7 +243,7 @@
                     optsHtml = q.options.map((opt, oIdx) => `
                         <div class="option" onclick="selectAnswer(this, ${i}, ${oIdx+1})">
                             <div class="opt-number">${oIdx+1}</div>
-                            <div style="flex: 1; padding-top: 4px;">${opt.startsWith('http') ? `<img src="${opt}" class="q-img" style="margin:0;">` : opt}</div>
+                            <div style="flex: 1; padding-top: 4px;">${String(opt).trim().startsWith('http') ? `<img src="${opt}" class="q-img" style="margin:0;">` : opt}</div>
                         </div>
                     `).join('');
                 }
@@ -296,10 +282,9 @@
         function forceEnterFullscreen() {
             let el = document.documentElement;
             if (el.requestFullscreen) { el.requestFullscreen().catch(()=>{}); } 
-            else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); } // Safari
-            else if (el.msRequestFullscreen) { el.msRequestFullscreen(); } // IE11
-            
-            hideWarning(); // ซ่อนหน้าจอเตือนถ้ายอมกดขยายจอ
+            else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); }
+            else if (el.msRequestFullscreen) { el.msRequestFullscreen(); }
+            hideWarning(); 
         }
 
         function selectAnswer(el, qIdx, ansIdx) {
@@ -315,9 +300,6 @@
             userAnswers[qIdx] = { row: examData[qIdx].row, ansText: el.value.trim() };
         }
 
-        // =========================================================
-        // 🌟 ระบบกันโกงขั้นสุดยอด (Strict Anti-Cheat) 🌟
-        // =========================================================
         function showWarning(msg) {
             document.getElementById('split-warning').style.display = 'flex';
             document.getElementById('warning-text').innerText = msg;
@@ -343,11 +325,7 @@
 
         async function ban(reason) {
             if(!canBan || !examStarted) return;
-            examStarted = false; 
-            canBan = false;
-            clearInterval(examInterval);
-            hideWarning();
-            
+            examStarted = false; canBan = false; clearInterval(examInterval); hideWarning();
             localStorage.setItem('is_banned', 'true');
             
             try {
@@ -356,12 +334,10 @@
                     body: JSON.stringify({action:"reportViolation", student_id:studentId, ip:userIP, name:studentName, reason:reason})
                 });
             } catch(e){}
-            
             alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์ทันที!");
             window.location.href = "student.html";
         }
 
-        // 1. ดักจับการกดย่อจอ (Exit Fullscreen) ด้วยปุ่ม Esc
         document.addEventListener('fullscreenchange', checkFullscreenState);
         document.addEventListener('webkitfullscreenchange', checkFullscreenState);
         document.addEventListener('mozfullscreenchange', checkFullscreenState);
@@ -374,41 +350,24 @@
             }
         }
 
-        // 2. ดักจับการแบ่งจอ หรือย่อหน้าต่าง (Split Screen Detector)
         window.addEventListener('resize', () => {
             if(!canBan || !examStarted) return;
-            
-            // เช็คว่าความกว้างของหน้าต่าง (innerWidth) หดลงเหลือน้อยกว่า 85% ของจอจริงหรือไม่
             if (window.innerWidth < screenAvailWidth * 0.85) {
-                showWarning("ตรวจพบการย่อหน้าต่าง หรือใช้โหมดแบ่งหน้าจอ (Split Screen) ขยายจอให้เต็มเดี๋ยวนี้!");
+                showWarning("ตรวจพบการย่อหน้าต่าง หรือใช้โหมดแบ่งหน้าจอ (Split Screen)");
             } else if (document.fullscreenElement || document.webkitFullscreenElement) {
-                hideWarning(); // ถ้ายอมขยายเต็มจอเหมือนเดิม ให้ยกโทษ
+                hideWarning();
             }
         });
 
-        // 3. ดักจับการสลับแท็บ / เสียโฟกัส / กด Snipping Tool
-        window.addEventListener('blur', () => { 
-            if(canBan) {
-                document.body.classList.add('lost-focus');
-                showWarning("คุณแอบสลับแท็บ หรือเปิดแอปอื่นทับหน้าจอ"); 
-            }
-        });
-        window.addEventListener('focus', () => { 
-            if(canBan) { document.body.classList.remove('lost-focus'); }
-        });
-        document.addEventListener('visibilitychange', () => {
-            if (canBan && document.visibilityState === 'hidden') showWarning("คุณซ่อนหน้าต่างเบราว์เซอร์ไว้");
-        });
-
-        // 4. ห้ามคลิกขวา และ ห้ามย้อนกลับ
+        window.addEventListener('blur', () => { if(canBan) { document.body.classList.add('lost-focus'); showWarning("คุณแอบสลับแท็บ หรือเปิดแอปอื่นทับหน้าจอ"); } });
+        window.addEventListener('focus', () => { if(canBan) { document.body.classList.remove('lost-focus'); } });
+        document.addEventListener('visibilitychange', () => { if (canBan && document.visibilityState === 'hidden') showWarning("คุณซ่อนหน้าต่างเบราว์เซอร์ไว้"); });
         document.addEventListener('contextmenu', event => event.preventDefault());
         window.history.pushState(null, null, window.location.href);
         window.addEventListener('popstate', function(event) {
             window.history.pushState(null, null, window.location.href);
             if (examStarted) alert("🚨 ไม่อนุญาตให้กดย้อนกลับ!");
         });
-
-        // =========================================================
 
         async function submitExam(isAutoSubmit = false) {
             if (!isAutoSubmit) {
@@ -420,9 +379,7 @@
                 }
             }
 
-            examStarted = false; 
-            canBan = false; 
-            clearInterval(examInterval);
+            examStarted = false; canBan = false; clearInterval(examInterval);
             
             const btn = document.getElementById('btnSubmit');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อสอบ...';
@@ -454,7 +411,6 @@
                     body: JSON.stringify({ action: "saveScore", student_id: studentId, activity_id: actId, score: finalScore })
                 });
 
-                // ออกจาก Fullscreen อัตโนมัติเมื่อส่งข้อสอบเสร็จ
                 if (document.exitFullscreen) { document.exitFullscreen().catch(()=>{}); } 
                 else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
 
