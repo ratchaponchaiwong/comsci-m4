@@ -3,28 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
-    <title>แบบทดสอบออนไลน์ | PROT Smart Workspace</title>
+    <title>ระบบทดสอบออนไลน์ | PROT Smart Workspace</title>
     
-    <meta name="apple-mobile-web-app-capable" content="yes">
-    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <meta name="mobile-web-app-capable" content="yes">
-    
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; min-height: 100vh; transition: 0.3s; user-select: none; -webkit-user-select: none; overflow-x: hidden;}
+        body { font-family: 'Prompt', sans-serif; background: #0f172a; color: white; min-height: 100vh; user-select: none; -webkit-user-select: none; overflow-x: hidden; }
         
-        /* 🌟 ลายน้ำ และ เอฟเฟกต์เบลอกันโกง 🌟 */
-        .watermark-container { position: fixed; inset:0; pointer-events:none; z-index:9999; display:grid; grid-template-columns:repeat(3, 1fr); opacity:0.06; }
-        .watermark-item { transform:rotate(-30deg); display:flex; align-items:center; justify-content:center; white-space:nowrap; font-size:1.1rem; font-weight: bold; color: white;}
-        body.lost-focus { filter: blur(15px) grayscale(1) brightness(0.4) !important; pointer-events: none; }
+        /* 🌟 ลายน้ำกันแคปจอ 🌟 */
+        .watermark-container { position: fixed; inset:0; pointer-events:none; z-index:9999; display:grid; grid-template-columns:repeat(3, 1fr); opacity:0.05; }
+        .watermark-item { transform:rotate(-30deg); display:flex; align-items:center; justify-content:center; white-space:nowrap; font-size:1.2rem; font-weight: bold; color: white;}
+        body.lost-focus { filter: blur(20px) grayscale(1) brightness(0.3) !important; pointer-events: none; transition: 0.2s; }
         
-        /* 🌟 หน้าจอเตือนก่อนแบน 🌟 */
-        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; backdrop-filter: blur(10px); }
+        /* 🌟 หน้าจอเตือนระบบกันโกง 🌟 */
+        #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(15,23,42,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; backdrop-filter: blur(15px); }
+        .btn-return-fs { margin-top: 20px; background: #3b82f6; color: white; border: none; padding: 15px 30px; font-size: 1.2rem; border-radius: 50px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; box-shadow: 0 0 20px rgba(59,130,246,0.5); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
 
-        header { background: rgba(0,0,0,0.8); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; border-bottom: 2px solid #3b82f6; box-shadow: 0 4px 15px rgba(0,0,0,0.5);}
+        header { background: rgba(0,0,0,0.8); padding: 15px 20px; display: flex; justify-content: space-between; align-items: center; position: sticky; top:0; z-index:100; border-bottom: 2px solid #3b82f6; }
         .exam-brand { font-weight: 800; color: #60a5fa; font-size: 1.2rem;}
         #exam-timer { color: #f59e0b; font-weight: bold; font-size: 1.2rem; background: rgba(245,158,11,0.2); padding: 5px 15px; border-radius: 20px; border: 1px solid rgba(245,158,11,0.5); font-family: monospace;}
         #exam-timer.danger { color: #ef4444; background: rgba(239,68,68,0.2); border-color: #ef4444; animation: blink 1s infinite; }
@@ -38,7 +36,6 @@
         
         .btn-main { background: #3b82f6; color: white; border: none; padding: 15px; border-radius: 12px; width: 100%; font-size: 1.1rem; cursor: pointer; transition: 0.3s; font-weight: bold; font-family: 'Prompt';}
         .btn-main:hover:not(:disabled) { transform: translateY(-3px); box-shadow: 0 8px 20px rgba(59,130,246,0.4); }
-        .btn-main:disabled { background: #475569; cursor: not-allowed; opacity: 0.7;}
         .btn-success { background: #10b981; }
 
         .option { padding: 15px 20px; border-radius: 12px; border: 2px solid rgba(255,255,255,0.2); margin-top: 12px; cursor: pointer; transition: 0.2s; display:flex; gap:15px; background: rgba(0,0,0,0.2); align-items: flex-start;}
@@ -46,14 +43,12 @@
         .option.selected { background: rgba(59,130,246,0.2); border-color: #3b82f6; box-shadow: 0 0 15px rgba(59,130,246,0.3); }
         .option.selected .opt-number { background: #3b82f6; color: white; border-color: #3b82f6;}
         
-        .opt-number { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0; transition: 0.2s;}
-
-        .countdown-box { font-size: 3rem; font-weight: bold; color: #f59e0b; margin: 20px 0; text-shadow: 0 0 20px rgba(245,158,11,0.5); font-family: monospace;}
+        .opt-number { width: 30px; height: 30px; border-radius: 50%; border: 2px solid rgba(255,255,255,0.5); display: flex; align-items: center; justify-content: center; font-weight: bold; flex-shrink: 0;}
+        .countdown-box { font-size: 3rem; font-weight: bold; color: #f59e0b; margin: 20px 0; font-family: monospace;}
         .q-img { max-width: 100%; border-radius: 10px; margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.2); }
+        .short-ans-input { width: 100%; padding: 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.3); background: rgba(0,0,0,0.5); color: white; font-family: 'Prompt'; font-size: 1.1rem; margin-top: 10px; }
 
-        #loadingOverlay { position: fixed; inset: 0; background: #0f172a; z-index: 1000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
-        .loader-spinner { font-size: 3rem; color: #3b82f6; animation: spin 1s infinite linear; margin-bottom: 20px; }
-        @keyframes spin { 100% { transform: rotate(360deg); } }
+        #loadingOverlay { position: fixed; inset: 0; background: #0f172a; z-index: 100000; display: flex; flex-direction: column; align-items: center; justify-content: center; }
     </style>
 </head>
 <body>
@@ -61,17 +56,18 @@
     <div id="watermark" class="watermark-container"></div>
 
     <div id="split-warning">
-        <i class="fas fa-exclamation-triangle fa-5x" style="color:#facc15; margin-bottom:20px;"></i>
-        <h2 style="color:#facc15;">⚠️ ตรวจพบความผิดปกติ!</h2>
-        <p id="warning-text" style="font-size:1.2rem; margin:15px 0;">ระบบตรวจพบการสลับหน้าจอ หรือแบ่งหน้าจอ</p>
-        <p style="font-size:1.1rem;">กรุณากลับสู่หน้าข้อสอบภายใน <span id="warning-time" style="font-size:3rem; font-weight:bold; color:#ef4444;">3</span> วินาที</p>
-        <p style="font-size:0.9rem; opacity:0.7; margin-top:15px;">(หากไม่กลับมาภายในเวลาที่กำหนด ระบบจะระงับสิทธิ์ทันที)</p>
+        <i class="fas fa-desktop fa-5x" style="color:#ef4444; margin-bottom:20px;"></i>
+        <h2 style="color:#ef4444; font-size: 2rem;">⚠️ ตรวจพบการออกนอกพื้นที่สอบ!</h2>
+        <p id="warning-text" style="font-size:1.2rem; margin:15px 0; color: #cbd5e1;">ระบบบังคับให้ทำข้อสอบแบบเต็มจอเท่านั้น</p>
+        <p style="font-size:1.1rem;">ระบบจะระงับสิทธิ์การสอบของคุณในอีก</p>
+        <p><span id="warning-time" style="font-size:4rem; font-weight:bold; color:#ef4444; text-shadow: 0 0 20px rgba(239,68,68,0.5);">3</span> วินาที</p>
+        
+        <button class="btn-return-fs" onclick="forceEnterFullscreen()"><i class="fas fa-expand-arrows-alt"></i> ขยายเต็มจอเพื่อกลับไปสอบต่อ</button>
     </div>
 
     <div id="loadingOverlay">
-        <i class="fas fa-circle-notch loader-spinner"></i>
-        <h2 style="color: #60a5fa;">กำลังเตรียมข้อสอบ...</h2>
-        <p style="opacity: 0.7; margin-top: 10px;">กรุณารอสักครู่ ห้ามปิดหน้าต่างนี้</p>
+        <i class="fas fa-spinner fa-spin fa-4x" style="color:#3b82f6; margin-bottom:20px;"></i>
+        <h2 style="color: #60a5fa;">กำลังโหลดข้อสอบ...</h2>
     </div>
 
     <header>
@@ -80,7 +76,6 @@
     </header>
 
     <div class="container">
-        
         <div class="qcard" id="screenStart" style="text-align: center; display: none;">
             <div class="student-info-bar" id="student-info-display"></div>
             
@@ -93,23 +88,23 @@
             </div>
 
             <div id="rules-area" style="text-align: left; background: rgba(239,68,68,0.1); padding: 20px; border-radius: 15px; margin-bottom: 25px; border-left: 4px solid #ef4444; display: none;">
-                <h4 style="color: #ef4444; margin-bottom: 10px;"><i class="fas fa-exclamation-triangle"></i> กฎการสอบ (โปรดอ่าน)</h4>
+                <h4 style="color: #ef4444; margin-bottom: 10px;"><i class="fas fa-exclamation-triangle"></i> กฎเหล็กการสอบ (โปรดอ่าน)</h4>
                 <ul style="margin-left: 20px; opacity: 0.9; line-height: 1.6;">
-                    <li>ห้ามสลับหน้าต่าง หรือเปิดแอปอื่นซ้อนระหว่างการสอบเด็ดขาด</li>
-                    <li>ไม่อนุญาตให้ใช้ 2 หน้าจอ (Split View)</li>
-                    <li>หากตรวจพบการกระทำผิด ระบบจะเตือนและให้เวลากลับมา 3 วินาที</li>
-                    <li>หากเกินกำหนด ระบบจะระงับสิทธิ์และบันทึกคะแนนเป็น 0 ทันที</li>
+                    <li><b>ระบบบังคับหน้าจอ Full Screen (เต็มจอ)</b> ตลอดเวลาการสอบ</li>
+                    <li>ห้ามกดย่อหน้าต่าง ห้ามแบ่ง 2 หน้าจอ (Split Screen)</li>
+                    <li>ห้ามสลับแท็บ เบราว์เซอร์ หรือเปิดแอปพลิเคชันอื่นซ้อนทับ</li>
+                    <li>หากฝ่าฝืน ระบบจะเตือนเพียง 3 วินาที หากไม่กลับมาจะถูก <b>ปรับตกทันที</b></li>
                 </ul>
             </div>
 
-            <button class="btn-main" id="btnBegin" style="display:none;" onclick="startExam()"><i class="fas fa-play-circle"></i> ยืนยันและเริ่มทำข้อสอบ</button>
+            <button class="btn-main" id="btnBegin" style="display:none; padding: 20px; font-size: 1.3rem;" onclick="startExam()"><i class="fas fa-expand"></i> ยอมรับกฎและขยายเต็มจอเพื่อเริ่มสอบ</button>
             <button class="btn-main" id="btnBack" style="background:#475569; margin-top: 15px;" onclick="window.location.href='student.html'"><i class="fas fa-arrow-left"></i> กลับหน้าห้องเรียน</button>
         </div>
 
         <div id="screenExam" style="display:none;">
             <div class="student-info-bar" id="exam-student-info"></div>
             <div id="questionArea"></div>
-            <button class="btn-main btn-success" id="btnSubmit" style="margin-top: 30px; font-size: 1.2rem; padding: 20px;" onclick="submitExam()">
+            <button class="btn-main btn-success" id="btnSubmit" style="margin-top: 40px; font-size: 1.3rem; padding: 20px;" onclick="submitExam()">
                 <i class="fas fa-paper-plane"></i> ส่งคำตอบทั้งหมด
             </button>
         </div>
@@ -118,14 +113,7 @@
             <i class="fas fa-check-circle" style="font-size: 5rem; color: #10b981; margin-bottom: 20px;"></i>
             <h2 style="font-size: 1.8rem;">ส่งข้อสอบสำเร็จ!</h2>
             <p style="opacity: 0.8; margin-top: 10px;">ระบบได้ทำการบันทึกคะแนนของคุณเรียบร้อยแล้ว</p>
-            
-            <div style="background: rgba(0,0,0,0.3); padding: 30px; border-radius: 20px; margin: 30px 0; border: 1px solid rgba(255,255,255,0.1);">
-                <p style="font-size: 1.2rem; color: #60a5fa;">คะแนนที่ได้</p>
-                <div id="scoreDisplay" style="font-size: 5rem; color:#10b981; font-weight:bold; line-height: 1;">0</div>
-                <p id="maxScoreDisplay" style="opacity: 0.7; font-size: 1.1rem; margin-top: 5px;">จากคะแนนเต็ม 0</p>
-            </div>
-
-            <button class="btn-main" onclick="window.location.href='student.html'"><i class="fas fa-home"></i> กลับหน้าห้องเรียน</button>
+            <button class="btn-main" style="margin-top:30px;" onclick="window.location.href='student.html'"><i class="fas fa-home"></i> กลับหน้าห้องเรียน</button>
         </div>
     </div>
 
@@ -137,10 +125,9 @@
         let waitInterval, examInterval, examTimeLeft;
         let actId = "", studentEmail = "", studentId = "", studentName = "";
         
-        // 🌟 ตัวแปรระบบกันโกง 🌟
         let examStarted = false, canBan = false, userIP = "unknown";
         let cheatTimer = null, countdownInterval = null;
-        let lastWidth = window.innerWidth, lastHeight = window.innerHeight;
+        let screenAvailWidth = window.screen.availWidth; // จำขนาดจอของจริงไว้
 
         window.onload = () => {
             if (localStorage.getItem('is_logged_in') !== 'true') {
@@ -154,15 +141,14 @@
             studentId = localStorage.getItem(studentEmail + '_studentid') || "ไม่ระบุรหัส";
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S&background=3b82f6&color=fff";
 
-            // ข้อมูลนักเรียน
             const infoHtml = `<img src="${pic}"><div><div style="font-weight:bold;">${studentName}</div><div style="font-size:0.85rem; opacity:0.8;">รหัสประจำตัว: ${studentId}</div></div>`;
             document.getElementById('student-info-display').innerHTML = infoHtml;
             document.getElementById('exam-student-info').innerHTML = infoHtml;
 
-            // สร้างลายน้ำ
+            // วาดลายน้ำ
             const wm = document.getElementById('watermark');
             const txt = `${studentName} (${studentId})`;
-            for(let i=0; i<15; i++) {
+            for(let i=0; i<20; i++) {
                 const div = document.createElement('div');
                 div.className = 'watermark-item';
                 div.innerText = txt;
@@ -170,45 +156,32 @@
             }
 
             actId = new URLSearchParams(window.location.search).get('actid');
-            if(!actId) {
-                alert("❌ ไม่พบรหัสวิชา (ActID)");
-                window.location.href = "student.html";
-                return;
-            }
+            if(!actId) { alert("❌ ไม่พบรหัสวิชา"); window.location.href = "student.html"; return; }
 
-            // ดึง IP และตรวจสอบประวัติการแบน
-            fetch('https://api64.ipify.org?format=json')
-                .then(r => r.json())
-                .then(ipData => { userIP = ipData.ip; })
-                .catch(e => { userIP = "unknown"; })
-                .finally(async () => {
-                    try {
-                        const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}`).then(r=>r.json());
-                        if(res.banned) {
-                            localStorage.setItem('is_banned', 'true');
-                            document.body.innerHTML = `<div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'>
-                                <i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i>
-                                <h1 style='color:red; font-family:Prompt;'>คุณถูกระงับสิทธิ์การสอบ!</h1>
-                                <p style='font-family:Prompt; color:#333;'>${res.reason}</p>
-                                <button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;">กลับหน้าหลัก</button>
-                            </div>`;
-                            return;
-                        }
-                    } catch(e) {}
-                    fetchExam();
-                });
+            // เช็คว่าเคยโดนแบนไหม
+            fetch('https://api64.ipify.org?format=json').then(r => r.json()).then(ipData => { userIP = ipData.ip; }).catch(e => { userIP = "unknown"; })
+            .finally(async () => {
+                try {
+                    const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}`).then(r=>r.json());
+                    if(res.banned) {
+                        localStorage.setItem('is_banned', 'true');
+                        document.body.innerHTML = `<div style='height:100vh; display:flex; align-items:center; justify-content:center; background:#fee2e2; flex-direction:column; text-align:center;'><i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i><h1 style='color:red; font-family:Prompt;'>คุณถูกระงับสิทธิ์การสอบ!</h1><p style='font-family:Prompt; color:#333;'>${res.reason}</p><button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; background:red; color:white;">กลับหน้าหลัก</button></div>`;
+                        return;
+                    }
+                } catch(e) {}
+                fetchExam();
+            });
         };
 
         async function fetchExam() {
             try {
                 const res = await fetch(`${VALIDATOR_URL}?action=getExamConfig&actid=${actId}`).then(r => r.json());
-                
                 document.getElementById('loadingOverlay').style.display = 'none';
                 document.getElementById('screenStart').style.display = 'block';
 
                 if(res.error) {
                     document.getElementById('eTitle').innerText = "ไม่พบข้อสอบในระบบ";
-                    document.getElementById('eMeta').innerText = `กรุณาแจ้งครูผู้สอน`;
+                    document.getElementById('eMeta').innerText = `ระบบอาจปิดรับคำตอบแล้ว หรือไม่มีรหัสวิชานี้`;
                     return;
                 }
 
@@ -220,7 +193,6 @@
                 document.getElementById('eMeta').innerText = `จำนวน ${examData.length} ข้อ | คะแนนเต็ม ${examConfig.totalScore} คะแนน`;
 
                 checkTimeLogic();
-
             } catch (e) {
                 alert("❌ เกิดข้อผิดพลาดในการเชื่อมต่อเซิร์ฟเวอร์");
                 window.location.href = "student.html";
@@ -255,34 +227,40 @@
             }
         }
 
+        // =========================================================
+        // 🌟 ระบบบังคับเต็มจอ (Force Fullscreen) 🌟
+        // =========================================================
         function startExam() {
-            if(!confirm("⚠️ ยืนยันการเริ่มสอบ?\n\nห้ามสลับแท็บหรือแบ่งจอระหว่างสอบเด็ดขาด! หากระบบจับได้จะถูกระงับสิทธิ์ทันที!")) return;
+            if(!confirm("⚠️ ยืนยันการเข้าสู่โหมดสอบ?\n\nระบบจะบังคับขยายเต็มหน้าจอ ห้ามกดปุ่ม ESC ห้ามย่อจอ หรือสลับแท็บเด็ดขาด หากระบบจับได้จะระงับสิทธิ์ทันที!")) return;
             
-            // บังคับเต็มจอ
-            if (document.documentElement.requestFullscreen) {
-                document.documentElement.requestFullscreen().catch(()=>{});
-            }
+            // สั่งขยายเต็มจอ
+            forceEnterFullscreen();
             
             examStarted = true;
             document.getElementById('screenStart').style.display = 'none';
             document.getElementById('screenExam').style.display = 'block';
             
-            // เริ่มระบบจับโกงหลังจาก 1.5 วินาที
-            setTimeout(() => { canBan = true; }, 1500);
-            lastWidth = window.innerWidth;
-            lastHeight = window.innerHeight;
+            // เปิดระบบตรวจจับการโกง หลังจากให้เวลาจัดจอ 2 วินาที
+            setTimeout(() => { canBan = true; }, 2000);
 
             const area = document.getElementById('questionArea');
             area.innerHTML = ''; 
 
             examData.forEach((q, i) => {
                 let mediaHtml = q.media ? `<img src="${q.media}" class="q-img">` : '';
-                let optsHtml = q.options.map((opt, oIdx) => `
-                    <div class="option" onclick="selectAnswer(this, ${i}, ${oIdx+1})">
-                        <div class="opt-number">${oIdx+1}</div>
-                        <div style="flex: 1; padding-top: 4px;">${opt}</div>
-                    </div>
-                `).join('');
+                let isShort = q.options.length === 0;
+
+                let optsHtml = '';
+                if(isShort) {
+                    optsHtml = `<input type="text" class="short-ans-input" placeholder="พิมพ์คำตอบที่นี่..." oninput="selectTextAnswer(this, ${i})">`;
+                } else {
+                    optsHtml = q.options.map((opt, oIdx) => `
+                        <div class="option" onclick="selectAnswer(this, ${i}, ${oIdx+1})">
+                            <div class="opt-number">${oIdx+1}</div>
+                            <div style="flex: 1; padding-top: 4px;">${opt.startsWith('http') ? `<img src="${opt}" class="q-img" style="margin:0;">` : opt}</div>
+                        </div>
+                    `).join('');
+                }
 
                 area.innerHTML += `
                     <div class="qcard" id="qbox-${i}">
@@ -315,6 +293,15 @@
             }, 1000);
         }
 
+        function forceEnterFullscreen() {
+            let el = document.documentElement;
+            if (el.requestFullscreen) { el.requestFullscreen().catch(()=>{}); } 
+            else if (el.webkitRequestFullscreen) { el.webkitRequestFullscreen(); } // Safari
+            else if (el.msRequestFullscreen) { el.msRequestFullscreen(); } // IE11
+            
+            hideWarning(); // ซ่อนหน้าจอเตือนถ้ายอมกดขยายจอ
+        }
+
         function selectAnswer(el, qIdx, ansIdx) {
             if(!examStarted) return;
             let siblings = el.parentElement.querySelectorAll('.option');
@@ -323,8 +310,13 @@
             userAnswers[qIdx] = { row: examData[qIdx].row, ansIdx: ansIdx };
         }
 
+        function selectTextAnswer(el, qIdx) {
+            if(!examStarted) return;
+            userAnswers[qIdx] = { row: examData[qIdx].row, ansText: el.value.trim() };
+        }
+
         // =========================================================
-        // 🌟 ระบบกันโกงอัจฉริยะ (Smart Forgiveness) 🌟
+        // 🌟 ระบบกันโกงขั้นสุดยอด (Strict Anti-Cheat) 🌟
         // =========================================================
         function showWarning(msg) {
             document.getElementById('split-warning').style.display = 'flex';
@@ -340,9 +332,7 @@
             }, 1000);
 
             clearTimeout(cheatTimer);
-            cheatTimer = setTimeout(() => {
-                ban(msg);
-            }, 3000); // ให้เวลา 3 วิ
+            cheatTimer = setTimeout(() => { ban(msg); }, 3000);
         }
 
         function hideWarning() {
@@ -360,7 +350,6 @@
             
             localStorage.setItem('is_banned', 'true');
             
-            // ส่งชื่อไปแบนหลังบ้าน
             try {
                 await fetch(VALIDATOR_URL, {
                     method: 'POST', mode: 'no-cors',
@@ -368,59 +357,55 @@
                 });
             } catch(e){}
             
-            alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์และปรับตกทันที!");
+            alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์ทันที!");
             window.location.href = "student.html";
         }
 
+        // 1. ดักจับการกดย่อจอ (Exit Fullscreen) ด้วยปุ่ม Esc
+        document.addEventListener('fullscreenchange', checkFullscreenState);
+        document.addEventListener('webkitfullscreenchange', checkFullscreenState);
+        document.addEventListener('mozfullscreenchange', checkFullscreenState);
+
+        function checkFullscreenState() {
+            if (examStarted && canBan) {
+                if (!document.fullscreenElement && !document.webkitFullscreenElement) {
+                    showWarning("คุณออกจากโหมดเต็มจอ (Fullscreen) กดยืนยันเพื่อขยายจอกลับเดี๋ยวนี้!");
+                }
+            }
+        }
+
+        // 2. ดักจับการแบ่งจอ หรือย่อหน้าต่าง (Split Screen Detector)
+        window.addEventListener('resize', () => {
+            if(!canBan || !examStarted) return;
+            
+            // เช็คว่าความกว้างของหน้าต่าง (innerWidth) หดลงเหลือน้อยกว่า 85% ของจอจริงหรือไม่
+            if (window.innerWidth < screenAvailWidth * 0.85) {
+                showWarning("ตรวจพบการย่อหน้าต่าง หรือใช้โหมดแบ่งหน้าจอ (Split Screen) ขยายจอให้เต็มเดี๋ยวนี้!");
+            } else if (document.fullscreenElement || document.webkitFullscreenElement) {
+                hideWarning(); // ถ้ายอมขยายเต็มจอเหมือนเดิม ให้ยกโทษ
+            }
+        });
+
+        // 3. ดักจับการสลับแท็บ / เสียโฟกัส / กด Snipping Tool
         window.addEventListener('blur', () => { 
             if(canBan) {
                 document.body.classList.add('lost-focus');
-                showWarning("คุณแอบสลับหน้าจอ ออกจากข้อสอบ หรือถูกแจ้งเตือนบังจอ"); 
+                showWarning("คุณแอบสลับแท็บ หรือเปิดแอปอื่นทับหน้าจอ"); 
             }
         });
-        
         window.addEventListener('focus', () => { 
-            if(canBan) {
-                document.body.classList.remove('lost-focus');
-                hideWarning(); 
-            }
+            if(canBan) { document.body.classList.remove('lost-focus'); }
         });
-
         document.addEventListener('visibilitychange', () => {
-            if (canBan && document.visibilityState === 'hidden') {
-                showWarning("ระบบตรวจพบการซ่อนหน้าต่างหรือเปิดแอปซ้อน");
-            } else if (canBan) {
-                hideWarning();
-            }
+            if (canBan && document.visibilityState === 'hidden') showWarning("คุณซ่อนหน้าต่างเบราว์เซอร์ไว้");
         });
 
-        // ดักการแบ่งจอ iPad (Split screen) 
-        window.addEventListener('resize', () => { 
-            if(!canBan) return;
-            let currentWidth = window.innerWidth;
-            let currentHeight = window.innerHeight;
-            if(currentWidth < lastWidth * 0.7 && currentHeight >= lastHeight * 0.9) {
-                showWarning("ไม่อนุญาตให้ใช้โหมดแบ่งหน้าจอ (Split View)");
-            } else {
-                hideWarning(); 
-            }
-            if(currentWidth >= lastWidth * 0.7) {
-                lastWidth = currentWidth; lastHeight = currentHeight;
-            }
-        });
-
-        // ดักการคลิกขวา และ ป้องกันปุ่ม Back
+        // 4. ห้ามคลิกขวา และ ห้ามย้อนกลับ
         document.addEventListener('contextmenu', event => event.preventDefault());
         window.history.pushState(null, null, window.location.href);
         window.addEventListener('popstate', function(event) {
             window.history.pushState(null, null, window.location.href);
-            if (examStarted) alert("🚨 ไม่อนุญาตให้กดย้อนกลับระหว่างการสอบ!");
-        });
-
-        window.addEventListener('pageshow', function(event) {
-            if (event.persisted || localStorage.getItem('is_banned') === 'true') {
-                if (localStorage.getItem('is_banned') === 'true') window.location.href = "student.html";
-            }
+            if (examStarted) alert("🚨 ไม่อนุญาตให้กดย้อนกลับ!");
         });
 
         // =========================================================
@@ -436,11 +421,11 @@
             }
 
             examStarted = false; 
-            canBan = false; // ปิดระบบกันโกงก่อนดึงข้อมูล
+            canBan = false; 
             clearInterval(examInterval);
             
             const btn = document.getElementById('btnSubmit');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจข้อสอบและบันทึกคะแนน...';
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่งข้อสอบ...';
             btn.disabled = true;
 
             let answersToSend = userAnswers.filter(a => a !== null);
@@ -459,7 +444,7 @@
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({
                         action: "submitWork", email: studentEmail, activity_id: actId,
-                        work_content: `ทำแบบทดสอบอัตโนมัติสำเร็จ\nได้คะแนน: ${finalScore} / ${examConfig.totalScore} คะแนน`
+                        work_content: `ทำแบบทดสอบ (Strict Mode) สำเร็จ\nได้คะแนน: ${finalScore} / ${examConfig.totalScore} คะแนน`
                     })
                 });
 
@@ -469,17 +454,18 @@
                     body: JSON.stringify({ action: "saveScore", student_id: studentId, activity_id: actId, score: finalScore })
                 });
 
+                // ออกจาก Fullscreen อัตโนมัติเมื่อส่งข้อสอบเสร็จ
+                if (document.exitFullscreen) { document.exitFullscreen().catch(()=>{}); } 
+                else if (document.webkitExitFullscreen) { document.webkitExitFullscreen(); }
+
                 document.getElementById('screenExam').style.display = 'none';
                 document.getElementById('screenResult').style.display = 'block';
-                document.getElementById('scoreDisplay').innerText = finalScore;
-                document.getElementById('maxScoreDisplay').innerText = `จากคะแนนเต็ม ${examConfig.totalScore}`;
 
             } catch (e) {
-                alert("❌ เกิดข้อผิดพลาดในการบันทึกคะแนน! แต่ระบบได้รับคำตอบของคุณแล้ว กรุณาแจ้งครูผู้สอน");
+                alert("❌ เกิดข้อผิดพลาดในการส่งข้อสอบ แจ้งครูผู้สอนด่วน!");
                 btn.innerHTML = '<i class="fas fa-paper-plane"></i> ลองส่งใหม่อีกครั้ง';
                 btn.disabled = false;
-                examStarted = true; 
-                canBan = true;
+                examStarted = true; canBan = true;
             }
         }
     </script>
