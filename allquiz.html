@@ -200,7 +200,7 @@
     </div>
 
     <script>
-        // 🌟 1. ใส่ลิงก์ Apps Script ของครูตรงนี้ให้ตรงกันนะครับ 🌟
+        // 🌟 1. ลิงก์ Apps Script ของครู 🌟
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbw9pnMjkHA9233qQERlcmHqrmsOjQMDSIUGybkEyKq0z64C-i1m5p5aVGm34-a1PuV-Xw/exec"; 
         
         let allQuestions = [];
@@ -364,7 +364,6 @@
         }
 
         async function saveNewExam() {
-            // ดึงค่า Config
             const payload = {
                 action: "createExam",
                 actid: document.getElementById('c-actid').value.trim(),
@@ -374,77 +373,5 @@
                 startTime: document.getElementById('c-start').value,
                 endTime: document.getElementById('c-end').value,
                 targetRoom: document.getElementById('c-room').value.trim(),
-                questions: []
-            };
-
-            if (!payload.actid || !payload.title || payload.totalQuestions <= 0) {
-                return alert("⚠️ กรุณากรอก รหัสชุดข้อสอบ, ชื่อแบบทดสอบ และจำนวนข้อให้ครบถ้วน");
-            }
-
-            // ดึงค่าคำถามทั้งหมด
-            const qBoxes = document.querySelectorAll('.create-q-card');
-            let totalPointsInBoxes = 0;
-
-            for (let box of qBoxes) {
-                const questionText = box.querySelector('.q-input-text').value.trim();
-                if (!questionText) continue; // ข้ามข้อที่ไม่ได้พิมพ์โจทย์
-
-                const media = box.querySelector('.q-input-media').value.trim();
-                const optInputs = box.querySelectorAll('.q-opt');
-                const opts = Array.from(optInputs).map(inp => input.value.trim());
-                const answer = box.querySelector('.q-answer').value;
-                const points = parseFloat(box.querySelector('.q-points').value) || 1;
-
-                totalPointsInBoxes += points;
-
-                payload.questions.push({
-                    question: questionText,
-                    media: media,
-                    opts: opts,
-                    answer: answer,
-                    points: points
-                });
-            }
-
-            if (payload.questions.length === 0) {
-                return alert("⚠️ ยังไม่ได้กรอกข้อสอบเลยครับ!");
-            }
-
-            if (totalPointsInBoxes < payload.totalScore) {
-                if(!confirm(`⚠️ คำเตือน: คะแนนรวมของทุกข้อ (${totalPointsInBoxes}) น้อยกว่าคะแนนเต็มที่ตั้งไว้ (${payload.totalScore}) \nต้องการบันทึกต่อหรือไม่?`)) return;
-            }
-
-            // ส่งข้อมูลไปเซฟที่ Google Sheets
-            const btn = document.getElementById('btn-save-exam');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปโหลดข้อมูล...';
-            btn.disabled = true;
-
-            try {
-                const res = await fetch(VALIDATOR_URL, {
-                    method: 'POST',
-                    mode: 'no-cors', // บังคับ no-cors ถ้าระบบครูใช้การบันทึกแบบข้ามโดเมน
-                    body: JSON.stringify(payload)
-                });
-                
-                alert("✅ สร้างชุดข้อสอบเรียบร้อยแล้ว!\nระบบได้บันทึกข้อมูลลง Google Sheets เรียบร้อยครับ");
-                
-                // รีเฟรชข้อมูลและสลับกลับไปหน้า View
-                fetchExamBank();
-                switchTab('tab-view', document.querySelector('.tab-btn'));
-                
-                // เคลียร์ฟอร์ม
-                document.getElementById('c-actid').value = '';
-                document.getElementById('c-title').value = '';
-                document.getElementById('create-q-list').innerHTML = '';
-                addQuestionBox();
-
-            } catch(e) {
-                alert("❌ เกิดข้อผิดพลาดในการบันทึกข้อมูล");
-            } finally {
-                btn.innerHTML = '<i class="fas fa-cloud-upload-alt"></i> ยืนยันการสร้างชุดข้อสอบ';
-                btn.disabled = false;
-            }
-        }
-    </script>
 </body>
 </html>
