@@ -104,8 +104,8 @@
 
         <div class="workspace-wrapper">
             <div class="sidebar">
-                <div class="task-title" id="task-title"><i class="fas fa-book-open"></i> บทเรียนและเนื้อหา</div>
-                <div class="task-desc" id="task-desc">ศึกษาเนื้อหาจากสื่อที่คุณครูแนบมาให้ เมื่อเข้าใจแล้วสามารถกลับไปทำกิจกรรมอื่นต่อได้เลย</div>
+                <div class="task-title" id="task-title"><i class="fas fa-book-open"></i> กำลังโหลดเนื้อหา...</div>
+                <div class="task-desc" id="task-desc">กรุณารอสักครู่ ระบบกำลังดึงข้อมูลจากฐานข้อมูล</div>
                 
                 <button class="btn-focus" onclick="toggleFocusMode()"><i class="fas fa-expand-arrows-alt"></i> ขยายจอเต็มที่</button>
                 <button class="btn-submit" onclick="window.location.href='student.html'"><i class="fas fa-home"></i> กลับไปหน้าหลัก</button>
@@ -122,6 +122,9 @@
     </div>
 
     <script>
+        // 🌟 ใส่ลิงก์ Google Script ให้ตรงกับหน้าอื่น 🌟
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+
         function toggleFocusMode() {
             document.body.classList.toggle('focus-mode');
             if (document.body.classList.contains('focus-mode')) {
@@ -131,25 +134,65 @@
             }
         }
 
-        function loadUserData() {
+        function getVal(obj, ...keys) {
+            if (!obj) return undefined;
+            for (let key of keys) {
+                const realKey = Object.keys(obj).find(k => String(k).trim().toLowerCase() === String(key).trim().toLowerCase());
+                if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) return obj[realKey];
+            }
+            return undefined;
+        }
+
+        async function loadUserData() {
             const email = localStorage.getItem('student_email');
             if (!email) { window.location.href = "student.html"; return; }
             document.getElementById('loginArea').innerHTML = `<img src="${localStorage.getItem('student_pic')}" class="user-avatar"><span class="user-name">${localStorage.getItem('student_name').split(' ')[0]}</span>`;
             document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
 
             const actId = new URLSearchParams(window.location.search).get('actid');
-            const acts = JSON.parse(localStorage.getItem('global_activities') || '[]');
-            const currentAct = acts.find(a => String(a.id) === String(actId));
             
-            if(currentAct) {
-                document.getElementById('task-title').innerHTML = `<i class="fas fa-book-open"></i> ${currentAct.title}`;
-                document.getElementById('task-desc').innerText = currentAct.desc;
-                
-                let targetUrl = currentAct.yt || currentAct.doc || "https://www.youtube.com/embed/dQw4w9WgXcQ";
-                if(targetUrl.includes("youtube.com/watch?v=")) targetUrl = targetUrl.replace("watch?v=", "embed/");
-                document.getElementById('content-frame').src = targetUrl;
+            if(actId) {
+                try {
+                    // ดึงข้อมูลตรงจาก Database
+                    const cacheBuster = new Date().getTime();
+                    const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + cacheBuster);
+                    const db = await res.json();
+                    
+                    const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน', 'ID') == actId);
+                    
+                    if(currentAct) {
+                        document.getElementById('task-title').innerHTML = `<i class="fas fa-book-open"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
+                        document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด');
+                        
+                        let ytLink = getVal(currentAct, 'yt_link', 'youtube');
+                        let docLink = getVal(currentAct, 'doc_link', 'doc');
+                        
+                        let targetUrl = ytLink || docLink || "https://www.youtube.com/embed/dQw4w9WgXcQ";
+                        
+                        // แปลงลิงก์ YouTube ให้ฝังได้
+                        if(targetUrl.includes("youtube.com/watch?v=")) {
+                            targetUrl = targetUrl.replace("watch?v=", "embed/");
+                        } 
+                        // แปลงลิงก์ Google Docs/Drive ให้ Preview ได้
+                        else if (targetUrl.includes("drive.google.com") || targetUrl.includes("docs.google.com")) {
+                            targetUrl = targetUrl.replace("/view", "/preview").replace("/edit", "/preview");
+                        }
+                        
+                        document.getElementById('content-frame').src = targetUrl;
+                    } else {
+                        document.getElementById('task-title').innerHTML = `<i class="fas fa-exclamation-circle"></i> ไม่พบเนื้อหา`;
+                        document.getElementById('task-desc').innerText = "ขออภัย ไม่พบข้อมูลเนื้อหานี้ในระบบ กรุณากลับไปหน้าห้องเรียน";
+                    }
+                } catch(e) {
+                    document.getElementById('task-title').innerHTML = `<i class="fas fa-wifi"></i> ขัดข้อง`;
+                    document.getElementById('task-desc').innerText = "เกิดปัญหาในการเชื่อมต่อฐานข้อมูล กรุณาลองใหม่อีกครั้ง";
+                }
+            } else {
+                document.getElementById('task-title').innerHTML = `<i class="fas fa-book-open"></i> ไม่ได้เลือกเนื้อหา`;
+                document.getElementById('task-desc').innerText = "กรุณาเข้าสู่เนื้อหาผ่านเมนู 'ห้องเรียนของฉัน'";
             }
         }
+        
         window.onload = loadUserData;
     </script>
 </body>
