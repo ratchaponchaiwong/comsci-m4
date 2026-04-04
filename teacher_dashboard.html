@@ -665,7 +665,7 @@
         window.onload = () => {
             // 🌟 ระบบ รปภ. ดักคนแอบเข้าหน้า Dashboard 🌟
             const currentEmail = localStorage.getItem('student_email');
-            const adminEmails = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com'];
+            const adminEmails = ['ratchapon@prot.ac.th'];
             
             // ถ้าไม่มีการล็อกอิน หรือ อีเมลที่ล็อกอินไม่ใช่ครู ให้เตะกลับหน้าแรก
             if (!currentEmail || !adminEmails.includes(currentEmail)) {
