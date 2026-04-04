@@ -161,9 +161,11 @@
 
         window.onload = () => {
             const currentEmail = localStorage.getItem('student_email');
+            
+            // 🌟 รปภ. ตรวจบัตร (อนุญาต 3 อีเมลนี้)
             const adminEmails = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com'];
             
-            // 🛑 ระบบตรวจสอบสิทธิ์ขั้นเด็ดขาด (Security Gate) 🛑
+            // 🛑 ถ้ายืนยันตัวตนไม่ผ่าน (ไม่ใช่แอดมิน)
             if (!currentEmail || !adminEmails.includes(currentEmail)) { 
                 // ทำลายเนื้อหาทิ้ง และขึ้นจอแดงทันที
                 document.body.innerHTML = `
@@ -182,9 +184,11 @@
             document.getElementById('security-lock').style.display = 'none';
             document.getElementById('main-app-content').style.display = 'flex';
 
+            // โชว์รูปโปรไฟล์
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=Admin";
             document.getElementById('loginArea').innerHTML = `<img src="${pic}" style="width:35px; border-radius:50%; border:2px solid #3b82f6;"> <span style="font-size:0.9rem; margin-left:10px;">แอดมิน ${localStorage.getItem('student_name')?.split(' ')[0] || ''}</span>`;
             
+            // โหลดข้อมูลข้อสอบ
             fetchExamBank();
         };
 
