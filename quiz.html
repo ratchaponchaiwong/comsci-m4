@@ -125,10 +125,9 @@
         let actId = "";
         let studentEmail = "", studentId = "", studentName = "";
         let examInProgress = false;
-        let blurWarnings = 0; // ตัวนับการโกง
+        let blurWarnings = 0; 
 
         window.onload = () => {
-            // 1. ตรวจสอบการล็อกอิน
             if (localStorage.getItem('is_logged_in') !== 'true') {
                 alert("กรุณาลงชื่อเข้าใช้ก่อนทำข้อสอบครับ");
                 window.location.href = "index.html";
@@ -144,7 +143,6 @@
             document.getElementById('student-info-display').innerHTML = infoHtml;
             document.getElementById('exam-student-info').innerHTML = infoHtml;
 
-            // 2. ดึงรหัสข้อสอบจาก URL
             actId = new URLSearchParams(window.location.search).get('actid');
             if(!actId) {
                 alert("❌ ไม่พบรหัสวิชา (ActID) กรุณาเข้าผ่านหน้าห้องเรียนครับ");
@@ -152,11 +150,9 @@
                 return;
             }
 
-            // 3. เริ่มโหลดข้อสอบ
             fetchExam();
         };
 
-        // 🌟 ดึงข้อมูลข้อสอบ 🌟
         async function fetchExam() {
             try {
                 const res = await fetch(`${VALIDATOR_URL}?action=getExamConfig&actid=${actId}`).then(r => r.json());
@@ -186,11 +182,9 @@
             }
         }
 
-        // 🌟 ตรวจสอบเวลา 🌟
         function checkTimeLogic() {
             const now = Date.now();
             
-            // กรณีหมดเวลา
             if (examConfig.endTime && now > examConfig.endTime) {
                 document.getElementById('eTitle').innerText = "หมดเวลาการทำข้อสอบ";
                 document.getElementById('eMeta').innerText = "ข้อสอบชุดนี้ถูกปิดรับคำตอบแล้วครับ";
@@ -198,7 +192,6 @@
                 return;
             }
 
-            // กรณียังไม่ถึงเวลาเปิดสอบ -> โชว์ Countdown
             if (examConfig.startTime && now < examConfig.startTime) {
                 document.getElementById('countdown-area').style.display = 'block';
                 
@@ -217,22 +210,20 @@
                     }
                 }, 1000);
             } else {
-                // กรณีอยู่ในเวลาสอบ
                 document.getElementById('rules-area').style.display = 'block';
                 document.getElementById('btnBegin').style.display = 'block';
             }
         }
 
-        // 🌟 วาดข้อสอบและเริ่มเวลา 🌟
         function startExam() {
-            if(!confirm("⚠️ ยืนยันการเริ่มสอบ?\n\nห้ามออกหรือสลับหน้าต่างระหว่างสอบเด็ดขาด! หากระบบจับได้จะถือว่าทุจริตทันที!")) return;
+            if(!confirm("⚠️ ยืนยันการเริ่มสอบ?\n\nห้ามสลับแท็บหรือพับหน้าต่างระหว่างสอบเด็ดขาด! หากระบบจับได้จะถือว่าทุจริตทันที!")) return;
             
             examInProgress = true;
             document.getElementById('screenStart').style.display = 'none';
             document.getElementById('screenExam').style.display = 'block';
             
             const area = document.getElementById('questionArea');
-            area.innerHTML = ''; // Clear
+            area.innerHTML = ''; 
 
             examData.forEach((q, i) => {
                 let mediaHtml = q.media ? `<img src="${q.media}" class="q-img">` : '';
@@ -255,11 +246,10 @@
                 `;
             });
 
-            // คำนวณเวลาที่เหลือ
             if (examConfig.endTime) {
                 examTimeLeft = Math.floor((examConfig.endTime - Date.now()) / 1000);
             } else {
-                examTimeLeft = 3600; // ค่าเริ่มต้นถ้าไม่ได้ตั้งเวลาปิด คือให้เวลา 1 ชั่วโมง
+                examTimeLeft = 3600; 
             }
 
             examInterval = setInterval(() => {
@@ -267,7 +257,7 @@
                 if (examTimeLeft <= 0) {
                     clearInterval(examInterval);
                     alert("⏳ หมดเวลาการทำข้อสอบ! ระบบจะส่งคำตอบของคุณอัตโนมัติ");
-                    submitExam(true); // บังคับส่ง
+                    submitExam(true); 
                     return;
                 }
 
@@ -278,13 +268,10 @@
                 const timerEl = document.getElementById('exam-timer');
                 timerEl.innerText = `${h > 0 ? String(h).padStart(2,'0')+':' : ''}${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;
                 
-                if(examTimeLeft < 300) { // เหลือน้อยกว่า 5 นาที ตัวแดงกระพริบ
-                    timerEl.classList.add('danger');
-                }
+                if(examTimeLeft < 300) timerEl.classList.add('danger');
             }, 1000);
         }
 
-        // 🌟 เลือกคำตอบ 🌟
         function selectAnswer(el, qIdx, ansIdx) {
             if(!examInProgress) return;
             let siblings = el.parentElement.querySelectorAll('.option');
@@ -294,9 +281,7 @@
             userAnswers[qIdx] = { row: examData[qIdx].row, ansIdx: ansIdx };
         }
 
-        // 🌟 ส่งข้อสอบและบันทึกคะแนน 🌟
         async function submitExam(isAutoSubmit = false) {
-            // ถ้านักเรียนกดส่งเอง ต้องเช็กว่าทำครบไหม
             if (!isAutoSubmit) {
                 let unanswered = userAnswers.filter(a => a === null).length;
                 if (unanswered > 0) {
@@ -306,75 +291,72 @@
                 }
             }
 
-            examInProgress = false; // หยุดระบบ Anti-cheat
+            examInProgress = false; 
             clearInterval(examInterval);
             
             const btn = document.getElementById('btnSubmit');
             btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจข้อสอบและบันทึกคะแนน...';
             btn.disabled = true;
 
-            // กรองเอาเฉพาะข้อที่ตอบ
             let answersToSend = userAnswers.filter(a => a !== null);
 
             try {
-                // 1. ส่งไปตรวจที่ VALIDATOR_URL
+                // 1. ตรวจข้อสอบ (แก้ไขการตั้งค่า Request ให้รับคะแนนกลับมาได้)
                 const evalRes = await fetch(VALIDATOR_URL, {
                     method: 'POST',
-                    mode: 'no-cors', // รองรับ Cross-origin
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ action: "evaluateExam", answers: answersToSend })
-                });
-                
-                // *เนื่องจาก no-cors เราจะอ่านค่า JSON ตรงๆ ไม่ได้ เราต้องจำลองคำนวณคะแนน หรือใช้ทริคให้ SCRIPT_URL ช่วย
-                // เพื่อความแม่นยำและเสถียร เราจะใช้ Fetch ปกติ ถ้า API เปิดสิทธิ์ Anyone ไว้จะอ่านได้
-                
-                // ดึงผลการตรวจ
-                const finalEval = await fetch(`${VALIDATOR_URL}?action=evaluateExam&data=` + encodeURIComponent(JSON.stringify(answersToSend))).then(r=>r.json()).catch(async () => {
-                    // ถ้า Fetch แบบ GET ล้มเหลว (เผื่อครูไม่ได้ทำ GET สำหรับ Evaluate) 
-                    // ให้ฝั่ง Frontend ช่วยคำนวณแบบคร่าวๆ เพื่อโชว์ให้เด็กดู (แต่จริงๆ คะแนนถูกบันทึกหลังบ้านแล้ว)
-                    // (ในระบบนี้เราใช้การส่งคำตอบพร้อมกัน)
-                    const tempRes = await fetch(VALIDATOR_URL, { method: 'POST', body: JSON.stringify({ action: "evaluateExam", answers: answersToSend }) }).then(r=>r.json());
-                    return tempRes;
-                });
+                }).then(r => r.json());
 
-                const finalScore = finalEval.score || 0;
+                const finalScore = evalRes.score || 0;
 
-                // 2. เอาคะแนนที่ได้ ส่งไปบันทึกในสมุดพก (SCRIPT_URL)
+                // 2. สร้างบันทึก "การส่งงาน" ลงชีตของครู (เพื่อให้ขึ้นโชว์ใน Matrix ว่าส่งแล้ว)
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
-                    mode: 'no-cors',
-                    body: JSON.stringify({ 
-                        action: "saveScore", 
-                        student_id: studentId, 
-                        activity_id: actId, 
-                        score: finalScore 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: "submitWork",
+                        email: studentEmail,
+                        activity_id: actId,
+                        work_content: `ทำแบบทดสอบอัตโนมัติสำเร็จ\nได้คะแนน: ${finalScore} / ${examConfig.totalScore} คะแนน`
                     })
                 });
 
-                // 3. โชว์หน้าต่างสรุปผล
+                // 3. บันทึกคะแนนลงช่อง "คะแนน" ใน Matrix
+                await fetch(SCRIPT_URL, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: "saveScore",
+                        student_id: studentId,
+                        activity_id: actId,
+                        score: finalScore
+                    })
+                });
+
                 document.getElementById('screenExam').style.display = 'none';
                 document.getElementById('screenResult').style.display = 'block';
                 document.getElementById('scoreDisplay').innerText = finalScore;
                 document.getElementById('maxScoreDisplay').innerText = `จากคะแนนเต็ม ${examConfig.totalScore}`;
 
             } catch (e) {
-                console.log(e);
-                alert("❌ ระบบขัดข้อง! โปรดแคปหน้าจอนี้แจ้งครูผู้สอนเพื่อยืนยันการส่ง");
-                document.getElementById('btnSubmit').innerHTML = '<i class="fas fa-paper-plane"></i> ลองส่งใหม่อีกครั้ง';
-                document.getElementById('btnSubmit').disabled = false;
-                examInProgress = true;
+                console.error("Submit Error:", e);
+                alert("❌ เกิดข้อผิดพลาดในการบันทึกคะแนน! แต่ระบบได้รับคำตอบของคุณแล้ว กรุณาแจ้งครูผู้สอน");
+                btn.innerHTML = '<i class="fas fa-paper-plane"></i> ลองส่งใหม่อีกครั้ง';
+                btn.disabled = false;
+                examInProgress = true; 
             }
         }
 
-        // 🌟 Anti-Cheat: ดักจับการสลับหน้าจอ 🌟
-        window.addEventListener('blur', () => {
-            if (examInProgress) {
+        // 🌟 Anti-Cheat: ดักจับการสลับแท็บแบบฉลาดขึ้น (visibilitychange) 🌟
+        document.addEventListener('visibilitychange', () => {
+            if (examInProgress && document.visibilityState === 'hidden') {
                 blurWarnings++;
                 if (blurWarnings >= 3) {
-                    alert("🚨 ยุติการสอบ: คุณละเมิดกฎการสอบโดยการสลับหน้าต่างเกินกำหนด (3 ครั้ง)\nระบบจะทำการส่งข้อสอบและบันทึกคะแนนเป็น 0 ทันที");
-                    userAnswers = []; // ล้างคำตอบ
+                    alert("🚨 ยุติการสอบ: คุณละเมิดกฎการสอบโดยการสลับแท็บ/พับหน้าต่างเกินกำหนด (3 ครั้ง)\nระบบจะทำการส่งข้อสอบและบันทึกคะแนนตามที่คุณทำได้ทันที");
                     submitExam(true);
                 } else {
-                    alert(`⚠️ คำเตือนการทุจริต (ครั้งที่ ${blurWarnings}/3)\nห้ามสลับหน้าต่างหรือออกจากหน้าจอสอบเด็ดขาด!`);
+                    alert(`⚠️ คำเตือนการทุจริต (ครั้งที่ ${blurWarnings}/3)\nห้ามสลับแท็บหรือออกจากหน้าเว็บขณะทำข้อสอบเด็ดขาด!`);
                 }
             }
         });
