@@ -21,6 +21,7 @@
         body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); color: white; }
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
@@ -70,10 +71,43 @@
         .btn-submit:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
         .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; }
 
+        /* 🌟 เมนูเลือกหน้าจอ 🌟 */
+        .view-toggle {
+            display: flex;
+            background: rgba(0,0,0,0.2);
+            padding: 6px;
+            border-radius: 20px;
+            gap: 5px;
+            border: 1px solid var(--border-ws);
+            margin: 5px auto 10px auto;
+            width: fit-content;
+        }
+        body[data-theme="snow"] .view-toggle, body[data-theme="love"] .view-toggle { background: rgba(0,0,0,0.05); }
+        
+        .view-btn { background: transparent; border: none; color: inherit; padding: 8px 20px; border-radius: 15px; font-family: 'Prompt'; font-weight: 600; cursor: pointer; transition: 0.3s; font-size: 0.9rem; display: flex; align-items: center; gap: 8px; }
+        .view-btn.active { background: var(--accent); color: white; box-shadow: 0 4px 10px rgba(0,0,0,0.15); }
+        .view-btn:hover:not(.active) { background: rgba(255,255,255,0.1); }
+        body[data-theme="snow"] .view-btn:hover:not(.active), body[data-theme="love"] .view-btn:hover:not(.active) { background: rgba(0,0,0,0.05); }
+
+        /* 🌟 โครงสร้างหน้าต่าง 2 จอ 🌟 */
         .split-container { display: flex; flex: 1; gap: 15px; overflow: hidden; flex-direction: column;}
         @media (min-width: 900px) { .split-container { flex-direction: row; } }
 
-        /* 🌟 คอนเทนเนอร์ของจอ 🌟 */
+        /* 🎯 โหมดเรียงบน-ล่าง (Stacked View) 🎯 */
+        .split-container.stacked-view { 
+            flex-direction: column !important; 
+            overflow-y: auto; 
+            padding-right: 5px; /* กัน scrollbar บังขอบ */
+        }
+        .split-container.stacked-view::-webkit-scrollbar { width: 8px; }
+        .split-container.stacked-view::-webkit-scrollbar-track { background: rgba(0,0,0,0.1); border-radius: 10px; }
+        .split-container.stacked-view::-webkit-scrollbar-thumb { background: rgba(59,130,246,0.5); border-radius: 10px; }
+        
+        .split-container.stacked-view .pane { 
+            min-height: 80vh; /* ให้แต่ละจอยาวจุใจตอนไถจอลงมา */
+            flex: none; 
+        }
+
         .pane { flex: 1; display: flex; flex-direction: column; overflow: hidden; transition: 0.3s; }
         
         .tool-view { flex: 1; display: flex; flex-direction: column; background: var(--panel-bg); backdrop-filter: blur(15px); border-radius: 20px; border: 1px solid var(--border-ws); box-shadow: 0 10px 30px rgba(0,0,0,0.15); overflow: hidden; padding: 15px; gap: 10px; animation: fadeIn 0.3s ease;}
@@ -82,7 +116,6 @@
 
         .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; font-weight: bold; color: var(--accent); font-size: 1.1rem; }
         
-        /* สไตล์แยกย่อยของแต่ละเครื่องมือ */
         .editor-area { flex: 1; background: var(--editor-bg); color: inherit; font-family: 'JetBrains Mono', monospace; padding: 15px; border-radius: 12px; border: 1px solid var(--border-ws); resize: none; font-size: 15px; line-height: 1.5;}
         body[data-theme="snow"] .editor-area, body[data-theme="love"] .editor-area { border-color: #cbd5e1; }
         .editor-area:focus { outline: none; border-color: var(--accent); }
@@ -161,6 +194,13 @@
                     <input type="text" id="wokwi-link" placeholder="วางลิงก์ Wokwi ที่นี่...">
                     <button class="btn-submit" id="submitBtnLab" onclick="submitWork()"><i class="fas fa-paper-plane"></i> ส่งงาน</button>
                 </div>
+            </div>
+
+            <div class="view-toggle">
+                <button class="view-btn active" onclick="switchView('split', this)"><i class="fas fa-columns"></i> ⚖️ แบ่งซ้าย-ขวา</button>
+                <button class="view-btn" onclick="switchView('stacked', this)"><i class="fas fa-stream"></i> ↕️ เรียงบน-ล่าง</button>
+                <button class="view-btn" onclick="switchView('leftOnly', this)"><i class="fas fa-square"></i> 👈 ดูเฉพาะจอซ้าย</button>
+                <button class="view-btn" onclick="switchView('rightOnly', this)"><i class="fas fa-square"></i> 👉 ดูเฉพาะจอขวา</button>
             </div>
 
             <div class="split-container">
@@ -293,6 +333,34 @@ print("Hello, PROT Smart Workspace!")
                 document.getElementById('task-title').innerHTML = `<i class="fas fa-laptop-code"></i> Lab อิสระ 2 หน้าจอ`;
                 document.getElementById('task-desc').innerText = `เลือกระบบที่ต้องการเปิดได้เลย (โหมดฝึกฝน ไม่มีการส่งงาน)`;
                 document.getElementById('submit-zone').style.display = 'none';
+            }
+        }
+
+        // 🌟 ฟังก์ชันสลับจอ (View Switcher อัปเกรดใหม่) 🌟
+        function switchView(viewType, btnElement) {
+            document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+            btnElement.classList.add('active');
+            
+            const paneLeft = document.getElementById('pane-left');
+            const paneRight = document.getElementById('pane-right');
+            const splitContainer = document.querySelector('.split-container');
+            
+            // ล้างโหมดบนล่างออกก่อน
+            splitContainer.classList.remove('stacked-view');
+            
+            if (viewType === 'split') {
+                paneLeft.style.display = 'flex';
+                paneRight.style.display = 'flex';
+            } else if (viewType === 'stacked') {
+                paneLeft.style.display = 'flex';
+                paneRight.style.display = 'flex';
+                splitContainer.classList.add('stacked-view'); // เข้าโหมดเรียงบน-ล่าง
+            } else if (viewType === 'leftOnly') {
+                paneLeft.style.display = 'flex';
+                paneRight.style.display = 'none';
+            } else if (viewType === 'rightOnly') {
+                paneLeft.style.display = 'none';
+                paneRight.style.display = 'flex';
             }
         }
 
