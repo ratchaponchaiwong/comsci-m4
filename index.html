@@ -591,7 +591,32 @@
             window.location.reload();
         }
         
-        function openLoginModal() { document.getElementById('loginModal').classList.add('active'); }
+        function openLoginModal() { 
+            // 1. เปิดหน้าต่าง Modal ให้แสดงขึ้นมาก่อน
+            document.getElementById('loginModal').classList.add('active'); 
+            
+            // 2. เช็คว่าเด็กเปิดผ่านแอป LINE, IG หรือ Facebook ไหม (ถ้าใช่ให้เตือน)
+            const ua = navigator.userAgent || navigator.vendor || window.opera;
+            if (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1 || ua.indexOf("Line") > -1 || ua.indexOf("Instagram") > -1) {
+                document.getElementById('in-app-warning').style.display = 'block';
+            }
+
+            // 3. สั่งวาดปุ่ม Google "หลังจาก" หน้าต่างเปิดแล้วเท่านั้น (แก้บั๊กปุ่มค้าง/กดไม่ติด 100%)
+            if (window.google && google.accounts) {
+                google.accounts.id.initialize({
+                    client_id: "717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com",
+                    callback: handleCredentialResponse,
+                    cancel_on_tap_outside: false
+                });
+                google.accounts.id.renderButton(
+                    document.getElementById("google-login-button"),
+                    { theme: "outline", size: "large", shape: "rectangular", type: "standard", text: "signin_with" }
+                );
+            } else {
+                // กรณีเน็ตช้า สคริปต์ Google โหลดไม่ทัน
+                document.getElementById("google-login-button").innerHTML = "<p style='font-size:0.85rem; color:#ef4444;'>กำลังเชื่อมต่อ Google... กรุณาปิดแล้วกดปุ่มใหม่อีกครั้ง</p>";
+            }
+        }
         function closeLoginModal() { document.getElementById('loginModal').classList.remove('active'); }
         
         const themes = { 
