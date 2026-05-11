@@ -128,7 +128,7 @@
                 
                 <div class="upload-section">
                     <p style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-info-circle"></i> ระบบจะดึงโค้ดที่คุณเขียนไปส่งให้อัตโนมัติ</p>
-                    <button class="btn-submit" id="submitBtnLab" onclick="submitWork()">
+                    <button class="btn-submit" id="submitBtnLab" onclick="submitWork()" style="display: none;">
                         <i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน
                     </button>
                 </div>
@@ -155,6 +155,10 @@ print("Hello, PROT Smart Workspace!")
         // 🌟 1. ใส่ลิงก์ Google Script ของครู 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
+        // 🌟 ตัวแปรเก็บผลลัพธ์ของระบบตรวจอัตโนมัติ 🌟
+        let expectedOutput = "";
+        let studentOutput = "";
+
         function getVal(obj, ...keys) {
             if (!obj) return undefined;
             for (let key of keys) {
@@ -166,7 +170,7 @@ print("Hello, PROT Smart Workspace!")
 
         let isPastDeadlineGlobal = false;
 
-        // โหลดข้อมูลนักเรียน
+        // โหลดข้อมูลนักเรียนและเนื้อหางาน
         async function loadUserData() {
             const email = localStorage.getItem('student_email');
             if (!email) {
@@ -201,6 +205,9 @@ print("Hello, PROT Smart Workspace!")
                         document.getElementById('task-title').innerHTML = `<i class="fab fa-python"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
                         document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด');
 
+                        // 🎯 ดึงข้อมูลเฉลยจาก Google Sheets
+                        expectedOutput = getVal(currentAct, 'expected_output', 'ผลลัพธ์ที่ถูกต้อง', 'เฉลย') || "";
+
                         let rawDate = getVal(currentAct, 'date', 'วันที่');
                         let rawTime = getVal(currentAct, 'time', 'เวลา');
                         if (rawDate) {
@@ -217,6 +224,7 @@ print("Hello, PROT Smart Workspace!")
                                 document.getElementById('task-deadline').innerHTML = `<i class="fas fa-ban"></i> หมดเวลาส่งงานแล้ว (${rawDate} | ${rawTime})`;
                                 const btn = document.getElementById('submitBtnLab');
                                 btn.disabled = true;
+                                btn.style.display = 'block'; // แสดงปุ่มเพื่อให้เห็นว่าโดนล็อก
                                 btn.innerHTML = '<i class="fas fa-lock"></i> หมดเวลาส่งงาน';
                                 btn.style.background = '#ef4444';
                                 btn.style.borderColor = '#ef4444';
@@ -245,8 +253,10 @@ print("Hello, PROT Smart Workspace!")
         let outputContent = "";
         function outf(text) {
             outputContent += text;
+            studentOutput += text; // 🎯 เก็บผลลัพธ์ของนักเรียนไปตรวจ
             document.getElementById("output").innerHTML = outputContent.replace(/\n/g, '<br>');
         }
+        
         function builtinRead(x) {
             if (Sk.builtinFiles === undefined || Sk.builtinFiles["files"][x] === undefined) throw "File not found: '" + x + "'";
             return Sk.builtinFiles["files"][x];
@@ -255,11 +265,12 @@ print("Hello, PROT Smart Workspace!")
         function runPython() {
             const code = document.getElementById("python-code").value;
             const outputDiv = document.getElementById("output");
+            
             outputDiv.innerHTML = ""; 
             outputContent = "";
-            Sk.pre = "output";
+            studentOutput = ""; // 🎯 เคลียร์ผลลัพธ์เก่าทิ้งทุกครั้งที่กดรันใหม่
             
-            // 🛑 แก้ไขบั๊กตัวอักษรแปลกปลอมใน Skulpt ตรงนี้ให้เรียบร้อยแล้วครับ 🛑
+            Sk.pre = "output";
             Sk.configure({ output: outf, read: builtinRead }); 
             
             const myPromise = Sk.misceval.asyncToPromise(function() {
@@ -267,9 +278,44 @@ print("Hello, PROT Smart Workspace!")
             });
             
             myPromise.then(
-                () => { if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ (ไม่มี Output แสดงผล)"; }, 
-                (err) => { outputDiv.innerHTML = `<span style="color: #ef4444;">❌ ข้อผิดพลาด: ${err.toString()}</span>`; }
+                () => { 
+                    if(outputContent === "") outputDiv.innerHTML = "✅ ทำงานสำเร็จ (ไม่มี Output แสดงผล)"; 
+                    checkAnswer(); // 🎯 เรียกฟังก์ชันตรวจคำตอบเมื่อโค้ดรันจบไม่มี Error
+                }, 
+                (err) => { 
+                    outputDiv.innerHTML = `<span style="color: #ef4444;">❌ ข้อผิดพลาด: ${err.toString()}</span>`; 
+                    document.getElementById("submitBtnLab").style.display = "none";
+                    outputDiv.style.border = "1px solid rgba(255,255,255,0.1)";
+                }
             );
+        }
+
+        // 🎯 ฟังก์ชันตรวจคำตอบอัตโนมัติ 🎯
+        function checkAnswer() {
+            if(isPastDeadlineGlobal) return; // ถ้าหมดเวลา ไม่ต้องแสดงปุ่มส่ง
+
+            let stuAns = studentOutput.trim();
+            let correctAns = String(expectedOutput).trim();
+            let mypre = document.getElementById("output");
+
+            // ถ้าระบบไม่ได้ตั้งเฉลยไว้ ถือว่าให้กดส่งได้เลย (โหมดยืดหยุ่น)
+            if (correctAns === "") {
+                document.getElementById("submitBtnLab").style.display = "inline-flex";
+                mypre.style.border = "1px solid rgba(255,255,255,0.2)";
+                return;
+            }
+
+            // ถ้าผลลัพธ์ตรงกับที่ครูตั้งไว้
+            if (stuAns === correctAns) {
+                document.getElementById("submitBtnLab").style.display = "inline-flex";
+                mypre.innerHTML += "<br><br><span style='color:#10b981; font-weight:bold;'>✅ [ระบบตรวจอัตโนมัติ]: ผลลัพธ์ถูกต้อง! ปุ่มส่งงานปรากฏขึ้นแล้ว</span>";
+                mypre.style.border = "2px solid #10b981";
+            } else {
+                // ถ้าผิด ให้ซ่อนปุ่ม
+                document.getElementById("submitBtnLab").style.display = "none";
+                mypre.innerHTML += "<br><br><span style='color:#ef4444; font-weight:bold;'>❌ [ระบบตรวจอัตโนมัติ]: ผลลัพธ์ยังไม่ตรงกับโจทย์ ลองแก้โค้ดใหม่นะ<br>(ใบ้: โจทย์ต้องการผลลัพธ์คือ => " + correctAns + ")</span>";
+                mypre.style.border = "2px solid #ef4444";
+            }
         }
 
         // 🌟 ฟังก์ชันสลับโหมดโฟกัส (รองรับทั้งคอมและ iPad) 🌟
@@ -277,7 +323,6 @@ print("Hello, PROT Smart Workspace!")
             document.body.classList.toggle('focus-mode');
             
             if (document.body.classList.contains('focus-mode')) {
-                // พยายามขอ Fullscreen (สำหรับคอม/แอนดรอยด์)
                 try {
                     if (document.documentElement.requestFullscreen) {
                         document.documentElement.requestFullscreen().catch(()=>{});
@@ -286,7 +331,6 @@ print("Hello, PROT Smart Workspace!")
                     }
                 } catch(e) {}
             } else {
-                // ออกจาก Fullscreen
                 try {
                     if (document.exitFullscreen) {
                         document.exitFullscreen().catch(()=>{});
