@@ -500,7 +500,31 @@
             document.getElementById('student-details-box').style.display = 'block';
             document.getElementById('tracking-box').style.display = 'block';
             document.getElementById('score-box-ui').style.display = 'block';
-            document.getElementById('editProfileBtn').style.display = 'block';
+            
+            // --- เริ่มโค้ดระบบล็อกปุ่ม ---
+            const editBtn = document.getElementById('editProfileBtn');
+            editBtn.style.display = 'block';
+
+            // เช็คว่าถ้ามี รหัส, ห้อง, เลขที่ ในฐานข้อมูลแล้ว ให้ล็อกปุ่มทันที
+            if (studentId !== '-' && room !== '-' && number !== '-' && studentId !== '') {
+                editBtn.innerHTML = '<i class="fas fa-lock"></i> ข้อมูลถูกล็อกแล้ว';
+                editBtn.style.background = '#475569'; // เปลี่ยนปุ่มเป็นสีเทา
+                editBtn.style.borderColor = '#475569';
+                editBtn.style.color = 'white';
+                editBtn.style.cursor = 'not-allowed';
+                editBtn.onclick = function() {
+                    alert('⚠️ ข้อมูลถูกบันทึกเข้าระบบแล้ว หากต้องการแก้ไขกรุณาแจ้งให้ผู้สอนทราบครับ');
+                };
+            } else {
+                // ถ้าข้อมูลยังไม่ครบ ให้กดเปิด Modal ได้ตามปกติ
+                editBtn.innerHTML = '<i class="fas fa-edit"></i> ระบุข้อมูลส่วนตัว';
+                editBtn.style.background = 'rgba(59,130,246,0.15)'; 
+                editBtn.style.borderColor = '#3b82f6';
+                editBtn.style.color = 'inherit';
+                editBtn.style.cursor = 'pointer';
+                editBtn.onclick = openEditProfileModal;
+            }
+            // --- จบโค้ดระบบล็อกปุ่ม ---
             
             document.getElementById('loginArea').innerHTML = `
                 <div class="user-info">
@@ -516,7 +540,7 @@
                 <div class="glass-card" style="text-align: center; border-color: #f59e0b;">
                     <i class="fas fa-exclamation-triangle fa-3x" style="color: #f59e0b; margin-bottom: 15px;"></i>
                     <h3 style="color: #f59e0b; margin-bottom: 10px;">ยังไม่ได้ระบุห้องเรียน</h3>
-                    <p style="font-size: 0.95rem; opacity: 0.9;">กรุณากดปุ่ม <b>"แก้ไขข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุรหัสประจำตัวและห้องเรียนของคุณให้ตรงกับระบบครับ</p>
+                    <p style="font-size: 0.95rem; opacity: 0.9;">กรุณากดปุ่ม <b>"ระบุข้อมูลส่วนตัว"</b> ด้านซ้ายมือ เพื่อระบุรหัสประจำตัวและห้องเรียนของคุณให้ตรงกับระบบครับ</p>
                 </div>`;
                 return;
             }
@@ -646,6 +670,11 @@
         }
 
         function openEditProfileModal() {
+            // เช็คอีกครั้งเผื่อ UI ไม่ตรงกัน
+            if (document.getElementById('editProfileBtn').innerHTML.includes('fa-lock')) {
+                return alert('⚠️ ข้อมูลถูกบันทึกเข้าระบบแล้ว หากต้องการแก้ไขกรุณาแจ้งให้ผู้สอนทราบครับ');
+            }
+
             const email = localStorage.getItem('student_email');
             const myData = db.students.find(s => getVal(s, 'email') === email) || {};
             
@@ -672,6 +701,11 @@
             const email = localStorage.getItem('student_email');
 
             if (!name || !number || !studentId) return alert('⚠️ กรุณากรอกรหัสนักเรียน, ชื่อ และเลขที่ให้ครบถ้วน');
+            
+            // ดักจับไม่ให้ส่งข้อมูลเข้า API หากปุ่มถูกล็อกไปแล้ว
+            if (document.getElementById('editProfileBtn').innerHTML.includes('fa-lock')) {
+                return alert('⚠️ ไม่สามารถบันทึกซ้ำได้ ข้อมูลของคุณถูกล็อกไว้แล้ว');
+            }
             
             document.getElementById('saving-status').style.display = 'block';
             document.getElementById('saving-status').innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังอัปเดตข้อมูล...';
