@@ -387,6 +387,7 @@
             let answersToSend = userAnswers.filter(a => a !== null);
 
             try {
+                // 1. ส่งตรวจคะแนนฝั่งชุดข้อสอบ
                 const evalRes = await fetch(VALIDATOR_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -395,7 +396,7 @@
 
                 const finalScore = evalRes.score || 0;
 
-                // 🌟 แก้ไข: บันทึกข้อมูลงานพร้อมระบุสถานะ student_id และ student_name พร้อมเปิดโหมด no-cors 🌟
+                // 2. ส่งสถานะบันทึกงาน (แก้ไขพารามิเตอร์ให้ตรงกับฐานข้อมูล และใส่ no-cors กันบล็อก)
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -403,14 +404,13 @@
                     body: JSON.stringify({
                         action: "submitWork", 
                         student_id: studentId, 
-                        student_name: studentName,
-                        email: studentEmail,
+                        student_name: studentName, 
                         activity_id: actId,
                         work_content: `ทำแบบทดสอบ (Strict Mode) สำเร็จ\nได้คะแนน: ${finalScore} / ${examConfig.totalScore} คะแนน`
                     })
                 });
 
-                // 🌟 แก้ไข: บันทึกคะแนนดิบลงตารางสรุปคะแนน พร้อมเปิดโหมด no-cors 🌟
+                // 3. บันทึกคะแนนดิบลงในช่องคะแนนสอบ
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -418,8 +418,7 @@
                     body: JSON.stringify({ 
                         action: "saveScore", 
                         student_id: studentId, 
-                        student_name: studentName,
-                        email: studentEmail,
+                        student_name: studentName, 
                         activity_id: actId, 
                         score: finalScore 
                     })
