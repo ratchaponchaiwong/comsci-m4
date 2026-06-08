@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Teacher Admin Hub | PROT Smart Workspace</title>
+    <title>Teacher Admin Center | PROT Smart Workspace</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
@@ -19,156 +19,284 @@
         body[data-theme="halloween"] { background: linear-gradient(135deg, #1a0b1a 0%, #2d1a2d 50%, #401040 100%); }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
 
-        /* Sidebar ซ้าย */
-        .sidebar { width: 260px; background: rgba(0,0,0,0.3); backdrop-filter: blur(10px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
+        /* Sidebar ซ้ายแบบขยายขอบเขตการทำงาน */
+        .sidebar { width: 280px; background: rgba(0,0,0,0.35); backdrop-filter: blur(12px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px; flex-shrink: 0; }
         body[data-theme="snow"] .sidebar, body[data-theme="love"] .sidebar { background: rgba(255,255,255,0.6); border-right-color: rgba(0,0,0,0.1); }
-        .sidebar-brand { font-size: 1.3rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; margin-bottom: 30px; display: flex; align-items: center; gap: 10px; }
+        .sidebar-brand { font-size: 1.25rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; padding-left: 10px; }
         
-        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 8px; }
-        .nav-item a { display: flex; align-items: center; gap: 12px; padding: 12px 20px; color: #cbd5e1; text-decoration: none; border-radius: 12px; font-weight: 500; transition: 0.3s; }
+        .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .nav-item a { display: flex; align-items: center; gap: 12px; padding: 12px 15px; color: #cbd5e1; text-decoration: none; border-radius: 12px; font-weight: 500; transition: 0.3s; font-size: 0.95rem; cursor: pointer; }
         body[data-theme="snow"] .nav-item a, body[data-theme="love"] .nav-item a { color: #475569; }
-        .nav-item.active a, .nav-item a:hover { background: #3b82f6; color: white !important; box-shadow: 0 4px 12px rgba(59,130,246,0.3); }
+        .nav-item.active a, .nav-item a:hover { background: #3b82f6; color: white !important; box-shadow: 0 4px 12px rgba(59,130,246,0.25); }
 
         /* พื้นที่เนื้อหาหลักขวา */
         .main-container { flex: 1; display: flex; flex-direction: column; overflow: hidden; }
-        header { background: rgba(0,0,0,0.15); padding: 15px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
+        header { background: rgba(0,0,0,0.15); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.05); flex-shrink: 0; }
         body[data-theme="snow"] header, body[data-theme="love"] header { border-bottom-color: rgba(0,0,0,0.05); }
 
-        .main-content { flex: 1; overflow-y: auto; padding: 30px 40px; }
-        .glass-card { background: rgba(255,255,255,0.04); border-radius: 24px; padding: 25px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); }
-        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255,255,255,0.8); border-color: rgba(0,0,0,0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.05); }
+        .main-content { flex: 1; overflow-y: auto; padding: 25px 30px; }
+        .tab-content { display: none; animation: fadeIn 0.3s ease-in-out; }
+        .tab-content.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* แผงควบคุมตัวกรองอัจฉริยะ (Smart Filter Controls) */
-        .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
+        .glass-card { background: rgba(255,255,255,0.04); border-radius: 20px; padding: 22px; border: 1px solid rgba(255,255,255,0.08); margin-bottom: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); }
+        body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255,255,255,0.85); border-color: rgba(0,0,0,0.08); box-shadow: 0 5px 15px rgba(0,0,0,0.03); }
+
+        /* ตัวกรองและเครื่องมือ */
+        .filter-bar { display: flex; gap: 12px; margin-bottom: 18px; flex-wrap: wrap; align-items: center; }
         .search-input { flex: 1; min-width: 200px; position: relative; }
-        .search-input input { width: 100%; padding: 12px 20px 12px 45px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; font-size: 0.9rem; }
-        .search-input i { position: absolute; left: 18px; top: 50%; transform: translateY(-50%); opacity: 0.6; }
+        .search-input input, .form-control { width: 100%; padding: 11px 15px 11px 40px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; font-size: 0.9rem; }
+        .search-input i { position: absolute; left: 15px; top: 50%; transform: translateY(-50%); opacity: 0.6; }
         
-        .filter-select { padding: 12px 20px; border-radius: 12px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; font-size: 0.9rem; min-width: 140px; cursor: pointer; }
+        .filter-select { padding: 11px 15px; border-radius: 10px; border: 1px solid rgba(255,255,255,0.15); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; font-size: 0.9rem; min-width: 140px; cursor: pointer; }
         body[data-theme="snow"] input, body[data-theme="love"] input,
-        body[data-theme="snow"] select, body[data-theme="love"] select { background: white; border-color: #cbd5e1; }
+        body[data-theme="snow"] select, body[data-theme="love"] select, .form-control { background: white; border-color: #cbd5e1; color: #1e293b; }
 
-        .btn-tool { background: #3b82f6; color: white; border: none; padding: 12px 20px; border-radius: 12px; font-weight: 600; cursor: pointer; font-family: 'Prompt'; transition: 0.2s; display: flex; align-items: center; gap: 8px; font-size: 0.9rem; }
+        .btn-tool { background: #3b82f6; color: white; border: none; padding: 11px 18px; border-radius: 10px; font-weight: 600; cursor: pointer; font-family: 'Prompt'; transition: 0.2s; display: inline-flex; align-items: center; gap: 8px; font-size: 0.9rem; }
         .btn-tool:hover { background: #2563eb; transform: translateY(-1px); }
         .btn-print { background: #10b981; } .btn-print:hover { background: #059669; }
+        .btn-danger { background: #ef4444; } .btn-danger:hover { background: #dc2626; }
 
-        /* สไตล์ตารางคะแนนระดับโปร */
-        .table-responsive { width: 100%; overflow-x: auto; border-radius: 16px; border: 1px solid rgba(255,255,255,0.08); }
+        /* ตารางสไตล์โมเดิร์น */
+        .table-responsive { width: 100%; overflow-x: auto; border-radius: 14px; border: 1px solid rgba(255,255,255,0.08); }
         body[data-theme="snow"] .table-responsive, body[data-theme="love"] .table-responsive { border-color: #e2e8f0; }
         
-        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.95rem; }
-        th { background: rgba(59,130,246,0.15); padding: 15px 20px; font-weight: 600; color: #60a5fa; border-bottom: 2px solid rgba(59,130,246,0.3); }
-        body[data-theme="snow"] th, body[data-theme="love"] th { color: #2563eb; background: rgba(59,130,246,0.08); border-bottom-color: #cbd5e1; }
-        td { padding: 14px 20px; border-bottom: 1px solid rgba(255,255,255,0.05); color: inherit; }
+        table { width: 100%; border-collapse: collapse; text-align: left; font-size: 0.9rem; }
+        th { background: rgba(59,130,246,0.12); padding: 14px 18px; font-weight: 600; color: #60a5fa; border-bottom: 2px solid rgba(59,130,246,0.25); }
+        body[data-theme="snow"] th, body[data-theme="love"] th { color: #2563eb; background: rgba(59,130,246,0.06); border-bottom-color: #cbd5e1; }
+        td { padding: 12px 18px; border-bottom: 1px solid rgba(255,255,255,0.05); color: inherit; vertical-align: middle; }
         body[data-theme="snow"] td, body[data-theme="love"] td { border-bottom-color: #f1f5f9; }
         tr:hover { background: rgba(255,255,255,0.02); }
-        body[data-theme="snow"] tr:hover, body[data-theme="love"] tr:hover { background: rgba(0,0,0,0.02); }
 
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-align: center; }
+        .badge { display: inline-block; padding: 3px 9px; border-radius: 20px; font-size: 0.75rem; font-weight: bold; text-align: center; }
         .badge-green { background: rgba(16, 185, 129, 0.15); color: #10b981; }
         .badge-red { background: rgba(239, 68, 68, 0.15); color: #ef4444; }
         .badge-blue { background: rgba(59, 130, 246, 0.15); color: #3b82f6; }
+        .badge-purple { background: rgba(168, 85, 247, 0.15); color: #a855f7; }
 
-        /* แผง Theme Switcher เล็กๆ ท้าย Sidebar */
+        /* ฟอร์มบานหน้าต่างจัดการข้อมูล (Modal Form) */
+        .modal { position: fixed; inset: 0; background: rgba(0,0,0,0.7); backdrop-filter: blur(5px); z-index: 1000; display: flex; align-items: center; justify-content: center; opacity: 0; pointer-events: none; transition: 0.2s; }
+        .modal.active { opacity: 1; pointer-events: auto; }
+        .modal-content { background: #1e293b; border-radius: 20px; padding: 25px; width: 90%; max-width: 500px; border: 1px solid rgba(255,255,255,0.1); color: white; }
+        body[data-theme="snow"] .modal-content, body[data-theme="love"] .modal-content { background: white; color: #1e293b; border-color: #e2e8f0; }
+        .form-group { margin-bottom: 15px; text-align: left; }
+        .form-group label { display: block; font-size: 0.85rem; margin-bottom: 5px; font-weight: 500; opacity: 0.9; }
+        .form-control { padding: 10px 12px; }
+
         .sidebar-footer { margin-top: auto; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px; display: flex; gap: 5px; flex-wrap: wrap; justify-content: center; }
-        .theme-mini-btn { background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; font-size: 0.9rem; display: flex; align-items: center; justify-content: center; }
-        .theme-mini-btn.active { border: 2px solid #3b82f6; box-shadow: 0 0 8px #3b82f6; }
+        .theme-mini-btn { background: rgba(255,255,255,0.1); border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; }
+        .theme-mini-btn.active { border: 2px solid #3b82f6; }
 
-        /* สไตล์หน้าพิมพ์ */
+        /* พิมพ์สำหรับรายงานคะแนน */
         @media print {
             body { background: white !important; color: black !important; }
-            .sidebar, header, .filter-bar, .btn-tool { display: none !important; }
+            .sidebar, header, .filter-bar, .btn-tool, .nav-menu { display: none !important; }
             .main-container, .main-content, .glass-card { overflow: visible !important; padding: 0 !important; margin: 0 !important; background: none !important; border: none !important; }
             table { border: 1px solid #333; width: 100%; }
             th, td { border: 1px solid #333 !important; color: black !important; padding: 8px !important; }
-            th { background: #eee !important; }
         }
     </style>
 </head>
 <body data-theme="default">
 
     <div class="sidebar">
-        <div class="sidebar-brand"><i class="fas fa-user-shield"></i> PROT Hub Admin</div>
+        <div class="sidebar-brand"><i class="fas fa-cubes"></i> PROT Workspace Admin</div>
         <ul class="nav-menu">
-            <li class="nav-item active"><a href="#"><i class="fas fa-chart-line"></i> แดชบอร์ดคะแนน</a></li>
-            <li class="nav-item"><a href="allquiz.html"><i class="fas fa-database"></i> จัดการคลังข้อสอบ</a></li>
+            <li class="nav-item active" onclick="switchTab('tab-scores')"><a><i class="fas fa-chart-bar"></i> คะแนนและสถานะเรียน</a></li>
+            <li class="nav-item" onclick="switchTab('tab-activities')"><a><i class="fas fa-plus-circle"></i> มอบหมายงาน/กิจกรรม</a></li>
+            <li class="nav-item" onclick="switchTab('tab-submissions')"><a><i class="fas fa-file-code"></i> ตรวจกล่องส่งงานเด็ก</a></li>
+            <li class="nav-item" onclick="switchTab('tab-security')"><a><i class="fas fa-user-shield"></i> รายงานโกงสอบ/ปลดแบน</a></li>
+            <li class="nav-item"><a href="allquiz.html"><i class="fas fa-database"></i> ไปคลังข้อสอบหลังบ้าน</a></li>
             <li class="nav-item"><a href="index.html"><i class="fas fa-home"></i> กลับหน้าหลักระบบ</a></li>
         </ul>
         
         <div class="sidebar-footer">
-            <button class="theme-mini-btn active" onclick="applyTheme('default')" title="เริ่มต้น">🤖</button>
-            <button class="theme-mini-btn" onclick="applyTheme('snow')" title="หิมะ">❄️</button>
-            <button class="theme-mini-btn" onclick="applyTheme('forest')" title="ป่าเขียว">🌿</button>
-            <button class="theme-mini-btn" onclick="applyTheme('halloween')" title="ฮัลโลวีน">🎃</button>
-            <button class="theme-mini-btn" onclick="applyTheme('love')" title="ซากุระ">🌸</button>
+            <button class="theme-mini-btn active" onclick="applyTheme('default')">🤖</button>
+            <button class="theme-mini-btn" onclick="applyTheme('snow')">❄️</button>
+            <button class="theme-mini-btn" onclick="applyTheme('forest')">🌿</button>
+            <button class="theme-mini-btn" onclick="applyTheme('halloween')">🎃</button>
+            <button class="theme-mini-btn" onclick="applyTheme('love')">🌸</button>
         </div>
     </div>
 
     <div class="main-container">
         <header>
-            <h2 style="font-weight: 700;"><i class="fas fa-chalkboard-teacher"></i> ระบบติดตามคะแนนและสถานะนักเรียน</h2>
+            <h2 id="hub-title" style="font-weight: 700;"><i class="fas fa-chart-line"></i> แดชบอร์ดสรุปคะแนนประจำห้องเรียน</h2>
             <div id="loginArea">กำลังโหลดผู้ใช้...</div>
         </header>
 
         <div class="main-content">
-            <div class="glass-card">
-                
-                <div class="filter-bar">
-                    <div class="search-input">
-                        <i class="fas fa-search"></i>
-                        <input type="text" id="searchBox" oninput="filterScoresTable()" placeholder="พิมพ์ค้นหา ชื่อนักเรียน หรือ รหัสประจำตัว...">
-                    </div>
-                    
-                    <select id="roomFilter" class="filter-select" onchange="filterScoresTable()">
-                        <option value="all">🏫 แสดงทุกห้องเรียน</option>
+
+            <div id="tab-scores" class="tab-content active">
+                <div class="glass-card">
+                    <div class="filter-bar">
+                        <div class="search-input">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchBox" oninput="filterScoresTable()" placeholder="ค้นหา ชื่อนักเรียน หรือ รหัสประจำตัว...">
+                        </div>
+                        <select id="roomFilter" class="filter-select" onchange="filterScoresTable()"><option value="all">🏫 ทุกห้องเรียน</option></select>
+                        <select id="sortFilter" class="filter-select" onchange="filterScoresTable()">
+                            <option value="no">🔢 เรียงตามเลขที่</option>
+                            <option value="scoreDesc">🏆 คะแนน: มาก ➔ น้อย</option>
+                            <option value="scoreAsc">📉 คะแนน: น้อย ➔ มาก</option>
                         </select>
-
-                    <select id="sortFilter" class="filter-select" onchange="filterScoresTable()">
-                        <option value="no">🔢 เรียงตามเลขที่</option>
-                        <option value="scoreDesc">🏆 คะแนน: มาก ➔ น้อย</option>
-                        <option value="scoreAsc">📉 คะแนน: น้อย ➔ มาก</option>
-                        <option value="id">🆔 เรียงตามรหัสนักเรียน</option>
-                    </select>
-
-                    <button class="btn-tool" onclick="fetchDashboardData()"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
-                    <button class="btn-tool btn-print" onclick="window.print()"><i class="fas fa-print"></i> พิมพ์ใบคะแนน</button>
+                        <button class="btn-tool" onclick="fetchDashboardData()"><i class="fas fa-sync-alt"></i> รีเฟรช</button>
+                        <button class="btn-tool btn-print" onclick="window.print()"><i class="fas fa-print"></i> พิมพ์ใบคะแนน</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">รหัสประจำตัว</th>
+                                    <th style="width: 70px;">ห้อง</th>
+                                    <th style="width: 70px;">เลขที่</th>
+                                    <th>ชื่อ-นามสกุล</th>
+                                    <th style="text-align: center;">ส่งงานแล้ว</th>
+                                    <th style="text-align: center;">ค้างส่ง</th>
+                                    <th style="text-align: center; font-size: 1rem;">คะแนนสะสม</th>
+                                </tr>
+                            </thead>
+                            <tbody id="scores-table-body"></tbody>
+                        </table>
+                    </div>
                 </div>
+            </div>
 
-                <div class="table-responsive">
-                    <table>
-                        <thead>
-                            <tr>
-                                <th style="width: 120px;">รหัสประจำตัว</th>
-                                <th style="width: 80px;">ห้อง</th>
-                                <th style="width: 80px;">เลขที่</th>
-                                <th>ชื่อ-นามสกุล</th>
-                                <th style="width: 150px; text-align: center;">ส่งงานแล้ว</th>
-                                <th style="width: 150px; text-align: center;">ค้างส่ง</th>
-                                <th style="width: 140px; text-align: center; font-size: 1.05rem;">คะแนนสอบรวม</th>
-                            </tr>
-                        </thead>
-                        <tbody id="scores-table-body">
-                            <tr>
-                                <td colspan="7" style="text-align: center; padding: 40px; opacity: 0.7;">
-                                    <i class="fas fa-spinner fa-spin fa-2x" style="color:#3b82f6; margin-bottom:10px;"></i><br>
-                                    กำลังดึงข้อมูลคะแนนนักเรียนเรียลไทม์...
-                                </td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div id="tab-activities" class="tab-content">
+                <div class="glass-card">
+                    <div class="filter-bar" style="justify-content: space-between;">
+                        <h3>📋 รายการกิจกรรมการเรียนรู้ที่มอบหมายในปัจจุบัน</h3>
+                        <button class="btn-tool btn-print" onclick="openActivityModal()"><i class="fas fa-plus"></i> มอบหมายงานใหม่</button>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">รหัสงาน (ID)</th>
+                                    <th style="width: 150px;">ประเภทกิจกรรม</th>
+                                    <th>หัวข้อ/ชื่องาน</th>
+                                    <th>คำชี้แจงรายละเอียด</th>
+                                    <th style="width: 100px; text-align: center;">จัดการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="activities-table-body">
+                                <tr><td colspan="5" style="text-align:center; padding:30px; opacity:0.6;">กำลังเชื่อมโยงข้อมูลตารางกิจกรรม...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
+            </div>
 
+            <div id="tab-submissions" class="tab-content">
+                <div class="glass-card">
+                    <div class="filter-bar">
+                        <div class="search-input" style="max-width: 350px;">
+                            <i class="fas fa-search"></i>
+                            <input type="text" id="searchSubmitBox" oninput="filterSubmissionsTable()" placeholder="พิมพ์ชื่อ ค้นหากล่องส่งงาน...">
+                        </div>
+                        <select id="workTypeFilter" class="filter-select" onchange="filterSubmissionsTable()">
+                            <option value="all">📂 กิจกรรมทั้งหมด</option>
+                        </select>
+                    </div>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 110px;">รหัสนักเรียน</th>
+                                    <th>ชื่อนักเรียน</th>
+                                    <th style="width: 100px;">รหัสงาน</th>
+                                    <th>เนื้อหางาน / โค้ดคอมพิวเตอร์ที่ส่งมา</th>
+                                    <th style="width: 150px; text-align: center;">เวลาที่ส่ง</th>
+                                </tr>
+                            </thead>
+                            <tbody id="submissions-table-body">
+                                <tr><td colspan="5" style="text-align:center; padding:30px; opacity:0.6;">กำลังดึงประวัติการพิมพ์โค้ดและการส่งงาน...</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <div id="tab-security" class="tab-content">
+                <div class="glass-card" style="border: 1px solid rgba(239, 68, 68, 0.3);">
+                    <h3 style="color:#ef4444; margin-bottom: 15px;"><i class="fas fa-radiation"></i> รายชื่อผู้ทุจริต/สลับหน้าจอสอบ (Strict Mode Log)</h3>
+                    <div class="table-responsive">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th style="width: 120px;">รหัสประจำตัว</th>
+                                    <th>ชื่อนักเรียน</th>
+                                    <th style="width: 140px;">หมายเลข IP</th>
+                                    <th>เหตุการณ์/สาเหตุการตรวจจับ</th>
+                                    <th style="width: 140px; text-align: center;">มาตรการ</th>
+                                </tr>
+                            </thead>
+                            <tbody id="banned-table-body">
+                                <tr><td colspan="5" style="text-align:center; padding:30px; opacity:0.6; color:#10b981;"><i class="fas fa-check-circle"></i> ห้องเรียนปลอดภัย ดีเยี่ยม ไม่มีประวัติแอบเปิดดูเฉลยในคาบนี้</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="actModal" class="modal">
+        <div class="modal-content">
+            <h3 style="margin-bottom: 15px;"><i class="fas fa-edit"></i> แบบฟอร์มมอบหมายกิจกรรม</h3>
+            <div class="form-group">
+                <label>🔑 รหัสกิจกรรม (ID) *ห้ามซ้ำกับงานอื่น*</label>
+                <input type="text" id="form-act-id" class="form-control" placeholder="เช่น LAB_PYTHON_01">
+            </div>
+            <div class="form-group">
+                <label>📌 ประเภทงาน</label>
+                <select id="form-act-type" class="form-control" style="padding-left:12px;">
+                    <option value="ปฏิบัติการ">💻 ปฏิบัติการ Python (แล็บส่งโค้ด)</option>
+                    <option value="quiz">📝 ทำข้อสอบออนไลน์ (Strict Mode)</option>
+                    <option value="บทเรียนเนื้อหา">📖 บทเรียนเนื้อหา/ใบความรู้</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label>🏷️ ชื่อหัวข้อกิจกรรม</label>
+                <input type="text" id="form-act-title" class="form-control" placeholder="เช่น ใบงานที่ 1 การเขียนเงื่อนไข If-Else">
+            </div>
+            <div class="form-group">
+                <label>📄 คำชี้แจง / รายละเอียดงาน (หรือลิงก์วิดีโอ/โจทย์)</label>
+                <textarea id="form-act-desc" class="form-control" style="height:100px; padding-left:12px;" placeholder="กรอกคำสั่งใบงาน หรือวางลิงก์เนื้อหา..."></textarea>
+            </div>
+            <div style="display:flex; gap:10px; justify-content: flex-end; margin-top:20px;">
+                <button class="btn-tool btn-danger" onclick="closeActivityModal()">ยกเลิก</button>
+                <button class="btn-tool" onclick="saveNewActivity()"><i class="fas fa-save"></i> บันทึกสั่งงาน</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ใช้ลิงก์สคริปต์หลักตัวเดียวกับหน้าห้องเรียนนักเรียน
         const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
-        let localStudentsData = []; // เก็บข้อมูลนักเรียนทั้งหมดไว้คัดกรองในหน้าบ้านเพื่อความรวดเร็ว
+        
+        // หน่วยความจำแคชเก็บดาต้าหลังบ้าน
+        let localStudentsData = [];
+        let localActivitiesData = [];
+        let localSubmissionsData = [];
+        let localBannedData = [];
+
+        // ฟังก์ชันสลับแท็บเมนูการทำงานที่หลากหลาย
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+            document.querySelectorAll('.nav-item').forEach(el => el.classList.remove('active'));
+            
+            document.getElementById(tabId).classList.add('active');
+            
+            // เปลี่ยนหัวข้อด้านบนตามเมนูที่สลับไป
+            const titleEl = document.getElementById('hub-title');
+            if(tabId === 'tab-scores') titleEl.innerHTML = `<i class="fas fa-chart-line"></i> แดชบอร์ดสรุปคะแนนประจำห้องเรียน`;
+            if(tabId === 'tab-activities') titleEl.innerHTML = `<i class="fas fa-folder-plus"></i> แผงบริหารจัดการและมอบหมายกิจกรรม`;
+            if(tabId === 'tab-submissions') titleEl.innerHTML = `<i class="fas fa-inbox"></i> คลังตรวจสอบซอร์สโค้ดและลิงก์โครงงานนวัตกรรม`;
+            if(tabId === 'tab-security') titleEl.innerHTML = `<i class="fas fa-shield-alt"></i> ศูนย์ควบคุมความปลอดภัยและตรวจสอบความซื่อสัตย์`;
+        }
 
         window.onload = () => {
-            // 🌟 ระบบ รปภ. ตรวจสอบสิทธิ์ครูขั้นเด็ดขาด (เหลือแค่อีเมลครูอันเดียว) 🌟
             const currentEmail = localStorage.getItem('student_email');
             const adminEmails = ['ratchapon@prot.ac.th'];
             
@@ -178,7 +306,6 @@
                 return;
             }
 
-            // ตั้งค่า UI ผู้สอน
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=Teacher";
             document.getElementById('loginArea').innerHTML = `<div style="display:flex; align-items:center; gap:10px;"><img src="${pic}" style="width:35px; border-radius:50%; border:2px solid #3b82f6;"> <span>ครูรัชพล (แอดมิน)</span></div>`;
 
@@ -186,97 +313,193 @@
             fetchDashboardData(); 
         };
 
-        // ฟังก์ชันดึงข้อมูลสรุปผลคะแนนจาก Google Sheets
+        // ฟังก์ชันดึงชุดข้อมูลจากฐานข้อมูลแผ่นงาน
         async function fetchDashboardData() {
-            const tbody = document.getElementById('scores-table-body');
-            tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>กำลังดึงข้อมูลอัปเดตล่าสุด...</td></tr>`;
-            
             try {
                 const res = await fetch(`${MAIN_URL}?action=getDashboardData&t=${Date.now()}`);
                 const data = await res.json();
                 
-                // เก็บข้อมูลลงตัวแปรภายในเพื่อใช้ค้นหา/กรอง
                 localStudentsData = data.students || [];
+                localActivitiesData = data.activities || [];
+                localSubmissionsData = data.submissions || [];
+                localBannedData = data.banned_students || []; // ถ้าระบบหลังบ้านส่งมา
                 
-                // สร้างรายชื่อห้องใน Dropdown อัตโนมัติ (Dynamic Room Filter)
-                buildRoomDropdown(localStudentsData);
-                
-                // แสดงผลตารางข้อมูล
+                buildDropdowns();
                 renderScoresTable(localStudentsData);
+                renderActivitiesTable(localActivitiesData);
+                renderSubmissionsTable(localSubmissionsData);
+                renderBannedTable(localBannedData);
             } catch (e) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; color:#ef4444;"><i class="fas fa-exclamation-triangle fa-2x"></i><br><br>เชื่อมต่อข้อมูลล้มเหลว กรุณากดปุ่มรีเฟรชลองใหม่อีกครั้ง</td></tr>`;
+                console.log("Fetch Data Error: ", e);
             }
         }
 
-        // ฟังก์ชันสร้างรายชื่อห้องเรียนที่มีอยู่จริงลงใน Dropdown แบบอัจฉริยะ
-        function buildRoomDropdown(students) {
-            const filter = document.getElementById('roomFilter');
-            const rooms = [...new Set(students.map(s => s.room).filter(Boolean))].sort();
-            
-            filter.innerHTML = `<option value="all">🏫 แสดงทุกห้องเรียน (${students.length} คน)</option>`;
-            rooms.forEach(room => {
-                const count = students.filter(s => s.room === room).length;
-                filter.innerHTML += `<option value="${room}">ชั้น ม.4 ห้อง ${room} (${count} คน)</option>`;
-            });
+        function buildDropdowns() {
+            // สร้าง Filter แยกห้องเรียน
+            const roomFilter = document.getElementById('roomFilter');
+            const rooms = [...new Set(localStudentsData.map(s => s.room).filter(Boolean))].sort();
+            roomFilter.innerHTML = '<option value="all">🏫 ทุกห้องเรียน</option>';
+            rooms.forEach(r => roomFilter.innerHTML += `<option value="${r}">ชั้น ม.4/${r}</option>`);
+
+            // สร้าง Filter แยกงานในคลังส่งงาน
+            const workFilter = document.getElementById('workTypeFilter');
+            const acts = [...new Set(localSubmissionsData.map(s => s.activity_id).filter(Boolean))].sort();
+            workFilter.innerHTML = '<option value="all">📂 กิจกรรมทั้งหมด</option>';
+            acts.forEach(a => workFilter.innerHTML += `<option value="${a}">งานรหัส: ${a}</option>`);
         }
 
-        // ฟังก์ชันวาดตารางแสดงผลข้อมูลคะแนน
-        function renderScoresTable(studentsList) {
+        /* ==================== RENDERS & FILTERS FUNCTIONS ==================== */
+        function renderScoresTable(list) {
             const tbody = document.getElementById('scores-table-body');
-            tbody.innerHTML = '';
-
-            if (studentsList.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" style="text-align: center; padding: 40px; opacity:0.6;">🔍 ไม่พบข้อมูลคะแนนตามเงื่อนไขที่เลือก</td></tr>`;
-                return;
-            }
-
-            studentsList.forEach(s => {
-                tbody.innerHTML += `
-                    <tr>
-                        <td style="font-family: monospace; font-weight: 500;">${s.student_id || '-'}</td>
-                        <td>${s.room ? '4/' + s.room : '-'}</td>
-                        <td>${s.number || '-'}</td>
-                        <td><strong>${s.name || 'นักเรียน'}</strong></td>
-                        <td style="text-align: center;"><span class="badge badge-green">${s.sent_count || 0} กิจกรรม</span></td>
-                        <td style="text-align: center;"><span class="badge badge-red">${s.pending_count || 0} กิจกรรม</span></td>
-                        <td style="text-align: center; font-weight: 700; color: #60a5fa; font-size: 1.1rem; background: rgba(59,130,246,0.03);">
-                            ${s.total_score || 0}
-                        </td>
-                    </tr>
-                `;
-            });
+            tbody.innerHTML = list.map(s => `
+                <tr>
+                    <td style="font-family:monospace;">${s.student_id || '-'}</td>
+                    <td>4/${s.room || '-'}</td>
+                    <td>${s.number || '-'}</td>
+                    <td><strong>${s.name || '-'}</strong></td>
+                    <td style="text-align:center;"><span class="badge badge-green">${s.sent_count || 0} งาน</span></td>
+                    <td style="text-align:center;"><span class="badge badge-red">${s.pending_count || 0} งาน</span></td>
+                    <td style="text-align:center; font-weight:700; color:#3b82f6; font-size:1.05rem; background:rgba(59,130,246,0.03);">${s.total_score || 0}</td>
+                </tr>
+            `).join('') || `<tr><td colspan="7" style="text-align:center; padding:20px;">ไม่พบรายการคะแนน</td></tr>`;
         }
 
-        // ฟังก์ชันหัวใจหลัก: ประมวลผล ค้นหา แยกห้อง และจัดเรียงคะแนน (Client-side Processing)
         function filterScoresTable() {
-            const searchText = document.getElementById('searchBox').value.trim().toLowerCase();
-            const selectedRoom = document.getElementById('roomFilter').value;
-            const sortBy = document.getElementById('sortFilter').value;
+            const search = document.getElementById('searchBox').value.trim().toLowerCase();
+            const room = document.getElementById('roomFilter').value;
+            const sort = document.getElementById('sortFilter').value;
 
-            // Step 1: กรองข้อมูลตามการค้นหาและห้องเรียน
             let filtered = localStudentsData.filter(s => {
-                const matchSearch = (s.name || '').toLowerCase().includes(searchText) || (s.student_id || '').toLowerCase().includes(searchText);
-                const matchRoom = (selectedRoom === 'all') || (String(s.room) === String(selectedRoom));
+                const matchSearch = (s.name || '').toLowerCase().includes(search) || (s.student_id || '').toLowerCase().includes(search);
+                const matchRoom = (room === 'all') || (String(s.room) === String(room));
                 return matchSearch && matchRoom;
             });
 
-            // Step 2: จัดเรียงลำดับข้อมูล (Sorting)
-            if (sortBy === 'no') {
-                // เรียงตามเลขที่ (จากน้อยไปมาก)
-                filtered.sort((a, b) => Number(a.number || 999) - Number(b.number || 999));
-            } else if (sortBy === 'scoreDesc') {
-                // คะแนนมากไปน้อย
-                filtered.sort((a, b) => Number(b.total_score || 0) - Number(a.total_score || 0));
-            } else if (sortBy === 'scoreAsc') {
-                // คะแนนน้อยไปมาก
-                filtered.sort((a, b) => Number(a.total_score || 0) - Number(b.total_score || 0));
-            } else if (sortBy === 'id') {
-                // เรียงตามรหัสนักเรียน
-                filtered.sort((a, b) => String(a.student_id).localeCompare(String(b.student_id)));
-            }
+            if (sort === 'no') filtered.sort((a,b) => Number(a.number || 999) - Number(b.number || 999));
+            if (sort === 'scoreDesc') filtered.sort((a,b) => Number(b.total_score || 0) - Number(a.total_score || 0));
+            if (sort === 'scoreAsc') filtered.sort((a,b) => Number(a.total_score || 0) - Number(b.total_score || 0));
 
-            // วาดตารางใหม่ด้วยข้อมูลที่ประมวลผลแล้ว
             renderScoresTable(filtered);
+        }
+
+        function renderActivitiesTable(list) {
+            const tbody = document.getElementById('activities-table-body');
+            tbody.innerHTML = list.map(a => {
+                let badge = `<span class="badge badge-blue">📄 ${a.type || 'ทั่วไป'}</span>`;
+                if(a.type === 'quiz') badge = `<span class="badge badge-red">📝 ข้อสอบ Strict</span>`;
+                if(a.type === 'ปฏิบัติการ') badge = `<span class="badge badge-purple">💻 แล็บปฏิบัติการ</span>`;
+                
+                return `
+                    <tr>
+                        <td style="font-family:monospace; font-weight:600; color:#60a5fa;">${a.id}</td>
+                        <td>${badge}</td>
+                        <td><strong>${a.title || '-'}</strong></td>
+                        <td><small style="opacity:0.8;">${a.desc || '-'}</small></td>
+                        <td style="text-align:center;">
+                            <button class="badge badge-red" style="border:none; cursor:pointer;" onclick="deleteActivity('${a.id}')"><i class="fas fa-trash-alt"></i> ลบ</button>
+                        </td>
+                    </tr>
+                `;
+            }).join('') || `<tr><td colspan="5" style="text-align:center; padding:20px;">คลังกิจกรรมว่างเปล่า</td></tr>`;
+        }
+
+        function renderSubmissionsTable(list) {
+            const tbody = document.getElementById('submissions-table-body');
+            tbody.innerHTML = list.map(s => `
+                <tr>
+                    <td style="font-family:monospace; font-size:0.85rem;">${s.student_id || '-'}</td>
+                    <td><strong>${s.student_name || 'ไม่ทราบชื่อ'}</strong></td>
+                    <td><span class="badge badge-purple">${s.activity_id || '-'}</span></td>
+                    <td><pre style="background:rgba(0,0,0,0.3); padding:8px; border-radius:6px; font-family:monospace; max-height:120px; overflow-y:auto; white-space:pre-wrap; color:#a7f3d0; font-size:0.8rem;">${s.work_content || '-'}</pre></td>
+                    <td><small style="opacity:0.7;">${s.timestamp || '-'}</small></td>
+                </tr>
+            `).join('') || `<tr><td colspan="5" style="text-align:center; padding:20px;">ยังไม่มีเด็กคนไหนส่งงานเข้ามาในระบบ</td></tr>`;
+        }
+
+        function filterSubmissionsTable() {
+            const search = document.getElementById('searchSubmitBox').value.trim().toLowerCase();
+            const actId = document.getElementById('workTypeFilter').value;
+
+            let filtered = localSubmissionsData.filter(s => {
+                const matchSearch = (s.student_name || '').toLowerCase().includes(search) || (s.student_id || '').toLowerCase().includes(search);
+                const matchAct = (actId === 'all') || (s.activity_id === actId);
+                return matchSearch && matchAct;
+            });
+
+            renderSubmissionsTable(filtered);
+        }
+
+        function renderBannedTable(list) {
+            const tbody = document.getElementById('banned-table-body');
+            if(!list || list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#10b981; font-weight:600;"><i class="fas fa-check-circle"></i> ห้องเรียนปลอดภัย ไร้ประวัติการทุจริตสอบคัดลอกกันในเวลานี้</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(b => `
+                <tr style="background:rgba(239, 68, 68, 0.04);">
+                    <td style="font-family:monospace; font-weight:600;">${b.student_id || '-'}</td>
+                    <td><strong>${b.student_name || '-'}</strong></td>
+                    <td><small style="color:#f87171;">${b.ip || 'unknown'}</small></td>
+                    <td style="color:#fca5a5; font-size:0.85rem;"><i class="fas fa-exclamation-circle"></i> ${b.reason || 'ออกจากหน้าต่างข้อสอบ'}</td>
+                    <td style="text-align:center;">
+                        <button class="btn-tool btn-print" style="padding:4px 10px; font-size:0.75rem;" onclick="unbanStudent('${b.student_id}')"><i class="fas fa-unlock"></i> ปลดล็อกสิทธิ์</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
+        /* ==================== ACTIONS BACKEND MANAGEMENT ==================== */
+        function openActivityModal() { document.getElementById('actModal').classList.add('active'); }
+        function closeActivityModal() { document.getElementById('actModal').classList.remove('active'); }
+
+        async function saveNewActivity() {
+            const id = document.getElementById('form-act-id').value.trim();
+            const type = document.getElementById('form-act-type').value;
+            const title = document.getElementById('form-act-title').value.trim();
+            const desc = document.getElementById('form-act-desc').value.trim();
+
+            if(!id || !title) return alert("⚠️ กรุณากรอก รหัสกิจกรรม และ ชื่อหัวข้อ ให้ครบถ้วน");
+
+            const btn = document.querySelector("#actModal .btn-tool:last-child");
+            btn.disabled = true; btn.innerHTML = "<i class='fas fa-spinner fa-spin'></i> กำลังบันทึกสั่งงาน...";
+
+            try {
+                await fetch(MAIN_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({ action: "addActivity", id: id, type: type, title: title, desc: desc })
+                });
+                alert("🎉 มอบหมายกิจกรรมและสั่งงานลงห้องเรียนเรียบร้อย!");
+                closeActivityModal();
+                fetchDashboardData();
+            } catch(e) {
+                alert("เกิดข้อผิดพลาดในการเชื่อมโยงฐานข้อมูล");
+            } finally {
+                btn.disabled = false; btn.innerHTML = "<i class='fas fa-save'></i> บันทึกสั่งงาน";
+            }
+        }
+
+        async function deleteActivity(actId) {
+            if(!confirm(`⚠️ ยืนยันที่จะลบกิจกรรมรหัส [${actId}] ใช่หรือไม่?\nการลบนี้จะทำให้หน้าห้องเรียนนักเรียนหายไปด้วย`)) return;
+            try {
+                await fetch(MAIN_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({ action: "deleteActivity", id: actId })
+                });
+                alert("✅ ลบกิจกรรมสำเร็จ!");
+                fetchDashboardData();
+            } catch(e) { alert("ลบไม่สำเร็จ"); }
+        }
+
+        async function unbanStudent(sid) {
+            if(!confirm(`🔓 ยืนยันการให้อภัยและปลดแบนสิทธิ์การสอบรหัสนักเรียน [${sid}] ใช่หรือไม่?`)) return;
+            try {
+                await fetch(MAIN_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    body: JSON.stringify({ action: "unbanStudent", student_id: sid })
+                });
+                alert("✅ ปลดล็อกสถานะการทุจริตเรียบร้อย นักเรียนกลับเข้าทำข้อสอบได้แล้ว!");
+                fetchDashboardData();
+            } catch(e) { alert("เกิดข้อผิดพลาดในการปลดล็อกสิทธิ์"); }
         }
 
         function applyTheme(theme) { 
