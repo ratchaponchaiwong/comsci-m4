@@ -16,21 +16,19 @@
         body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); }
         body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
 
-        /* พื้นหลังเคลื่อนไหว */
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; overflow: hidden; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 500px; height: 500px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 700px; height: 700px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
 
-        /* แถบด้านซ้าย */
         .sidebar { width: 280px; background: rgba(0, 0, 0, 0.4); backdrop-filter: blur(20px); border-right: 1px solid rgba(255,255,255,0.1); display: flex; flex-direction: column; padding: 20px 0; z-index: 100; transition: 0.3s; height: 100vh; overflow-y: auto;}
         body[data-theme="snow"] .sidebar, body[data-theme="love"] .sidebar { background: rgba(255,255,255,0.6); border-right-color: rgba(0,0,0,0.1); }
         .sidebar-brand { font-size: 1.3rem; font-weight: 800; color: #60a5fa; padding: 0 20px 20px 20px; border-bottom: 1px solid rgba(255,255,255,0.1); margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         body[data-theme="snow"] .sidebar-brand, body[data-theme="love"] .sidebar-brand { border-bottom-color: rgba(0,0,0,0.1); }
         
         .nav-menu { list-style: none; display: flex; flex-direction: column; gap: 5px; padding: 0 15px; flex: 1; }
-        .nav-menu li { padding: 12px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 12px; font-weight: 500; transition: 0.2s; opacity: 0.8; font-size: 0.95rem; }
+        .nav-menu li { padding: 10px 15px; border-radius: 12px; cursor: pointer; display: flex; align-items: center; gap: 10px; font-weight: 500; transition: 0.2s; opacity: 0.8; font-size: 0.9rem; }
         .nav-menu li:hover { background: rgba(59, 130, 246, 0.2); opacity: 1; color: #60a5fa; }
         .nav-menu li.active { background: #3b82f6; color: white; opacity: 1; box-shadow: 0 4px 10px rgba(59, 130, 246, 0.3); }
         
@@ -40,17 +38,15 @@
         body[data-theme="snow"] .theme-btn, body[data-theme="love"] .theme-btn { border-color: rgba(0,0,0,0.1); background: rgba(0,0,0,0.05); }
         .theme-btn:hover { background: #3b82f6; color: white; border-color: #3b82f6; }
 
-        /* พื้นที่เนื้อหา */
         .main-content { flex: 1; display: flex; flex-direction: column; height: 100vh; overflow-y: auto; position: relative; z-index: 10; }
         .header-bar { padding: 20px 30px; display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 50; background: rgba(0, 0, 0, 0.3); backdrop-filter: blur(15px); border-bottom: 1px solid rgba(255,255,255,0.1);}
         body[data-theme="snow"] .header-bar, body[data-theme="love"] .header-bar { background: rgba(255, 255, 255, 0.5); border-bottom-color: rgba(0,0,0,0.1); }
-        .content-body { padding: 30px 20px; max-width: 1200px; margin: 0 auto; width: 100%; padding-bottom: 100px; }
+        .content-body { padding: 30px 20px; max-width: 1400px; margin: 0 auto; width: 100%; padding-bottom: 100px; }
 
         .tab-content { display: none; animation: fadeIn 0.3s ease; }
         .tab-content.active { display: block; }
         @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* การ์ดแบบ Glassmorphism */
         .glass-card { background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 24px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); margin-bottom: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.15); color: inherit; transition: 0.3s;}
         body[data-theme="snow"] .glass-card, body[data-theme="love"] .glass-card { background: rgba(255, 255, 255, 0.85); color: #1e293b; border-color: rgba(0,0,0,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.05); }
 
@@ -64,7 +60,6 @@
         body[data-theme="snow"] input, body[data-theme="snow"] select, body[data-theme="snow"] textarea, body[data-theme="love"] input, body[data-theme="love"] select, body[data-theme="love"] textarea { background: white; border-color: #cbd5e1; }
         input:focus, select:focus, textarea:focus { outline: none; border-color: #3b82f6; box-shadow: 0 0 10px rgba(59,130,246,0.3); }
         
-        /* ฟิลเตอร์ แถบค้นหา สำหรับระบบใหม่ */
         .filter-bar { display: flex; gap: 15px; margin-bottom: 20px; flex-wrap: wrap; align-items: center; }
         .search-input { flex: 1; min-width: 200px; position: relative; }
         .search-input input { width: 100%; padding: 12px 20px 12px 45px; }
@@ -74,22 +69,19 @@
         .btn-action:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(59,130,246,0.3); }
         .btn-action:disabled { opacity: 0.7; cursor: not-allowed; transform: none; }
         .btn-danger { background: #ef4444 !important; }
-        .btn-danger:hover { box-shadow: 0 5px 15px rgba(239,68,68,0.3) !important; }
         .btn-success { background: #10b981 !important; }
-        .btn-success:hover { box-shadow: 0 5px 15px rgba(16,185,129,0.3) !important; }
         .btn-warning { background: #f59e0b !important; }
 
         .list-item { background: rgba(0,0,0,0.2); padding: 15px 20px; border-radius: 15px; margin-bottom: 12px; border-left: 5px solid #3b82f6; display: flex; justify-content: space-between; align-items: center; transition: 0.3s;}
         body[data-theme="snow"] .list-item, body[data-theme="love"] .list-item { background: rgba(0,0,0,0.05); }
         .list-item:hover { background: rgba(0,0,0,0.3); transform: translateX(5px); }
-        body[data-theme="snow"] .list-item:hover, body[data-theme="love"] .list-item:hover { background: rgba(0,0,0,0.1); }
         
         .table-responsive { overflow-x: auto; width: 100%; border-radius: 15px; }
         table { width: 100%; border-collapse: separate; border-spacing: 0; margin-top: 10px; border-radius: 12px; overflow: hidden; border: 1px solid rgba(255,255,255,0.1); }
         body[data-theme="snow"] table, body[data-theme="love"] table { border-color: rgba(0,0,0,0.1); }
-        th { font-weight: 600; color: white; background: rgba(59,130,246,0.4); padding: 15px; text-align: left; }
+        th { font-weight: 600; color: white; background: rgba(59,130,246,0.4); padding: 15px; text-align: left; white-space: nowrap; }
         body[data-theme="snow"] th, body[data-theme="love"] th { background: rgba(59,130,246,0.1); color: #3b82f6; }
-        td { padding: 15px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s;}
+        td { padding: 15px; background: rgba(0,0,0,0.2); border-bottom: 1px solid rgba(255,255,255,0.05); transition: 0.2s; white-space: nowrap; }
         body[data-theme="snow"] td, body[data-theme="love"] td { background: rgba(255,255,255,0.6); border-bottom-color: rgba(0,0,0,0.05); }
         tr:last-child td { border-bottom: none; }
         tr:hover td { background: rgba(59,130,246,0.2); }
@@ -136,13 +128,14 @@
     <div class="sidebar">
         <div class="sidebar-brand"><i class="fas fa-user-shield"></i> Admin Hub</div>
         <ul class="nav-menu">
-            <li class="active" onclick="switchTab('tab-scores', this)"><i class="fas fa-chart-bar"></i> 1. แดชบอร์ดสรุปคะแนน</li>
-            <li onclick="switchTab('tab-activities', this)"><i class="fas fa-edit"></i> 2. จัดการกิจกรรม/สั่งงาน</li>
-            <li onclick="switchTab('tab-matrix', this)"><i class="fas fa-tasks"></i> 3. ตรวจงาน (Matrix)</li>
-            <li onclick="switchTab('tab-submissions', this)"><i class="fas fa-file-code"></i> 4. ตรวจกล่องซอร์สโค้ด</li>
-            <li onclick="switchTab('tab-security', this)"><i class="fas fa-shield-alt"></i> 5. ปลดแบนสอบ/ทุจริต</li>
-            <li onclick="switchTab('tab-cms', this)"><i class="fas fa-trophy"></i> 6. อัปโหลดผลงานเว็บ</li>
-            <li onclick="window.location.href='allquiz.html'"><i class="fas fa-database"></i> 7. คลังข้อสอบ (Exam)</li>
+            <li class="active" onclick="switchTab('tab-scores', this)"><i class="fas fa-chart-pie"></i> 1. แดชบอร์ดสรุปภาพรวม</li>
+            <li onclick="switchTab('tab-export', this)"><i class="fas fa-file-excel"></i> 2. สรุปคะแนนทุกช่อง (Export)</li>
+            <li onclick="switchTab('tab-activities', this)"><i class="fas fa-edit"></i> 3. จัดการกิจกรรม/สั่งงาน</li>
+            <li onclick="switchTab('tab-matrix', this)"><i class="fas fa-tasks"></i> 4. ตรวจงาน (Matrix)</li>
+            <li onclick="switchTab('tab-submissions', this)"><i class="fas fa-file-code"></i> 5. ตรวจกล่องซอร์สโค้ด</li>
+            <li onclick="switchTab('tab-security', this)"><i class="fas fa-shield-alt"></i> 6. ปลดแบนสอบ/ทุจริต</li>
+            <li onclick="switchTab('tab-cms', this)"><i class="fas fa-trophy"></i> 7. อัปโหลดผลงานเว็บ</li>
+            <li onclick="window.location.href='allquiz.html'"><i class="fas fa-database"></i> 8. คลังข้อสอบ (Exam)</li>
             <li><a href="index.html" style="color: inherit; text-decoration: none; display: flex; gap: 12px; width: 100%;"><i class="fas fa-home"></i> กลับหน้าหลัก</a></li>
         </ul>
         <div class="theme-switcher-sidebar">
@@ -155,7 +148,7 @@
 
     <div class="main-content">
         <div class="header-bar">
-            <h2 id="hub-title" style="font-size: 1.4rem; color: inherit;"><i class="fas fa-chart-bar" style="color: #60a5fa;"></i> ระบบบริหารจัดการงานและคะแนน</h2>
+            <h2 id="hub-title" style="font-size: 1.4rem; color: inherit;"><i class="fas fa-chart-pie" style="color: #60a5fa;"></i> แดชบอร์ดสรุปภาพรวมคะแนน</h2>
             <div style="display: flex; gap: 15px; align-items: center;">
                 <button class="btn-action btn-success" onclick="loadAllData()" id="btn-global-sync"><i class="fas fa-sync-alt"></i> อัปเดตข้อมูลล่าสุด</button>
             </div>
@@ -175,10 +168,9 @@
                         </select>
                         <select id="sortFilter" class="btn-action" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2);" onchange="filterScoresTable()">
                             <option value="no">🔢 เรียงตามเลขที่</option>
-                            <option value="scoreDesc">🏆 คะแนน: มาก ➔ น้อย</option>
-                            <option value="scoreAsc">📉 คะแนน: น้อย ➔ มาก</option>
+                            <option value="scoreDesc">🏆 คะแนนรวม: มาก ➔ น้อย</option>
+                            <option value="scoreAsc">📉 คะแนนรวม: น้อย ➔ มาก</option>
                         </select>
-                        <button class="btn-action btn-success" onclick="window.print()"><i class="fas fa-print"></i> พิมพ์ใบคะแนน</button>
                     </div>
                     <div class="table-responsive">
                         <table>
@@ -188,14 +180,30 @@
                                     <th>ห้อง</th>
                                     <th>เลขที่</th>
                                     <th>ชื่อ-นามสกุล</th>
-                                    <th style="text-align: center;">ส่งงานแล้ว</th>
+                                    <th style="text-align: center;">สถานะเรียน/ส่งงานแล้ว</th>
                                     <th style="text-align: center;">ค้างส่ง</th>
-                                    <th style="text-align: center;">คะแนนรวมสะสม</th>
+                                    <th style="text-align: center;">คะแนนรวมทั้งหมด</th>
                                 </tr>
                             </thead>
                             <tbody id="scores-table-body"></tbody>
                         </table>
                     </div>
+                </div>
+            </div>
+
+            <div id="tab-export" class="tab-content">
+                <div class="glass-card">
+                    <h3 style="margin-bottom: 25px; color: #10b981; font-size: 1.3rem;"><i class="fas fa-file-excel"></i> ตารางคะแนนแยกช่องกิจกรรม สำหรับนำไปลงไฟล์ ปพ.</h3>
+                    <div class="filter-bar">
+                        <select id="export-room-filter" class="btn-action" style="background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.2); min-width: 200px;" onchange="renderExportTable()">
+                            <option value="all">🏫 แสดงทุกห้องเรียน</option>
+                        </select>
+                        <button class="btn-action btn-success" onclick="exportToCSV()"><i class="fas fa-download"></i> ดาวน์โหลดเป็นไฟล์ Excel (CSV)</button>
+                        <button class="btn-action btn-warning" onclick="window.print()"><i class="fas fa-print"></i> ปริ้นตาราง</button>
+                    </div>
+                    <div class="table-responsive" id="export-table-container">
+                        </div>
+                    <p style="margin-top: 15px; font-size: 0.85rem; color: #94a3b8;"><i class="fas fa-info-circle"></i> เลื่อนขวาเพื่อดูคะแนนช่องอื่นๆ หรือกดปุ่มดาวน์โหลดเพื่อนำไปเปิดในโปรแกรม Microsoft Excel</p>
                 </div>
             </div>
 
@@ -392,7 +400,8 @@
             if(el) el.classList.add('active');
             
             const titles = {
-                'tab-scores': '<i class="fas fa-chart-line"></i> แดชบอร์ดสรุปคะแนนรวม',
+                'tab-scores': '<i class="fas fa-chart-pie"></i> แดชบอร์ดสรุปภาพรวมคะแนน',
+                'tab-export': '<i class="fas fa-file-excel"></i> สรุปคะแนนทุกช่อง (สำหรับ ปพ.)',
                 'tab-activities': '<i class="fas fa-cogs"></i> ระบบบริหารจัดการงาน',
                 'tab-matrix': '<i class="fas fa-clipboard-check"></i> ตารางลงคะแนน (Matrix)',
                 'tab-submissions': '<i class="fas fa-file-code"></i> คลังตรวจสอบซอร์สโค้ด',
@@ -403,20 +412,20 @@
 
             if(tabId === 'tab-matrix') renderMatrix();
             if(tabId === 'tab-cms') renderPortfoliosList();
+            if(tabId === 'tab-export') renderExportTable();
         }
 
         async function loadAllData() {
             const btn = document.getElementById('btn-global-sync');
             btn.innerHTML = '<i class="fas fa-sync fa-spin"></i> กำลังอัปเดต...';
             try {
-                // ดึงข้อมูลทั้งหมดผ่านฟังก์ชัน readAll
                 const resp = await fetch(`${SCRIPT_URL}?action=readAll`);
                 db = await resp.json();
                 
                 updateRoomSelectors();
                 
-                // Render ทุกๆ Tab ให้เป็นข้อมูลล่าสุด
                 renderScoresTable();
+                renderExportTable();
                 renderActivitiesList();
                 renderMatrix();
                 renderSubmissionsTable();
@@ -432,10 +441,10 @@
 
         function updateRoomSelectors() {
             const rooms = [...new Set((db.students || []).map(s => s.room))].filter(Boolean).sort();
-            
             const roomOptions = '<option value="all">-- แสดงทุกห้องเรียน --</option>' + rooms.map(r => `<option value="${r}">${r}</option>`).join('');
             
             if(document.getElementById('roomFilter')) document.getElementById('roomFilter').innerHTML = roomOptions;
+            if(document.getElementById('export-room-filter')) document.getElementById('export-room-filter').innerHTML = roomOptions;
             if(document.getElementById('matrix-room')) document.getElementById('matrix-room').innerHTML = roomOptions;
 
             const matrixAct = document.getElementById('matrix-act');
@@ -452,7 +461,7 @@
             }
         }
 
-        /* ==================== TAB 1: ระบบคะแนน (Scores) ==================== */
+        /* ==================== TAB 1: ระบบคะแนนรวม ==================== */
         function renderScoresTable() {
             const search = document.getElementById('searchBox').value.trim().toLowerCase();
             const room = document.getElementById('roomFilter').value;
@@ -461,14 +470,12 @@
 
             let filtered = db.students || [];
 
-            // ค้นหาและกรอง
             filtered = filtered.filter(s => {
                 const matchSearch = (s.name || '').toLowerCase().includes(search) || (s.student_id || '').toLowerCase().includes(search);
                 const matchRoom = (room === 'all') || (String(s.room) === String(room));
                 return matchSearch && matchRoom;
             });
 
-            // จัดเรียง
             if (sort === 'no') filtered.sort((a,b) => Number(a.number || 999) - Number(b.number || 999));
             if (sort === 'scoreDesc') filtered.sort((a,b) => Number(b.total_score || 0) - Number(a.total_score || 0));
             if (sort === 'scoreAsc') filtered.sort((a,b) => Number(a.total_score || 0) - Number(b.total_score || 0));
@@ -492,7 +499,83 @@
         }
         function filterScoresTable() { renderScoresTable(); }
 
-        /* ==================== TAB 2: ระบบจัดการกิจกรรม ==================== */
+        /* ==================== TAB 2: ตารางคะแนนแยกรายกิจกรรม (Export Excel) ==================== */
+        function renderExportTable() {
+            const room = document.getElementById('export-room-filter').value;
+            const container = document.getElementById('export-table-container');
+
+            let filteredStudents = db.students || [];
+            if(room !== 'all') filteredStudents = filteredStudents.filter(s => s.room == room);
+            
+            // เรียงลำดับ: ห้อง -> เลขที่
+            filteredStudents.sort((a, b) => {
+                if (a.room !== b.room) return String(a.room).localeCompare(String(b.room));
+                return Number(a.number || 999) - Number(b.number || 999);
+            });
+
+            const acts = db.activities || [];
+            
+            let html = '<table id="full-score-table"><thead><tr>';
+            html += '<th style="position: sticky; left: 0; z-index: 2; background: rgba(59,130,246,0.9);">ห้อง</th>';
+            html += '<th style="position: sticky; left: 60px; z-index: 2; background: rgba(59,130,246,0.9);">เลขที่</th>';
+            html += '<th style="position: sticky; left: 130px; z-index: 2; background: rgba(59,130,246,0.9);">รหัสประจำตัว</th>';
+            html += '<th style="position: sticky; left: 240px; z-index: 2; background: rgba(59,130,246,0.9); min-width: 200px;">ชื่อ-นามสกุล</th>';
+            
+            // สร้างหัวคอลัมน์กิจกรรมทุกงาน
+            acts.forEach(a => { html += `<th>${a.Title || a.title}</th>`; });
+            html += '<th style="color: #10b981;">รวมทั้งหมด</th></tr></thead><tbody>';
+
+            if(filteredStudents.length === 0) {
+                html += `<tr><td colspan="${4 + acts.length + 1}" class="empty-state">ไม่พบข้อมูล</td></tr>`;
+            }
+
+            filteredStudents.forEach(s => {
+                html += `<tr>`;
+                html += `<td style="position: sticky; left: 0; background: inherit;">4/${s.room || '-'}</td>`;
+                html += `<td style="position: sticky; left: 60px; background: inherit;">${s.number || '-'}</td>`;
+                html += `<td style="position: sticky; left: 130px; background: inherit;">${s.student_id || '-'}</td>`;
+                html += `<td style="position: sticky; left: 240px; background: inherit;"><b>${s.name || '-'}</b></td>`;
+                
+                let rowTotal = 0;
+                // ดึงคะแนนแต่ละกิจกรรมของนักเรียนคนนี้
+                acts.forEach(a => {
+                    const actId = a.ID || a.id;
+                    const sub = (db.submissions || []).find(subm => subm.student_id == s.student_id && subm.activity_id == actId);
+                    const score = sub ? Number(sub.score || 0) : 0;
+                    rowTotal += score;
+                    html += `<td>${sub ? (sub.score !== '' ? sub.score : '0') : '-'}</td>`;
+                });
+                
+                html += `<td style="font-weight:bold; color:#10b981; font-size: 1.1rem;">${s.total_score || rowTotal}</td>`;
+                html += `</tr>`;
+            });
+            html += '</tbody></table>';
+            container.innerHTML = html;
+        }
+
+        function exportToCSV() {
+            const table = document.getElementById('full-score-table');
+            if(!table) return alert('ไม่พบตารางข้อมูล');
+            let csv = '\uFEFF'; // เข้ารหัสภาษาไทย
+            for(let i=0; i<table.rows.length; i++) {
+                let row = [], cols = table.rows[i].querySelectorAll('td, th');
+                for(let j=0; j<cols.length; j++) {
+                    let data = cols[j].innerText.replace(/(\r\n|\n|\r)/gm, '').replace(/(\"|,)/g, ' ');
+                    row.push('"' + data + '"');
+                }
+                csv += row.join(',') + '\n';
+            }
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.download = "คะแนนนักเรียน_รายกิจกรรม_" + new Date().toLocaleDateString('th-TH') + ".csv";
+            link.style.display = "none";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+        }
+
+        /* ==================== TAB 3: ระบบจัดการกิจกรรม ==================== */
         async function saveActivity() {
             const grade = document.getElementById('act-grade').value;
             const roomNum = document.getElementById('act-room-num').value;
@@ -593,7 +676,7 @@
         }
 
         async function deleteActivity(actId) {
-            if(!confirm("⚠️ แน่ใจหรือไม่ที่จะลบกิจกรรมนี้ออกจากฐานข้อมูล?")) return;
+            if(!confirm("⚠️ แน่ใจหรือไม่ที่จะลบกิจกรรมนี้ออกจากฐานข้อมูล? (ข้อมูลการส่งงานของเด็กจะไม่ถูกลบ)")) return;
             await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "deleteActivity", id: actId }) });
             loadAllData();
         }
@@ -609,7 +692,7 @@
             document.getElementById('btn-cancel-edit').style.display = 'none';
         }
 
-        /* ==================== TAB 3: ตรวจงานลงคะแนน (Matrix) ==================== */
+        /* ==================== TAB 4: ตรวจงานลงคะแนน (Matrix) ==================== */
         function renderMatrix() {
             const actId = document.getElementById('matrix-act').value;
             const room = document.getElementById('matrix-room').value;
@@ -686,7 +769,7 @@
             }
         }
 
-        /* ==================== TAB 4: ตรวจกล่องซอร์สโค้ด (Submissions) ==================== */
+        /* ==================== TAB 5: ตรวจกล่องซอร์สโค้ด (Submissions) ==================== */
         function renderSubmissionsTable() {
             const search = document.getElementById('searchSubmitBox').value.trim().toLowerCase();
             const actId = document.getElementById('workTypeFilter').value;
@@ -716,7 +799,7 @@
         }
         function filterSubmissionsTable() { renderSubmissionsTable(); }
 
-        /* ==================== TAB 5: ความปลอดภัย / ปลดแบน ==================== */
+        /* ==================== TAB 6: ความปลอดภัย / ปลดแบน ==================== */
         function renderBannedTable() {
             const tbody = document.getElementById('banned-table-body');
             const list = db.banned_students || [];
@@ -747,7 +830,7 @@
             } catch(e) { alert("เกิดข้อผิดพลาด"); }
         }
 
-        /* ==================== TAB 6: ระบบ CMS ==================== */
+        /* ==================== TAB 7: ระบบ CMS ==================== */
         async function saveCMSPortfolio() {
             const title = document.getElementById('cms-p-title').value;
             const imgLink = document.getElementById('cms-p-img').value;
@@ -795,7 +878,6 @@
         }
 
         window.onload = () => {
-            // 🌟 ระบบ รปภ. ดักคนแอบเข้าหน้า Dashboard (เหลือเฉพาะอีเมลครูคนเดียวตามที่ตั้งไว้) 🌟
             const currentEmail = localStorage.getItem('student_email');
             const adminEmails = ['ratchapon@prot.ac.th'];
             
