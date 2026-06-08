@@ -392,10 +392,9 @@
             const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
             
             try {
-                // 🌟 แก้ไข: แนบ Header ชุดควบคุมตัวอักษรเพื่อส่งตรวจคะแนนดิบ 🌟
+                // 1. ส่งคำตอบไปตรวจที่ฝั่ง Validator
                 const res = await fetch(VALIDATOR_URL, {
                     method: 'POST', 
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({action: "evaluate", answers: data})
                 }).then(r => r.json());
                 
@@ -406,7 +405,7 @@
                 const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
                 const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
                 
-                // 🌟 แก้ไข: เชื่อมระบบส่งประวัติการทำแบบทดสอบเข้าฐานข้อมูลหลักพร้อมกำหนด UTF-8 กันภาษาเพี้ยน 🌟
+                // 2. บันทึกประวัติการส่งงานเข้าตารางกิจกรรมหลัก
                 await fetch(MAIN_URL, {
                     method:'POST', 
                     mode:'no-cors', 
@@ -415,13 +414,12 @@
                         action: "submitWork", 
                         student_id: sid, 
                         student_name: sname, 
-                        email: email,
                         activity_id: actId, 
                         work_content: log
                     })
                 });
                 
-                // 🌟 แก้ไข: ส่งข้อมูลสรุปคะแนนดิบเข้าคลังคะแนนหลักของห้องเรียนเรียบร้อย 🌟
+                // 3. บันทึกคะแนนลงชีตคะแนนรวม
                 await fetch(MAIN_URL, {
                     method:'POST', 
                     mode:'no-cors', 
@@ -430,7 +428,6 @@
                         action: "saveScore", 
                         student_id: sid, 
                         student_name: sname, 
-                        email: email,
                         activity_id: actId, 
                         score: res.finalScore
                     })
@@ -441,7 +438,7 @@
                 document.getElementById('screenResult').style.display = 'block';
                 document.getElementById('scoreDisplay').innerText = res.finalScore + "/20";
             } catch(e) {
-                alert("❌ การเชื่อมต่อล้มเหลว หรือระบบขัดข้องในการบันทึกผลคะแนน กรุณากดส่งคำตอบใหม่อีกครั้ง");
+                alert("❌ การเชื่อมต่อล้มเหลว หรือโครงสร้างคำตอบผิดพลาด กรุณากดส่งใหม่อีกครั้ง");
                 document.getElementById('btnSubmit').disabled = false;
                 document.getElementById('btnSubmit').innerText = "ส่งคำตอบทั้งหมด";
             }
