@@ -68,7 +68,7 @@
         body[data-theme="snow"] .theme-btn, body[data-theme="love"] .theme-btn { border-color: rgba(0,0,0,0.1); }
         .theme-btn.active { background: #3b82f6; color: white; border-color: #3b82f6; box-shadow: 0 4px 10px rgba(59,130,246,0.3); }
 
-        /* ==================== โครงสร้างหน้าเว็บแบบสมส่วน (Proportional Layout) ==================== */
+        /* ==================== โครงสร้างหน้าเว็บแบบสมส่วน ==================== */
         .page-content-wrapper { padding: 20px; max-width: 1050px; margin: 0 auto; width: 100%; z-index: 10; position: relative; flex: 1; display: flex; flex-direction: column; gap: 40px; }
         
         .hero { display: flex; align-items: center; justify-content: space-between; padding: 40px; flex-wrap: wrap; gap: 40px; background: rgba(255,255,255,0.05); backdrop-filter: blur(15px); border-radius: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.15); margin-top: 10px; }
@@ -127,7 +127,7 @@
         .click-flash { position: fixed; width: 100px; height: 100px; border-radius: 50%; background: radial-gradient(circle, rgba(255,215,0,0.8) 0%, rgba(255,215,0,0) 70%); pointer-events: none; z-index: 200; animation: flashRipple 0.6s ease-out forwards; }
         @keyframes flashRipple { 0% { transform: scale(0); opacity: 0.8; } 100% { transform: scale(3); opacity: 0; } }
 
-        /* ==================== 🌟 Features Section (ปรับให้เป็นการ์ดใส) 🌟 ==================== */
+        /* ==================== Features Section ==================== */
         .features { margin-bottom: 20px; }
         .features-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 25px; }
         
@@ -249,10 +249,10 @@
             <div class="features">
                 <h2 style="text-align:center; margin-bottom:30px; color:inherit; font-size: 1.5rem;"><i class="fas fa-star" style="color:#f59e0b;"></i> ทำไมต้องเรียนกับเรา?</h2>
                 <div class="features-grid">
-                    <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='python.html'; else openLoginModal()">
+                    <div class="feature-card" id="feat-python" onclick="handleFeatureClick('python.html')">
                         <div class="feature-icon"><i class="fab fa-python"></i></div><h4>ห้อง Lab Python</h4><p>ฝึกเขียนโค้ดภาษา Python</p>
                     </div>
-                    <div class="feature-card" onclick="if(localStorage.getItem('is_logged_in')==='true') window.location.href='robotics.html'; else openLoginModal()">
+                    <div class="feature-card" id="feat-robot" onclick="handleFeatureClick('robotics.html')">
                         <div class="feature-icon"><i class="fas fa-robot"></i></div><h4>PROT ROBOT</h4><p>สร้างหุ่นยนต์ด้วยโครงงานจริง</p>
                     </div>
                     <div class="feature-card" onclick="window.location.href='teacher_profile.html';">
@@ -278,7 +278,7 @@
                     <select id="faceMouth"><option value="smile">😊 ยิ้ม</option><option value="happy">😄 ดีใจ</option><option value="love">😍 รัก</option><option value="wink">😉 ขยิบตา</option><option value="cool">😎 เท่</option></select></div>
                 <div class="dressup-category"><label><i class="fas fa-fill-drip"></i> สีเสื้อ</label>
                     <select id="shirtColor"><option value="#2563eb">🔵 น้ำเงิน</option><option value="#dc2626">🔴 แดง</option><option value="#ea580c">🟠 ส้ม</option><option value="#16a34a">🟢 เขียว</option><option value="#9333ea">🟣 ม่วง</option><option value="#fbbf24">🟡 เหลือง</option><option value="#ec4899">🌸 ชมพู</option></select></div>
-                <div class="dressup-category"><label><i class="fas fa-shield-alt"></i> ลายเสื้อ</label>
+                <div class="dressup-category"><label><i class="fas fa-fill-drip"></i> ลายเสื้อ</label>
                     <select id="pattern"><option value="none">✨ ไม่มี</option><option value="star">⭐ ดาว</option><option value="heart">❤️ หัวใจ</option><option value="circle">⚪ วงกลม</option><option value="stripe">📏 ลายเส้น</option></select></div>
                 <div class="dressup-category"><label><i class="fas fa-shoe-prints"></i> รองเท้า</label>
                     <select id="shoeColor"><option value="#4a4a4a">⚫ ดำ</option><option value="#dc2626">🔴 แดง</option><option value="#fbbf24">🟡 ทอง</option><option value="#ffffff">⚪ ขาว</option><option value="#8b4513">🤎 น้ำตาล</option></select></div>
@@ -305,8 +305,8 @@
 
     <script>
         const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbw6LgfZ1EMcKAh8shNWgqHzqHJgF76GFA79jECZbketXpu_r0ghIOUCu1LH0TICLmZj1A/exec";
-        
-        // 🌟 เพิ่มฟังก์ชันถอดรหัสของ Google (ตัวแก้ปัญหาล็อกอินค้าง) 🌟
+        const ADMIN_EMAILS = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com'];
+
         function decodeJwtResponse(token) {
             let base64Url = token.split('.')[1];
             let base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/');
@@ -566,35 +566,26 @@
         function handleCredentialResponse(response) {
             const userData = decodeJwtResponse(response.credential);
             const userEmail = userData.email;
-
-            // 🌟 1. ดักจับอีเมลของครู (Admin) 🌟
-            const adminEmails = ['ratchapon@prot.ac.th']; 
             
-            if (adminEmails.includes(userEmail)) {
-                localStorage.setItem('student_name', userData.name);
-                localStorage.setItem('student_email', userEmail);
-                localStorage.setItem('student_pic', userData.picture);
-                localStorage.setItem('is_logged_in', 'true');
-                
+            localStorage.setItem('student_name', userData.name);
+            localStorage.setItem('student_email', userEmail);
+            localStorage.setItem('student_pic', userData.picture);
+            localStorage.setItem('is_logged_in', 'true');
+
+            // 🌟 1. ตรวจสอบสิทธิ์เมลครู (Admin) เด้งเข้าแดชบอร์ดครูทันที 🌟
+            if (ADMIN_EMAILS.includes(userEmail)) {
                 alert('ยินดีต้อนรับเข้าสู่ระบบจัดการของผู้สอนครับ');
-                window.location.href = 'teacher_dashboard.html'; // เด้งไปหน้า Admin ทันที
+                window.location.href = 'teacher_dashboard.html';
                 return;
             }
 
-            // 🌟 2. ถ้าเป็นอีเมลนักเรียนปกติ 🌟
+            // 🌟 2. ตรวจสอบสิทธิ์เมลนักเรียนปกติ เด้งเข้าหน้าห้องเรียนทันที 🌟
             if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
-                localStorage.setItem('student_name', userData.name);
-                localStorage.setItem('student_email', userEmail);
-                localStorage.setItem('student_pic', userData.picture);
-                localStorage.setItem('is_logged_in', 'true');
-                
-                closeLoginModal();
-                // สั่งอัปเดตหน้าตาเว็บของแต่ละหน้า
-                if (typeof updateLoginUI === "function") updateLoginUI(userData.name, userData.picture);
-                if (typeof fetchRealtimeData === "function") fetchRealtimeData();
-                if (typeof loadOutfit === "function") loadOutfit();
+                alert('🎉 เข้าสู่ระบบสำเร็จ ยินดีต้อนรับเข้าสู่ห้องเรียนครับ');
+                window.location.href = 'student.html';
             } else {
                 alert('❌ อีเมลนี้ไม่ได้รับอนุญาตให้เข้าสู่ระบบ');
+                logout();
             }
         }
         
@@ -602,25 +593,51 @@
             const name = localStorage.getItem('student_name');
             const pic = localStorage.getItem('student_pic');
             document.getElementById('loginArea').innerHTML = `<div class="user-info"><img src="${pic}" class="user-avatar" alt="avatar"><span class="user-name">${name.split(' ')[0]}</span><button class="logout-btn" onclick="logout()" title="ออกจากระบบ"><i class="fas fa-sign-out-alt"></i></button></div>`;
+            
+            // ตรวจสอบเส้นทางของครูแบบ Realtime
+            checkAdminRoleAndFixLinks();
+        }
+
+        // 🌟 ฟังก์ชันตรวจสอบหากล็อกอินอยู่เป็นเมลครู ให้แก้ลิงก์ปุ่มห้องเรียนทั้งหมดไปหาครู 🌟
+        function checkAdminRoleAndFixLinks() {
+            const currentEmail = localStorage.getItem('student_email');
+            if (currentEmail && ADMIN_EMAILS.includes(currentEmail)) {
+                document.querySelectorAll('a[href="student.html"]').forEach(link => {
+                    link.href = 'teacher_dashboard.html';
+                });
+            }
+        }
+
+        function handleFeatureClick(targetUrl) {
+            const currentEmail = localStorage.getItem('student_email');
+            if(localStorage.getItem('is_logged_in') !== 'true') {
+                showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะเข้าแล็บได้เลย!');
+                openLoginModal();
+                return;
+            }
+            if (currentEmail && ADMIN_EMAILS.includes(currentEmail)) {
+                window.location.href = 'teacher_dashboard.html';
+            } else {
+                window.location.href = targetUrl;
+            }
         }
         
         function logout() {
             stopAutoDance();
             localStorage.removeItem('is_logged_in');
+            localStorage.removeItem('student_name');
+            localStorage.removeItem('student_email');
+            localStorage.removeItem('student_pic');
             window.location.reload();
         }
         
         function openLoginModal() { 
-            // 1. เปิดหน้าต่าง Modal ให้แสดงขึ้นมาก่อน
             document.getElementById('loginModal').classList.add('active'); 
-            
-            // 2. เช็คว่าเด็กเปิดผ่านแอป LINE, IG หรือ Facebook ไหม (ถ้าใช่ให้เตือน)
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             if (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1 || ua.indexOf("Line") > -1 || ua.indexOf("Instagram") > -1) {
                 document.getElementById('in-app-warning').style.display = 'block';
             }
 
-            // 3. สั่งวาดปุ่ม Google "หลังจาก" หน้าต่างเปิดแล้วเท่านั้น (แก้บั๊กปุ่มค้าง/กดไม่ติด 100%)
             if (window.google && google.accounts) {
                 google.accounts.id.initialize({
                     client_id: "717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com",
@@ -632,7 +649,6 @@
                     { theme: "outline", size: "large", shape: "rectangular", type: "standard", text: "signin_with" }
                 );
             } else {
-                // กรณีเน็ตช้า สคริปต์ Google โหลดไม่ทัน
                 document.getElementById("google-login-button").innerHTML = "<p style='font-size:0.85rem; color:#ef4444;'>กำลังเชื่อมต่อ Google... กรุณาปิดแล้วกดปุ่มใหม่อีกครั้ง</p>";
             }
         }
@@ -677,8 +693,7 @@
             localStorage.setItem('smart_theme', themeKey);
             document.getElementById("robotGlow").style.background = `radial-gradient(circle, ${themes[themeKey].glowColor} 0%, rgba(0,0,0,0) 70%)`;
             
-            // Only show message if user clicked, not on initial load
-            if (event) {
+            if (window.event) {
                 const msg = themeKey === 'snow' ? '❄️ ธีมหิมะ เย็นสบาย~' : themeKey === 'forest' ? '🌿 ธีมป่าเขียว สดชื่น!' : themeKey === 'halloween' ? '🎃 ธีมฮัลโลวีน สนุกสุดๆ!' : themeKey === 'love' ? '🌸 ธีมซากุระ หวานละมุน~' : '🤖 ธีมเริ่มต้น คลาสสิค!';
                 showSpeechBubble(msg);
             }
@@ -691,8 +706,13 @@
         
         document.getElementById('heroRobot')?.addEventListener('click', (e) => {
             e.stopPropagation();
+            const currentEmail = localStorage.getItem('student_email');
             if(localStorage.getItem('is_logged_in') === 'true') {
-                playRandomBounce(e);
+                if (currentEmail && ADMIN_EMAILS.includes(currentEmail)) {
+                    window.location.href = 'teacher_dashboard.html';
+                } else {
+                    playRandomBounce(e);
+                }
             } else {
                 showSpeechBubble('🤗 ลงชื่อเข้าใช้ก่อนนะ แล้วจะมาเล่นด้วยกันได้เลย!');
                 openLoginModal();
@@ -725,6 +745,7 @@
                 document.getElementById('outfitIcon').style.display = 'none';
                 startAutoDance();
             }
+            checkAdminRoleAndFixLinks();
         };
     </script>
 </body>
