@@ -406,6 +406,7 @@
             const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
             
             try {
+                // 1. ส่งคำตอบไปตรวจที่ฝั่ง Validator
                 const res = await fetch(VALIDATOR_URL, {
                     method: 'POST', 
                     body: JSON.stringify({action: "evaluate", answers: data})
@@ -418,17 +419,31 @@
                 const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
                 const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
                 
+                // 2. บันทึกประวัติการส่งงานเข้าตารางกิจกรรมหลัก
                 await fetch(MAIN_URL, {
-                    method:'POST', mode:'no-cors', 
+                    method:'POST', 
+                    mode:'no-cors', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body:JSON.stringify({
-                        action: "submitWork", student_id: sid, student_name: sname, activity_id: actId, work_content: log
+                        action: "submitWork", 
+                        student_id: sid, 
+                        student_name: sname, 
+                        activity_id: actId, 
+                        work_content: log
                     })
                 });
                 
+                // 3. บันทึกคะแนนลงชีตคะแนนรวม
                 await fetch(MAIN_URL, {
-                    method:'POST', mode:'no-cors', 
+                    method:'POST', 
+                    mode:'no-cors', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body:JSON.stringify({
-                        action: "saveScore", student_id: sid, student_name: sname, activity_id: actId, score: res.finalScore
+                        action: "saveScore", 
+                        student_id: sid, 
+                        student_name: sname, 
+                        activity_id: actId, 
+                        score: res.finalScore
                     })
                 });
                 
@@ -437,7 +452,7 @@
                 document.getElementById('screenResult').style.display = 'block';
                 document.getElementById('scoreDisplay').innerText = res.finalScore + "/20";
             } catch(e) {
-                alert("❌ การเชื่อมต่อล้มเหลว กรุณากดส่งใหม่อีกครั้ง");
+                alert("❌ การเชื่อมต่อล้มเหลว หรือโครงสร้างคำตอบผิดพลาด กรุณากดส่งใหม่อีกครั้ง");
                 document.getElementById('btnSubmit').disabled = false;
                 document.getElementById('btnSubmit').innerText = "ส่งคำตอบทั้งหมด";
             }
