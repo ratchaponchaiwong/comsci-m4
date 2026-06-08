@@ -26,7 +26,6 @@
         
         body.lost-focus { filter: blur(20px) grayscale(1) brightness(0.5) !important; transition: 0.2s; }
         
-        /* 🌟 หน้าจอเตือนก่อนแบน 🌟 */
         #split-warning { position:fixed; inset:0; z-index:10002; background:rgba(0,0,0,0.95); color:white; display:none; flex-direction:column; align-items:center; justify-content:center; text-align:center; padding:20px; backdrop-filter: blur(10px); }
         
         .qcard { margin-top: 20px; padding: 25px; border-radius: 20px; background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1); backdrop-filter: blur(10px); }
@@ -90,12 +89,10 @@
     <div class="progress-bar" id="dotsArea" style="display:none;"></div>
 
     <script>
-        // 🌟 ใส่ URL ของครูตรงนี้ให้ถูกต้อง 🌟
         const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
         const MAIN_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
         
         let examStarted = false, canBan = false, userIP = "unknown", drawn = [], ans = [], timerHandle, timeLeft = 2400;
-        
         let cheatTimer = null;
         let countdownInterval = null;
 
@@ -138,7 +135,7 @@
             { "id": 36, "question": "ลำดับเริ่มต้นใช้งาน Node-RED ที่เหมาะสมคือข้อใด", "options": ["ติดตั้ง Node-RED ก่อน", "เปิด Wokwi ก่อน", "ติดตั้ง DHT ก่อน", "ติดตั้ง Node.js ก่อน"] },
             { "id": 37, "question": "ข้อใดเกี่ยวข้องกับการติดตั้งซอฟต์แวร์โดยตรง", "options": ["การเลือกเซนเซอร์", "การติดตั้ง Node-RED", "การวัดอุณหภูมิ", "การสื่อสาร ESP-NOW"] },
             { "id": 38, "question": "nodejs.org คือเว็บไซต์ของอะไร", "options": ["Node-RED", "ESP-NOW", "Node.js", "DHT"] },
-            { "id": 39, "question": "หากไม่ต้องการติดตั้งโปรแกรมในเครื่อง ควรเริ่มด้วยอะไร", "options": ["ใช้แพลตฟอร์มจำลองออนไลน์", "ปิดอินเทอร์เน็ต", "ถอดสายไฟทั้งหมด", "ลบไดรเวอร์จอ"] },
+            { "id": 39, "question": "หากไม่ต้องการติดตั้งโปรแกรมในเครื่อง ควรเริ่มด้วยอะไร", "options": ["ใช้แพลตฟอร์มจำลองออนไลน์", "เปิดอินเทอร์เน็ต", "ถอดสายไฟทั้งหมด", "ลบไดรเวอร์จอ"] },
             { "id": 40, "question": "เหตุผลที่นิยมใช้ Node-RED ในงาน IoT คือข้อใด", "options": ["เพิ่มแรงมอเตอร์", "ทำให้เซนเซอร์ไม่ใช้ไฟ", "ไม่ต้องเขียนโปรแกรมเลย", "เชื่อมข้อมูลและอุปกรณ์ได้สะดวก"] },
             { "id": 41, "question": "Display Reading หมายถึงข้อใด", "options": ["ลบค่าที่อ่านได้", "แสดงค่าที่อ่านได้", "ซ่อนข้อมูล", "แปลงเป็นเสียง"] },
             { "id": 42, "question": "ข้อใดเป็นตัวอย่างข้อมูลเซนเซอร์", "options": ["ชื่อโดเมน", "เวอร์ชันโปรแกรม", "อุณหภูมิ 28°C", "สีไอคอน"] },
@@ -163,7 +160,7 @@
             { "id": 61, "question": "ตัวหลัก/ตัวรอง ใช้แทนคำใด", "options": ["client/server", "master/slave", "encoder/decoder", "publisher/subscriber"] },
             { "id": 62, "question": "ESP-NOW สื่อสารได้แบบใด", "options": ["ทางเดียว", "รับอย่างเดียว", "สองทาง", "ส่งอย่างเดียว"] },
             { "id": 63, "question": "บอร์ดสองตัวคุยกันและแลกเปลี่ยนข้อมูลโดยตรง คือข้อใด", "options": ["การสื่อสารสองทาง", "การสื่อสารอ่านอย่างเดียว", "ผ่านเครื่องพิมพ์", "ผ่าน HDMI"] },
-            { "id": 64, "question": "การเพิ่มหลายบอร์ดใน ESP32 ช่วยให้เกิดอะไร", "options": ["เพิ่มแรงดันไฟ", "เพิ่มความละเอียดจอ", "ปิด Wi‑Fi", "สื่อสารกันเป็นเครือข่าย"] },
+            { "id": 64, "question": "การที่บอร์ด ESP32 คุยกันเองได้หลายตัว มีลักษณะอย่างไร", "options": ["เพิ่มแรงดันไฟ", "เพิ่มความละเอียดจอ", "ปิด Wi‑Fi", "สื่อสารกันเป็นเครือข่าย"] },
             { "id": 65, "question": "ตัวอย่างโครงสร้างตัวหลักตัวเดียวคือข้อใด", "options": ["ทำบัญชี", "ควบคุมอุปกรณ์หลายตัวในบ้าน", "ตัดต่อเพลง", "สตรีมภาพยนตร์"] },
             { "id": 66, "question": "ตัวส่งและตัวรับ หมายถึงอะไร", "options": ["การชาร์จแบตเตอรี่", "การพิมพ์งาน", "การส่งและรับข้อมูล", "การบีบอัดไฟล์"] },
             { "id": 67, "question": "ข้อดีของหลายตัวรับคืออะไร", "options": ["ส่งคำสั่งไปหลายอุปกรณ์ได้", "มอเตอร์แรงขึ้น", "เซนเซอร์เร็วขึ้นเอง", "บอร์ดไม่ต้องใช้ไฟ"] },
@@ -236,7 +233,7 @@
             }, 1000);
             
             drawn = bank.sort(()=>0.5-Math.random()).slice(0,40);
-            answers = new Array(40).fill(null);
+            ans = new Array(40).fill(null);
             renderQuestions();
         }
 
@@ -273,9 +270,6 @@
             });
         }
 
-        // =========================================================
-        // 🌟 1. ระบบให้อภัยอัจฉริยะ (Smart Forgiveness) 🌟
-        // =========================================================
         function showWarning(msg) {
             document.getElementById('split-warning').style.display = 'flex';
             document.getElementById('warning-text').innerText = msg;
@@ -292,7 +286,7 @@
             clearTimeout(cheatTimer);
             cheatTimer = setTimeout(() => {
                 ban(msg);
-            }, 3000); // ให้เวลา 3 วินาทีในการกลับมา
+            }, 3000);
         }
 
         function hideWarning() {
@@ -319,9 +313,6 @@
             window.location.href = "student.html";
         }
 
-        // =========================================================
-        // 🌟 2. ตัวตรวจจับที่แม่นยำขึ้น 🌟
-        // =========================================================
         window.addEventListener('blur', () => { 
             if(canBan) {
                 document.body.classList.add('lost-focus');
@@ -332,7 +323,7 @@
         window.addEventListener('focus', () => { 
             if(canBan) {
                 document.body.classList.remove('lost-focus');
-                hideWarning(); // ถ้ารีบกลับมาภายใน 3 วิ ระบบจะยกโทษให้
+                hideWarning();
             }
         });
 
@@ -348,7 +339,6 @@
 
         document.addEventListener('contextmenu', event => event.preventDefault());
 
-        // 🌟 3. ปรับระบบตรวจจับ 2 จอ ไม่ให้แบนมั่วตอนหมุนไอแพด 🌟
         let lastWidth = window.innerWidth;
         let lastHeight = window.innerHeight;
         
@@ -357,21 +347,17 @@
             let currentWidth = window.innerWidth;
             let currentHeight = window.innerHeight;
             
-            // ตรวจว่าแบ่งจอจริงไหม: ความกว้างหายไปเยอะ (เกิน 30%) แต่ความสูงยังเกือบเท่าเดิม
             if(currentWidth < lastWidth * 0.7 && currentHeight >= lastHeight * 0.9) {
                 showWarning("ไม่อนุญาตให้ใช้โหมดแบ่งหน้าจอ (Split View)");
             } else {
-                hideWarning(); // ถ้าแค่หมุนจอ ความสูงจะเปลี่ยนไปด้วย ระบบจะปล่อยผ่าน
+                hideWarning();
             }
             
-            // อัปเดตค่าความจำจอ (เฉพาะตอนไม่ได้แบ่งจอ)
             if(currentWidth >= lastWidth * 0.7) {
                 lastWidth = currentWidth;
                 lastHeight = currentHeight;
             }
         });
-
-        // ==================================================
         
         window.history.pushState(null, null, window.location.href);
         window.addEventListener('popstate', function(event) {
@@ -406,9 +392,10 @@
             const data = drawn.map((q, i) => ({ id: String(q.id), ans: ans[i] }));
             
             try {
-                // 1. ส่งคำตอบไปตรวจที่ฝั่ง Validator
+                // 🌟 แก้ไข: แนบ Header ชุดควบคุมตัวอักษรเพื่อส่งตรวจคะแนนดิบ 🌟
                 const res = await fetch(VALIDATOR_URL, {
                     method: 'POST', 
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({action: "evaluate", answers: data})
                 }).then(r => r.json());
                 
@@ -419,7 +406,7 @@
                 const log = `📊 สอบออนไลน์: ถูก ${res.correct}/40 | คะแนน: ${res.finalScore}/20`;
                 const actId = new URLSearchParams(window.location.search).get('actid') || "FINAL_EXAM";
                 
-                // 2. บันทึกประวัติการส่งงานเข้าตารางกิจกรรมหลัก
+                // 🌟 แก้ไข: เชื่อมระบบส่งประวัติการทำแบบทดสอบเข้าฐานข้อมูลหลักพร้อมกำหนด UTF-8 กันภาษาเพี้ยน 🌟
                 await fetch(MAIN_URL, {
                     method:'POST', 
                     mode:'no-cors', 
@@ -428,12 +415,13 @@
                         action: "submitWork", 
                         student_id: sid, 
                         student_name: sname, 
+                        email: email,
                         activity_id: actId, 
                         work_content: log
                     })
                 });
                 
-                // 3. บันทึกคะแนนลงชีตคะแนนรวม
+                // 🌟 แก้ไข: ส่งข้อมูลสรุปคะแนนดิบเข้าคลังคะแนนหลักของห้องเรียนเรียบร้อย 🌟
                 await fetch(MAIN_URL, {
                     method:'POST', 
                     mode:'no-cors', 
@@ -442,6 +430,7 @@
                         action: "saveScore", 
                         student_id: sid, 
                         student_name: sname, 
+                        email: email,
                         activity_id: actId, 
                         score: res.finalScore
                     })
@@ -452,7 +441,7 @@
                 document.getElementById('screenResult').style.display = 'block';
                 document.getElementById('scoreDisplay').innerText = res.finalScore + "/20";
             } catch(e) {
-                alert("❌ การเชื่อมต่อล้มเหลว หรือโครงสร้างคำตอบผิดพลาด กรุณากดส่งใหม่อีกครั้ง");
+                alert("❌ การเชื่อมต่อล้มเหลว หรือระบบขัดข้องในการบันทึกผลคะแนน กรุณากดส่งคำตอบใหม่อีกครั้ง");
                 document.getElementById('btnSubmit').disabled = false;
                 document.getElementById('btnSubmit').innerText = "ส่งคำตอบทั้งหมด";
             }
@@ -489,7 +478,7 @@
                 .catch(e => { userIP = "unknown"; })
                 .finally(async () => {
                     try {
-                        const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}`).then(r=>r.json());
+                        const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${userIP}&t=${Date.now()}`).then(r=>r.json());
                         if(res.banned) {
                             localStorage.setItem('is_banned', 'true');
                             document.body.innerHTML = `
@@ -497,7 +486,7 @@
                                 <i class='fas fa-user-slash fa-5x' style='color:red; margin-bottom:20px;'></i>
                                 <h1 style='color:red; font-family:Prompt;'>คุณถูกระงับสิทธิ์การสอบ!</h1>
                                 <p style='font-family:Prompt; color:#333;'>${res.reason}</p>
-                                <button onclick="window.location.href='student.html'" style="margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;">กลับหน้าหลัก</button>
+                                <button onclick=\"window.location.href='student.html'\" style=\"margin-top:20px; padding:15px 30px; border-radius:30px; border:none; background:red; color:white; font-weight:bold; cursor:pointer;\">กลับหน้าหลัก</button>
                             </div>`;
                         }
                     } catch(e) {}
