@@ -195,5 +195,30 @@
         
         window.onload = loadUserData;
     </script>
+    <script>
+    (function() {
+        const CRU_EMAILS = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com'];
+        const activeEmail = localStorage.getItem('student_email');
+        if (activeEmail && CRU_EMAILS.includes(activeEmail)) {
+            // 1. แปลงลิงก์และปุ่มทั้งหมดที่มุ่งหน้าไปหา student.html ให้เบี่ยงเส้นทางมาหาครูทันที
+            document.querySelectorAll('a[href="student.html"], button[onclick*="student.html"]').forEach(element => {
+                if(element.tagName === 'A') {
+                    element.href = 'teacher_dashboard.html';
+                } else if(element.getAttribute('onclick')) {
+                    element.setAttribute('onclick', "window.location.href='teacher_dashboard.html'");
+                }
+            });
+            // 2. ดักปุ่มที่มีข้อความแนว "กลับห้องเรียน" หรือ "ห้องเรียนของฉัน"
+            document.querySelectorAll('a, button').forEach(el => {
+                if(el.textContent.includes('ห้องเรียน') || el.textContent.includes('กลับห้องเรียน')) {
+                    el.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        window.location.href = 'teacher_dashboard.html';
+                    });
+                }
+            });
+        }
+    })();
+</script>
 </body>
 </html>
