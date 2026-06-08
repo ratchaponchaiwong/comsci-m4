@@ -269,10 +269,9 @@
             return undefined;
         }
 
-        // 🌟 ฟังก์ชันเช็คการหมดเวลา (อัจฉริยะ) 🌟
         function isDeadlinePassed(act) {
             let status = getVal(act, 'status', 'สถานะ');
-            if (status === 'closed') return true; // ถ้าครูปิดเองให้ถือว่าหมดเวลา
+            if (status === 'closed') return true;
 
             let rawDate = getVal(act, 'date', 'วันที่');
             let rawTime = getVal(act, 'time', 'เวลา');
@@ -280,13 +279,12 @@
             if (!rawDate || String(rawDate).trim() === '-' || String(rawDate).trim() === '') return false;
 
             let dStr = String(rawDate);
-            if (dStr.includes('T')) dStr = dStr.split('T')[0]; // ดึงเฉพาะ YYYY-MM-DD
+            if (dStr.includes('T')) dStr = dStr.split('T')[0];
 
             let tStr = '23:59:59';
             if (rawTime && String(rawTime).trim() !== '-' && String(rawTime).trim() !== '') {
                 let tmp = String(rawTime);
                 if (tmp.includes('T')) {
-                    // ถ้า Sheet แปลงเป็น Time Object (UTC) ให้ดึงชั่วโมง/นาทีออกมาตรงๆ
                     let dObj = new Date(tmp);
                     let hh = String(dObj.getHours()).padStart(2, '0');
                     let mm = String(dObj.getMinutes()).padStart(2, '0');
@@ -297,9 +295,8 @@
                 }
             }
 
-            // คำนวณเป็นเวลาปัจจุบันของเครื่องนักเรียน
             let deadlineTime = new Date(`${dStr}T${tStr}`);
-            if (isNaN(deadlineTime.getTime())) return false; // ถ้าใส่ผิดฟอร์แมต ให้ปล่อยผ่าน
+            if (isNaN(deadlineTime.getTime())) return false;
             
             return Date.now() > deadlineTime.getTime();
         }
@@ -324,9 +321,7 @@
             const userData = decodeJwtResponse(response.credential);
             const userEmail = userData.email;
 
-            // 🌟 1. ดักจับอีเมลของครู (Admin) 🌟
-            // ครูสามารถเพิ่มอีเมลแอดมินของครูลงในวงเล็บนี้ได้เลยครับ
-            const adminEmails = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com']; 
+            const adminEmails = ['ratchapon@prot.ac.th']; 
             
             if (adminEmails.includes(userEmail)) {
                 localStorage.setItem('student_name', userData.name);
@@ -335,22 +330,18 @@
                 localStorage.setItem('is_logged_in', 'true');
                 
                 alert('ยินดีต้อนรับเข้าสู่ระบบจัดการของผู้สอนครับ');
-                window.location.href = 'teacher_dashboard.html'; // เด้งไปหน้า Admin ทันที
+                window.location.href = 'teacher_dashboard.html';
                 return;
             }
 
-            // 🌟 2. ถ้าเป็นอีเมลนักเรียนปกติ 🌟
             if (userEmail.endsWith('@gmail.com') || userEmail.endsWith('@prot.ac.th')) {
                 localStorage.setItem('student_name', userData.name);
                 localStorage.setItem('student_email', userEmail);
                 localStorage.setItem('student_pic', userData.picture);
                 localStorage.setItem('is_logged_in', 'true');
                 
-                closeLoginModal();
-                // สั่งอัปเดตหน้าตาเว็บของแต่ละหน้า
-                if (typeof updateLoginUI === "function") updateLoginUI(userData.name, userData.picture);
-                if (typeof fetchRealtimeData === "function") fetchRealtimeData();
-                if (typeof loadOutfit === "function") loadOutfit();
+                alert('🎉 เข้าสู่ระบบสำเร็จ ยินดีต้อนรับครับ');
+                window.location.href = 'student_portfolio.html';
             } else {
                 alert('❌ อีเมลนี้ไม่ได้รับอนุญาตให้เข้าสู่ระบบ');
             }
@@ -362,16 +353,12 @@
             }
         }
         function openLoginModal() { 
-            // 1. เปิดหน้าต่าง Modal ให้แสดงขึ้นมาก่อน
             document.getElementById('loginModal').classList.add('active'); 
-            
-            // 2. เช็คว่าเด็กเปิดผ่านแอป LINE, IG หรือ Facebook ไหม (ถ้าใช่ให้เตือน)
             const ua = navigator.userAgent || navigator.vendor || window.opera;
             if (ua.indexOf("FBAN") > -1 || ua.indexOf("FBAV") > -1 || ua.indexOf("Line") > -1 || ua.indexOf("Instagram") > -1) {
                 document.getElementById('in-app-warning').style.display = 'block';
             }
 
-            // 3. สั่งวาดปุ่ม Google "หลังจาก" หน้าต่างเปิดแล้วเท่านั้น (แก้บั๊กปุ่มค้าง/กดไม่ติด 100%)
             if (window.google && google.accounts) {
                 google.accounts.id.initialize({
                     client_id: "717590675447-98867qquq15bhc3t5cot57f8c99e5ll3.apps.googleusercontent.com",
@@ -383,7 +370,6 @@
                     { theme: "outline", size: "large", shape: "rectangular", type: "standard", text: "signin_with" }
                 );
             } else {
-                // กรณีเน็ตช้า สคริปต์ Google โหลดไม่ทัน
                 document.getElementById("google-login-button").innerHTML = "<p style='font-size:0.85rem; color:#ef4444;'>กำลังเชื่อมต่อ Google... กรุณาปิดแล้วกดปุ่มใหม่อีกครั้ง</p>";
             }
         }
@@ -402,7 +388,7 @@
             container.innerHTML = '<div style="text-align: center; padding: 40px 20px; opacity: 0.8;"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>กำลังซิงค์ข้อมูลจากฐานข้อมูล...</div>';
             
             try {
-                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll");
+                const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + Date.now());
                 db = await res.json();
                 
                 try { const ipRes = await fetch('https://api64.ipify.org?format=json'); const ipData = await ipRes.json(); userIP = ipData.ip; } catch(e) {}
@@ -417,7 +403,7 @@
                 if (studentId !== '-' && studentId !== '') {
                     localStorage.setItem(email + '_studentid', studentId);
                     try {
-                        const banRes = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}`);
+                        const banRes = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}&t=${Date.now()}`);
                         const banData = await banRes.json();
                         isStudentBanned = banData.banned;
                         banReasonStr = banData.reason || "ทุจริตการสอบ";
@@ -462,7 +448,7 @@
             try { const r = await fetch('https://api64.ipify.org?format=json'); const d = await r.json(); currentIP = d.ip; } catch(e) {}
 
             try {
-                const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${currentIP}`);
+                const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${currentIP}&t=${Date.now()}`);
                 const data = await res.json();
                 
                 loader.style.display = 'none';
@@ -501,14 +487,12 @@
             document.getElementById('tracking-box').style.display = 'block';
             document.getElementById('score-box-ui').style.display = 'block';
             
-            // --- เริ่มโค้ดระบบล็อกปุ่ม ---
             const editBtn = document.getElementById('editProfileBtn');
             editBtn.style.display = 'block';
 
-            // เช็คว่าถ้ามี รหัส, ห้อง, เลขที่ ในฐานข้อมูลแล้ว ให้ล็อกปุ่มทันที
             if (studentId !== '-' && room !== '-' && number !== '-' && studentId !== '') {
                 editBtn.innerHTML = '<i class="fas fa-lock"></i> ข้อมูลถูกล็อกแล้ว';
-                editBtn.style.background = '#475569'; // เปลี่ยนปุ่มเป็นสีเทา
+                editBtn.style.background = '#475569'; 
                 editBtn.style.borderColor = '#475569';
                 editBtn.style.color = 'white';
                 editBtn.style.cursor = 'not-allowed';
@@ -516,7 +500,6 @@
                     alert('⚠️ ข้อมูลถูกบันทึกเข้าระบบแล้ว หากต้องการแก้ไขกรุณาแจ้งให้ผู้สอนทราบครับ');
                 };
             } else {
-                // ถ้าข้อมูลยังไม่ครบ ให้กดเปิด Modal ได้ตามปกติ
                 editBtn.innerHTML = '<i class="fas fa-edit"></i> ระบุข้อมูลส่วนตัว';
                 editBtn.style.background = 'rgba(59,130,246,0.15)'; 
                 editBtn.style.borderColor = '#3b82f6';
@@ -524,7 +507,6 @@
                 editBtn.style.cursor = 'pointer';
                 editBtn.onclick = openEditProfileModal;
             }
-            // --- จบโค้ดระบบล็อกปุ่ม ---
             
             document.getElementById('loginArea').innerHTML = `
                 <div class="user-info">
@@ -581,14 +563,13 @@
                 
                 let isContent = (actType === 'content');
                 let linkPath = getVal(act, 'link', 'ลิงก์') || '#';
-                let isExam = (actType === 'exam' || String(linkPath).includes('quiz.html')); 
+                let isExam = (actType === 'exam' || actType === 'quiz' || String(linkPath).includes('quiz.html') || String(linkPath).includes('quizrobot5.html')); 
                 
                 let tColor = '#3b82f6', tIcon = '📝', tName = 'งาน';
                 if(isContent) { tColor = '#a855f7'; tIcon = '📖'; tName = 'เนื้อหา'; }
                 else if(actType === 'activity') { tColor = '#10b981'; tIcon = '💡'; tName = 'กิจกรรม'; }
                 else if(isExam) { tColor = '#f97316'; tIcon = '🎯'; tName = 'แบบทดสอบ'; } 
 
-                // 🌟 ประมวลผลล็อกปุ่มอัตโนมัติ ถ้าเลยเวลา 🌟
                 let isClosed = isDeadlinePassed(act);
 
                 let badgeHtml = '', btnHtml = '', scoreHtml = '';
@@ -670,7 +651,6 @@
         }
 
         function openEditProfileModal() {
-            // เช็คอีกครั้งเผื่อ UI ไม่ตรงกัน
             if (document.getElementById('editProfileBtn').innerHTML.includes('fa-lock')) {
                 return alert('⚠️ ข้อมูลถูกบันทึกเข้าระบบแล้ว หากต้องการแก้ไขกรุณาแจ้งให้ผู้สอนทราบครับ');
             }
@@ -702,7 +682,6 @@
 
             if (!name || !number || !studentId) return alert('⚠️ กรุณากรอกรหัสนักเรียน, ชื่อ และเลขที่ให้ครบถ้วน');
             
-            // ดักจับไม่ให้ส่งข้อมูลเข้า API หากปุ่มถูกล็อกไปแล้ว
             if (document.getElementById('editProfileBtn').innerHTML.includes('fa-lock')) {
                 return alert('⚠️ ไม่สามารถบันทึกซ้ำได้ ข้อมูลของคุณถูกล็อกไว้แล้ว');
             }
