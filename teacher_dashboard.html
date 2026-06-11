@@ -579,7 +579,13 @@
                 return Number(a.number || 999) - Number(b.number || 999);
             });
 
-            const acts = db.activities || [];
+            // 🌟 จุดที่แก้ไข: กรองเอากิจกรรมเฉพาะของ "ม.4" หรือ "ทุกห้อง" มาแสดงเท่านั้น 🌟
+            let acts = db.activities || [];
+            acts = acts.filter(a => {
+                const targetRoom = String(a.Room || a.room || '');
+                return targetRoom === 'ทุกห้อง' || targetRoom.includes('ม.4');
+            });
+
             let html = '<table id="full-score-table"><thead><tr>';
             html += '<th style="position: sticky; left: 0; z-index: 2; background: rgba(59,130,246,0.9);">ห้อง</th>';
             html += '<th style="position: sticky; left: 60px; z-index: 2; background: rgba(59,130,246,0.9);">เลขที่</th>';
