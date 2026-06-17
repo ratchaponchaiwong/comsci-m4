@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no, maximum-scale=1.0">
+    <title>Robotics Lab (แบ่งจอ) | PROT Smart Workspace</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Prompt:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; transition: 0.3s; }
+        body { font-family: 'Prompt', sans-serif; overflow-x: hidden; cursor: default; }
+        body[data-theme="default"] { background: linear-gradient(135deg, #0a0f2a 0%, #0f172a 50%, #1e293b 100%); color: white; }
+        body[data-theme="snow"] { background: linear-gradient(135deg, #cfe3ff 0%, #e0f0ff 50%, #f0f8ff 100%); color: #1e293b; }
+        body[data-theme="forest"] { background: linear-gradient(135deg, #1a3c1a 0%, #2d5a2d 50%, #3e7a3e 100%); color: white; }
+        body[data-theme="love"] { background: linear-gradient(135deg, #ffb7c5 0%, #ff9eb0 50%, #ff85a0 100%); color: #1e293b; }
+        
+        .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
+        .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
+        @keyframes float { 0%, 100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-30px) scale(1.05); } }
+        .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
+        .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
+        
+        header { position: relative; z-index: 10; background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
+        .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
+        
+        :root { --panel-bg: rgba(30, 41, 59, 0.6); --border-ws: rgba(255,255,255,0.1); --accent: #3b82f6; }
+        body[data-theme="snow"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(0,0,0,0.1); --accent: #3b82f6; }
+        body[data-theme="forest"] { --panel-bg: rgba(30, 60, 30, 0.6); --accent: #10b981; }
+        body[data-theme="love"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(255,105,180,0.3); --accent: #ec4899; }
+
+        .workspace-wrapper { display: flex; flex: 1; padding: 15px; gap: 15px; height: calc(100vh - 60px); position: relative; z-index: 10; }
+        
+        .sidebar { width: 320px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 15px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; overflow-y: auto; flex-shrink: 0;}
+        .task-title { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; }
+        .task-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px; }
+        
+        .main-panel { flex: 1; display: flex; gap: 15px; overflow: hidden; }
+        .split-box { flex: 1; background: var(--panel-bg); border-radius: 15px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; overflow: hidden; }
+        .split-header { background: rgba(0,0,0,0.3); padding: 10px 15px; font-size: 0.9rem; font-weight: bold; border-bottom: 1px solid var(--border-ws); display: flex; align-items: center; gap: 8px; color: var(--accent); }
+        .iframe-container { flex: 1; width: 100%; border: none; background: #fff; }
+
+        .upload-section { background: rgba(16, 185, 129, 0.1); border-radius: 12px; padding: 15px; border: 1px solid #10b981; margin-top: auto; }
+        .wokwi-input { width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--border-ws); background: rgba(0,0,0,0.2); color: inherit; font-family: 'Prompt'; margin-bottom: 10px; outline: none; }
+        body[data-theme="snow"] .wokwi-input, body[data-theme="love"] .wokwi-input { background: #fff; border-color: #cbd5e1; }
+        .btn-submit { background: #10b981; color: white; border: none; padding: 10px; width: 100%; border-radius: 8px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-submit:hover:not(:disabled) { background: #059669; }
+
+        body.focus-mode header { display: none !important; }
+        body.focus-mode .workspace-wrapper { height: 100vh; padding: 10px; }
+        #exit-focus-btn { display: none; position: fixed; top: 15px; right: 15px; z-index: 10000; background: #ef4444; color: white; border: none; padding: 8px 15px; border-radius: 20px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; }
+        body.focus-mode #exit-focus-btn { display: block; }
+
+        @media (max-width: 900px) {
+            .workspace-wrapper { flex-direction: column; height: auto; overflow: auto;}
+            .sidebar { width: 100%; height: auto; }
+            .main-panel { flex-direction: column; min-height: 100vh; }
+            .split-box { min-height: 50vh; }
+        }
+    </style>
+</head>
+<body data-theme="default">
+    <div class="bg-animation"><div class="circle"></div><div class="circle"></div></div>
+    <button id="exit-focus-btn" onclick="toggleFocusMode()"><i class="fas fa-compress-arrows-alt"></i> ออกจากโหมดเต็มจอ</button>
+
+    <header>
+        <a href="index.html" class="logo"><i class="fas fa-microchip"></i> Robotics Split View</a>
+        <div style="display: flex; gap: 15px; align-items: center;">
+            <button onclick="toggleFocusMode()" style="background: transparent; color: var(--accent); border: 1px solid var(--accent); padding: 5px 15px; border-radius: 20px; cursor: pointer; font-family: 'Prompt';"><i class="fas fa-expand-arrows-alt"></i> เต็มจอ</button>
+            <a href="student.html" style="color: inherit; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px;"><i class="fas fa-arrow-left"></i> กลับ</a>
+        </div>
+    </header>
+
+    <div class="workspace-wrapper">
+        <div class="sidebar">
+            <div class="task-title" id="task-title"><i class="fas fa-spinner fa-spin"></i> กำลังโหลด...</div>
+            <div class="task-desc" id="task-desc">กรุณารอสักครู่</div>
+            
+            <div class="upload-section">
+                <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;"><i class="fas fa-link"></i> วางลิงก์ผลงาน (Wokwi) ที่นี่</p>
+                <input type="text" id="work-link" class="wokwi-input" placeholder="https://wokwi.com/...">
+                <button class="btn-submit" id="submitBtnLab" onclick="submitWork()"><i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน</button>
+            </div>
+        </div>
+
+        <div class="main-panel">
+            <div class="split-box">
+                <div class="split-header"><i class="fas fa-microchip"></i> พื้นที่จำลองหุ่นยนต์ (Wokwi)</div>
+                <iframe id="editor-iframe" class="iframe-container" src="https://wokwi.com/projects/new/esp32"></iframe>
+            </div>
+            
+            <div class="split-box">
+                <div class="split-header"><i class="fas fa-book-open"></i> สื่อประกอบการเรียน</div>
+                <iframe id="material-iframe" class="iframe-container" src="about:blank"></iframe>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
+
+        function getVal(obj, ...keys) {
+            if (!obj) return undefined;
+            for (let key of keys) {
+                const realKey = Object.keys(obj).find(k => String(k).trim().toLowerCase() === String(key).trim().toLowerCase());
+                if (realKey !== undefined && obj[realKey] !== "" && obj[realKey] !== null) return obj[realKey];
+            }
+            return undefined;
+        }
+
+        function getEmbedUrl(url) {
+            if (!url) return '';
+            if (url.includes('youtube.com/watch?v=')) return url.replace('watch?v=', 'embed/').split('&')[0];
+            if (url.includes('youtu.be/')) return url.replace('youtu.be/', 'youtube.com/embed/').split('?')[0];
+            if (url.includes('canva.com/design')) return url.split('/view')[0] + '/view?embed';
+            return url;
+        }
+
+        async function loadUserData() {
+            const email = localStorage.getItem('student_email');
+            if (!email) { window.location.href = "student.html"; return; }
+            document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
+
+            const actId = new URLSearchParams(window.location.search).get('actid');
+            if(actId) {
+                try {
+                    const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + Date.now());
+                    const db = await res.json();
+                    const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน') == actId);
+                    
+                    if(currentAct) {
+                        document.getElementById('task-title').innerText = getVal(currentAct, 'title', 'ชื่อหัวข้อ');
+                        document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'รายละเอียด') || "-";
+                        
+                        // 🌟 ดึงลิงก์โปรเจกต์ตั้งต้นของครู (ถ้ามี) 🌟
+                        let customLink = getVal(currentAct, 'link', 'ลิงก์');
+                        if(customLink && customLink.includes("wokwi.com")) {
+                            document.getElementById('editor-iframe').src = customLink;
+                        }
+
+                        // 🌟 จัดการสื่อฝั่งขวา 🌟
+                        let ytLink = getVal(currentAct, 'yt_link', 'youtube');
+                        let docLink = getVal(currentAct, 'doc_link', 'doc');
+                        let materialIframe = document.getElementById('material-iframe');
+                        
+                        if (ytLink && ytLink.startsWith('http')) {
+                            materialIframe.src = getEmbedUrl(ytLink);
+                        } else if (docLink && docLink.startsWith('http')) {
+                            materialIframe.src = getEmbedUrl(docLink);
+                        } else {
+                            materialIframe.outerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:gray; font-size:1.2rem;">ไม่มีสื่อประกอบการเรียนสำหรับงานนี้</div>';
+                        }
+                    }
+                } catch(e) { document.getElementById('task-title').innerText = "เกิดข้อผิดพลาดในการดึงข้อมูล"; }
+            } else {
+                document.getElementById('task-title').innerText = "โหมดอิสระ";
+                document.querySelector('.upload-section').style.display = 'none';
+            }
+        }
+
+        function toggleFocusMode() { document.body.classList.toggle('focus-mode'); }
+
+        async function submitWork() {
+            const link = document.getElementById('work-link').value.trim();
+            if (link === "" || !link.includes("wokwi.com")) return alert("กรุณาวางลิงก์ผลงานให้ถูกต้อง!");
+            if(!confirm("ยืนยันการส่งผลงาน?")) return;
+
+            const actId = new URLSearchParams(window.location.search).get('actid'); 
+            const email = localStorage.getItem('student_email');
+            const studentId = localStorage.getItem(email + '_studentid');
+            
+            const btn = document.getElementById('submitBtnLab');
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังส่ง...'; 
+            btn.disabled = true;
+
+            try {
+                await fetch(GOOGLE_SCRIPT_URL, { 
+                    method: 'POST', mode: 'no-cors', 
+                    body: JSON.stringify({ action: "submitWork", student_id: studentId, student_name: localStorage.getItem('student_name'), activity_id: actId, work_content: "📌 ลิงก์ Wokwi:\n" + link }) 
+                });
+                alert('✅ ส่งงานสำเร็จ!'); window.location.href = 'student.html'; 
+            } catch(e) { alert('❌ เกิดข้อผิดพลาด'); btn.disabled = false; btn.innerText = 'ยืนยันการส่งงาน'; }
+        }
+        window.onload = loadUserData;
+    </script>
+</body>
+</html>
