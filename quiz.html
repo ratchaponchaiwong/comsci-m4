@@ -322,17 +322,30 @@
             clearInterval(countdownInterval);
         }
 
+        // 🌟 อัปเกรดระบบแบน ให้ยิงไปที่ 2 ฐานข้อมูลโดยตรง
         async function ban(reason) {
             if(!canBan || !examStarted) return;
             examStarted = false; canBan = false; clearInterval(examInterval); hideWarning();
             localStorage.setItem('is_banned', 'true');
             
+            // 1. ส่งข้อมูลไปที่คลังข้อสอบ (VALIDATOR)
             try {
                 await fetch(VALIDATOR_URL, {
                     method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({action:"reportViolation", student_id:studentId, ip:userIP, name:studentName, reason:reason})
                 });
             } catch(e){}
+
+            // 2. ส่งข้อมูลไปที่ฐานข้อมูลครู (SCRIPT_URL)
+            try {
+                await fetch(SCRIPT_URL, {
+                    method: 'POST', mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({action:"banStudent", student_id:studentId, ip:userIP, student_name:studentName, reason:reason})
+                });
+            } catch(e){}
+
             alert("🚨 ยุติการสอบ: " + reason + "\nคุณถูกระงับสิทธิ์ทันที!");
             window.location.href = "student.html";
         }
@@ -387,7 +400,6 @@
             let answersToSend = userAnswers.filter(a => a !== null);
 
             try {
-                // 1. ส่งตรวจคะแนนฝั่งชุดข้อสอบ
                 const evalRes = await fetch(VALIDATOR_URL, {
                     method: 'POST',
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
@@ -396,7 +408,6 @@
 
                 const finalScore = evalRes.score || 0;
 
-                // 2. ส่งสถานะบันทึกงาน (แก้ไขพารามิเตอร์ให้ตรงกับฐานข้อมูล และใส่ no-cors กันบล็อก)
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -410,7 +421,6 @@
                     })
                 });
 
-                // 3. บันทึกคะแนนดิบลงในช่องคะแนนสอบ
                 await fetch(SCRIPT_URL, {
                     method: 'POST',
                     mode: 'no-cors',
