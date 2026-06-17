@@ -211,12 +211,26 @@
                         document.getElementById('task-title').innerHTML = `<i class="fas fa-microchip"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
                         document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด') || "ไม่มีคำอธิบายเพิ่มเติม";
 
-                        // 🌟 ดึงข้อมูลมาแสดงในกล่องโจทย์ 🌟
+                        // ==========================================
+                        // 🌟 ระบบ Smart Auto-Fix ดึงข้อมูลโจทย์ (แก้ปัญหาคอลัมน์เลื่อน) 🌟
+                        // 1. ลองดึงจากตัวแปร expected_output ปกติก่อน
                         let problemData = getVal(currentAct, 'expected_output', 'ผลลัพธ์ที่ถูกต้อง', 'เฉลย', 'โจทย์');
+                        
+                        // 2. ถ้าไม่เจอ (เพราะในชีตครูมีแค่ 13 คอลัมน์ ทำให้ข้อมูลเลื่อนผิดช่อง) ให้ไปดึงจากช่องที่เลื่อนมาแทน!
+                        if (!problemData || problemData.trim() === "") {
+                            let shiftedData = getVal(currentAct, 'image_link');
+                            // ป้องกันกรณีเป็นลิงก์รูปภาพจริงๆ
+                            if (shiftedData && shiftedData.trim() !== "" && !shiftedData.startsWith("http")) {
+                                problemData = shiftedData; 
+                            }
+                        }
+
+                        // แสดงผลเมื่อมีข้อมูลโจทย์จริงๆ
                         if (problemData && problemData.trim() !== "") {
-                            document.getElementById('problem-box').style.display = 'block'; // เปิดกล่องโจทย์
+                            document.getElementById('problem-box').style.display = 'block'; 
                             document.getElementById('task-problem').innerText = problemData;
                         }
+                        // ==========================================
 
                         // หากครูใส่ลิงก์ Wokwi แบบเริ่มต้นมาให้ในชีต (คอลัมน์ link) ให้เปิดลิงก์นั้นเลย
                         let customLink = getVal(currentAct, 'link', 'ลิงก์');
