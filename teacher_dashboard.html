@@ -952,11 +952,39 @@
             `).join('');
         }
 
+       /* ==================== TAB 6: ความปลอดภัย / ปลดแบน ==================== */
+        function renderBannedTable() {
+            const tbody = document.getElementById('banned-table-body');
+            const list = db.banned_students || [];
+            
+            if(list.length === 0) {
+                tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; padding:30px; color:#10b981; font-weight:600;"><i class="fas fa-check-circle"></i> ห้องเรียนปลอดภัย ไร้ประวัติการทุจริตสอบคัดลอกกันในเวลานี้</td></tr>`;
+                return;
+            }
+            tbody.innerHTML = list.map(b => `
+                <tr style="background:rgba(239, 68, 68, 0.04);">
+                    <td style="font-family:monospace; font-weight:600;">${b.student_id || '-'}</td>
+                    <td><strong>${b.student_name || '-'}</strong></td>
+                    <td><small style="color:#f87171;">${b.ip || 'unknown'}</small></td>
+                    <td style="color:#fca5a5; font-size:0.85rem;"><i class="fas fa-exclamation-circle"></i> ${b.reason || 'ออกจากหน้าต่างข้อสอบ'}</td>
+                    <td style="text-align:center;">
+                        <button class="btn-action" style="background:#10b981; font-size:0.8rem; padding:6px 12px;" onclick="unbanStudent('${b.student_id}')"><i class="fas fa-unlock"></i> ปลดล็อกสิทธิ์</button>
+                    </td>
+                </tr>
+            `).join('');
+        }
+
         async function unbanStudent(sid) {
             if(!confirm(`🔓 ยืนยันการปลดแบนสิทธิ์การสอบรหัสนักเรียน [${sid}] ใช่หรือไม่?`)) return;
             try {
+                // 1. ส่งคำสั่งไปปลดแบนในฐานข้อมูลหลัก (ลบชื่อออกจาก Dashboard)
                 await fetch(SCRIPT_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "unbanStudent", student_id: sid }) });
-                alert("✅ ปลดล็อกสถานะการทุจริตเรียบร้อย!");
+                
+                // 2. 🌟 ส่งคำสั่งไปปลดแบนในฐานข้อมูลคลังข้อสอบด้วย! (ให้นักเรียนเข้าสอบได้อีกครั้ง) 🌟
+                const EXAM_DB_URL = "https://script.google.com/macros/s/AKfycbw9pnMjkHA9233qQERlcmHqrmsOjQMDSIUGybkEyKq0z64C-i1m5p5aVGm34-a1PuV-Xw/exec";
+                await fetch(EXAM_DB_URL, { method: 'POST', mode: 'no-cors', body: JSON.stringify({ action: "unbanStudent", student_id: sid }) });
+                
+                alert("✅ ปลดล็อกสถานะการทุจริตเรียบร้อย นักเรียนสามารถเข้าสอบได้แล้ว!");
                 loadAllData();
             } catch(e) { alert("เกิดข้อผิดพลาด"); }
         }
