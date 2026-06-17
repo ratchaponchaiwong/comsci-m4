@@ -593,7 +593,6 @@
                 return Number(a.number || 999) - Number(b.number || 999);
             });
 
-            // 🌟 จุดที่แก้ไข: กรองเอากิจกรรมเฉพาะของ "ม.4" หรือ "ทุกห้อง" มาแสดงเท่านั้น 🌟
             let acts = db.activities || [];
             acts = acts.filter(a => {
                 const targetRoom = String(a.Room || a.room || '');
@@ -659,19 +658,16 @@
         }
 
         /* ==================== TAB 3: จัดการกิจกรรม/สั่งงาน ==================== */
-        /* ==================== TAB 3: จัดการกิจกรรม/สั่งงาน ==================== */
-        // 🌟 ฟังก์ชันตัวช่วย: กดติ๊ก "เลือกทุกห้อง"
+        
         function toggleAllRooms(source) {
             document.querySelectorAll('input[name="room_cb"]').forEach(cb => {
                 cb.checked = source.checked;
             });
         }
 
-        /* ==================== TAB 3: จัดการกิจกรรม/สั่งงาน ==================== */
         async function saveActivity() {
             const grade = document.getElementById('act-grade').value;
             
-            // 🌟 ระบบกวาดห้องที่ถูกติ๊กเลือก
             const checkAll = document.getElementById('check-all-rooms').checked;
             let selectedRooms = [];
             document.querySelectorAll('input[name="room_cb"]:checked').forEach(cb => {
@@ -684,7 +680,6 @@
             } else if (checkAll || selectedRooms.length === 0) {
                 fullRoom = grade + "/ทุกห้อง";
             } else {
-                // รวบยอดเป็น: "ม.4/1, ม.4/2, ม.4/8, ม.4/9"
                 fullRoom = selectedRooms.map(r => grade + "/" + r).join(", ");
             }
 
@@ -694,6 +689,7 @@
             if (editId === '' && customId === '') {
                 customId = "ACT-" + Math.floor(100000 + Math.random() * 900000); 
             }
+
             const finalId = editId !== '' ? editId : customId;
 
             const data = {
@@ -733,6 +729,35 @@
             }
         }
 
+        function renderActivitiesList() {
+            const list = document.getElementById('activities-list');
+            if (!db.activities || db.activities.length === 0) {
+                list.innerHTML = '<div class="empty-state">ยังไม่มีกิจกรรมในระบบ</div>';
+                return;
+            }
+            list.innerHTML = db.activities.map(act => {
+                let actId = act.ID || act.id;
+                let actTitle = act.Title || act.title;
+                let actStatus = act.Status || act.status;
+                let actRoom = act.Room || act.room;
+                let actPoints = act.Points || act.points;
+                let actDate = formatThaiDate(act.Date || act.date); 
+
+                return `
+                <div class="list-item">
+                    <div>
+                        <strong style="font-size: 1.1rem; display:block; margin-bottom:5px;">${actTitle}</strong> 
+                        <span class="badge ${actStatus === 'open' ? 'badge-green' : 'badge-red'}">${actStatus === 'open' ? 'เปิดให้ทำ' : 'ปิดรับงาน'}</span>
+                        <br><small style="color: #94a3b8; line-height:1.8;">รหัสงาน: <b>${actId}</b> | เป้าหมาย: <b>${actRoom}</b> | กำหนดส่ง: <b>${actDate}</b> | <b>${actPoints}</b> คะแนน</small>
+                    </div>
+                    <div style="display:flex; flex-direction: column; gap:8px;">
+                        <button class="btn-action" onclick="editActivity('${actId}')"><i class="fas fa-edit"></i> แก้ไข</button>
+                        <button class="btn-action btn-danger" onclick="deleteActivity('${actId}')"><i class="fas fa-trash"></i> ลบ</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
         function editActivity(actId) {
             const act = db.activities.find(a => (a.ID || a.id) == actId);
             if(!act) return;
@@ -755,7 +780,6 @@
             if (String(rawDate).includes('T')) rawDate = String(rawDate).split('T')[0]; 
             document.getElementById('act-date').value = rawDate;
 
-            // 🌟 คืนค่าห้องเรียนเวลาโหลดงานมาแก้ไข (ดึงติ๊กถูกกลับมา) 🌟
             const roomStr = getVal('Room', 'room') || '';
             document.getElementById('check-all-rooms').checked = false;
             document.querySelectorAll('input[name="room_cb"]').forEach(cb => cb.checked = false);
@@ -764,8 +788,8 @@
                 document.getElementById('check-all-rooms').checked = true;
                 toggleAllRooms(document.getElementById('check-all-rooms'));
             } else {
-                const parts = roomStr.split(',').map(s => s.trim()); // เช่น ["ม.4/1", "ม.4/2"]
-                const roomNums = parts.map(p => p.split('/')[1]); // ดึงเอาเฉพาะเลขห้อง เช่น ["1", "2"]
+                const parts = roomStr.split(',').map(s => s.trim()); 
+                const roomNums = parts.map(p => p.split('/')[1]); 
                 document.querySelectorAll('input[name="room_cb"]').forEach(cb => {
                     if (roomNums.includes(cb.value)) cb.checked = true;
                 });
@@ -776,6 +800,12 @@
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
 
+        async function deleteActivity(actId) {
+            if(!confirm("⚠️ แน่ใจหรือไม่ที่จะลบกิจกรรมนี้ออกจากฐานข้อมูล? (ข้อมูลการส่งงานของเด็กจะไม่ถูกลบ)")) return;
+            await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify({ action: "deleteActivity", id: actId }) });
+            loadAllData();
+        }
+
         function resetForm() {
             document.getElementById('act-edit-id').value = '';
             document.getElementById('act-custom-id').value = '';
@@ -784,7 +814,6 @@
             document.getElementById('act-img').value = '';
             document.getElementById('act-expected').value = '';
             
-            // 🌟 ล้างค่า Checkbox เวลากดบันทึกหรือยกเลิก 🌟
             document.getElementById('check-all-rooms').checked = false;
             document.querySelectorAll('input[name="room_cb"]').forEach(cb => cb.checked = false);
 
