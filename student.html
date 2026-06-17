@@ -253,8 +253,8 @@
     </div>
 
     <script>
+        // 🌟 ตั้งค่าให้ใช้ฐานข้อมูลหลักตัวเดียวเท่านั้น! (ถอด VALIDATOR_URL ออกไปเลย)
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec"; 
-        const VALIDATOR_URL = "https://script.google.com/macros/s/AKfycbyyXbMRmMGgIiSz49VmPhym-vQi01u8I2Z-rDdOhk8AKFCTy77cJGFGALyEV_31nrak/exec"; 
 
         let userIP = "unknown";
         let isStudentBanned = false;
@@ -403,7 +403,8 @@
                 if (studentId !== '-' && studentId !== '') {
                     localStorage.setItem(email + '_studentid', studentId);
                     try {
-                        const banRes = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}&t=${Date.now()}`);
+                        // 🌟 ดึงข้อมูลทุจริตจากฐานข้อมูลหลัก 🌟
+                        const banRes = await fetch(`${GOOGLE_SCRIPT_URL}?action=checkBanStatus&id=${studentId}&ip=${userIP}&t=${Date.now()}`);
                         const banData = await banRes.json();
                         isStudentBanned = banData.banned;
                         banReasonStr = banData.reason || "ทุจริตการสอบ";
@@ -448,7 +449,8 @@
             try { const r = await fetch('https://api64.ipify.org?format=json'); const d = await r.json(); currentIP = d.ip; } catch(e) {}
 
             try {
-                const res = await fetch(`${VALIDATOR_URL}?action=checkBanStatus&id=${sid}&ip=${currentIP}&t=${Date.now()}`);
+                // 🌟 ดึงข้อมูลทุจริตจากฐานข้อมูลหลัก 🌟
+                const res = await fetch(`${GOOGLE_SCRIPT_URL}?action=checkBanStatus&id=${sid}&ip=${currentIP}&t=${Date.now()}`);
                 const data = await res.json();
                 
                 loader.style.display = 'none';
@@ -527,36 +529,26 @@
                 return;
             }
 
-            // ==========================================
-            // 🌟 ระบบคัดกรองห้องอัจฉริยะ (อัปเดตใหม่) 🌟
             const myActivities = db.activities.filter(act => {
                 let targetRoom = String(getVal(act, 'room', 'ห้อง', 'ชั้น') || 'ทุกห้อง').trim();
-                let currentRoom = String(room).trim(); // เช่น "ม.4/4"
+                let currentRoom = String(room).trim();
                 
-                // 1. สั่งทุกห้องทั้งโรงเรียน
                 if (targetRoom === 'ทุกห้อง' || targetRoom === '' || targetRoom === 'all') return true;
-                
-                // 2. สั่งห้องเดียวตรงๆ (กรณีเดิม)
                 if (targetRoom === currentRoom) return true;
                 
-                // 3. สั่งแบบเหมาระดับชั้น (เช่น ม.4/ทุกห้อง)
                 if (targetRoom.includes('ทุกห้อง') || targetRoom.includes('all')) {
                     let targetGrade = targetRoom.split('/')[0].trim();
                     let myGrade = currentRoom.split('/')[0].trim();
                     if (targetGrade === myGrade) return true;
                 }
                 
-                // 4. สั่งแบบเลือกหลายห้องด้วย Checkbox (เช่น ม.4/1, ม.4/2, ม.4/4)
                 if (targetRoom.includes(',')) {
-                    // แยกชื่อห้องด้วยเครื่องหมายลูกน้ำ แล้วลบช่องว่างทิ้ง
                     let roomArray = targetRoom.split(',').map(r => r.trim());
-                    // ถ้าในรายการที่ครูสั่ง มีชื่อห้องของนักเรียนคนนี้รวมอยู่ด้วย ให้แสดงงาน
                     if (roomArray.includes(currentRoom)) return true;
                 }
                 
                 return false;
             });
-            // ==========================================
 
             if (myActivities.length === 0) {
                 container.innerHTML = `<div class="glass-card" style="text-align: center; opacity: 0.8;"><p>ยังไม่มีบทเรียนสำหรับห้อง ${room}</p></div>`;
