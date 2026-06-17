@@ -535,7 +535,7 @@
             body.innerHTML = filtered.map(s => `
                 <tr ondblclick="openEditStudent('${s.email}')" style="cursor: pointer;" title="ดับเบิลคลิกเพื่อแก้ไขข้อมูล">
                     <td style="font-family:monospace;">${s.student_id || '-'}</td>
-                    <td>4/${s.room || '-'}</td>
+                    <td>${s.room || '-'}</td>
                     <td>${s.number || '-'}</td>
                     <td><strong>${s.name || '-'}</strong></td>
                     <td style="text-align:center; font-weight:700; color:#3b82f6; font-size:1.1rem;">${s.total_score || 0}</td>
@@ -616,7 +616,7 @@
 
             filteredStudents.forEach(s => {
                 html += `<tr>`;
-                html += `<td style="position: sticky; left: 0; background: inherit;">4/${s.room || '-'}</td>`;
+                html += `<td style="position: sticky; left: 0; background: inherit;">${s.room || '-'}</td>`;
                 html += `<td style="position: sticky; left: 60px; background: inherit;">${s.number || '-'}</td>`;
                 html += `<td style="position: sticky; left: 130px; background: inherit;">${s.student_id || '-'}</td>`;
                 html += `<td style="position: sticky; left: 240px; background: inherit;"><b>${s.name || '-'}</b></td>`;
@@ -845,7 +845,7 @@
                     <td>${s.student_id || '-'}</td>
                     <td>${s.number || '-'}</td>
                     <td><b>${s.name || 'นักเรียน'}</b></td>
-                    <td>4/${s.room || '-'}</td>
+                    <td>${s.room || '-'}</td>
                     <td><span class="badge ${sub ? 'badge-green' : 'badge-red'}">${sub ? 'ส่งแล้ว' : 'ค้างส่ง'}</span></td>
                     <td style="font-weight:bold; color: #60a5fa; font-size:1.1rem;">${sub ? (sub.score || '0') : '-'}</td>
                     <td><button class="btn-action" onclick="openGrade('${s.student_id}', '${actId}')"><i class="fas fa-search"></i> ตรวจ</button></td>
