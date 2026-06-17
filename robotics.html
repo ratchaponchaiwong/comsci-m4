@@ -14,7 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
-        /* CSS หลัก (คงโครงสร้างเดิมทั้งหมด) */
+        /* CSS หลัก */
         * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s, color 0.3s;}
         body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; cursor: default; }
         
@@ -51,14 +51,14 @@
         .task-title { color: var(--accent); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; }
         .task-desc { font-size: 0.95rem; opacity: 0.8; margin-bottom: 15px; }
         
-        /* 🌟 CSS สำหรับกล่องโจทย์ที่เพิ่มใหม่ 🌟 */
+        /* กล่องโจทย์ */
         .problem-box {
             background: rgba(59, 130, 246, 0.15);
             border-left: 4px solid var(--accent);
             padding: 15px;
             margin-bottom: 20px;
             border-radius: 0 12px 12px 0;
-            display: none; /* ซ่อนไว้ก่อน จะแสดงเมื่อมีข้อมูล */
+            display: none; 
             flex-shrink: 0;
         }
         body[data-theme="forest"] .problem-box { background: rgba(16, 185, 129, 0.15); border-left-color: #10b981; }
@@ -83,7 +83,7 @@
         /* ==================== 🎯 โหมดโฟกัส 🎯 ==================== */
         body.focus-mode header { display: none !important; }
         body.focus-mode .workspace-wrapper { padding: 10px; height: 100vh; }
-        body.focus-mode .sidebar { width: 280px; }
+        body.focus-mode .sidebar { width: 300px; }
         
         #exit-focus-btn {
             display: none;
@@ -143,7 +143,15 @@
                 
                 <div id="problem-box" class="problem-box">
                     <div class="problem-title"><i class="fas fa-clipboard-list"></i> โจทย์ / สิ่งที่ต้องทำ</div>
-                    <div class="problem-text" id="task-problem">กำลังโหลดโจทย์...</div>
+                    
+                    <div class="problem-text" id="task-problem" style="display:none;"></div>
+                    
+                    <div id="problem-image-box" style="margin-top: 15px; display: none; text-align: center;">
+                        <img id="task-image" src="" alt="ภาพประกอบวงจร" style="max-width: 100%; border-radius: 10px; border: 2px solid rgba(255,255,255,0.1); box-shadow: 0 4px 10px rgba(0,0,0,0.2); cursor: pointer; transition: 0.3s;" onclick="window.open(this.src, '_blank')" onmouseover="this.style.transform='scale(1.02)'" onmouseout="this.style.transform='scale(1)'" title="คลิกเพื่อดูรูปขนาดเต็ม">
+                        <div style="font-size: 0.8rem; opacity: 0.7; margin-top: 8px; color: inherit;">
+                            <i class="fas fa-search-plus"></i> คลิกที่รูปเพื่อขยายใหญ่
+                        </div>
+                    </div>
                 </div>
 
                 <div class="upload-section">
@@ -212,27 +220,47 @@
                         document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด') || "ไม่มีคำอธิบายเพิ่มเติม";
 
                         // ==========================================
-                        // 🌟 ระบบ Smart Auto-Fix ดึงข้อมูลโจทย์ (แก้ปัญหาคอลัมน์เลื่อน) 🌟
-                        // 1. ลองดึงจากตัวแปร expected_output ปกติก่อน
+                        // 🌟 ระบบดึงข้อมูลข้อความโจทย์ และ รูปภาพอัจฉริยะ 🌟
                         let problemData = getVal(currentAct, 'expected_output', 'ผลลัพธ์ที่ถูกต้อง', 'เฉลย', 'โจทย์');
-                        
-                        // 2. ถ้าไม่เจอ (เพราะในชีตครูมีแค่ 13 คอลัมน์ ทำให้ข้อมูลเลื่อนผิดช่อง) ให้ไปดึงจากช่องที่เลื่อนมาแทน!
+                        let imgLink = getVal(currentAct, 'image_link', 'ลิงก์รูปภาพ');
+
+                        // เช็คแก้คอลัมน์เลื่อน (เผื่อข้อความโจทย์ดันไปตกช่องรูปภาพ)
                         if (!problemData || problemData.trim() === "") {
                             let shiftedData = getVal(currentAct, 'image_link');
-                            // ป้องกันกรณีเป็นลิงก์รูปภาพจริงๆ
                             if (shiftedData && shiftedData.trim() !== "" && !shiftedData.startsWith("http")) {
                                 problemData = shiftedData; 
                             }
                         }
+                        
+                        // เช็คแก้คอลัมน์เลื่อน (เผื่อลิงก์รูปล้นไปตกช่องโจทย์/เฉลยแทน)
+                        if (!imgLink || !imgLink.startsWith("http")) {
+                            let shiftedImg = getVal(currentAct, 'expected_output');
+                            if (shiftedImg && shiftedImg.startsWith("http")) {
+                                imgLink = shiftedImg;
+                                if (problemData === imgLink) problemData = ""; // ล้างข้อความโจทย์ถ้ามันกลายเป็นลิงก์
+                            }
+                        }
 
-                        // แสดงผลเมื่อมีข้อมูลโจทย์จริงๆ
-                        if (problemData && problemData.trim() !== "") {
+                        let hasText = problemData && problemData.trim() !== "";
+                        let hasImage = imgLink && (imgLink.startsWith("http") || imgLink.startsWith("data:image"));
+
+                        // แสดงผลกล่องถ้ายืนยันว่ามีอย่างใดอย่างหนึ่ง
+                        if (hasText || hasImage) {
                             document.getElementById('problem-box').style.display = 'block'; 
-                            document.getElementById('task-problem').innerText = problemData;
+                            
+                            if (hasText) {
+                                document.getElementById('task-problem').style.display = 'block';
+                                document.getElementById('task-problem').innerText = problemData;
+                            }
+                            
+                            if (hasImage) {
+                                document.getElementById('problem-image-box').style.display = 'block';
+                                document.getElementById('task-image').src = imgLink;
+                            }
                         }
                         // ==========================================
 
-                        // หากครูใส่ลิงก์ Wokwi แบบเริ่มต้นมาให้ในชีต (คอลัมน์ link) ให้เปิดลิงก์นั้นเลย
+                        // เปิดลิงก์ Wokwi แบบเริ่มต้น
                         let customLink = getVal(currentAct, 'link', 'ลิงก์');
                         if(customLink && customLink.includes("wokwi.com")) {
                             document.getElementById('wokwi-iframe').src = customLink;
@@ -279,7 +307,6 @@
             }
         }
 
-        // 🌟 ฟังก์ชันสลับโหมดโฟกัส (รองรับทั้งคอมและ iPad) 🌟
         function toggleFocusMode() {
             document.body.classList.toggle('focus-mode');
             
@@ -302,7 +329,6 @@
             }
         }
 
-        // 🌟 ระบบส่งงาน (อัปเดตแก้บั๊กเรียบร้อย) 🌟
         async function submitWork() {
             if(isPastDeadlineGlobal) return alert("หมดเวลาส่งงานแล้วครับ ไม่สามารถส่งได้");
 
@@ -314,7 +340,6 @@
             const actId = urlParams.get('actid'); 
             const email = localStorage.getItem('student_email');
             const studentId = localStorage.getItem(email + '_studentid');
-            // 🌟 เพิ่มการดึงชื่อนักเรียน
             const studentName = localStorage.getItem('student_name') || "ไม่ระบุชื่อ";
 
             if (!actId) {
@@ -355,19 +380,17 @@
                 }
             } catch(e) {} 
 
-            // รูปแบบข้อมูลส่งให้ Google Sheets
             const finalWorkContent = "📌 ลิงก์ Wokwi:\n" + link;
 
             try {
                 await fetch(GOOGLE_SCRIPT_URL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
-                    // 🌟 ส่งเป็น Text plain ป้องกัน CORS
                     headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ 
                         action: "submitWork",
                         student_id: studentId,
-                        student_name: studentName, // ส่งชื่อไปด้วย
+                        student_name: studentName, 
                         activity_id: actId,
                         work_content: finalWorkContent
                     }) 
@@ -386,7 +409,7 @@
     </script>
     <script>
     (function() {
-        const CRU_EMAILS = ['ratchapon@prot.ac.th' ];
+        const CRU_EMAILS = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com'];
         const activeEmail = localStorage.getItem('student_email');
         if (activeEmail && CRU_EMAILS.includes(activeEmail)) {
             // 1. แปลงลิงก์และปุ่มทั้งหมดที่มุ่งหน้าไปหา student.html ให้เบี่ยงเส้นทางมาหาครูทันที
