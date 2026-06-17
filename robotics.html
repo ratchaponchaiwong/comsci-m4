@@ -14,6 +14,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     
     <style>
+        /* CSS หลัก (คงโครงสร้างเดิมทั้งหมด) */
         * { margin: 0; padding: 0; box-sizing: border-box; transition: background-color 0.3s ease, border-color 0.3s, color 0.3s;}
         body { font-family: 'Prompt', 'Inter', sans-serif; overflow-x: hidden; cursor: default; }
         
@@ -25,25 +26,20 @@
         
         .bg-animation { position: fixed; top: 0; left: 0; width: 100%; height: 100%; z-index: 0; pointer-events: none; }
         .bg-animation .circle { position: absolute; background: radial-gradient(circle, rgba(59,130,246,0.15) 0%, rgba(59,130,246,0) 70%); border-radius: 50%; animation: float 20s infinite ease-in-out; }
-        body[data-theme="snow"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,255,255,0.3) 0%, rgba(255,255,255,0) 70%); }
-        body[data-theme="forest"] .bg-animation .circle { background: radial-gradient(circle, rgba(144,238,144,0.2) 0%, rgba(144,238,144,0) 70%); }
-        body[data-theme="love"] .bg-animation .circle { background: radial-gradient(circle, rgba(255,105,180,0.25) 0%, rgba(255,105,180,0) 70%); }
         @keyframes float { 0%, 100% { transform: translateY(0) translateX(0) scale(1); } 25% { transform: translateY(-30px) translateX(20px) scale(1.05); } 75% { transform: translateY(30px) translateX(-20px) scale(0.95); } }
         .bg-animation .circle:nth-child(1) { width: 400px; height: 400px; top: -100px; left: -100px; animation-duration: 25s; }
         .bg-animation .circle:nth-child(2) { width: 600px; height: 600px; bottom: -200px; right: -100px; animation-duration: 30s; animation-delay: -5s; }
         
         .content-layer { position: relative; z-index: 10; height: 100vh; display: flex; flex-direction: column; }
         
-        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); padding-top: max(10px, env(safe-area-inset-top)); }
-        body[data-theme="snow"] header, body[data-theme="love"] header { background: rgba(255, 255, 255, 0.8); border-bottom-color: rgba(0,0,0,0.1); }
+        header { background: rgba(15, 23, 42, 0.8); backdrop-filter: blur(12px); padding: 10px 40px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(59,130,246,0.3); }
         .logo { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #60a5fa, #3b82f6); -webkit-background-clip: text; color: transparent; text-decoration: none; }
-        body[data-theme="snow"] .logo, body[data-theme="love"] .logo { background: linear-gradient(135deg, #ff6b6b, #ff8e8e); -webkit-background-clip: text; }
         
         .user-info { display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.15); padding: 4px 12px 4px 8px; border-radius: 50px; }
-        body[data-theme="snow"] .user-info, body[data-theme="love"] .user-info { background: rgba(0,0,0,0.05); }
         .user-avatar { width: 32px; height: 32px; border-radius: 50%; border: 2px solid #3b82f6; }
         .user-name { font-size: 0.85rem; font-weight: 500; color: inherit; }
-
+        
+        /* Workspace CSS */
         :root { --panel-bg: rgba(30, 41, 59, 0.6); --border-ws: rgba(255,255,255,0.1); --editor-bg: rgba(15, 23, 42, 0.8); --accent: #3b82f6; }
         body[data-theme="snow"] { --panel-bg: rgba(255, 255, 255, 0.85); --border-ws: rgba(0,0,0,0.1); --editor-bg: #ffffff; --accent: #ff6b6b; }
         body[data-theme="forest"] { --panel-bg: rgba(30, 60, 30, 0.6); --accent: #10b981; --editor-bg: rgba(10, 30, 10, 0.8); }
@@ -51,28 +47,44 @@
 
         .workspace-wrapper { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; transition: 0.3s; }
         
-        .sidebar { width: 300px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; transition: 0.3s; }
-        .task-title { color: var(--accent); font-weight: 700; font-size: 1.1rem; margin-bottom: 10px; }
-        .task-desc { font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px; }
+        .sidebar { width: 350px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; transition: 0.3s; overflow-y: auto;}
+        .task-title { color: var(--accent); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; }
+        .task-desc { font-size: 0.95rem; opacity: 0.8; margin-bottom: 15px; }
         
-        .upload-section { background: rgba(16, 185, 129, 0.1); border-radius: 16px; padding: 15px; border: 1px solid #10b981; margin-top: auto; }
-        .upload-section input { width: 100%; padding: 10px; border-radius: 10px; border: 1px solid var(--border-ws); background: var(--editor-bg); color: inherit; font-family: 'Prompt'; font-size: 0.85rem; margin-top: 8px; transition: 0.3s;}
-        body[data-theme="snow"] .upload-section input, body[data-theme="love"] .upload-section input { border-color: #cbd5e1; }
-        .upload-section input:focus { outline: none; border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.3); }
+        /* 🌟 CSS สำหรับกล่องโจทย์ที่เพิ่มใหม่ 🌟 */
+        .problem-box {
+            background: rgba(59, 130, 246, 0.15);
+            border-left: 4px solid var(--accent);
+            padding: 15px;
+            margin-bottom: 20px;
+            border-radius: 0 12px 12px 0;
+            display: none; /* ซ่อนไว้ก่อน จะแสดงเมื่อมีข้อมูล */
+            flex-shrink: 0;
+        }
+        body[data-theme="forest"] .problem-box { background: rgba(16, 185, 129, 0.15); border-left-color: #10b981; }
+        body[data-theme="love"] .problem-box { background: rgba(236, 72, 153, 0.15); border-left-color: #ec4899; }
+        body[data-theme="snow"] .problem-box { background: rgba(255, 107, 107, 0.15); border-left-color: #ff6b6b; }
         
-        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; margin-top: 15px; transition: 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px;}
-        .btn-submit:hover:not(:disabled) { background: #059669; transform: translateY(-2px); box-shadow: 0 4px 10px rgba(16, 185, 129, 0.3);}
-        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; border-color: #94a3b8; box-shadow: none;}
-        
-        .main-panel { flex: 1; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; padding: 20px; transition: 0.3s; }
-        .main-panel iframe { flex: 1; width: 100%; height: 100%; border: none; background: white; border-radius: 12px; }
+        .problem-title { font-weight: 700; color: var(--accent); margin-bottom: 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
+        .problem-text { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; color: inherit; }
 
-        /* ==================== 🎯 โหมดโฟกัส (Focus Mode) 🎯 ==================== */
+        .upload-section { background: rgba(16, 185, 129, 0.1); border-radius: 16px; padding: 15px; border: 1px solid #10b981; margin-top: auto; flex-shrink: 0;}
+        .wokwi-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-ws); background: var(--editor-bg); color: inherit; font-family: 'Prompt'; margin-bottom: 10px; outline: none; transition: 0.3s;}
+        .wokwi-input:focus { border-color: #10b981; box-shadow: 0 0 10px rgba(16, 185, 129, 0.2); }
+        body[data-theme="snow"] .wokwi-input, body[data-theme="love"] .wokwi-input { border-color: #cbd5e1; }
+        
+        .btn-submit { background: #10b981; color: white; border: none; padding: 12px; width: 100%; border-radius: 10px; font-family: 'Prompt'; font-weight: bold; cursor: pointer; transition: 0.2s;}
+        .btn-submit:hover:not(:disabled) { background: #059669; transform: translateY(-2px); }
+        .btn-submit:disabled { background: #94a3b8; cursor: not-allowed; transform: none; border-color: #94a3b8; }
+        
+        .main-panel { flex: 1; background: var(--panel-bg); border-radius: 20px; border: 1px solid var(--border-ws); overflow: hidden; display: flex; position: relative;}
+        .iframe-container { width: 100%; height: 100%; border: none; background: #ffffff; }
+
+        /* ==================== 🎯 โหมดโฟกัส 🎯 ==================== */
         body.focus-mode header { display: none !important; }
         body.focus-mode .workspace-wrapper { padding: 10px; height: 100vh; }
-        body.focus-mode .sidebar { width: 250px; } /* ย่อแถบซ้ายให้เล็กลงนิดนึงเพิ่มพื้นที่ทำงาน */
+        body.focus-mode .sidebar { width: 280px; }
         
-        /* ปุ่มลอยสีแดงมุมขวาบน สำหรับกดออกจากโหมดโฟกัส */
         #exit-focus-btn {
             display: none;
             position: fixed;
@@ -95,11 +107,10 @@
         #exit-focus-btn:hover { background: #dc2626; transform: scale(1.05); }
         body.focus-mode #exit-focus-btn { display: flex; }
 
-        /* Responsive สำหรับหน้าจอเล็ก */
         @media (max-width: 768px) {
             .workspace-wrapper { flex-direction: column; overflow-y: auto; }
             .sidebar { width: 100%; height: auto; flex-shrink: 0; }
-            .main-panel { min-height: 65vh; }
+            .main-panel { min-height: 60vh; }
         }
     </style>
 </head>
@@ -114,7 +125,10 @@
         <header>
             <a href="index.html" class="logo"><i class="fas fa-robot"></i> PROT Smart Workspace</a>
             <div style="display: flex; gap: 15px; align-items: center;">
-                <a href="student.html" style="color: inherit; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold; transition: 0.2s;"><i class="fas fa-arrow-left"></i> กลับห้องเรียน</a>
+                <button onclick="toggleFocusMode()" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 5px 15px; border-radius: 20px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
+                    <i class="fas fa-expand-arrows-alt"></i> เต็มจอ
+                </button>
+                <a href="student.html" style="color: inherit; text-decoration: none; font-size: 0.9rem; border: 1px solid rgba(255,255,255,0.2); padding: 5px 15px; border-radius: 20px; font-weight: bold;"><i class="fas fa-arrow-left"></i> กลับห้องเรียน</a>
                 <div class="user-info" id="loginArea">
                     <i class="fas fa-spinner fa-spin"></i> กำลังโหลด...
                 </div>
@@ -125,11 +139,16 @@
             <div class="sidebar">
                 <div class="task-title" id="task-title"><i class="fas fa-microchip"></i> กำลังโหลดข้อมูลงาน...</div>
                 <div class="task-desc" id="task-desc">กรุณารอสักครู่ ระบบกำลังเชื่อมต่อฐานข้อมูล</div>
-                <div id="task-deadline" style="font-size: 0.8rem; color: #ef4444; margin-bottom: 15px; font-weight: 600;"></div>
+                <div id="task-deadline" style="font-size: 0.85rem; color: #ef4444; margin-bottom: 15px; font-weight: 600;"></div>
                 
+                <div id="problem-box" class="problem-box">
+                    <div class="problem-title"><i class="fas fa-clipboard-list"></i> โจทย์ / สิ่งที่ต้องทำ</div>
+                    <div class="problem-text" id="task-problem">กำลังโหลดโจทย์...</div>
+                </div>
+
                 <div class="upload-section">
-                    <p style="font-size: 0.85rem; font-weight: 600;"><i class="fas fa-link"></i> วางลิงก์ Wokwi ของคุณ</p>
-                    <input type="text" id="wokwi-link" placeholder="https://wokwi.com/projects/...">
+                    <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 8px;"><i class="fas fa-link"></i> วางลิงก์ผลงาน Wokwi ที่นี่</p>
+                    <input type="text" id="wokwi-link" class="wokwi-input" placeholder="https://wokwi.com/projects/...">
                     <button class="btn-submit" id="submitBtnLab" onclick="submitWork()">
                         <i class="fas fa-paper-plane"></i> ยืนยันการส่งงาน
                     </button>
@@ -137,18 +156,13 @@
             </div>
 
             <div class="main-panel">
-                <div style="display: flex; justify-content: flex-end; margin-bottom: 12px;">
-                    <button onclick="toggleFocusMode()" style="background: rgba(59, 130, 246, 0.2); color: #60a5fa; border: 1px solid #3b82f6; padding: 8px 18px; border-radius: 30px; cursor: pointer; font-family: 'Prompt'; font-weight: bold; display: flex; align-items: center; gap: 8px; transition: 0.3s;">
-                        <i class="fas fa-expand-arrows-alt"></i> พื้นที่ทำงานเต็มจอ
-                    </button>
-                </div>
-                <iframe src="https://wokwi.com/projects/new/esp32" title="Arduino Simulator"></iframe>
+                 <iframe id="wokwi-iframe" class="iframe-container" src="https://wokwi.com/projects/new/esp32"></iframe>
             </div>
         </div>
     </div>
 
     <script>
-        // 🌟 1. ใส่ลิงก์ Google Script ของครูตรงนี้ 🌟
+        // 🌟 1. ใส่ลิงก์ Google Script ของครู 🌟
         const GOOGLE_SCRIPT_URL = "https://script.google.com/macros/s/AKfycby901YIN3KkAJXTItn_ySYqqecw4tT8rArbASqOa768Mpgah8XQjYX8jMVSj9w0VC6C/exec";
 
         function getVal(obj, ...keys) {
@@ -162,18 +176,19 @@
 
         let isPastDeadlineGlobal = false;
 
+        // โหลดข้อมูลนักเรียนและเนื้อหางาน
         async function loadUserData() {
             const email = localStorage.getItem('student_email');
-            if (!email) { 
+            if (!email) {
                 alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
-                window.location.href = "student.html"; 
-                return; 
+                window.location.href = "student.html"; return;
             }
-            
             const name = localStorage.getItem('student_name') || "นักเรียน";
             const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S";
             document.getElementById('loginArea').innerHTML = `<img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span>`;
-            document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
+            
+            const theme = localStorage.getItem('smart_theme') || "default";
+            document.body.setAttribute('data-theme', theme);
 
             const urlParams = new URLSearchParams(window.location.search);
             const actId = urlParams.get('actid');
@@ -194,7 +209,20 @@
                     
                     if(currentAct) {
                         document.getElementById('task-title').innerHTML = `<i class="fas fa-microchip"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
-                        document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด');
+                        document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด') || "ไม่มีคำอธิบายเพิ่มเติม";
+
+                        // 🌟 ดึงข้อมูลมาแสดงในกล่องโจทย์ 🌟
+                        let problemData = getVal(currentAct, 'expected_output', 'ผลลัพธ์ที่ถูกต้อง', 'เฉลย', 'โจทย์');
+                        if (problemData && problemData.trim() !== "") {
+                            document.getElementById('problem-box').style.display = 'block'; // เปิดกล่องโจทย์
+                            document.getElementById('task-problem').innerText = problemData;
+                        }
+
+                        // หากครูใส่ลิงก์ Wokwi แบบเริ่มต้นมาให้ในชีต (คอลัมน์ link) ให้เปิดลิงก์นั้นเลย
+                        let customLink = getVal(currentAct, 'link', 'ลิงก์');
+                        if(customLink && customLink.includes("wokwi.com")) {
+                            document.getElementById('wokwi-iframe').src = customLink;
+                        }
 
                         let rawDate = getVal(currentAct, 'date', 'วันที่');
                         let rawTime = getVal(currentAct, 'time', 'เวลา');
@@ -214,6 +242,7 @@
                                 btn.disabled = true;
                                 btn.innerHTML = '<i class="fas fa-lock"></i> หมดเวลาส่งงาน';
                                 btn.style.background = '#ef4444';
+                                btn.style.borderColor = '#ef4444';
                                 document.getElementById('wokwi-link').disabled = true;
                             } else {
                                 document.getElementById('task-deadline').innerHTML = `<i class="far fa-clock"></i> กำหนดส่ง: ${rawDate} | ${rawTime}`;
@@ -225,11 +254,12 @@
                         document.getElementById('task-desc').innerText = `ไม่พบข้อมูลงานในระบบ กรุณากลับไปหน้าหลัก`;
                     }
                 } catch(e) {
-                    console.log("Error loading task info", e);
+                    document.getElementById('task-title').innerHTML = `<i class="fas fa-microchip"></i> ห้องปฏิบัติการหุ่นยนต์`;
+                    document.getElementById('task-desc').innerText = `เกิดข้อผิดพลาดในการดึงข้อมูล`;
                 }
             } else {
-                document.getElementById('task-title').innerHTML = `<i class="fas fa-microchip"></i> ปฏิบัติการหุ่นยนต์ (โหมดอิสระ)`;
-                document.getElementById('task-desc').innerText = `ต่อวงจรและเขียนโค้ดได้อย่างอิสระ (ไม่มีการส่งงาน)`;
+                document.getElementById('task-title').innerHTML = `<i class="fas fa-microchip"></i> ห้องปฏิบัติการหุ่นยนต์ (โหมดอิสระ)`;
+                document.getElementById('task-desc').innerText = `จำลองการต่อวงจรและเขียนโปรแกรมได้อย่างอิสระ (ไม่มีการส่งงาน)`;
                 document.getElementById('submitBtnLab').style.display = 'none';
                 document.querySelector('.upload-section').style.display = 'none';
             }
@@ -240,7 +270,6 @@
             document.body.classList.toggle('focus-mode');
             
             if (document.body.classList.contains('focus-mode')) {
-                // พยายามขอ Fullscreen (สำหรับคอม/แอนดรอยด์)
                 try {
                     if (document.documentElement.requestFullscreen) {
                         document.documentElement.requestFullscreen().catch(()=>{});
@@ -249,7 +278,6 @@
                     }
                 } catch(e) {}
             } else {
-                // ออกจาก Fullscreen
                 try {
                     if (document.exitFullscreen) {
                         document.exitFullscreen().catch(()=>{});
@@ -260,19 +288,20 @@
             }
         }
 
-        // 🌟 ระบบส่งงาน 🌟
+        // 🌟 ระบบส่งงาน (อัปเดตแก้บั๊กเรียบร้อย) 🌟
         async function submitWork() {
             if(isPastDeadlineGlobal) return alert("หมดเวลาส่งงานแล้วครับ ไม่สามารถส่งได้");
 
             const link = document.getElementById('wokwi-link').value.trim();
-            if (link === "") return alert("กรุณาวางลิงก์ Wokwi ก่อนส่งครับ!");
-            if (!confirm("ยืนยันการส่งลิงก์ผลงานนี้ใช่หรือไม่?")) return;
+            if (link === "" || !link.includes("wokwi.com")) return alert("กรุณาวางลิงก์ของ Wokwi ให้ถูกต้องก่อนส่งครับ!");
+            if(!confirm("ยืนยันการส่งลิงก์ผลงานนี้ใช่หรือไม่?")) return;
 
             const urlParams = new URLSearchParams(window.location.search);
             const actId = urlParams.get('actid'); 
             const email = localStorage.getItem('student_email');
             const studentId = localStorage.getItem(email + '_studentid');
-            const sname = localStorage.getItem('student_name'); // 🌟 ดึงชื่อนักเรียนส่งไปด้วย
+            // 🌟 เพิ่มการดึงชื่อนักเรียน
+            const studentName = localStorage.getItem('student_name') || "ไม่ระบุชื่อ";
 
             if (!actId) {
                 alert("❌ ไม่พบรหัสกิจกรรม! กรุณากลับไปเข้าผ่านหน้า 'ห้องเรียนของฉัน'");
@@ -284,7 +313,7 @@
             }
 
             const btn = document.getElementById('submitBtnLab');
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบเวลาและส่งงาน...'; 
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> กำลังตรวจสอบและส่งงาน...'; 
             btn.disabled = true;
 
             try {
@@ -305,23 +334,26 @@
                     if (rawTime.split(':').length === 2) rawTime += ':00';
                     
                     if (nowCheck > new Date(`${rawDate}T${rawTime}`).getTime()) {
-                        alert("หมดเวลาส่งงานพอดีครับ ระบบไม่สามารถบันทึกข้อมูลได้");
+                        alert("หมดเวลาส่งงานพอดีครับ ไม่สามารถบันทึกข้อมูลได้");
                         window.location.href = "student.html";
                         return;
                     }
                 }
             } catch(e) {} 
 
+            // รูปแบบข้อมูลส่งให้ Google Sheets
             const finalWorkContent = "📌 ลิงก์ Wokwi:\n" + link;
 
             try {
                 await fetch(GOOGLE_SCRIPT_URL, { 
                     method: 'POST', 
                     mode: 'no-cors', 
+                    // 🌟 ส่งเป็น Text plain ป้องกัน CORS
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
                     body: JSON.stringify({ 
                         action: "submitWork",
                         student_id: studentId,
-                        student_name: sname,
+                        student_name: studentName, // ส่งชื่อไปด้วย
                         activity_id: actId,
                         work_content: finalWorkContent
                     }) 
