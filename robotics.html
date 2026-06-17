@@ -47,15 +47,17 @@
 
         .workspace-wrapper { display: flex; flex: 1; padding: 20px; gap: 20px; overflow: hidden; transition: 0.3s; }
         
-        .sidebar { width: 350px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; transition: 0.3s; overflow-y: auto;}
+        /* 🌟 ขยายความกว้างกล่องด้านซ้ายตรงนี้ครับ 🌟 */
+        .sidebar { width: 420px; background: var(--panel-bg); backdrop-filter: blur(12px); border-radius: 20px; padding: 20px; border: 1px solid var(--border-ws); display: flex; flex-direction: column; transition: 0.3s; overflow-y: auto;}
+        
         .task-title { color: var(--accent); font-weight: 700; font-size: 1.2rem; margin-bottom: 10px; }
         .task-desc { font-size: 0.95rem; opacity: 0.8; margin-bottom: 15px; }
         
-        /* กล่องโจทย์ */
+        /* กล่องโจทย์ (อัปเกรดให้กว้างและข้อความใหญ่ขึ้น) */
         .problem-box {
             background: rgba(59, 130, 246, 0.15);
             border-left: 4px solid var(--accent);
-            padding: 15px;
+            padding: 20px; /* เพิ่มพื้นที่ภายในกล่อง */
             margin-bottom: 20px;
             border-radius: 0 12px 12px 0;
             display: none; 
@@ -65,8 +67,8 @@
         body[data-theme="love"] .problem-box { background: rgba(236, 72, 153, 0.15); border-left-color: #ec4899; }
         body[data-theme="snow"] .problem-box { background: rgba(255, 107, 107, 0.15); border-left-color: #ff6b6b; }
         
-        .problem-title { font-weight: 700; color: var(--accent); margin-bottom: 8px; font-size: 1rem; display: flex; align-items: center; gap: 8px;}
-        .problem-text { font-size: 0.9rem; line-height: 1.6; white-space: pre-wrap; color: inherit; }
+        .problem-title { font-weight: 700; color: var(--accent); margin-bottom: 10px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;}
+        .problem-text { font-size: 1rem; line-height: 1.7; white-space: pre-wrap; color: inherit; } /* ขยายตัวหนังสือและบรรทัด */
 
         .upload-section { background: rgba(16, 185, 129, 0.1); border-radius: 16px; padding: 15px; border: 1px solid #10b981; margin-top: auto; flex-shrink: 0;}
         .wokwi-input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border-ws); background: var(--editor-bg); color: inherit; font-family: 'Prompt'; margin-bottom: 10px; outline: none; transition: 0.3s;}
@@ -83,7 +85,7 @@
         /* ==================== 🎯 โหมดโฟกัส 🎯 ==================== */
         body.focus-mode header { display: none !important; }
         body.focus-mode .workspace-wrapper { padding: 10px; height: 100vh; }
-        body.focus-mode .sidebar { width: 300px; }
+        body.focus-mode .sidebar { width: 350px; } /* โหมดโฟกัสให้กล่องเล็กลงนิดนึงจะได้มีที่ต่อวงจร */
         
         #exit-focus-btn {
             display: none;
@@ -409,10 +411,9 @@
     </script>
     <script>
     (function() {
-        const CRU_EMAILS = ['ratchapon@prot.ac.th'];
+        const CRU_EMAILS = ['ratchapon@prot.ac.th', 'teacher@prot.ac.th', 'ratchaponchaiwong@gmail.com'];
         const activeEmail = localStorage.getItem('student_email');
         if (activeEmail && CRU_EMAILS.includes(activeEmail)) {
-            // 1. แปลงลิงก์และปุ่มทั้งหมดที่มุ่งหน้าไปหา student.html ให้เบี่ยงเส้นทางมาหาครูทันที
             document.querySelectorAll('a[href="student.html"], button[onclick*="student.html"]').forEach(element => {
                 if(element.tagName === 'A') {
                     element.href = 'teacher_dashboard.html';
@@ -420,7 +421,6 @@
                     element.setAttribute('onclick', "window.location.href='teacher_dashboard.html'");
                 }
             });
-            // 2. ดักปุ่มที่มีข้อความแนว "กลับห้องเรียน" หรือ "ห้องเรียนของฉัน"
             document.querySelectorAll('a, button').forEach(el => {
                 if(el.textContent.includes('ห้องเรียน') || el.textContent.includes('กลับห้องเรียน')) {
                     el.addEventListener('click', function(e) {
