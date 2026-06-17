@@ -645,13 +645,21 @@
         }
 
         /* ==================== TAB 3: จัดการกิจกรรม/สั่งงาน ==================== */
+        /* ==================== TAB 3: จัดการกิจกรรม/สั่งงาน ==================== */
         async function saveActivity() {
             const grade = document.getElementById('act-grade').value;
             const roomNum = document.getElementById('act-room-num').value;
             const fullRoom = (grade === "ทุกห้อง") ? "ทุกห้อง" : (roomNum === "ทุกห้อง" ? grade + "/ทุกห้อง" : grade + "/" + roomNum);
 
             const editId = document.getElementById('act-edit-id').value;
-            const customId = document.getElementById('act-custom-id').value.trim();
+            let customId = document.getElementById('act-custom-id').value.trim();
+
+            // 🌟 [แก้ปัญหา ActID = undefined] 🌟
+            // ถ้าครูไม่ได้กรอกรหัสมา และไม่ได้เป็นการแก้ไขงานเดิม ให้ระบบสุ่มรหัสให้อัตโนมัติ (เช่น ACT-849201)
+            if (editId === '' && customId === '') {
+                customId = "ACT-" + Math.floor(100000 + Math.random() * 900000); 
+            }
+
             const finalId = editId !== '' ? editId : customId;
 
             const data = {
@@ -681,7 +689,7 @@
 
             try {
                 await fetch(SCRIPT_URL, { method: 'POST', body: JSON.stringify(data) });
-                alert("✅ บันทึกและส่งข้อมูลสำเร็จ");
+                alert("✅ บันทึกและส่งข้อมูลสำเร็จ (รหัสกิจกรรมคือ: " + finalId + ")");
                 resetForm();
                 loadAllData();
             } catch (e) { 
