@@ -118,44 +118,168 @@
         }
 
         async function loadUserData() {
+            // 1. ตรวจสอบการล็อกอิน
             const email = localStorage.getItem('student_email');
-            if (!email) { window.location.href = "student.html"; return; }
+            if (!email) {
+                alert("กรุณาเข้าสู่ระบบก่อนใช้งาน");
+                window.location.href = "student.html"; return;
+            }
+            const name = localStorage.getItem('student_name') || "นักเรียน";
+            const pic = localStorage.getItem('student_pic') || "https://ui-avatars.com/api/?name=S";
+            const loginArea = document.getElementById('loginArea');
+            if(loginArea) loginArea.innerHTML = `<img src="${pic}" class="user-avatar"><span class="user-name">${name.split(' ')[0]}</span>`;
+            
             document.body.setAttribute('data-theme', localStorage.getItem('smart_theme') || "default");
+            
+            // 🌟 สำคัญ: ดึงรหัสนักเรียนมาเตรียมไว้ค้นหางานเก่า 🌟
+            const studentId = localStorage.getItem(email + '_studentid');
 
-            const actId = new URLSearchParams(window.location.search).get('actid');
+            const urlParams = new URLSearchParams(window.location.search);
+            const actId = urlParams.get('actid');
+            
             if(actId) {
                 try {
+                    let currentRealTime = Date.now();
+                    try {
+                        const timeRes = await fetch('https://worldtimeapi.org/api/timezone/Asia/Bangkok');
+                        const timeData = await timeRes.json();
+                        currentRealTime = new Date(timeData.datetime).getTime();
+                    } catch(e) {}
+
                     const res = await fetch(GOOGLE_SCRIPT_URL + "?action=readAll&t=" + Date.now());
                     const db = await res.json();
-                    const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน') == actId);
+                    const currentAct = db.activities.find(a => getVal(a, 'id', 'รหัสงาน', 'ID') == actId);
                     
                     if(currentAct) {
-                        document.getElementById('task-title').innerText = getVal(currentAct, 'title', 'ชื่อหัวข้อ');
-                        document.getElementById('task-desc').innerText = getVal(currentAct, 'desc', 'รายละเอียด') || "-";
-                        
-                        // 🌟 ดึงลิงก์โปรเจกต์ตั้งต้นของครู (ถ้ามี) 🌟
-                        let customLink = getVal(currentAct, 'link', 'ลิงก์');
-                        if(customLink && customLink.includes("wokwi.com")) {
-                            document.getElementById('editor-iframe').src = customLink;
+                        const titleEl = document.getElementById('task-title');
+                        const descEl = document.getElementById('task-desc');
+                        if(titleEl) titleEl.innerHTML = `<i class="fas fa-microchip"></i> ${getVal(currentAct, 'title', 'ชื่อหัวข้อ')}`;
+                        if(descEl) descEl.innerText = getVal(currentAct, 'desc', 'description', 'รายละเอียด') || "ไม่มีคำอธิบายเพิ่มเติม";
+
+                        // [ระบบกล่องโจทย์และรูปภาพ]
+                        const problemBox = document.getElementById('problem-box');
+                        if (problemBox) {
+                            let problemData = getVal(currentAct, 'expected_output', 'ผลลัพธ์ที่ถูกต้อง', 'เฉลย', 'โจทย์');
+                            let imgLink = getVal(currentAct, 'image_link', 'ลิงก์รูปภาพ');
+                            if (!problemData || problemData.trim() === "") {
+                                let shiftedData = getVal(currentAct, 'image_link');
+                                if (shiftedData && shiftedData.trim() !== "" && !shiftedData.startsWith("http")) problemData = shiftedData; 
+                            }
+                            if (!imgLink || !imgLink.startsWith("http")) {
+                                let shiftedImg = getVal(currentAct, 'expected_output');
+                                if (shiftedImg && shiftedImg.startsWith("http")) { imgLink = shiftedImg; if (problemData === imgLink) problemData = ""; }
+                            }
+                            let hasText = problemData && problemData.trim() !== "";
+                            let hasImage = imgLink && (imgLink.startsWith("http") || imgLink.startsWith("data:image"));
+
+                            if (hasText || hasImage) {
+                                problemBox.style.display = 'block'; 
+                                if (hasText) {
+                                    document.getElementById('task-problem').style.display = 'block';
+                                    document.getElementById('task-problem').innerText = problemData;
+                                }
+                                if (hasImage) {
+                                    document.getElementById('problem-image-box').style.display = 'block';
+                                    document.getElementById('task-image').src = imgLink;
+                                }
+                            }
                         }
 
-                        // 🌟 จัดการสื่อฝั่งขวา 🌟
-                        let ytLink = getVal(currentAct, 'yt_link', 'youtube');
-                        let docLink = getVal(currentAct, 'doc_link', 'doc');
-                        let materialIframe = document.getElementById('material-iframe');
-                        
-                        if (ytLink && ytLink.startsWith('http')) {
-                            materialIframe.src = getEmbedUrl(ytLink);
-                        } else if (docLink && docLink.startsWith('http')) {
-                            materialIframe.src = getEmbedUrl(docLink);
-                        } else {
-                            materialIframe.outerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:gray; font-size:1.2rem;">ไม่มีสื่อประกอบการเรียนสำหรับงานนี้</div>';
+                        // 🌟 ดึงลิงก์ตั้งต้นของครู 🌟
+                        let targetIframeUrl = "https://wokwi.com/projects/new/esp32"; 
+                        let customLink = getVal(currentAct, 'link', 'ลิงก์');
+                        if(customLink && (customLink.includes("wokwi.com") || customLink.includes("trinket.io") || customLink.includes("replit.com"))) {
+                            targetIframeUrl = customLink;
                         }
+
+                        // 🌟 ดึงประวัติงานเก่าของนักเรียนกลับมาทำต่อ (ระบบใหม่) 🌟
+                        if (studentId && studentId !== '-') {
+                            const mySubmission = db.submissions.find(sub => 
+                                (getVal(sub, 'student_id', 'รหัส') == studentId) && 
+                                (getVal(sub, 'activity_id', 'รหัสงาน') == actId)
+                            );
+                            
+                            if (mySubmission) {
+                                const content = getVal(mySubmission, 'work_content', 'ผลงาน') || "";
+                                // ค้นหา URL ในข้อความที่เคยส่ง
+                                const urlMatch = content.match(/(https?:\/\/[^\s]+)/); 
+                                if (urlMatch) {
+                                    targetIframeUrl = urlMatch[0]; // นำลิงก์งานของเด็กมาโหลดแทนลิงก์ครู
+                                    
+                                    // คืนค่าลิงก์เข้าช่อง Input ให้ด้วย
+                                    const inputBox = document.getElementById('wokwi-link') || document.getElementById('work-link');
+                                    if(inputBox) inputBox.value = targetIframeUrl;
+                                    
+                                    // เปลี่ยนปุ่มเป็นคำว่า อัปเดตงาน
+                                    const submitBtn = document.getElementById('submitBtnLab');
+                                    if(submitBtn) submitBtn.innerHTML = '<i class="fas fa-edit"></i> อัปเดต/แก้ไขผลงาน';
+                                }
+                            }
+                        }
+
+                        // โหลดเข้าจอจำลอง
+                        const editorIframe = document.getElementById('wokwi-iframe') || document.getElementById('editor-iframe');
+                        if (editorIframe) editorIframe.src = targetIframeUrl;
+
+                        // [ระบบสื่อการเรียนฝั่งขวา สำหรับหน้าแบ่งจอ]
+                        let materialIframe = document.getElementById('material-iframe');
+                        if (materialIframe && typeof getEmbedUrl === "function") {
+                            let ytLink = getVal(currentAct, 'yt_link', 'youtube');
+                            let docLink = getVal(currentAct, 'doc_link', 'doc');
+                            if (ytLink && ytLink.startsWith('http')) materialIframe.src = getEmbedUrl(ytLink);
+                            else if (docLink && docLink.startsWith('http')) materialIframe.src = getEmbedUrl(docLink);
+                            else materialIframe.outerHTML = '<div style="flex:1; display:flex; align-items:center; justify-content:center; color:gray; font-size:1.2rem;">ไม่มีสื่อประกอบการเรียนสำหรับงานนี้</div>';
+                        }
+
+                        // [ระบบเช็คเวลาหมดเขตส่งงาน]
+                        const deadlineEl = document.getElementById('task-deadline');
+                        if (deadlineEl) {
+                            let rawDate = getVal(currentAct, 'date', 'วันที่');
+                            let rawTime = getVal(currentAct, 'time', 'เวลา');
+                            if (rawDate) {
+                                if (String(rawDate).includes('T')) rawDate = String(rawDate).split('T')[0];
+                                if (String(rawTime).includes('T')) rawTime = String(rawTime).split('T')[1].substring(0,5);
+                                else if (String(rawTime).length >= 5) rawTime = String(rawTime).substring(0,5);
+
+                                let timeObj = (rawTime !== '-' && rawTime) ? rawTime : '23:59';
+                                if (timeObj.split(':').length === 2) timeObj += ':00';
+                                
+                                let deadlineTime = new Date(`${rawDate}T${timeObj}`).getTime();
+                                if (currentRealTime > deadlineTime) {
+                                    if (typeof isPastDeadlineGlobal !== 'undefined') isPastDeadlineGlobal = true;
+                                    deadlineEl.innerHTML = `<i class="fas fa-ban"></i> หมดเวลาส่งงานแล้ว (${rawDate} | ${rawTime})`;
+                                    const btn = document.getElementById('submitBtnLab');
+                                    if(btn) {
+                                        btn.disabled = true;
+                                        btn.innerHTML = '<i class="fas fa-lock"></i> หมดเวลาส่งงาน';
+                                        btn.style.background = '#ef4444';
+                                        btn.style.borderColor = '#ef4444';
+                                    }
+                                    const input = document.getElementById('wokwi-link') || document.getElementById('work-link');
+                                    if(input) input.disabled = true;
+                                } else {
+                                    deadlineEl.innerHTML = `<i class="far fa-clock"></i> กำหนดส่ง: ${rawDate} | ${rawTime}`;
+                                    deadlineEl.style.color = '#10b981';
+                                }
+                            }
+                        }
+                    } else {
+                        const titleEl = document.getElementById('task-title');
+                        if(titleEl) titleEl.innerHTML = `<i class="fas fa-microchip"></i> ห้องปฏิบัติการ (โหมดอิสระ)`;
+                        const uploadSec = document.querySelector('.upload-section');
+                        if(uploadSec) uploadSec.style.display = 'none';
                     }
-                } catch(e) { document.getElementById('task-title').innerText = "เกิดข้อผิดพลาดในการดึงข้อมูล"; }
+                } catch(e) {
+                    const titleEl = document.getElementById('task-title');
+                    if(titleEl) titleEl.innerHTML = `<i class="fas fa-exclamation-triangle"></i> ขัดข้องในการเชื่อมต่อฐานข้อมูล`;
+                }
             } else {
-                document.getElementById('task-title').innerText = "โหมดอิสระ";
-                document.querySelector('.upload-section').style.display = 'none';
+                const titleEl = document.getElementById('task-title');
+                const descEl = document.getElementById('task-desc');
+                if(titleEl) titleEl.innerHTML = `<i class="fas fa-microchip"></i> ห้องปฏิบัติการ (โหมดอิสระ)`;
+                if(descEl) descEl.innerText = `จำลองการต่อวงจรและเขียนโปรแกรมได้อย่างอิสระ (ไม่มีการส่งงาน)`;
+                const uploadSec = document.querySelector('.upload-section');
+                if(uploadSec) uploadSec.style.display = 'none';
             }
         }
 
