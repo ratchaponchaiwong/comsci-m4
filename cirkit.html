@@ -12,19 +12,22 @@
         header { background: rgba(0, 0, 0, 0.5); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid rgba(255,255,255,0.1); }
         .logo { font-size: 1.2rem; font-weight: 700; color: #60a5fa; text-decoration: none; }
         
-        .container { max-width: 1000px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; display: grid; grid-template-columns: 1fr; gap: 25px; }
+        .container { max-width: 1200px; margin: 30px auto; padding: 0 20px; width: 100%; flex: 1; display: grid; grid-template-columns: 1fr; gap: 25px; }
         
-        /* สไตล์กล่องต่างๆ */
         .card { background: #1e293b; border-radius: 16px; padding: 30px; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 25px rgba(0,0,0,0.2); }
         
-        /* ส่วนแสดงโจทย์ */
         .task-header { border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 20px; margin-bottom: 20px; }
         .task-title { font-size: 1.5rem; color: #a78bfa; margin-bottom: 10px; display: flex; align-items: center; gap: 10px; }
         .task-meta { display: flex; gap: 15px; font-size: 0.85rem; color: #94a3b8; }
         .task-desc { background: rgba(0,0,0,0.2); padding: 20px; border-radius: 12px; line-height: 1.6; font-size: 1.05rem; white-space: pre-wrap; margin-bottom: 20px; border-left: 4px solid #8b5cf6;}
+        
         .task-image { max-width: 100%; border-radius: 12px; margin-top: 15px; border: 1px solid rgba(255,255,255,0.2); display: none; }
         
-        /* ฟอร์มส่งงาน */
+        /* กล่องสำหรับฝังวงจร 3D */
+        #display-embed { margin-top: 20px; width: 100%; display: none; border-radius: 12px; overflow: hidden; background: #0f172a; border: 1px solid rgba(255,255,255,0.1); }
+        #display-embed p { color: #94a3b8; font-size: 0.85rem; text-align: center; margin-top: 10px !important; padding-bottom: 10px; }
+        #display-embed a { color: #8b5cf6; text-decoration: none; font-weight: 600; }
+        
         .form-group { margin-bottom: 20px; }
         label { display: block; margin-bottom: 8px; color: #60a5fa; font-weight: 500; }
         input, textarea { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid rgba(255,255,255,0.2); background: rgba(0,0,0,0.3); color: white; font-family: 'Prompt'; }
@@ -34,12 +37,11 @@
         .btn:hover { background: #2563eb; transform: translateY(-2px); }
         .btn-purple { background: #8b5cf6; } .btn-purple:hover { background: #7c3aed; }
         
-        /* Loading State */
         #loading-screen { text-align: center; padding: 50px; font-size: 1.2rem; color: #94a3b8; }
         #main-content { display: none; }
         
         @media (min-width: 900px) {
-            .container { grid-template-columns: 1fr 1fr; } /* แบ่ง 2 คอลัมน์ ซ้ายโจทย์ ขวาส่งงาน */
+            .container { grid-template-columns: 1fr 1fr; } 
         }
     </style>
 </head>
@@ -49,13 +51,13 @@
         <div id="user-info" style="font-size: 0.9rem; opacity: 0.8;"></div>
     </header>
 
-    <div id="loading-screen"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>กำลังโหลดข้อมูลใบงาน...</div>
+    <div id="loading-screen"><i class="fas fa-spinner fa-spin fa-2x"></i><br><br>กำลังโหลดแบบจำลอง 3D และใบงาน...</div>
 
     <div class="container" id="main-content">
         
         <div class="card" style="height: fit-content;">
             <div class="task-header">
-                <h2 class="task-title"><i class="fas fa-clipboard-list"></i> <span id="display-title">กำลังโหลด...</span></h2>
+                <h2 class="task-title"><i class="fas fa-microchip"></i> <span id="display-title">กำลังโหลด...</span></h2>
                 <div class="task-meta">
                     <span><i class="fas fa-clock"></i> กำหนดส่ง: <span id="display-date">-</span></span>
                     <span><i class="fas fa-star" style="color: #fbbf24;"></i> <span id="display-points">-</span> คะแนน</span>
@@ -64,14 +66,17 @@
             
             <h4 style="margin-bottom: 10px; color: #cbd5e1;">คำสั่ง / รายละเอียดงาน:</h4>
             <div class="task-desc" id="display-desc"></div>
+            
             <img id="display-img" class="task-image" src="" alt="ภาพประกอบโจทย์">
+            
+            <div id="display-embed"></div>
             
             <hr style="border-color: rgba(255,255,255,0.1); margin: 25px 0;">
             
             <h4 style="margin-bottom: 15px; color: #8b5cf6;"><i class="fas fa-tools"></i> พื้นที่ปฏิบัติงาน:</h4>
-            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px; line-height: 1.5;">คลิกปุ่มด้านล่างเพื่อเปิดเว็บ Cirkit Designer หากครูมีต้นแบบให้ ให้กดทำสำเนา (Duplicate) ก่อนเริ่มทำงาน</p>
-            <a href="https://app.cirkitdesigner.com/project/ed2a2132-5dc3-44d4-95e7-d4ec93fc3a73" id="cirkit-btn" target="_blank" class="btn btn-purple" style="text-decoration: none;">
-                <i class="fas fa-external-link-alt"></i> เปิดเว็บไซต์ Cirkit Designer
+            <p style="font-size: 0.9rem; opacity: 0.8; margin-bottom: 15px; line-height: 1.5;">หากคุณครูมีวงจรต้นแบบอยู่ด้านบน ให้นักเรียนคลิกปุ่ม <b>Edit this project in Cirkit Designer</b> ด้านใต้วงจร เพื่อทำสำเนาและแก้ไขเป็นผลงานของตนเอง</p>
+            <a href="https://app.cirkitdesigner.com/dashboard" target="_blank" class="btn btn-purple" style="text-decoration: none;">
+                <i class="fas fa-external-link-alt"></i> เปิดหน้าแรก Cirkit Designer
             </a>
         </div>
 
@@ -113,7 +118,6 @@
             await loadTaskData();
         };
 
-        // ฟังก์ชันดึงข้อมูลโจทย์มาแสดง
         async function loadTaskData() {
             try {
                 const res = await fetch(`${SCRIPT_URL}?action=readAll&t=${Date.now()}`);
@@ -132,17 +136,25 @@
                         document.getElementById('display-date').innerText = !isNaN(d.getTime()) ? `${d.getDate()}/${d.getMonth()+1}/${d.getFullYear()+543}` : dateStr.split('T')[0];
                     }
 
-                    // ถ้าระบบครูแนบลิงก์รูปมาให้ ก็แสดงรูปด้วย
+                    // 1. จัดการรูปภาพ (ถ้ามี)
                     const imgLink = task.ImageLink || task.image_link;
                     if (imgLink && imgLink.trim() !== '') {
                         document.getElementById('display-img').src = imgLink;
                         document.getElementById('display-img').style.display = 'block';
                     }
+
+                    // 2. 🌟 จัดการโค้ดฝังเว็บ Embed 3D (ถ้ามี) 🌟
+                    // ระบบจะค้นหาคอลัมน์ชื่อ EmbedCode หรือ EmbedLink 
+                    const embedCode = task.EmbedCode || task.embed_code || task.EmbedLink || task.embed_link || task['EmbedCode'];
+                    if (embedCode && embedCode.trim() !== '') {
+                        document.getElementById('display-embed').innerHTML = embedCode;
+                        document.getElementById('display-embed').style.display = 'block';
+                    }
+                    
                 } else {
                     document.getElementById('display-title').innerText = "ไม่พบข้อมูลกิจกรรม";
                 }
                 
-                // ปิดหน้าโหลด แสดงเนื้อหา
                 document.getElementById('loading-screen').style.display = 'none';
                 document.getElementById('main-content').style.display = 'grid';
                 
@@ -151,7 +163,6 @@
             }
         }
 
-        // ฟังก์ชันส่งงาน
         async function submitCirkitWork() {
             const cdLink = document.getElementById('cd-link').value.trim();
             const cdCode = document.getElementById('cd-code').value.trim();
